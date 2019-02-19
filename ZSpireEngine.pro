@@ -25,7 +25,8 @@ SOURCES += \
         src/engine.cpp
 
 HEADERS += \
-        headers/engine.h
+        headers/engine.h \
+    headers/vulkan/zsvulkan.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
