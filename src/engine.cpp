@@ -1,7 +1,7 @@
 #include "../headers/engine.h"
 #include <iostream>
 
-ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win)
+ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win, ZSGAME_DESC* desc)
 {
     std::cout << "ZSPIRE Engine v0.1" << std::endl;
 
@@ -33,9 +33,12 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
         if(info->graphicsApi == OGL32){
             this->glcontext = SDL_GL_CreateContext(window);
         }
+        if(info->graphicsApi == VULKAN){
+            this->vkcontext.init(desc->app_label.c_str(), desc->app_version);
+        }
     }
 }
 
-void ZSpireEngine::setGame(ZSGAME_DESC* desc){
+void ZSpireEngine::loadGame(){
 
 }

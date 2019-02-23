@@ -9,6 +9,8 @@
 #include "vulkan/zsvulkan.h"
 
 enum ZSGAPI {OGL32, VULKAN};
+enum ZSRESTYPE {TYPE_BLOBS, TYPE_FILES};
+enum ZSPERSPECTIVE {PERSP_3D, PERSP_2D};
 
 typedef struct ZSENGINE_CREATE_INFO{
     char* appName; //String to store name of application
@@ -30,8 +32,15 @@ typedef struct ZSWINDOW_CREATE_INFO{
 }ZSWINDOW_CREATE_INFO;
 
 typedef struct ZSGAME_DESC{
-    char* game_dir;
-    int game_perspective;
+    std::string app_label;
+    int app_version;
+
+    std::string game_dir; //Game root directory
+    std::string resource_map_file_path; //Relative path to resource map (if blob mode)
+    ZSPERSPECTIVE game_perspective; //Perspective of game scenes
+    ZSRESTYPE resource_type; //Type of resource store
+    std::string startup_scene; //Relative path to scene, what loaded on startup
+
 }ZSGAME_DESC;
 
 class ZSpireEngine
@@ -41,9 +50,9 @@ private:
     SDL_GLContext glcontext;
     ZsVulkan vkcontext;
 public:
-    ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win);
+    ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win, ZSGAME_DESC* desc);
 
-    void setGame(ZSGAME_DESC* desc);
+    void loadGame();
 };
 
 #endif // ENGINE_H
