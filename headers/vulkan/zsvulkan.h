@@ -3,11 +3,17 @@
 
 #include "vulkan/vulkan.hpp"
 
+#include <vector>
+
 class ZsVulkan{
 private:
     VkInstance instance;
+    VkPhysicalDevice used_gpu;
+
+    std::vector<VkExtensionProperties> inst_extensions;
+    std::vector<VkPhysicalDevice> phys_devices_list;
 public:
-    void init(const char* app_name, int app_ver);
+    bool init(const char* app_name, int app_ver);
     ZsVulkan();
 };
 
