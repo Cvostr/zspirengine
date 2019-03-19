@@ -7,6 +7,9 @@
 #include <SDL2/SDL.h>
 
 #include "vulkan/zsvulkan.h"
+#include "render/zs-pipeline.h"
+#include "engine/resources.h"
+#include "world/World.h"
 
 enum ZSGAPI {OGL32, VULKAN};
 enum ZSRESTYPE {TYPE_BLOBS, TYPE_FILES};
@@ -46,9 +49,15 @@ typedef struct ZSGAME_DESC{
 class ZSpireEngine
 {
 private:
+    Engine::World* world;
+    EngineRenderPipeline* pipeline;
+    ResourceManager* resources;
+
     SDL_Window* window;
     SDL_GLContext glcontext;
     ZsVulkan vkcontext;
+
+    ZSGAME_DESC* desc;
 public:
     ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win, ZSGAME_DESC* desc);
 

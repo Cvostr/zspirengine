@@ -8,7 +8,7 @@ ZsVulkan::ZsVulkan(){
 bool ZsVulkan::init(const char* app_name, int app_ver){
     uint32_t num_extensions;
     vkEnumerateInstanceExtensionProperties(nullptr, &num_extensions, nullptr);
-    this->inst_properties.resize(num_extensions);
+    this->inst_extensions.resize(num_extensions);
     vkEnumerateInstanceExtensionProperties(nullptr, &num_extensions, this->inst_extensions.data());
 
     VkApplicationInfo vk_app_info = {};

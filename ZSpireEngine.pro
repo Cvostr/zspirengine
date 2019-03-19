@@ -23,11 +23,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         src/engine.cpp \
-    src/vulkan/zsvulkan.cpp
+    src/vulkan/zsvulkan.cpp \
+    src/render/zs-pipeline.cpp \
+    src/render/zs-shader.cpp \
+    src/render/zs-math.cpp \
+    src/engine/resources.cpp \
+    src/world/World.cpp
 
 HEADERS += \
         headers/engine.h \
-    headers/vulkan/zsvulkan.h
+    headers/vulkan/zsvulkan.h \
+    headers/render/zs-pipeline.h \
+    headers/render/zs-shader.h \
+    headers/render/zs-math.h \
+    headers/engine/resources.h \
+    headers/world/World.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

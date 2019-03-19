@@ -1,9 +1,12 @@
 #include "../headers/engine.h"
+#include <GL/glew.h>
 #include <iostream>
 
 ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win, ZSGAME_DESC* desc)
 {
     std::cout << "ZSPIRE Engine v0.1" << std::endl;
+
+    this->desc = desc;
 
     if(info->createWindow == true){ //we have to init window
         std::cout << "Opening SDL2 window" << std::endl;
@@ -32,6 +35,9 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
         this->window = SDL_CreateWindow(win->title, 0, 0, win->Width, win->Height, SDL_WIN_MODE); //Create window
         if(info->graphicsApi == OGL32){
             this->glcontext = SDL_GL_CreateContext(window);
+
+            glewExperimental = true;
+            if(!glewInit()) std::cout << "GLEW initialize failed" << std::endl;
         }
         if(info->graphicsApi == VULKAN){
             this->vkcontext.init(desc->app_label.c_str(), desc->app_version);
@@ -41,4 +47,13 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
 
 void ZSpireEngine::loadGame(){
 
+    this->pipeline = new EngineRenderPipeline;
+    this->resources = new ResourceManager;
+    this->world = new Engine::World;
+
+    world->loadFromFile(desc->game_dir + "/" + desc->startup_scene);
+
+    while(true){
+
+    }
 }
