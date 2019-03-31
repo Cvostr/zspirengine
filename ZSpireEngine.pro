@@ -28,7 +28,8 @@ SOURCES += \
     src/render/zs-shader.cpp \
     src/render/zs-math.cpp \
     src/engine/resources.cpp \
-    src/world/World.cpp
+    src/world/World.cpp \
+    src/world/go_properties.cpp
 
 HEADERS += \
         headers/engine.h \
@@ -37,7 +38,9 @@ HEADERS += \
     headers/render/zs-shader.h \
     headers/render/zs-math.h \
     headers/engine/resources.h \
-    headers/world/World.h
+    headers/world/World.h \
+    headers/world/go_properties.h \
+    headers/game.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

@@ -1,4 +1,5 @@
 #include "../headers/engine.h"
+#include "../headers/game.h"
 #include <GL/glew.h>
 #include <iostream>
 
@@ -47,11 +48,14 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
 
 void ZSpireEngine::loadGame(){
 
-    this->pipeline = new EngineRenderPipeline;
-    this->resources = new ResourceManager;
-    this->world = new Engine::World;
+    ZSGAME_DATA* data = new ZSGAME_DATA;
+    this->zsgame_ptr = static_cast<void*>(data);
 
-    world->loadFromFile(desc->game_dir + "/" + desc->startup_scene);
+    data->pipeline = new EngineRenderPipeline;
+    this->resources = new ResourceManager;
+    data->world = new Engine::World;
+
+    data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene);
 
     while(true){
 

@@ -12,10 +12,13 @@ private:
 
     std::vector<VkExtensionProperties> inst_extensions;
     std::vector<VkPhysicalDevice> phys_devices_list;
+    std::vector<VkPhysicalDeviceProperties> phys_devices_props;
 
-    VkDevice device;
+    VkPhysicalDevice selected_device;
+    VkDevice logicalDevice;
 public:
     bool init(const char* app_name, int app_ver);
+    void initDevice();
     ZsVulkan();
 };
 

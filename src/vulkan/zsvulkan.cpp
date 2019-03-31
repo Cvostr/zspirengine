@@ -35,9 +35,51 @@ bool ZsVulkan::init(const char* app_name, int app_ver){
 
     uint32_t gpus_count;
     vkEnumeratePhysicalDevices(instance, &gpus_count, nullptr);
+    //resize vectors
     phys_devices_list.resize(gpus_count);
+    phys_devices_props.resize(gpus_count);
     vkEnumeratePhysicalDevices(instance, &gpus_count, phys_devices_list.data());
+    //Get properties of all gpu
+    for(unsigned int gpu_i = 0; gpu_i < gpus_count; gpu_i ++){
+        VkPhysicalDevice device = this->phys_devices_list[gpu_i];
+        vkGetPhysicalDeviceProperties(device, &this->phys_devices_props[gpu_i]);
+    }
+    this->selected_device = phys_devices_list[0];
 
-
+    initDevice();
     return true;
+}
+
+void ZsVulkan::initDevice(){
+    std::vector<VkQueueFamilyProperties> qFamilyProps;
+    uint32_t qFamilyPropCount;
+
+    vkGetPhysicalDeviceQueueFamilyProperties(selected_device, &qFamilyPropCount, nullptr);
+    qFamilyProps.resize(qFamilyPropCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(selected_device, &qFamilyPropCount, &qFamilyProps[0]);
+
+    int family_index = -1;
+    VkDeviceQueueCreateInfo qCreateInfo = {};
+    for(unsigned int q_i = 0; q_i < qFamilyPropCount; q_i ++){
+        VkQueueFamilyProperties prop = qFamilyProps[q_i];
+        if((prop.queueFlags & VK_QUEUE_GRAPHICS_BIT) && family_index < 0)
+            family_index = q_i;
+    }
+    if(family_index > 0){ //if we found right queue family
+        qCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        qCreateInfo.pNext = nullptr;
+        qCreateInfo.queueFamilyIndex = static_cast<uint32_t>(family_index);
+        qCreateInfo.queueCount = 1;
+        qCreateInfo.flags = 0;
+    }
+
+    VkDeviceCreateInfo logical_gpu_create_info = {};
+    logical_gpu_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    logical_gpu_create_info.pNext = nullptr;
+    logical_gpu_create_info.flags = 0;
+    logical_gpu_create_info.queueCreateInfoCount = 1; //1 queue
+    logical_gpu_create_info.pQueueCreateInfos = &qCreateInfo;
+
+    vkCreateDevice(selected_device, &logical_gpu_create_info, nullptr, &logicalDevice);
+
 }
