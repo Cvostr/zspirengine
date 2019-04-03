@@ -49,6 +49,7 @@ class ZSpireEngine
 private:
     void* zsgame_ptr;
 
+    bool gameRuns;
 
     ResourceManager* resources;
 

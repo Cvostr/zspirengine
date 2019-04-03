@@ -47,6 +47,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
 }
 
 void ZSpireEngine::loadGame(){
+    gameRuns = true;
 
     ZSGAME_DATA* data = new ZSGAME_DATA;
     this->zsgame_ptr = static_cast<void*>(data);
@@ -57,7 +58,14 @@ void ZSpireEngine::loadGame(){
 
     data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene);
 
-    while(true){
+    while(gameRuns == true){
+
+        SDL_Event event;
+        while (SDL_PollEvent(&event)){
+            if (event.type == SDL_QUIT)  //If user caused SDL window to close
+                this->gameRuns = false;
+        }
 
     }
+    SDL_DestroyWindow(window); //Destroy SDL and opengl
 }

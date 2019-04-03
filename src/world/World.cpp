@@ -10,7 +10,25 @@ Engine::GameObjectLink::GameObjectLink(){
 }
 
 Engine::GameObject::GameObject(){
+    props_num = 0;
+}
 
+bool Engine::GameObject::addProperty(int property){
+    unsigned int props = static_cast<unsigned int>(this->props_num);
+    for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
+        GameObjectProperty* property_ptr = this->properties[prop_i];
+        if(property_ptr->type == property){ //If object already has one
+            return false; //Exit function
+        }
+    }
+    GameObjectProperty* _ptr = allocProperty(property);
+
+    //_ptr->go_link = this->getLinkToThisObject();
+    //_ptr->go_link.updLinkPtr();
+    //_ptr->world_ptr = this->world_ptr; //Assign pointer to world
+    //this->properties[props_num] = _ptr; //Store property in gameobject
+    //this->props_num += 1;
+    return true;
 }
 
 Engine::GameObject* Engine::World::getGameObjectByStrId(std::string id){
@@ -72,7 +90,7 @@ void Engine::World::loadFromFile(std::string file){
 
                 }
                 if(prefix.compare("G_PROPERTY") == 0){ //We found an property, zaeb*s'
-                    //object.loadProperty(&world_stream);
+                    obj.loadProperty(&stream);
                 }
             }
 

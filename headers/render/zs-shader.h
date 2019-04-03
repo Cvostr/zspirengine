@@ -2,14 +2,18 @@
 #define zs_shader
 
 #include "zs-math.h"
+
+#include <vulkan/vulkan.hpp>
+
 //#include "../../World/headers/zs-camera.h"
-//#include "../../World/headers/props/lightsource.h"
 
 namespace ZSPIRE {
+class VkShaderBracket;
+
 	class Shader {
 	protected:
 		unsigned int SHADER_ID;
-
+        VkShaderBracket* vulkan_shader;
 	public:
 
 		void Init();
@@ -36,6 +40,11 @@ namespace ZSPIRE {
 
         Shader(); //Construct to set isCreated var to false
 	};
+
+    class VkShaderBracket{
+        VkShaderModule vertexShader;
+        VkShaderModule fragmentShader;
+    };
 }
 
 
