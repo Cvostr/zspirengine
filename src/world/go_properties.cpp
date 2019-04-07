@@ -1,4 +1,5 @@
 #include "../../headers/world/go_properties.h"
+#include "../../headers/world/tile_properties.h"
 
 Engine::GameObjectProperty::GameObjectProperty(){
     type = GO_PROPERTY_TYPE_NONE;
@@ -23,11 +24,12 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
-       /* case GO_PROPERTY_TYPE_MESH:{
+        case GO_PROPERTY_TYPE_MESH:{
             MeshProperty* ptr = new MeshProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
+        /*
         case GO_PROPERTY_TYPE_LIGHTSOURCE:{
             LightsourceProperty* ptr = new LightsourceProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
@@ -53,6 +55,7 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
+        */
         case GO_PROPERTY_TYPE_TILE_GROUP:{
             TileGroupProperty* ptr = new TileGroupProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
@@ -62,7 +65,7 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             TileProperty* ptr = new TileProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
-        }*/
+        }
     }
     return _ptr;
 }
@@ -77,23 +80,26 @@ Engine::LabelProperty::LabelProperty(){
 }
 
 
+Engine::MeshProperty::MeshProperty(){
+    this->type = GO_PROPERTY_TYPE_MESH;
+}
+
 void Engine::GameObject::loadProperty(std::ifstream* world_stream){
     PROPERTY_TYPE type;
     world_stream->seekg(1, std::ofstream::cur); //Skip space
     world_stream->read(reinterpret_cast<char*>(&type), sizeof(int));
     //Spawn new property with readed type
-    //addProperty(type);
-    //GameObjectProperty* prop_ptr = getPropertyPtrByType(type); //get created property
+    addProperty(type);
+    GameObjectProperty* prop_ptr = getPropertyPtrByType(type); //get created property
     //since more than 1 properties same type can't be on one gameobject
-    /*switch(type){
+    switch(type){
         case GO_PROPERTY_TYPE_LABEL :{
             std::string label;
             *world_stream >> label;
             LabelProperty* lptr = static_cast<LabelProperty*>(prop_ptr);
-            this->label = &lptr->label; //Making GameObjects's pointer to string in label property
-            lptr->label = QString::fromStdString(label); //Write loaded string
-            lptr->list_item_ptr->setText(0, lptr->label); //Set text on widget
+            this->label_ptr = &lptr->label; //Making GameObjects's pointer to string in label property
+            lptr->label = label; //Write loaded string
             break;
         }
-    }*/
+    }
 }

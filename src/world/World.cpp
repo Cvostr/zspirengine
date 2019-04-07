@@ -9,8 +9,42 @@ Engine::GameObjectLink::GameObjectLink(){
     world_ptr = nullptr;
 }
 
+
+Engine::GameObject* Engine::GameObjectLink::updLinkPtr(){
+    if(world_ptr == nullptr) //If world not defined, exiting
+        return nullptr;
+    if(this->ptr != nullptr) //if pointer already calculated
+        if(this->obj_str_id.compare(ptr->str_id) == 0)
+            return ptr;
+
+    this->ptr = world_ptr->getGameObjectByStrId(this->obj_str_id);
+    return ptr;
+}
+
+bool Engine::GameObjectLink::isEmpty(){
+    if (this->world_ptr == nullptr) return true;
+    return false;
+}
+
+void Engine::GameObjectLink::crack(){
+    this->world_ptr = nullptr; //It will now pass isEmpty() check
+}
+
+
 Engine::GameObject::GameObject(){
     props_num = 0;
+    alive = true;
+
+    world_ptr = nullptr;
+}
+
+Engine::GameObjectLink Engine::GameObject::getLinkToThisObject(){
+    GameObjectLink link; //Definition of result link
+    link.obj_str_id = this->str_id; //Placing string id
+    link.world_ptr = this->world_ptr; //Placing world pointer
+
+    link.ptr = world_ptr->getGameObjectByStrId(link.obj_str_id);
+    return link;
 }
 
 bool Engine::GameObject::addProperty(int property){
@@ -23,12 +57,23 @@ bool Engine::GameObject::addProperty(int property){
     }
     GameObjectProperty* _ptr = allocProperty(property);
 
-    //_ptr->go_link = this->getLinkToThisObject();
-    //_ptr->go_link.updLinkPtr();
-    //_ptr->world_ptr = this->world_ptr; //Assign pointer to world
-    //this->properties[props_num] = _ptr; //Store property in gameobject
-    //this->props_num += 1;
+    _ptr->go_link = this->getLinkToThisObject();
+    _ptr->go_link.updLinkPtr();
+    _ptr->world_ptr = this->world_ptr; //Assign pointer to world
+    this->properties[props_num] = _ptr; //Store property in gameobject
+    this->props_num += 1;
     return true;
+}
+
+Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByType(PROPERTY_TYPE type){
+    unsigned int props = static_cast<unsigned int>(this->props_num);
+    for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
+        GameObjectProperty* property_ptr = this->properties[prop_i];
+        if(property_ptr->type == type){ //If object already has one
+            return property_ptr; //return it
+        }
+    }
+    return nullptr;
 }
 
 Engine::GameObject* Engine::World::getGameObjectByStrId(std::string id){
@@ -39,6 +84,28 @@ Engine::GameObject* Engine::World::getGameObjectByStrId(std::string id){
             return obj_ptr; //Return founded object
     }
     return nullptr; //if we haven't found one
+}
+
+Engine::GameObject* Engine::World::addObject(GameObject obj){
+    unsigned int free_index = this->objects.size();
+    for(unsigned int obj_i = 0; obj_i < this->objects.size(); obj_i ++){
+        GameObject* obj_ptr = &this->objects[obj_i];
+        if(obj_ptr->alive == false){
+            free_index = static_cast<int>(obj_i);
+        }
+    }
+
+    if(free_index == objects.size()){ //all indeces are busy
+        this->objects.push_back(obj);
+    }else{
+        this->objects[free_index] = obj;
+    }
+
+    GameObject* obj_ptr = &this->objects[free_index];
+
+    obj_ptr->world_ptr = this;
+
+    return obj_ptr;
 }
 
 void Engine::World::loadFromFile(std::string file){
@@ -61,6 +128,7 @@ void Engine::World::loadFromFile(std::string file){
 
         if(prefix.compare("G_OBJECT") == 0){ //if it is game object
             GameObject obj;
+            obj.world_ptr = this; //Assign pointer to world
             stream >> obj.str_id;
 
             stream.seekg(1, std::ofstream::cur);
@@ -94,7 +162,7 @@ void Engine::World::loadFromFile(std::string file){
                 }
             }
 
-            this->objects.push_back(obj);
+            this->addObject(obj);
         }
     }
 

@@ -29,7 +29,8 @@ SOURCES += \
     src/render/zs-math.cpp \
     src/engine/resources.cpp \
     src/world/World.cpp \
-    src/world/go_properties.cpp
+    src/world/go_properties.cpp \
+    src/world/GoProperty/tile_properties.cpp
 
 HEADERS += \
         headers/engine.h \
@@ -40,7 +41,8 @@ HEADERS += \
     headers/engine/resources.h \
     headers/world/World.h \
     headers/world/go_properties.h \
-    headers/game.h
+    headers/game.h \
+    headers/world/tile_properties.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

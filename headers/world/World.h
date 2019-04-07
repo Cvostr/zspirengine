@@ -49,6 +49,8 @@ public:
     void loadFromFile(std::string file);
     GameObject* getGameObjectByStrId(std::string id);
 
+    GameObject* addObject(GameObject obj);
+
     World();
 };
 
@@ -56,7 +58,11 @@ class GameObject{
 public:
     std::string str_id; //Object's unique string ID
     std::string* label_ptr;
+
+    bool alive;
+
     unsigned int props_num;
+    World* world_ptr; //pointer to world, when object placed
 
     GO_RENDER_TYPE render_type;
 
@@ -67,6 +73,9 @@ public:
 
     GameObjectProperty* allocProperty(int type);
     bool addProperty(int property); //Adds property with property ID
+    GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
+
+    GameObjectLink getLinkToThisObject();
 
     GameObject();
 };
@@ -76,6 +85,9 @@ public:
 class GameObjectProperty{
 public:
     PROPERTY_TYPE type;
+    GameObjectLink go_link;
+
+    World* world_ptr;
 
     virtual void copyTo(GameObjectProperty* dest);
 
