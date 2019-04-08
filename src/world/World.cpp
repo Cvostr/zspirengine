@@ -34,6 +34,7 @@ void Engine::GameObjectLink::crack(){
 Engine::GameObject::GameObject(){
     props_num = 0;
     alive = true;
+    hasParent = false;
 
     world_ptr = nullptr;
 }
@@ -63,6 +64,10 @@ bool Engine::GameObject::addProperty(int property){
     this->properties[props_num] = _ptr; //Store property in gameobject
     this->props_num += 1;
     return true;
+}
+
+Engine::TransformProperty* Engine::GameObject::getTransformProperty(){
+    return static_cast<TransformProperty*>(getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
 }
 
 Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByType(PROPERTY_TYPE type){
@@ -163,6 +168,16 @@ void Engine::World::loadFromFile(std::string file){
             }
 
             this->addObject(obj);
+        }
+    }
+    //Now iterate over all objects and set depencies
+    for(unsigned int obj_i = 0; obj_i < this->objects.size(); obj_i ++){
+        GameObject* obj_ptr = &this->objects[obj_i];
+        for(unsigned int chi_i = 0; chi_i < obj_ptr->children.size(); chi_i ++){ //Now iterate over all children
+            GameObjectLink* child_ptr = &obj_ptr->children[chi_i];
+            GameObject* child_go_ptr = child_ptr->updLinkPtr();
+            child_go_ptr->parent = obj_ptr->getLinkToThisObject();
+            child_go_ptr->hasParent = true;
         }
     }
 

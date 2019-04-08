@@ -28,6 +28,8 @@ class GameObject;
 class World;
 class GameObjectProperty;
 
+class TransformProperty;
+
 class GameObjectLink{
 public:
     Engine::World* world_ptr;
@@ -60,11 +62,14 @@ public:
     std::string* label_ptr;
 
     bool alive;
+    bool hasParent;
 
-    unsigned int props_num;
+    unsigned int props_num; //amount of properties
     World* world_ptr; //pointer to world, when object placed
 
     GO_RENDER_TYPE render_type;
+
+    GameObjectLink parent;
 
     std::vector<GameObjectLink> children;
     GameObjectProperty* properties[OBJ_PROPS_SIZE];
@@ -75,6 +80,8 @@ public:
     bool addProperty(int property); //Adds property with property ID
     GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
 
+    TransformProperty* getTransformProperty();
+
     GameObjectLink getLinkToThisObject();
 
     GameObject();
@@ -84,7 +91,7 @@ public:
 
 class GameObjectProperty{
 public:
-    PROPERTY_TYPE type;
+    PROPERTY_TYPE type; //type of property
     GameObjectLink go_link;
 
     World* world_ptr;
@@ -109,10 +116,6 @@ public:
     ZSVECTOR3 translation;
     ZSVECTOR3 scale;
     ZSVECTOR3 rotation;
-    //Absolute values
-    ZSVECTOR3 _last_translation;
-    ZSVECTOR3 _last_scale;
-    ZSVECTOR3 _last_rotation;
 
     void updateMat();
     void getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r);
