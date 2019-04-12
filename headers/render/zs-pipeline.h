@@ -11,8 +11,8 @@ enum GO_RENDER_TYPE {
 };
 
 class EngineRenderPipeline{
-    ZSPIRE::Shader tile_shader;
-    ZSPIRE::Shader deffered_shader;
+    Engine::Shader tile_shader;
+    Engine::Shader deffered_shader;
 
     void initShaders();
 public:

@@ -65,12 +65,14 @@ void ZsVulkan::initDevice(){
         if((prop.queueFlags & VK_QUEUE_GRAPHICS_BIT) && family_index < 0)
             family_index = q_i;
     }
-    if(family_index > 0){ //if we found right queue family
+    if(family_index >= 0){ //if we found right queue family
         qCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         qCreateInfo.pNext = nullptr;
         qCreateInfo.queueFamilyIndex = static_cast<uint32_t>(family_index);
         qCreateInfo.queueCount = 1;
         qCreateInfo.flags = 0;
+        float priority = 1.0f;
+        qCreateInfo.pQueuePriorities = &priority;
     }
 
     VkDeviceCreateInfo logical_gpu_create_info = {};
@@ -79,7 +81,9 @@ void ZsVulkan::initDevice(){
     logical_gpu_create_info.flags = 0;
     logical_gpu_create_info.queueCreateInfoCount = 1; //1 queue
     logical_gpu_create_info.pQueueCreateInfos = &qCreateInfo;
-
+    //create logical device
     vkCreateDevice(selected_device, &logical_gpu_create_info, nullptr, &logicalDevice);
+    //get graphics queue
+    vkGetDeviceQueue(logicalDevice, static_cast<uint32_t>(family_index), 0, &this->graphicsQueue);
 
 }

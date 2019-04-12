@@ -30,7 +30,8 @@ SOURCES += \
     src/engine/resources.cpp \
     src/world/World.cpp \
     src/world/go_properties.cpp \
-    src/world/GoProperty/tile_properties.cpp
+    src/world/GoProperty/tile_properties.cpp \
+    src/world/GoProperty/go_filestream.cpp
 
 HEADERS += \
         headers/engine.h \

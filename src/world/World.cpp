@@ -37,6 +37,10 @@ Engine::GameObject::GameObject(){
     hasParent = false;
 
     world_ptr = nullptr;
+
+    for(int prop_i = 0; prop_i < OBJ_PROPS_SIZE; prop_i ++){ //iterate over all property pointers and clear them
+        properties[prop_i] = nullptr;
+    }
 }
 
 Engine::GameObjectLink Engine::GameObject::getLinkToThisObject(){

@@ -9,17 +9,16 @@
 #include <sstream>
 #include <iostream>
 
-int cur_shader_gl_id = -1;
 
-ZSPIRE::Shader::Shader(){
+Engine::Shader::Shader(){
     isCreated = false; //Not created by default
 }
 
-void ZSPIRE::Shader::Init() {
+void Engine::Shader::Init() {
     this->SHADER_ID = glCreateProgram(); //Call OGL function to create new shader
 }
 
-void GLcheckCompileErrors(unsigned int shader, const char* type, const char* filepath = nullptr)
+void Engine::Shader::GLcheckCompileErrors(unsigned int shader, const char* type, const char* filepath)
 {
 
 	GLint success;
@@ -49,7 +48,7 @@ void GLcheckCompileErrors(unsigned int shader, const char* type, const char* fil
 	}
 }
 
-bool readShaderFile(const char* path, char* result) {
+bool Engine::Shader::readShaderFile(const char* path, char* result) {
 
 	std::string res_data;
 
@@ -74,23 +73,21 @@ bool readShaderFile(const char* path, char* result) {
 	return true;
 }
 
-bool ZSPIRE::Shader::compileFromFile(const char* VSpath, const char* FSpath){
+bool Engine::Shader::compileFromFile(const char* VSpath, const char* FSpath, ZSGAPI g_api){
 	char vsp[64];
 	char fsp[64];
 
 	strcpy(vsp, VSpath);
 	strcpy(fsp, FSpath);
 
-
 	std::cout << "OGL: Compiling shader " << vsp << " " << fsp << std::endl;
 
 	Init();
 
-	int VS = glCreateShader(GL_VERTEX_SHADER);
-	int FS = glCreateShader(GL_FRAGMENT_SHADER);
 
-	GLchar vs_data[4096];
-	GLchar fs_data[4096];
+
+    GLchar vs_data[4096];
+    GLchar fs_data[4096];
 
 	const GLchar* vs = &vs_data[0];
 	const GLchar* fs = &fs_data[0];
@@ -98,63 +95,63 @@ bool ZSPIRE::Shader::compileFromFile(const char* VSpath, const char* FSpath){
 	readShaderFile(vsp, &vs_data[0]);
 	readShaderFile(fsp, &fs_data[0]);
 
-	glShaderSource(VS, 1, &vs, NULL); //Setting shader code text on vs
-	glShaderSource(FS, 1, &fs, NULL); //Setting shader code text on fs
+    if(g_api == OGL32){
+        int VS = glCreateShader(GL_VERTEX_SHADER);
+        int FS = glCreateShader(GL_FRAGMENT_SHADER);
 
-	glCompileShader(VS); //Compile VS shader code
-	GLcheckCompileErrors(VS, "VERTEX", VSpath); //Check vertex errors
-	glCompileShader(FS); //Compile FS shader code
-	GLcheckCompileErrors(FS, "FRAGMENT", FSpath); //Check fragment compile errors
+        glShaderSource(VS, 1, &vs, NULL); //Setting shader code text on vs
+        glShaderSource(FS, 1, &fs, NULL); //Setting shader code text on fs
 
-	glAttachShader(this->SHADER_ID, VS);
-	glAttachShader(this->SHADER_ID, FS);
+        glCompileShader(VS); //Compile VS shader code
+        GLcheckCompileErrors(VS, "VERTEX", VSpath); //Check vertex errors
+        glCompileShader(FS); //Compile FS shader code
+        GLcheckCompileErrors(FS, "FRAGMENT", FSpath); //Check fragment compile errors
 
-	glLinkProgram(this->SHADER_ID);
-	GLcheckCompileErrors(SHADER_ID, "PROGRAM");
-	//Clear shaders, we don't need them anymore
-	glDeleteShader(VS);
-	glDeleteShader(FS);
+        glAttachShader(this->SHADER_ID, VS);
+        glAttachShader(this->SHADER_ID, FS);
 
-	Use();
-	setGLuniformInt("diffuse", 0);
-    setGLuniformInt("normal_map", 1);
-    setGLuniformInt("specular_map", 2);
-    setGLuniformInt("transparent", 5);
+        glLinkProgram(this->SHADER_ID);
+        GLcheckCompileErrors(SHADER_ID, "PROGRAM");
+        //Clear shaders, we don't need them anymore
+        glDeleteShader(VS);
+        glDeleteShader(FS);
 
+        Use();
+        setGLuniformInt("diffuse", 0);
+        setGLuniformInt("normal_map", 1);
+        setGLuniformInt("specular_map", 2);
+        setGLuniformInt("transparent", 5);
 
-	setGLuniformInt("sprite_map", 0);
-	setGLuniformInt("glyph_map", 1);
+        setGLuniformInt("tDiffuse", 10);
+        setGLuniformInt("tNormal", 11);
+        setGLuniformInt("tPos", 12);
+        setGLuniformInt("tTransparent", 13);
 
-    setGLuniformInt("tDiffuse", 10);
-    setGLuniformInt("tNormal", 11);
-    setGLuniformInt("tPos", 12);
-    setGLuniformInt("tTransparent", 13);
+    }
+    if(g_api == VULKAN){
+        vulkan_shader = new VkShaderBracket; //allocate bracket
 
-	setGLuniformInt("shadow0", 20);
-
+    }
     this->isCreated = true; //Shader created & compiled now
 	return true;
 
 }
 
-void ZSPIRE::Shader::Destroy() {
+void Engine::Shader::Destroy() {
 	glDeleteProgram(this->SHADER_ID);
     this->isCreated = false;
 }
 
-void ZSPIRE::Shader::Use() {
-    if(cur_shader_gl_id == this->SHADER_ID) return;
-
+void Engine::Shader::Use() {
 	glUseProgram(this->SHADER_ID);
-    cur_shader_gl_id = this->SHADER_ID;
 }
 
-void ZSPIRE::Shader::setGLuniformMat4x4(const char* uniform_str, ZSMATRIX4x4 value) {
+void Engine::Shader::setGLuniformMat4x4(const char* uniform_str, ZSMATRIX4x4 value) {
 	unsigned int uniform_id = glGetUniformLocation(this->SHADER_ID, uniform_str);
 	glUniformMatrix4fv(uniform_id, 1, GL_FALSE, &value.m[0][0]);
 }
 
-void ZSPIRE::Shader::setTransform(ZSMATRIX4x4 transform){
+void Engine::Shader::setTransform(ZSMATRIX4x4 transform){
 	setGLuniformMat4x4("object_transform", transform);
 }
 /*
@@ -165,49 +162,49 @@ void ZSPIRE::Shader::setCamera(Camera* cam, bool sendPos){
         setGLuniformVec3("cam_position", cam->getCameraPosition());
 }
 */
-void ZSPIRE::Shader::setGLuniformColor(const char* uniform_str, ZSRGBCOLOR value) {
+void Engine::Shader::setGLuniformColor(const char* uniform_str, ZSRGBCOLOR value) {
 
 	unsigned int uniform_id = glGetUniformLocation(this->SHADER_ID, uniform_str);
 	glUniform3f(uniform_id, value.gl_r, value.gl_g, value.gl_b);
 
 }
-void ZSPIRE::Shader::setGLuniformFloat(const char* uniform_str, float value) {
+void Engine::Shader::setGLuniformFloat(const char* uniform_str, float value) {
 
 	unsigned int uniform_id = glGetUniformLocation(this->SHADER_ID, uniform_str);
 	glUniform1f(uniform_id, value);
 
 }
 
-void ZSPIRE::Shader::setGLuniformVec3(const char* uniform_str, ZSVECTOR3 value){
+void Engine::Shader::setGLuniformVec3(const char* uniform_str, ZSVECTOR3 value){
 
 	unsigned int uniform_id = glGetUniformLocation(this->SHADER_ID, uniform_str);
 	glUniform3f(uniform_id, value.X, value.Y, value.Z);
 
 }
 
-void ZSPIRE::Shader::setGLuniformVec4(const char* uniform_str, ZSVECTOR4 value){
+void Engine::Shader::setGLuniformVec4(const char* uniform_str, ZSVECTOR4 value){
 
     unsigned int uniform_id = glGetUniformLocation(this->SHADER_ID, uniform_str);
     glUniform4f(uniform_id, value.X, value.Y, value.Z, value.W);
 
 }
 
-void ZSPIRE::Shader::setGLuniformInt(const char* uniform_str, int value) {
+void Engine::Shader::setGLuniformInt(const char* uniform_str, int value) {
 
 	unsigned int uniform_id = glGetUniformLocation(this->SHADER_ID, uniform_str);
 	glUniform1i(uniform_id, value);
 
 }
 
-void ZSPIRE::Shader::setHasDiffuseTextureProperty(bool hasDiffuseMap){
+void Engine::Shader::setHasDiffuseTextureProperty(bool hasDiffuseMap){
 	this->setGLuniformInt("hasDiffuseMap", (int)hasDiffuseMap);
 }
 
-void ZSPIRE::Shader::setHasNormalTextureProperty(bool hasNormalMap){
+void Engine::Shader::setHasNormalTextureProperty(bool hasNormalMap){
 	this->setGLuniformInt("hasNormalMap", (int)hasNormalMap);
 }
 
-void ZSPIRE::Shader::setTextureCountProperty(int tX, int tY) {
+void Engine::Shader::setTextureCountProperty(int tX, int tY) {
 	this->setGLuniformInt("textures_x", tX);
 	this->setGLuniformInt("textures_y", tY);
 }

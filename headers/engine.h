@@ -10,8 +10,7 @@
 #include "engine/resources.h"
 
 enum ZSGAPI {OGL32, VULKAN};
-enum ZSRESTYPE {TYPE_BLOBS, TYPE_FILES};
-enum ZSPERSPECTIVE {PERSP_3D, PERSP_2D};
+enum ZSPERSPECTIVE {PERSP_3D = 3, PERSP_2D = 2};
 
 typedef struct ZSENGINE_CREATE_INFO{
     char* appName; //String to store name of application
@@ -39,7 +38,6 @@ typedef struct ZSGAME_DESC{
     std::string game_dir; //Game root directory
     std::string resource_map_file_path; //Relative path to resource map (if blob mode)
     ZSPERSPECTIVE game_perspective; //Perspective of game scenes
-    ZSRESTYPE resource_type; //Type of resource store
     std::string startup_scene; //Relative path to scene, what loaded on startup
 
 }ZSGAME_DESC;

@@ -4,10 +4,11 @@
 #include "zs-math.h"
 
 #include <vulkan/vulkan.hpp>
+#include "../engine.h"
 
 //#include "../../World/headers/zs-camera.h"
 
-namespace ZSPIRE {
+namespace Engine {
 class VkShaderBracket;
 
 	class Shader {
@@ -17,7 +18,9 @@ class VkShaderBracket;
 	public:
 
 		void Init();
-		bool compileFromFile(const char* VSpath, const char* FSpath);
+        bool compileFromFile(const char* VSpath, const char* FSpath, ZSGAPI g_api);
+        void GLcheckCompileErrors(unsigned int shader, const char* type, const char* filepath = nullptr);
+        bool readShaderFile(const char* path, char* result);
 		void Use();
 		void Destroy();
 
