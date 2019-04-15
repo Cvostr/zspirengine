@@ -61,7 +61,7 @@ void ZSpireEngine::loadGame(){
 
     data->pipeline = new EngineRenderPipeline;
     this->resources = new ResourceManager;
-    data->world = new Engine::World;
+    data->world = new Engine::World(this->resources);
 
     this->resources->loadResourcesTable(this->desc->resource_map_file_path);
     data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene);

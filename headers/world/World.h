@@ -5,6 +5,8 @@
 #include <vector>
 #include <fstream>
 
+#include "../engine/resources.h"
+
 #include "../render/zs-pipeline.h"
 
 #define OBJ_PROPS_SIZE 11
@@ -46,6 +48,7 @@ public:
 class World{
 private:
     std::vector<GameObject> objects;
+    ResourceManager* manager;
 public:
 
     void loadFromFile(std::string file);
@@ -53,7 +56,7 @@ public:
 
     GameObject* addObject(GameObject obj);
 
-    World();
+    World(ResourceManager* manager);
 };
 
 class GameObject{

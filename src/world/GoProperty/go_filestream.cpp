@@ -45,5 +45,22 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
 
             break;
         }
+        case GO_PROPERTY_TYPE_TILE:{
+            TileProperty* lptr = static_cast<TileProperty*>(prop_ptr);
+            *world_stream >> lptr->diffuse_relpath;
+
+            *world_stream >> lptr->transparent_relpath;
+
+           // lptr->updTexturePtr();
+
+            world_stream->seekg(1, std::ofstream::cur);
+            world_stream->read(reinterpret_cast<char*>(&lptr->anim_property.isAnimated), sizeof(bool));
+            if(lptr->anim_property.isAnimated){ //if animated, then write animation properties
+                world_stream->read(reinterpret_cast<char*>(&lptr->anim_property.framesX), sizeof(int));
+                world_stream->read(reinterpret_cast<char*>(&lptr->anim_property.framesY), sizeof(int));
+            }
+
+            break;
+        }
     }
 }

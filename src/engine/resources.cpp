@@ -1,6 +1,10 @@
 #include "../../headers/engine/resources.h"
 #include <fstream>
 
+ZsResource::ZsResource(){
+    this->resource_type = TYPE_NONE;
+}
+
 TextureResource::TextureResource(){
     this->resource_type = TYPE_TEXTURE;
 }
@@ -63,4 +67,12 @@ void ResourceManager::loadResourcesTable(std::string resmap_path){
         }
     }
     file_stream.close();
+}
+
+TextureResource* ResourceManager::getTextureByLabel(std::string label){
+    for(unsigned int res = 0; res < this->resources.size(); res ++){
+        ZsResource* resource_ptr = this->resources[res];
+        if(resource_ptr->resource_type == TYPE_TEXTURE && resource_ptr->rel_path.compare(label) == 0)
+            return static_cast<TextureResource*>(resource_ptr);
+    }
 }
