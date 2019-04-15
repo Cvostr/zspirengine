@@ -3,11 +3,16 @@
 #include <GL/glew.h>
 #include <iostream>
 
+ZSpireEngine* engine_ptr;
+
 ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win, ZSGAME_DESC* desc)
 {
-    std::cout << "ZSPIRE Engine v0.1" << std::endl;
+    engine_ptr = this;
 
+    std::cout << "ZSPIRE Engine v0.1" << std::endl;
+    //Store info structures
     this->desc = desc;
+    this->engine_info = info;
 
     if(info->createWindow == true){ //we have to init window
         std::cout << "Opening SDL2 window" << std::endl;
@@ -29,6 +34,8 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
             SDL_WIN_MODE = SDL_WINDOW_OPENGL; //Set window mode to OpenGL
 
             std::cout << "OpenGL version : 3.2 core" << std::endl;
+        }else{
+            SDL_WIN_MODE = SDL_WINDOW_VULKAN; //Set window mode to OpenGL
         }
         SDL_DisplayMode current;
         SDL_GetCurrentDisplayMode(0, &current);
@@ -41,7 +48,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
             if(!glewInit()) std::cout << "GLEW initialize failed" << std::endl;
         }
         if(info->graphicsApi == VULKAN){
-            this->vkcontext.init(desc->app_label.c_str(), desc->app_version);
+            this->vkcontext.init(desc->app_label.c_str(), desc->app_version, this->window);
         }
     }
 }
@@ -56,6 +63,7 @@ void ZSpireEngine::loadGame(){
     this->resources = new ResourceManager;
     data->world = new Engine::World;
 
+    this->resources->loadResourcesTable(this->desc->resource_map_file_path);
     data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene);
 
     while(gameRuns == true){

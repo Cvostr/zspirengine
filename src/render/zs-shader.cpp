@@ -73,7 +73,7 @@ bool Engine::Shader::readShaderFile(const char* path, char* result) {
 	return true;
 }
 
-bool Engine::Shader::compileFromFile(const char* VSpath, const char* FSpath, ZSGAPI g_api){
+bool Engine::Shader::compileFromFile(const char* VSpath, const char* FSpath, ZSpireEngine* engine){
 	char vsp[64];
 	char fsp[64];
 
@@ -81,9 +81,6 @@ bool Engine::Shader::compileFromFile(const char* VSpath, const char* FSpath, ZSG
 	strcpy(fsp, FSpath);
 
 	std::cout << "OGL: Compiling shader " << vsp << " " << fsp << std::endl;
-
-	Init();
-
 
 
     GLchar vs_data[4096];
@@ -95,7 +92,9 @@ bool Engine::Shader::compileFromFile(const char* VSpath, const char* FSpath, ZSG
 	readShaderFile(vsp, &vs_data[0]);
 	readShaderFile(fsp, &fs_data[0]);
 
-    if(g_api == OGL32){
+    if(engine->engine_info->graphicsApi == OGL32){
+        Init();
+
         int VS = glCreateShader(GL_VERTEX_SHADER);
         int FS = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -128,7 +127,7 @@ bool Engine::Shader::compileFromFile(const char* VSpath, const char* FSpath, ZSG
         setGLuniformInt("tTransparent", 13);
 
     }
-    if(g_api == VULKAN){
+    if(engine->engine_info->graphicsApi == VULKAN){
         vulkan_shader = new VkShaderBracket; //allocate bracket
 
     }

@@ -5,11 +5,19 @@ ZsVulkan::ZsVulkan(){
  //Nothing much to do
 }
 
-bool ZsVulkan::init(const char* app_name, int app_ver){
-    uint32_t num_extensions;
-    vkEnumerateInstanceExtensionProperties(nullptr, &num_extensions, nullptr);
-    this->inst_extensions.resize(num_extensions);
-    vkEnumerateInstanceExtensionProperties(nullptr, &num_extensions, this->inst_extensions.data());
+bool ZsVulkan::init(const char* app_name, int app_ver, SDL_Window* window){
+    this->window_ptr = window; //assign window pointer
+
+    unsigned int ext_count;
+    if (!SDL_Vulkan_GetInstanceExtensions(window, &ext_count, nullptr)) return false;
+
+    std::vector<const char*> extensions = {
+        VK_EXT_DEBUG_REPORT_EXTENSION_NAME // Sample additional extension
+    };
+    size_t additional_extension_count = extensions.size();
+    extensions.resize(additional_extension_count + ext_count);
+
+    if (!SDL_Vulkan_GetInstanceExtensions(window, &ext_count, extensions.data() + additional_extension_count)) return false;
 
     VkApplicationInfo vk_app_info = {};
     vk_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -24,8 +32,8 @@ bool ZsVulkan::init(const char* app_name, int app_ver){
     vk_inst_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     vk_inst_create_info.pNext = nullptr;
     vk_inst_create_info.pApplicationInfo = &vk_app_info;
-    //vk_inst_create_info.enabledExtensionCount = num_extensions;
-    //vk_inst_create_info.ppEnabledExtensionNames
+    vk_inst_create_info.enabledExtensionCount = extensions.size();
+    vk_inst_create_info.ppEnabledExtensionNames = extensions.data();
 
     std::cout << "Creating Vulkan Instance" << std::endl;
     if(vkCreateInstance(&vk_inst_create_info, nullptr, &this->instance) != VK_SUCCESS){
@@ -47,6 +55,7 @@ bool ZsVulkan::init(const char* app_name, int app_ver){
     this->selected_device = phys_devices_list[0];
 
     initDevice();
+    initSurface();
     return true;
 }
 
@@ -59,11 +68,19 @@ void ZsVulkan::initDevice(){
     vkGetPhysicalDeviceQueueFamilyProperties(selected_device, &qFamilyPropCount, &qFamilyProps[0]);
 
     int family_index = -1;
+    int present_family_index = -1;
+
     VkDeviceQueueCreateInfo qCreateInfo = {};
+    //VkDeviceCreateInfo
+
     for(unsigned int q_i = 0; q_i < qFamilyPropCount; q_i ++){
         VkQueueFamilyProperties prop = qFamilyProps[q_i];
         if((prop.queueFlags & VK_QUEUE_GRAPHICS_BIT) && family_index < 0)
             family_index = q_i;
+        bool canPresent = false;
+        if(vkGetPhysicalDeviceSurfaceSupportKHR(device, q_i, surface, &canPresent)){
+            present_family_index = q_i;
+        }
     }
     if(family_index >= 0){ //if we found right queue family
         qCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -86,4 +103,10 @@ void ZsVulkan::initDevice(){
     //get graphics queue
     vkGetDeviceQueue(logicalDevice, static_cast<uint32_t>(family_index), 0, &this->graphicsQueue);
 
+}
+
+void ZsVulkan::initSurface(){
+    if(!SDL_Vulkan_CreateSurface(window_ptr, instance, &this->vk_surface)){
+        std::cout << "Can't create Vulkan Window Surface. Terminating..." << std::endl;
+    }
 }

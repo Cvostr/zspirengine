@@ -11,13 +11,16 @@ public:
     RESTYPE resource_type; //Type of resource
 
     std::string rel_path; //Path to resource
+
+    int64_t offset;
+    int size;
 };
 
 class ResourceManager{
 private:
-    std::vector<ZsResource> resources;
+    std::vector<ZsResource*> resources;
 public:
-    //void lookForResources(std::string rootDir);
+    void loadResourcesTable(std::string resmap_path);
 };
 
 class TextureResource : public ZsResource{
@@ -28,6 +31,11 @@ public:
 class MeshResource : public ZsResource{
 public:
     MeshResource();
+};
+
+class AudioResource : public ZsResource{
+public:
+    AudioResource();
 };
 
 #endif

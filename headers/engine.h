@@ -54,9 +54,10 @@ private:
     SDL_Window* window;
     SDL_GLContext glcontext;
     ZsVulkan vkcontext;
-
-    ZSGAME_DESC* desc;
 public:
+    ZSGAME_DESC* desc;
+    ZSENGINE_CREATE_INFO* engine_info;
+
     ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win, ZSGAME_DESC* desc);
 
     void loadGame();
