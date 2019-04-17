@@ -5,19 +5,34 @@ ZsVulkan::ZsVulkan(){
  //Nothing much to do
 }
 
+static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+    void* pUserData) {
+    std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+    return VK_FALSE;
+}
+
 const std::vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-bool ZsVulkan::init(const char* app_name, int app_ver, SDL_Window* window){
+const std::vector<const char*> validationLayers = {
+    "VK_LAYER_LUNARG_standard_validation"
+};
+
+std::vector<const char*> extensions = {
+    VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+    "VK_EXT_debug_report"
+};
+
+bool ZsVulkan::init(bool validate, const char* app_name, int app_ver, SDL_Window* window, ZSWINDOW_CREATE_INFO* win_info){
     this->window_ptr = window; //assign window pointer
 
     unsigned int ext_count;
     if (!SDL_Vulkan_GetInstanceExtensions(window, &ext_count, nullptr)) return false;
 
-    std::vector<const char*> extensions = {
-        VK_EXT_DEBUG_REPORT_EXTENSION_NAME // Sample additional extension
-    };
+
     size_t additional_extension_count = extensions.size();
     extensions.resize(additional_extension_count + ext_count);
 
@@ -38,11 +53,30 @@ bool ZsVulkan::init(const char* app_name, int app_ver, SDL_Window* window){
     vk_inst_create_info.pApplicationInfo = &vk_app_info;
     vk_inst_create_info.enabledExtensionCount = extensions.size();
     vk_inst_create_info.ppEnabledExtensionNames = extensions.data();
+    if(validate){
+        vk_inst_create_info.enabledLayerCount = validationLayers.size();
+        vk_inst_create_info.ppEnabledLayerNames = validationLayers.data();
+    }
 
     std::cout << "Creating Vulkan Instance" << std::endl;
     if(vkCreateInstance(&vk_inst_create_info, nullptr, &this->instance) != VK_SUCCESS){
         std::cout << "Can't create Vulkan Instance. Terminating" << std::endl;
         return false;
+    }
+
+    if(validate){
+        VkDebugUtilsMessengerCreateInfoEXT createInfo = {};
+        createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        createInfo.pNext = nullptr;
+        createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        createInfo.pfnUserCallback = debugCallback;
+        createInfo.pUserData = nullptr; // Optional
+
+        auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+
+
+        func(this->instance, &createInfo, nullptr, &this->debugMessenger);
     }
 
     uint32_t gpus_count;
@@ -58,12 +92,14 @@ bool ZsVulkan::init(const char* app_name, int app_ver, SDL_Window* window){
     }
     this->selected_device = phys_devices_list[0];
 
-    initDevice();
+    initDevice(validate);
+
+    initSwapChain(win_info);
 
     return true;
 }
 
-bool ZsVulkan::initDevice(){
+bool ZsVulkan::initDevice(bool validate){
     //Init vulkan surface
     initSurface();
 
@@ -120,6 +156,12 @@ bool ZsVulkan::initDevice(){
     logical_gpu_create_info.pQueueCreateInfos = &queues_toCreate[0]; //pointer to start of queues vector
     logical_gpu_create_info.enabledExtensionCount = deviceExtensions.size();
     logical_gpu_create_info.ppEnabledExtensionNames = &deviceExtensions[0];
+
+    if(validate){
+        logical_gpu_create_info.enabledLayerCount = validationLayers.size();
+        logical_gpu_create_info.ppEnabledLayerNames = validationLayers.data();
+    }
+
     //create logical device
     vkCreateDevice(selected_device, &logical_gpu_create_info, nullptr, &logicalDevice); //creating logical device
     //get graphics queue
@@ -127,6 +169,8 @@ bool ZsVulkan::initDevice(){
     //get present queue
     vkGetDeviceQueue(logicalDevice, static_cast<uint32_t>(present_family_index), 0, &this->presentQueue);
 
+    q_f_indices.graphicsIndex = static_cast<uint32_t>(family_index);
+    q_f_indices.presentIndex = static_cast<uint32_t>(present_family_index);
 }
 
 void ZsVulkan::initSurface(){
@@ -135,6 +179,81 @@ void ZsVulkan::initSurface(){
     }
 }
 
-bool ZsVulkan::initSwapChain(){
+SwapChainSupportDetails ZsVulkan::getSwapChainDetails(){
+    SwapChainSupportDetails result;
+    //Get surface capabilities
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(this->selected_device, this->vk_surface, &result.capabilities);
 
+    uint32_t surface_format_count = 0;
+    //Get surface formats
+    vkGetPhysicalDeviceSurfaceFormatsKHR(this->selected_device, this->vk_surface, &surface_format_count, nullptr);
+
+    result.formats.resize(surface_format_count);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(this->selected_device, this->vk_surface, &surface_format_count, result.formats.data());
+
+    uint32_t present_mode_count = 0;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(this->selected_device, this->vk_surface, &present_mode_count, nullptr);
+
+    result.presentModes.resize(present_mode_count);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(this->selected_device, this->vk_surface, &present_mode_count, result.presentModes.data());
+
+    return result;
+}
+
+bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
+    SwapChainSupportDetails swc_details = getSwapChainDetails();
+    //Find best surface format
+    VkSurfaceFormatKHR chosen_sf_format;
+    for(unsigned int i = 0; i < swc_details.formats.size(); i ++){
+        VkSurfaceFormatKHR format = swc_details.formats[i];
+        if(format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR && format.format == VK_FORMAT_B8G8R8A8_UNORM){
+            chosen_sf_format = format;
+        }
+    }
+    //find best presentation mode
+    VkPresentModeKHR chosen_present_mode;
+    for(unsigned int i = 0; i < swc_details.presentModes.size(); i ++){
+        VkPresentModeKHR pres_mode = swc_details.presentModes[i];
+        if(pres_mode == VK_PRESENT_MODE_IMMEDIATE_KHR)
+            chosen_present_mode = pres_mode;
+    }
+    //configure swap extend
+    VkExtent2D swap_extend;
+    swap_extend.width = win_info->Width;
+    swap_extend.height = win_info->Height;
+
+    //Now fill the strcucture
+    VkSwapchainCreateInfoKHR swc_create_info;
+    swc_create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swc_create_info.pNext = nullptr;
+    swc_create_info.flags = 0;
+    swc_create_info.surface = this->vk_surface;
+    swc_create_info.minImageCount = swc_details.capabilities.minImageCount + 1;
+    swc_create_info.imageExtent = swap_extend;
+    //Configure image props
+    swc_create_info.imageFormat = chosen_sf_format.format;
+    swc_create_info.imageColorSpace = chosen_sf_format.colorSpace;
+
+    swc_create_info.imageArrayLayers = 1;
+    swc_create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT; //we'll render directly to images
+
+    if(q_f_indices.graphicsIndex != q_f_indices.presentIndex){ //if indices are not equal
+        swc_create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+        //TODO - implement
+    }else{
+        swc_create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    }
+    //No extra transformations
+    swc_create_info.preTransform = swc_details.capabilities.currentTransform;
+    //No comosite alpha
+    swc_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+
+    swc_create_info.presentMode = chosen_present_mode;
+    swc_create_info.clipped = VK_TRUE;
+    swc_create_info.oldSwapchain = VK_NULL_HANDLE;
+
+    //Creating swapchain
+    if(!vkCreateSwapchainKHR(this->logicalDevice, &swc_create_info, nullptr, &this->vk_swapchain)){
+        return false;
+    }
 }

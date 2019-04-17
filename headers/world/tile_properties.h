@@ -80,9 +80,8 @@ public:
     TileAnimation anim_property;
     TileAnimationState anim_state;
 
-    //void updTexturePtr();
+    void updTexturePtr();
     //void copyTo(GameObjectProperty* dest);
-    //void onAddToObject();
     //void onUpdate(float deltaTime);
 
     TileProperty();

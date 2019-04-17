@@ -48,7 +48,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
             if(!glewInit()) std::cout << "GLEW initialize failed" << std::endl;
         }
         if(info->graphicsApi == VULKAN){
-            this->vkcontext.init(desc->app_label.c_str(), desc->app_version, this->window);
+            this->vkcontext.init(true, desc->app_label.c_str(), desc->app_version, this->window, win);
         }
     }
 }

@@ -110,3 +110,6 @@ void Engine::World::loadFromFile(std::string file){
     stream.close();
 }
 
+ResourceManager* Engine::World::getResourceManager(){
+    return this->manager;
+}

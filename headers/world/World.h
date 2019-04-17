@@ -52,9 +52,11 @@ private:
 public:
 
     void loadFromFile(std::string file);
-    GameObject* getGameObjectByStrId(std::string id);
 
+    GameObject* getGameObjectByStrId(std::string id);
     GameObject* addObject(GameObject obj);
+
+    ResourceManager* getResourceManager();
 
     World(ResourceManager* manager);
 };

@@ -8,6 +8,7 @@
 
 #include "vulkan/zsvulkan.h"
 #include "engine/resources.h"
+#include "engine/engine_window.h"
 
 enum ZSGAPI {OGL32, VULKAN};
 enum ZSPERSPECTIVE {PERSP_3D = 3, PERSP_2D = 2};
@@ -17,19 +18,6 @@ typedef struct ZSENGINE_CREATE_INFO{
     bool createWindow; //will engine create SDL window at start
     ZSGAPI graphicsApi; //Selected graphics API
 }ZSENGINE_CREATE_INFO;
-
-typedef struct ZSWINDOW_CREATE_INFO{
-    char* title; //title for window
-    int Width;
-    int Height;
-    bool resizable;
-
-    ZSWINDOW_CREATE_INFO(){
-        Width = 640;
-        Height = 480;
-        resizable = true;
-    }
-}ZSWINDOW_CREATE_INFO;
 
 typedef struct ZSGAME_DESC{
     std::string app_label;

@@ -44,7 +44,8 @@ HEADERS += \
     headers/world/World.h \
     headers/world/go_properties.h \
     headers/game.h \
-    headers/world/tile_properties.h
+    headers/world/tile_properties.h \
+    headers/engine/engine_window.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

@@ -8,3 +8,7 @@ Engine::TileProperty::TileProperty(){
     type = GO_PROPERTY_TYPE_TILE;
 }
 
+void Engine::TileProperty::updTexturePtr(){
+    this->texture_diffuse = this->go_link.world_ptr->getResourceManager()->getTextureByLabel(this->diffuse_relpath);
+    this->texture_transparent = this->go_link.world_ptr->getResourceManager()->getTextureByLabel(this->transparent_relpath);
+}

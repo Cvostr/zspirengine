@@ -29,17 +29,19 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
-        /*
+
         case GO_PROPERTY_TYPE_LIGHTSOURCE:{
             LightsourceProperty* ptr = new LightsourceProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
+
         case GO_PROPERTY_TYPE_SCRIPTGROUP:{
             ScriptGroupProperty* ptr = new ScriptGroupProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
+        /*
         case GO_PROPERTY_TYPE_AUDSOURCE:{
             AudioSourceProperty* ptr = new AudioSourceProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
@@ -139,4 +141,12 @@ Engine::LabelProperty::LabelProperty(){
 
 Engine::MeshProperty::MeshProperty(){
     this->type = GO_PROPERTY_TYPE_MESH;
+}
+
+Engine::ScriptGroupProperty::ScriptGroupProperty(){
+    this->type = GO_PROPERTY_TYPE_SCRIPTGROUP;
+}
+
+Engine::LightsourceProperty::LightsourceProperty(){
+    this->type = GO_PROPERTY_TYPE_LIGHTSOURCE;
 }
