@@ -18,9 +18,10 @@ class VkShaderBracket;
 	public:
 
 		void Init();
-        bool compileFromFile(const char* VSpath, const char* FSpath, ZSpireEngine* engine);
+        bool compileFromFile(std::string VSpath, std::string FSpath, ZSpireEngine* engine);
         void GLcheckCompileErrors(unsigned int shader, const char* type, const char* filepath = nullptr);
         bool readShaderFile(const char* path, char* result);
+        bool readBinaryShaderFile(std::string path, char* result, int* size);
 		void Use();
 		void Destroy();
 

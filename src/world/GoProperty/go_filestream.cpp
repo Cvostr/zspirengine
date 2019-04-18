@@ -41,7 +41,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             *world_stream >> rel_path;
             MeshProperty* lptr = static_cast<MeshProperty*>(prop_ptr);
             lptr->resource_relpath = rel_path; //Write loaded mesh relative path
-            //lptr->updateMeshPtr(); //Pointer will now point to mesh resource
+            lptr->updateMeshPtr(); //Pointer will now point to mesh resource
 
             break;
         }

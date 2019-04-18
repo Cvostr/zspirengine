@@ -40,11 +40,15 @@ private:
 
     VkSurfaceKHR vk_surface;
     VkSwapchainKHR vk_swapchain;
+
+    std::vector<VkImageView> swapChainImageViews;
 public:
     bool init(bool validate, const char* app_name, int app_ver, SDL_Window* window, ZSWINDOW_CREATE_INFO* win_info);
     bool initDevice(bool validate);
     void initSurface();
     bool initSwapChain(ZSWINDOW_CREATE_INFO* win_info);
+
+    VkDevice getVkDevice();
 
     SwapChainSupportDetails getSwapChainDetails();
 

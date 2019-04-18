@@ -143,6 +143,10 @@ Engine::MeshProperty::MeshProperty(){
     this->type = GO_PROPERTY_TYPE_MESH;
 }
 
+void Engine::MeshProperty::updateMeshPtr(){
+    this->mesh_ptr = go_link.world_ptr->getResourceManager()->getMeshByLabel(this->resource_relpath);
+}
+
 Engine::ScriptGroupProperty::ScriptGroupProperty(){
     this->type = GO_PROPERTY_TYPE_SCRIPTGROUP;
 }

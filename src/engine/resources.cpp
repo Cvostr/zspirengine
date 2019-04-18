@@ -75,4 +75,14 @@ TextureResource* ResourceManager::getTextureByLabel(std::string label){
         if(resource_ptr->resource_type == TYPE_TEXTURE && resource_ptr->rel_path.compare(label) == 0)
             return static_cast<TextureResource*>(resource_ptr);
     }
+    return nullptr;
+}
+
+MeshResource* ResourceManager::getMeshByLabel(std::string label){
+    for(unsigned int res = 0; res < this->resources.size(); res ++){
+        ZsResource* resource_ptr = this->resources[res];
+        if(resource_ptr->resource_type == TYPE_MESH && resource_ptr->rel_path.compare(label) == 0)
+            return static_cast<MeshResource*>(resource_ptr);
+    }
+    return nullptr;
 }

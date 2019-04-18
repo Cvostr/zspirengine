@@ -19,6 +19,7 @@ public:
 };
 
 class TextureResource;
+class MeshResource;
 
 class ResourceManager{
 private:
@@ -27,6 +28,7 @@ public:
     void loadResourcesTable(std::string resmap_path);
 
     TextureResource* getTextureByLabel(std::string label);
+    MeshResource* getMeshByLabel(std::string label);
 };
 
 class TextureResource : public ZsResource{

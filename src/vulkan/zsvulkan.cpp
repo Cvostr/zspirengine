@@ -5,6 +5,10 @@ ZsVulkan::ZsVulkan(){
  //Nothing much to do
 }
 
+VkDevice ZsVulkan::getVkDevice(){
+    return this->logicalDevice;
+}
+
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
     VkDebugUtilsMessageTypeFlagsEXT messageType,
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
@@ -162,6 +166,7 @@ bool ZsVulkan::initDevice(bool validate){
         logical_gpu_create_info.ppEnabledLayerNames = validationLayers.data();
     }
 
+    std::cout << "Creating Vulkan GPU " << this->phys_devices_props[0].deviceName << std::endl;
     //create logical device
     vkCreateDevice(selected_device, &logical_gpu_create_info, nullptr, &logicalDevice); //creating logical device
     //get graphics queue
@@ -174,6 +179,7 @@ bool ZsVulkan::initDevice(bool validate){
 }
 
 void ZsVulkan::initSurface(){
+    std::cout << "Creating Vulkan surface" << std::endl;
     if(!SDL_Vulkan_CreateSurface(window_ptr, instance, &this->vk_surface)){
         std::cout << "Can't create Vulkan Window Surface. Terminating..." << std::endl;
     }
@@ -252,8 +258,41 @@ bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
     swc_create_info.clipped = VK_TRUE;
     swc_create_info.oldSwapchain = VK_NULL_HANDLE;
 
+    std::cout << "Creating Vulkan Swapchain" << std::endl;
     //Creating swapchain
     if(!vkCreateSwapchainKHR(this->logicalDevice, &swc_create_info, nullptr, &this->vk_swapchain)){
         return false;
     }
+    //array of swapchain images
+    std::vector<VkImage> swapChainImages;
+    uint32_t swc_images;
+
+    vkGetSwapchainImagesKHR(this->logicalDevice, this->vk_swapchain, &swc_images, nullptr);
+    swapChainImages.resize(swc_images);
+    vkGetSwapchainImagesKHR(this->logicalDevice, this->vk_swapchain, &swc_images, swapChainImages.data());
+
+    this->swapChainImageViews.resize(swc_images);
+    //Iterate over all swapchain images and create image views
+    for(unsigned int sw_i = 0; sw_i < swc_images; sw_i ++){
+        VkImageViewCreateInfo img_view_create_info;
+        img_view_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        img_view_create_info.pNext = nullptr;
+        img_view_create_info.image = swapChainImages[sw_i];
+        img_view_create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        img_view_create_info.format = chosen_sf_format.format;
+
+        img_view_create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        img_view_create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        img_view_create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        img_view_create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+        img_view_create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        img_view_create_info.subresourceRange.baseMipLevel = 0;
+        img_view_create_info.subresourceRange.levelCount = 1;
+        img_view_create_info.subresourceRange.baseArrayLayer = 0;
+        img_view_create_info.subresourceRange.layerCount = 1;
+
+        vkCreateImageView(this->logicalDevice, &img_view_create_info, nullptr, &this->swapChainImageViews[sw_i]);
+    }
+    return true;
 }

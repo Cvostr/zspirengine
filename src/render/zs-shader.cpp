@@ -51,7 +51,6 @@ void Engine::Shader::GLcheckCompileErrors(unsigned int shader, const char* type,
 bool Engine::Shader::readShaderFile(const char* path, char* result) {
 
 	std::string res_data;
-
 	std::ifstream stream;
 
 	stream.exceptions(std::ifstream::badbit);
@@ -73,26 +72,44 @@ bool Engine::Shader::readShaderFile(const char* path, char* result) {
 	return true;
 }
 
-bool Engine::Shader::compileFromFile(const char* VSpath, const char* FSpath, ZSpireEngine* engine){
-	char vsp[64];
-	char fsp[64];
+bool Engine::Shader::readBinaryShaderFile(std::string path, char* result, int* size){
+    std::ifstream stream;
 
-	strcpy(vsp, VSpath);
-	strcpy(fsp, FSpath);
+    stream.exceptions(std::ifstream::badbit);
 
-	std::cout << "OGL: Compiling shader " << vsp << " " << fsp << std::endl;
+    try
+    {
+        stream.open(path, std::ifstream::binary);// Open file
+        size_t fileSize = (size_t) stream.tellg();
+        stream.read(result, fileSize);
 
+        *size = fileSize;
 
-    GLchar vs_data[4096];
-    GLchar fs_data[4096];
+        stream.close();//close file stream
+    }
+    catch (std::ifstream::failure e)
+    {
+        return false;
+    }
+    return true;
+}
 
-	const GLchar* vs = &vs_data[0];
-	const GLchar* fs = &fs_data[0];
+bool Engine::Shader::compileFromFile(std::string VSpath, std::string FSpath, ZSpireEngine* engine){
 
-	readShaderFile(vsp, &vs_data[0]);
-	readShaderFile(fsp, &fs_data[0]);
-
+    //if opengl
     if(engine->engine_info->graphicsApi == OGL32){
+
+        std::cout << "OGL: Compiling shader " << VSpath << " " << FSpath << std::endl;
+
+        GLchar vs_data[4096];
+        GLchar fs_data[4096];
+
+        const GLchar* vs = &vs_data[0];
+        const GLchar* fs = &fs_data[0];
+        //read shader files
+        readShaderFile(VSpath.c_str(), &vs_data[0]);
+        readShaderFile(FSpath.c_str(), &fs_data[0]);
+        //init opengl shaders
         Init();
 
         int VS = glCreateShader(GL_VERTEX_SHADER);
@@ -102,9 +119,9 @@ bool Engine::Shader::compileFromFile(const char* VSpath, const char* FSpath, ZSp
         glShaderSource(FS, 1, &fs, NULL); //Setting shader code text on fs
 
         glCompileShader(VS); //Compile VS shader code
-        GLcheckCompileErrors(VS, "VERTEX", VSpath); //Check vertex errors
+        GLcheckCompileErrors(VS, "VERTEX", VSpath.c_str()); //Check vertex errors
         glCompileShader(FS); //Compile FS shader code
-        GLcheckCompileErrors(FS, "FRAGMENT", FSpath); //Check fragment compile errors
+        GLcheckCompileErrors(FS, "FRAGMENT", FSpath.c_str()); //Check fragment compile errors
 
         glAttachShader(this->SHADER_ID, VS);
         glAttachShader(this->SHADER_ID, FS);
@@ -128,7 +145,31 @@ bool Engine::Shader::compileFromFile(const char* VSpath, const char* FSpath, ZSp
 
     }
     if(engine->engine_info->graphicsApi == VULKAN){
+        std::cout << "VULKAN: Compiling shader " << VSpath << "_vk" << " " << FSpath << "_vk" << std::endl;
+
         vulkan_shader = new VkShaderBracket; //allocate bracket
+
+        ZsVulkan* vk = engine->getVulkanContext();
+
+        char* VScontent = new char[8192];
+        char* FScontent = new char[8192];
+
+        int VS_size, FS_size = 0;
+
+        readBinaryShaderFile(VSpath + "_vk", VScontent, &VS_size);
+        readBinaryShaderFile(FSpath + "_vk", FScontent, &FS_size);
+
+        VkShaderModuleCreateInfo createVsInfo = {};
+        createVsInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        createVsInfo.codeSize = VS_size;
+        createVsInfo.pCode = reinterpret_cast<const uint32_t*>(VScontent);
+        vkCreateShaderModule(vk->getVkDevice(), &createVsInfo, nullptr, &vulkan_shader->vertexShader);
+
+        VkShaderModuleCreateInfo createFsInfo = {};
+        createVsInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        createVsInfo.codeSize = FS_size;
+        createVsInfo.pCode = reinterpret_cast<const uint32_t*>(FScontent);
+        vkCreateShaderModule(vk->getVkDevice(), &createFsInfo, nullptr, &vulkan_shader->fragmentShader);
 
     }
     this->isCreated = true; //Shader created & compiled now

@@ -53,6 +53,10 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
     }
 }
 
+ZsVulkan* ZSpireEngine::getVulkanContext(){
+    return &this->vkcontext;
+}
+
 void ZSpireEngine::loadGame(){
     gameRuns = true;
 
