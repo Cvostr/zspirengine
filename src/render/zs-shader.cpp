@@ -79,8 +79,9 @@ bool Engine::Shader::readBinaryShaderFile(std::string path, char* result, int* s
 
     try
     {
-        stream.open(path, std::ifstream::binary);// Open file
-        size_t fileSize = (size_t) stream.tellg();
+        stream.open(path, std::ifstream::binary | std::ios::ate);// Open file
+        size_t fileSize = (size_t) stream.tellg(); //tellg returns size
+        stream.seekg(0);
         stream.read(result, fileSize);
 
         *size = fileSize;
@@ -161,14 +162,16 @@ bool Engine::Shader::compileFromFile(std::string VSpath, std::string FSpath, ZSp
 
         VkShaderModuleCreateInfo createVsInfo = {};
         createVsInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        createVsInfo.pNext = nullptr;
         createVsInfo.codeSize = VS_size;
         createVsInfo.pCode = reinterpret_cast<const uint32_t*>(VScontent);
         vkCreateShaderModule(vk->getVkDevice(), &createVsInfo, nullptr, &vulkan_shader->vertexShader);
 
         VkShaderModuleCreateInfo createFsInfo = {};
-        createVsInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        createVsInfo.codeSize = FS_size;
-        createVsInfo.pCode = reinterpret_cast<const uint32_t*>(FScontent);
+        createFsInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        createFsInfo.pNext = nullptr;
+        createFsInfo.codeSize = FS_size;
+        createFsInfo.pCode = reinterpret_cast<const uint32_t*>(FScontent);
         vkCreateShaderModule(vk->getVkDevice(), &createFsInfo, nullptr, &vulkan_shader->fragmentShader);
 
     }
