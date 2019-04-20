@@ -6,6 +6,7 @@
 #include <SDL2/SDL_vulkan.h>
 #include <vector>
 
+
 #include "../engine/engine_window.h"
 
 typedef struct SwapChainSupportDetails{
@@ -18,6 +19,16 @@ typedef struct ZsVkFamilyIndices{
     uint32_t graphicsIndex;
     uint32_t presentIndex;
 }ZsVkFamilyIndices;
+
+class ZsVkPipeline{
+private:
+    VkPipelineInputAssemblyStateCreateInfo inputAssembly;
+    VkViewport viewport;
+
+    VkPipeline pipeline;
+public:
+    void create(void* shader);
+};
 
 class ZsVulkan{
 private:

@@ -78,6 +78,8 @@ void ZSpireEngine::loadGame(){
                 this->gameRuns = false;
         }
 
+        data->pipeline->render();
+
     }
     SDL_DestroyWindow(window); //Destroy SDL and opengl
 }

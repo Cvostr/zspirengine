@@ -32,7 +32,8 @@ SOURCES += \
     src/world/go_properties.cpp \
     src/world/GoProperty/tile_properties.cpp \
     src/world/GoProperty/go_filestream.cpp \
-    src/world/GameObject.cpp
+    src/world/GameObject.cpp \
+    src/world/zs-camera.cpp
 
 HEADERS += \
         headers/engine.h \
@@ -45,7 +46,8 @@ HEADERS += \
     headers/world/go_properties.h \
     headers/game.h \
     headers/world/tile_properties.h \
-    headers/engine/engine_window.h
+    headers/engine/engine_window.h \
+    headers/world/zs-camera.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

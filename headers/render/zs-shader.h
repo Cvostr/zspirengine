@@ -6,7 +6,7 @@
 #include <vulkan/vulkan.hpp>
 #include "../engine.h"
 
-//#include "../../World/headers/zs-camera.h"
+#include "../world/zs-camera.h"
 
 namespace Engine {
 class VkShaderBracket;
@@ -36,9 +36,9 @@ class VkShaderBracket;
 		void setHasNormalTextureProperty(bool hasNormalMap);
 		void setTextureCountProperty(int tX, int tY);
 		void setTransform(ZSMATRIX4x4 transform);
-       // void setCamera(Camera* cam, bool sendPos = false);
-        //void sendLight(unsigned int index, void* _light);
-        //void unsetLight(unsigned int index);
+        void setCamera(Camera* cam, bool sendPos = false);
+        void sendLight(unsigned int index, void* _light);
+        void unsetLight(unsigned int index);
 
         bool isCreated;
 
@@ -49,6 +49,9 @@ class VkShaderBracket;
     public:
         VkShaderModule vertexShader;
         VkShaderModule fragmentShader;
+
+        VkPipelineShaderStageCreateInfo vertStageInfo;
+        VkPipelineShaderStageCreateInfo fragStageInfo;
     };
 }
 

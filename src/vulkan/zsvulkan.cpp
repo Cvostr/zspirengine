@@ -1,4 +1,5 @@
 #include "../../headers/vulkan/zsvulkan.h"
+#include "../../headers/render/zs-shader.h"
 #include <iostream>
 
 ZsVulkan::ZsVulkan(){
@@ -295,4 +296,8 @@ bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
         vkCreateImageView(this->logicalDevice, &img_view_create_info, nullptr, &this->swapChainImageViews[sw_i]);
     }
     return true;
+}
+
+void ZsVkPipeline::create(void* shader){
+
 }

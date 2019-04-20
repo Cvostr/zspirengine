@@ -11,11 +11,14 @@ enum GO_RENDER_TYPE {
 };
 
 class EngineRenderPipeline{
+private:
     Engine::Shader tile_shader;
     Engine::Shader deffered_shader;
 
     void initShaders();
 public:
+    void render();
+
     EngineRenderPipeline();
 };
 

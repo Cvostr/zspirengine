@@ -12,3 +12,7 @@ EngineRenderPipeline::EngineRenderPipeline(){
 
     initShaders();
 }
+
+void EngineRenderPipeline::render(){
+
+}

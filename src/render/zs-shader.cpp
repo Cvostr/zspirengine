@@ -1,6 +1,6 @@
 #include "../../headers/render/zs-shader.h"
 //#include "../World/headers/World.h"
-//#include "../World/headers/obj_properties.h"
+#include "../../headers/world/go_properties.h"
 #include <GL/glew.h>
 
 #include <cstring>
@@ -197,14 +197,14 @@ void Engine::Shader::setGLuniformMat4x4(const char* uniform_str, ZSMATRIX4x4 val
 void Engine::Shader::setTransform(ZSMATRIX4x4 transform){
 	setGLuniformMat4x4("object_transform", transform);
 }
-/*
-void ZSPIRE::Shader::setCamera(Camera* cam, bool sendPos){
+
+void Engine::Shader::setCamera(Camera* cam, bool sendPos){
     setGLuniformMat4x4("cam_projection", cam->getProjMatrix());
     setGLuniformMat4x4("cam_view", cam->getViewMatrix());
     if(sendPos)
         setGLuniformVec3("cam_position", cam->getCameraPosition());
 }
-*/
+
 void Engine::Shader::setGLuniformColor(const char* uniform_str, ZSRGBCOLOR value) {
 
 	unsigned int uniform_id = glGetUniformLocation(this->SHADER_ID, uniform_str);
@@ -251,8 +251,8 @@ void Engine::Shader::setTextureCountProperty(int tX, int tY) {
 	this->setGLuniformInt("textures_x", tX);
 	this->setGLuniformInt("textures_y", tY);
 }
-/*
-void ZSPIRE::Shader::sendLight(unsigned int index, void* _light){
+
+void Engine::Shader::sendLight(unsigned int index, void* _light){
     LightsourceProperty* light = static_cast<LightsourceProperty*>(_light);
     if (light->light_type > 0) {
         std::string id_s = std::to_string(index);
@@ -281,8 +281,8 @@ void ZSPIRE::Shader::sendLight(unsigned int index, void* _light){
         //std::string spot_oangle;
         //spot_oangle = "lights[" + std::to_string(index) + "].spot_out_angle";
 
-        setGLuniformInt(type.c_str(), (int)light->light_type);
-        setGLuniformVec3(pos.c_str(), light->transform->_last_translation);
+        setGLuniformInt(type.c_str(), static_cast<int>(light->light_type));
+        //setGLuniformVec3(pos.c_str(), light->transform->_last_translation);
         setGLuniformVec3(dir.c_str(), light->direction);
         setGLuniformFloat(range.c_str(), light->range);
         setGLuniformFloat(intensity.c_str(), light->intensity);
@@ -292,10 +292,10 @@ void ZSPIRE::Shader::sendLight(unsigned int index, void* _light){
     }
 }
 
-void ZSPIRE::Shader::unsetLight(unsigned int index){
+void Engine::Shader::unsetLight(unsigned int index){
     std::string type;
     type = "lights[" + std::to_string(index) + "].type";
 
     setGLuniformInt(type.c_str(), 0);
 }
-*/
+
