@@ -57,13 +57,17 @@ ZsVulkan* ZSpireEngine::getVulkanContext(){
     return &this->vkcontext;
 }
 
+void* ZSpireEngine::getGameDataPtr(){
+    return this->zsgame_ptr;
+}
+
 void ZSpireEngine::loadGame(){
     gameRuns = true;
 
     ZSGAME_DATA* data = new ZSGAME_DATA;
     this->zsgame_ptr = static_cast<void*>(data);
 
-    data->pipeline = new EngineRenderPipeline;
+    data->pipeline = new Engine::RenderPipeline;
     this->resources = new ResourceManager;
     data->world = new Engine::World(this->resources);
 

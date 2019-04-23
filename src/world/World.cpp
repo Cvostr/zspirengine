@@ -113,3 +113,7 @@ void Engine::World::loadFromFile(std::string file){
 ResourceManager* Engine::World::getResourceManager(){
     return this->manager;
 }
+
+Engine::Camera* Engine::World::getCameraPtr(){
+    return &this->cam;
+}

@@ -7,7 +7,7 @@
 typedef struct ZSGAME_DATA{
 
     Engine::World* world;
-    EngineRenderPipeline* pipeline;
+    Engine::RenderPipeline* pipeline;
 
 }ZSGAME_DATA;
 

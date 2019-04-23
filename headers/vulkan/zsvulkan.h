@@ -20,14 +20,29 @@ typedef struct ZsVkFamilyIndices{
     uint32_t presentIndex;
 }ZsVkFamilyIndices;
 
+typedef struct ZsVkPipelineConf{
+    VkPrimitiveTopology iaTopology;
+    VkViewport viewport;
+    VkRect2D scissor;
+    VkPolygonMode polygonMode;
+
+    unsigned int cullFace;
+
+    ZsVkPipelineConf(){
+        iaTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        polygonMode = VK_POLYGON_MODE_FILL;
+        cullFace = VK_CULL_MODE_NONE;
+    }
+}ZsVkPipelineConf;
+
 class ZsVkPipeline{
 private:
-    VkPipelineInputAssemblyStateCreateInfo inputAssembly;
-    VkViewport viewport;
-
     VkPipeline pipeline;
+    VkPipelineLayout pipelineLayout;
 public:
-    void create(void* shader);
+    VkPipeline getPipeline();
+
+    void create(void* shader, ZsVkPipelineConf conf);
 };
 
 class ZsVulkan{

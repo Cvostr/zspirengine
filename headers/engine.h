@@ -49,6 +49,8 @@ public:
     ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win, ZSGAME_DESC* desc);
 
     ZsVulkan* getVulkanContext();
+    void* getGameDataPtr();
+
     void loadGame();
 };
 

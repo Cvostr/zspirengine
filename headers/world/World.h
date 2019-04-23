@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "../engine/resources.h"
+#include "zs-camera.h"
 
 #include "../render/zs-pipeline.h"
 
@@ -49,6 +50,7 @@ class World{
 private:
     std::vector<GameObject> objects;
     ResourceManager* manager;
+    Engine::Camera cam;
 public:
 
     void loadFromFile(std::string file);
@@ -57,6 +59,8 @@ public:
     GameObject* addObject(GameObject obj);
 
     ResourceManager* getResourceManager();
+
+    Engine::Camera* getCameraPtr();
 
     World(ResourceManager* manager);
 };
