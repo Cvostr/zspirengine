@@ -2,6 +2,7 @@
 #define zs_pipeline
 
 #include "zs-shader.h"
+#include "zs-mesh.h"
 #include "SDL2/SDL.h"
 #include "GL/glew.h"
 

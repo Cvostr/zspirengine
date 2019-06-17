@@ -7,7 +7,7 @@
 #include <SDL2/SDL.h>
 
 #include "vulkan/zsvulkan.h"
-#include "engine/resources.h"
+
 #include "engine/engine_window.h"
 
 enum ZSGAPI {OGL32, VULKAN};
@@ -37,7 +37,6 @@ private:
 
     bool gameRuns;
 
-    ResourceManager* resources;
 
     SDL_Window* window;
     SDL_GLContext glcontext;
@@ -48,6 +47,7 @@ public:
 
     ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win, ZSGAME_DESC* desc);
 
+    SDL_Window* getWindowSDL();
     ZsVulkan* getVulkanContext();
     void* getGameDataPtr();
 

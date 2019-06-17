@@ -8,9 +8,12 @@ Engine::GameObjectProperty::GameObjectProperty(){
 void Engine::GameObjectProperty::copyTo(GameObjectProperty* dest){
 
 }
+void Engine::GameObjectProperty::onUpdate(float deltaTime){
 
+}
+void Engine::GameObjectProperty::onPreRender(RenderPipeline* pipeline){
 
-
+}
 
 Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
     GameObjectProperty* _ptr = nullptr;

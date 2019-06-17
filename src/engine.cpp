@@ -57,6 +57,10 @@ ZsVulkan* ZSpireEngine::getVulkanContext(){
     return &this->vkcontext;
 }
 
+SDL_Window* ZSpireEngine::getWindowSDL(){
+    return this->window;
+}
+
 void* ZSpireEngine::getGameDataPtr(){
     return this->zsgame_ptr;
 }
@@ -68,10 +72,10 @@ void ZSpireEngine::loadGame(){
     this->zsgame_ptr = static_cast<void*>(data);
 
     data->pipeline = new Engine::RenderPipeline;
-    this->resources = new ResourceManager;
-    data->world = new Engine::World(this->resources);
+    data->resources = new Engine::ResourceManager;
+    data->world = new Engine::World(data->resources);
 
-    this->resources->loadResourcesTable(this->desc->resource_map_file_path);
+    data->resources->loadResourcesTable(this->desc->resource_map_file_path);
     data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene);
 
     while(gameRuns == true){

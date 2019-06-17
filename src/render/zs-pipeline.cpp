@@ -1,6 +1,7 @@
 #include "../../headers/render/zs-pipeline.h"
 #include "../../headers/engine.h"
 #include "../../headers/game.h"
+#include "../../headers/world/go_properties.h"
 
 extern ZSpireEngine* engine_ptr;
 
@@ -12,6 +13,8 @@ void Engine::RenderPipeline::initShaders(){
 Engine::RenderPipeline::RenderPipeline(){
 
     initShaders();
+    Engine::setupDefaultMeshes();
+
     //if we use opengl, then create GBUFFER in GL commands
     if(engine_ptr->engine_info->graphicsApi == OGL32){
         this->gbuffer.create(640, 480);
@@ -22,21 +25,82 @@ void Engine::RenderPipeline::render(){
     ZSGAME_DATA* game = static_cast<ZSGAME_DATA*>(engine_ptr->getGameDataPtr());
 
     if(engine_ptr->engine_info->graphicsApi == OGL32){
-    gbuffer.bindFramebuffer();
-    glClearColor(0,0,0,1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        gbuffer.bindFramebuffer();
+        glClearColor(0,0,0,1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
+        World* world_ptr = game->world;
+        //Iterate over all objects in the world
+        for(unsigned int obj_i = 0; obj_i < world_ptr->objects.size(); obj_i ++){
+            GameObject* obj_ptr = &world_ptr->objects[obj_i];
+            if(!obj_ptr->hasParent) //if it is a root object
+                obj_ptr->processObject(this); //Draw object
+        }
 
 
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
+        glClear(GL_COLOR_BUFFER_BIT); //Clear screen
+        gbuffer.bindTextures(); //Bind gBuffer textures
+        deffered_shader.Use(); //use deffered shader
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
-    glClear(GL_COLOR_BUFFER_BIT); //Clear screen
-    gbuffer.bindTextures(); //Bind gBuffer textures
-    deffered_shader.Use(); //use deffered shader
+        deffered_shader.setGLuniformVec3("ambient_color", ZSVECTOR3(1.0f,
+                                                               1.0f,
+                                                               1.0f));
+
+        Engine::getPlaneMesh2D()->Draw(); //Draw screen
+
+        SDL_GL_SwapWindow(engine_ptr->getWindowSDL()); //Send rendered frame
     }
 }
 
+void Engine::GameObject::processObject(RenderPipeline* pipeline){ //On render pipeline wish to work with object
+    //Obtain EditWindow pointer to check if scene is running
+    //EditWindow* editwin_ptr = static_cast<EditWindow*>(pipeline->win_ptr);
+    if(active == false || alive == false) return; //if object is inactive, not to render it
+
+    TransformProperty* transform_prop = static_cast<TransformProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+    //Call update on every property in objects
+    //if(editwin_ptr->isSceneRun && pipeline->current_state == PIPELINE_STATE_DEFAULT)
+        //this->onUpdate(static_cast<int>(pipeline->deltaTime));
+
+    //Obtain camera viewport
+    //ZSVIEWPORT cam_viewport = pipeline->cam->getViewport();
+    //Distance limit
+    //int max_dist = static_cast<int>(cam_viewport.endX - cam_viewport.startX);
+   // bool difts = isDistanceFits(pipeline->cam->getCameraViewCenterPos(), transform_prop->_last_translation, max_dist);
+
+   // if(difts)
+        this->Draw(pipeline);
+
+    for(unsigned int obj_i = 0; obj_i < this->children.size(); obj_i ++){
+        if(!children[obj_i].isEmpty()){ //if link isn't broken
+            children[obj_i].updLinkPtr();
+            GameObject* child_ptr = this->children[obj_i].ptr;
+            child_ptr->processObject(pipeline);
+        }
+    }
+}
+void Engine::GameObject::Draw(RenderPipeline* pipeline){    //On render pipeline wish to draw the object
+    //Call prerender on each property in object
+    //this->onPreRender(pipeline);
+
+    //ZSPIRE::Shader* shader = pipeline->processShaderOnObject(static_cast<void*>(this)); //Will be used next time
+    TransformProperty* transform_prop = static_cast<TransformProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+
+    //if(shader != nullptr && transform_prop != nullptr){
+        //send transform matrix to shader
+        //shader->setTransform(transform_prop->transform_mat);
+        //Get mesh pointer
+        MeshProperty* mesh_prop = static_cast<MeshProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_MESH));
+        if(mesh_prop != nullptr){
+            if(mesh_prop->mesh_ptr != nullptr){
+                mesh_prop->mesh_ptr->mesh_ptr->Draw();
+
+            }
+        }
+    //}
+}
 
 Engine::G_BUFFER_GL::G_BUFFER_GL(){
 

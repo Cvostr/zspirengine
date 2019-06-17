@@ -9,6 +9,8 @@
 
 #include "../engine/engine_window.h"
 
+class ZsVulkan;
+
 typedef struct SwapChainSupportDetails{
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
@@ -42,7 +44,7 @@ private:
 public:
     VkPipeline getPipeline();
 
-    void create(void* shader, ZsVkPipelineConf conf);
+    void create(void* shader, ZsVkPipelineConf conf, ZsVulkan* vulkan);
 };
 
 class ZsVulkan{

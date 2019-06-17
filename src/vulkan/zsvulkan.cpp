@@ -298,7 +298,7 @@ bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
     return true;
 }
 
-void ZsVkPipeline::create(void* shader, ZsVkPipelineConf conf){
+void ZsVkPipeline::create(void* shader, ZsVkPipelineConf conf, ZsVulkan* vulkan){
     Engine::Shader* shader_ptr = static_cast<Engine::Shader*>(shader);
     //IA state
     VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
@@ -344,6 +344,15 @@ void ZsVkPipeline::create(void* shader, ZsVkPipelineConf conf){
     colorBlending.logicOpEnable = VK_FALSE;
     colorBlending.attachmentCount = 1;
     colorBlending.pAttachments = &colorBlendAttachment;
+
+    VkPipelineLayoutCreateInfo pipeline_info = {};
+    pipeline_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipeline_info.setLayoutCount = 0;
+    pipeline_info.pSetLayouts = nullptr;
+    pipeline_info.pushConstantRangeCount = 0;
+    pipeline_info.pPushConstantRanges = nullptr;
+
+    vkCreatePipelineLayout(vulkan->getVkDevice(), &pipeline_info, nullptr, &this->pipelineLayout);
 }
 
 VkPipeline ZsVkPipeline::getPipeline(){

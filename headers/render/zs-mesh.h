@@ -2,12 +2,17 @@
 #define zs_mesh
 
 #include "zs-math.h"
+#include <string>
+#include <GL/glew.h>
 
-namespace ZSPIRE {
+#define NO_INDICES 0
+
+namespace Engine {
 
     class Mesh {
     public:
         bool alive; //Non destroyed
+        std::string label;
 
         unsigned int meshVAO;
         unsigned int meshVBO;
@@ -22,12 +27,7 @@ namespace ZSPIRE {
         void Draw();
         void DrawLines();
         void Destroy();
-        void DestroyResource();
 
-        void LoadMeshesFromFileASSIMP(const char* file_path);
-#ifdef USE_ASSIMP
-        void processMesh(aiMesh* mesh, const aiScene* scene);
-#endif
         Mesh();
     };
 
@@ -38,7 +38,6 @@ namespace ZSPIRE {
     Mesh* getUiSpriteMesh2D();
     Mesh* getIsoTileMesh2D();
     Mesh* getCubeMesh3D();
-   // Mesh LoadMeshesFromFile(const char* file_path);
 
 }
 

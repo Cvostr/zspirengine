@@ -48,11 +48,10 @@ public:
 
 class World{
 private:
-    std::vector<GameObject> objects;
     ResourceManager* manager;
     Engine::Camera cam;
 public:
-
+    std::vector<GameObject> objects;
     void loadFromFile(std::string file);
 
     GameObject* getGameObjectByStrId(std::string id);
@@ -70,6 +69,7 @@ public:
     std::string str_id; //Object's unique string ID
     std::string* label_ptr;
 
+    bool active;
     bool alive;
     bool hasParent;
 
@@ -93,6 +93,11 @@ public:
 
     GameObjectLink getLinkToThisObject();
 
+    void processObject(RenderPipeline* pipeline); //On render pipeline wish to work with object
+    void Draw(RenderPipeline* pipeline); //On render pipeline wish to draw the object
+    void onUpdate(int deltaTime); //calls onUpdate on all properties
+    void onPreRender(RenderPipeline* pipeline); //calls onPreRender on all properties
+
     GameObject();
 };
 
@@ -106,6 +111,8 @@ public:
     World* world_ptr;
 
     virtual void copyTo(GameObjectProperty* dest);
+    virtual void onUpdate(float deltaTime);
+    virtual void onPreRender(RenderPipeline* pipeline);
 
     GameObjectProperty();
 };

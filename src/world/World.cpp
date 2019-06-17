@@ -64,6 +64,7 @@ void Engine::World::loadFromFile(std::string file){
 
             stream.seekg(1, std::ofstream::cur);
             stream.read(reinterpret_cast<char*>(&obj.render_type), sizeof(int)); //read render type
+            stream.read(reinterpret_cast<char*>(&obj.active), sizeof(bool));
 
             //Then do the same sh*t, iterate until "G_END" came up
             while(true){
@@ -110,7 +111,7 @@ void Engine::World::loadFromFile(std::string file){
     stream.close();
 }
 
-ResourceManager* Engine::World::getResourceManager(){
+Engine::ResourceManager* Engine::World::getResourceManager(){
     return this->manager;
 }
 
