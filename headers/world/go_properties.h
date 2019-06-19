@@ -55,7 +55,7 @@ public:
    // void copyTo(GameObjectProperty* dest);
     void updTransformPtr();
     void onObjectDeleted();
-    //void onPreRender(RenderPipeline* pipeline);
+    void onPreRender(RenderPipeline* pipeline);
 
     LightsourceProperty();
 };

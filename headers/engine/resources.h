@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "../render/zs-texture.h"
 #include "../render/zs-mesh.h"
 
 enum RESTYPE {TYPE_NONE, TYPE_TEXTURE, TYPE_MESH, TYPE_AUDIO, TYPE_MATERIAL};
@@ -40,6 +41,8 @@ public:
 
 class TextureResource : public ZsResource{
 public:
+    Engine::Texture* texture_ptr;
+
     TextureResource();
 };
 

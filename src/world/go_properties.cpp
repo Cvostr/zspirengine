@@ -14,6 +14,9 @@ void Engine::GameObjectProperty::onUpdate(float deltaTime){
 void Engine::GameObjectProperty::onPreRender(RenderPipeline* pipeline){
 
 }
+Engine::GameObjectProperty::~GameObjectProperty(){
+
+}
 
 Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
     GameObjectProperty* _ptr = nullptr;
@@ -136,6 +139,9 @@ void Engine::TransformProperty::getAbsoluteRotationMatrix(ZSMATRIX4x4& m){
     }
 }
 
+void Engine::TransformProperty::onPreRender(RenderPipeline* pipeline){
+
+}
 
 Engine::LabelProperty::LabelProperty(){
     this->type = GO_PROPERTY_TYPE_LABEL;
@@ -153,7 +159,16 @@ void Engine::MeshProperty::updateMeshPtr(){
 Engine::ScriptGroupProperty::ScriptGroupProperty(){
     this->type = GO_PROPERTY_TYPE_SCRIPTGROUP;
 }
+void Engine::ScriptGroupProperty::wakeUp(){   //on scene startup
+
+}
+void Engine::ScriptGroupProperty::onUpdate(float deltaTime){  //calls update in scripts
+
+}
 
 Engine::LightsourceProperty::LightsourceProperty(){
     this->type = GO_PROPERTY_TYPE_LIGHTSOURCE;
+}
+void Engine::LightsourceProperty::onPreRender(RenderPipeline* pipeline){
+
 }

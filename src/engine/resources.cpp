@@ -58,6 +58,9 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
             switch(resource.resource_type){
                 case TYPE_TEXTURE:{
                     resource_ptr = new Engine::TextureResource;
+
+                    Engine::TextureResource* texture_ptr = static_cast<Engine::TextureResource*>(resource_ptr);
+                    texture_ptr->texture_ptr = new Engine::Texture;
                     break;
                 }
                 case TYPE_MESH:{

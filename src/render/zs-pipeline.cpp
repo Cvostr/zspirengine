@@ -61,8 +61,7 @@ void Engine::GameObject::processObject(RenderPipeline* pipeline){ //On render pi
 
     TransformProperty* transform_prop = static_cast<TransformProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
     //Call update on every property in objects
-    //if(editwin_ptr->isSceneRun && pipeline->current_state == PIPELINE_STATE_DEFAULT)
-        //this->onUpdate(static_cast<int>(pipeline->deltaTime));
+    this->onUpdate(static_cast<int>(pipeline->deltaTime));
 
     //Obtain camera viewport
     //ZSVIEWPORT cam_viewport = pipeline->cam->getViewport();
@@ -83,7 +82,7 @@ void Engine::GameObject::processObject(RenderPipeline* pipeline){ //On render pi
 }
 void Engine::GameObject::Draw(RenderPipeline* pipeline){    //On render pipeline wish to draw the object
     //Call prerender on each property in object
-    //this->onPreRender(pipeline);
+    this->onPreRender(pipeline);
 
     //ZSPIRE::Shader* shader = pipeline->processShaderOnObject(static_cast<void*>(this)); //Will be used next time
     TransformProperty* transform_prop = static_cast<TransformProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));

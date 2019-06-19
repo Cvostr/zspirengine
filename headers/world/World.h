@@ -115,6 +115,7 @@ public:
     virtual void onPreRender(RenderPipeline* pipeline);
 
     GameObjectProperty();
+    virtual ~GameObjectProperty();
 };
 
 class LabelProperty : public GameObjectProperty {
@@ -136,7 +137,7 @@ public:
     void updateMat();
     void getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r);
     //void copyTo(GameObjectProperty* dest);
-    //void onPreRender(RenderPipeline* pipeline);
+    void onPreRender(RenderPipeline* pipeline);
     void getAbsoluteRotationMatrix(ZSMATRIX4x4& m);
 
     void setTranslation(ZSVECTOR3 new_translation);

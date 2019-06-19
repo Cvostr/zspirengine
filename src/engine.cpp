@@ -13,6 +13,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
     //Store info structures
     this->desc = desc;
     this->engine_info = info;
+    this->window_info = win;
 
     if(info->createWindow == true){ //we have to init window
         std::cout << "Opening SDL2 window" << std::endl;
@@ -65,6 +66,20 @@ void* ZSpireEngine::getGameDataPtr(){
     return this->zsgame_ptr;
 }
 
+void ZSpireEngine::startManager(EngineComponentManager* manager){
+    manager->setDpMetrics(this->window_info->Width, this->window_info->Height);
+    //manager->setProjectStructPtr(&this->project);
+    manager->init();
+    this->components.push_back(manager);
+}
+void ZSpireEngine::updateDeltaTime(float deltaTime){
+    this->deltaTime = deltaTime;
+
+    for(unsigned int i = 0; i < components.size(); i ++){
+        components[i]->deltaTime = deltaTime;
+    }
+}
+
 void ZSpireEngine::loadGame(){
     gameRuns = true;
 
@@ -78,7 +93,15 @@ void ZSpireEngine::loadGame(){
     data->resources->loadResourcesTable(this->desc->resource_map_file_path);
     data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene);
 
+    static uint64_t NOW = SDL_GetPerformanceCounter();
+    static uint64_t last = 0;
+
     while(gameRuns == true){
+
+        last = NOW;
+        NOW = SDL_GetPerformanceCounter();
+        deltaTime = (NOW - last) * 1000 / SDL_GetPerformanceFrequency();
+        updateDeltaTime(deltaTime);
 
         SDL_Event event;
         while (SDL_PollEvent(&event)){

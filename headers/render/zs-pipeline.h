@@ -3,6 +3,7 @@
 
 #include "zs-shader.h"
 #include "zs-mesh.h"
+#include "../../headers/engine/EngineManager.h"
 #include "SDL2/SDL.h"
 #include "GL/glew.h"
 
@@ -30,7 +31,7 @@ public:
     void Destroy();
 };
 
-class RenderPipeline{
+class RenderPipeline : public EngineComponentManager{
 private:
     G_BUFFER_GL gbuffer;
 
