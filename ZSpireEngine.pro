@@ -36,7 +36,8 @@ SOURCES += \
     src/world/zs-camera.cpp \
     src/render/zs-mesh.cpp \
     src/engine/EngineManager.cpp \
-    src/render/zs-texture.cpp
+    src/render/zs-texture.cpp \
+    src/Scripting/LuaScript.cpp
 
 HEADERS += \
         headers/engine.h \
@@ -53,7 +54,8 @@ HEADERS += \
     headers/world/zs-camera.h \
     headers/render/zs-mesh.h \
     headers/engine/EngineManager.h \
-    headers/render/zs-texture.h
+    headers/render/zs-texture.h \
+    headers/Scripting/LuaScript.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

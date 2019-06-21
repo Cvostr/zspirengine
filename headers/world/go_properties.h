@@ -2,6 +2,8 @@
 #define go_properties
 
 #include "World.h"
+#include "../Scripting/LuaScript.h"
+
 namespace Engine {
 
 enum LIGHTSOURCE_TYPE {
@@ -25,7 +27,7 @@ public:
 class ScriptGroupProperty : public GameObjectProperty {
 public:
 
-    //std::vector<ObjectScript> scripts_attached;
+    std::vector<ObjectScript> scripts_attached;
 
     void wakeUp(); //on scene startup
     void onUpdate(float deltaTime); //calls update in scripts
@@ -60,6 +62,25 @@ public:
     LightsourceProperty();
 };
 
+class AudioSourceProperty : public GameObjectProperty{
+public:
+    std::string resource_relpath; //Relative path to resource
+    //SoundBuffer* buffer_ptr;
+    //SoundSource source;
+
+    ZSVECTOR3 last_pos;
+
+    void onValueChanged(); //Update soud buffer pointer and send source props
+    //void onUpdate(float deltaTime);
+    void onObjectDeleted();
+    //void copyTo(GameObjectProperty* dest);
+
+    void updateAudioPtr();
+    void audio_start();
+    void audio_stop();
+
+    AudioSourceProperty();
+};
 
 }
 

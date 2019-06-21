@@ -172,3 +172,7 @@ Engine::LightsourceProperty::LightsourceProperty(){
 void Engine::LightsourceProperty::onPreRender(RenderPipeline* pipeline){
 
 }
+
+Engine::AudioSourceProperty::AudioSourceProperty(){
+    this->type = GO_PROPERTY_TYPE_AUDSOURCE;
+}

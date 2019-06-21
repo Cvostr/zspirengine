@@ -18,11 +18,11 @@ Engine::GameObject* Engine::World::getGameObjectByStrId(std::string id){
 }
 
 Engine::GameObject* Engine::World::addObject(GameObject obj){
-    unsigned int free_index = this->objects.size();
+    unsigned int free_index = static_cast<unsigned int>(this->objects.size());
     for(unsigned int obj_i = 0; obj_i < this->objects.size(); obj_i ++){
         GameObject* obj_ptr = &this->objects[obj_i];
         if(obj_ptr->alive == false){
-            free_index = static_cast<int>(obj_i);
+            free_index = static_cast<unsigned int>(obj_i);
         }
     }
 
