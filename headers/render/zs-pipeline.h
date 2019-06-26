@@ -6,6 +6,7 @@
 #include "../../headers/engine/EngineManager.h"
 #include "SDL2/SDL.h"
 #include "GL/glew.h"
+#include "../world/zs-camera.h"
 
 namespace Engine{
 
@@ -39,8 +40,13 @@ private:
     Engine::Shader deffered_shader;
 
     void initShaders();
+    void updateShadersCameraInfo(Engine::Camera* cam_ptr);
 public:
+
+    Engine::Shader* getTileShader();
+
     void render();
+    void destroy();
 
     RenderPipeline();
 };

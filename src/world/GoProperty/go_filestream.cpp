@@ -8,6 +8,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
     //Spawn new property with readed type
     addProperty(type);
     GameObjectProperty* prop_ptr = getPropertyPtrByType(type); //get created property
+    world_stream->read(reinterpret_cast<char*>(&prop_ptr->active), sizeof(bool));
     //since more than 1 properties same type can't be on one gameobject
     switch(type){
         case GO_PROPERTY_TYPE_LABEL :{

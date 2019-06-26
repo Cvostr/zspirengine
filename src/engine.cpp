@@ -1,4 +1,5 @@
 #include "../headers/engine.h"
+#include "../headers/engine/loader.h"
 #include "../headers/game.h"
 #include <GL/glew.h>
 #include <iostream>
@@ -44,9 +45,12 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
         this->window = SDL_CreateWindow(win->title, 0, 0, win->Width, win->Height, SDL_WIN_MODE); //Create window
         if(info->graphicsApi == OGL32){
             this->glcontext = SDL_GL_CreateContext(window);
+            glViewport(0, 0, win->Width, win->Height);
 
-            glewExperimental = true;
-            if(!glewInit()) std::cout << "GLEW initialize failed" << std::endl;
+            glewExperimental = GL_TRUE;
+            if(glewInit() != GLEW_OK) std::cout << "GLEW initialize failed" << std::endl; else {
+                std::cout << "GLEW initialize sucessful" << std::endl;
+            }
         }
         if(info->graphicsApi == VULKAN){
             this->vkcontext.init(true, desc->app_label.c_str(), desc->app_version, this->window, win);
@@ -68,7 +72,6 @@ void* ZSpireEngine::getGameDataPtr(){
 
 void ZSpireEngine::startManager(EngineComponentManager* manager){
     manager->setDpMetrics(this->window_info->Width, this->window_info->Height);
-    //manager->setProjectStructPtr(&this->project);
     manager->init();
     this->components.push_back(manager);
 }
@@ -89,6 +92,8 @@ void ZSpireEngine::loadGame(){
     data->pipeline = new Engine::RenderPipeline;
     data->resources = new Engine::ResourceManager;
     data->world = new Engine::World(data->resources);
+    Engine::Loader::start();
+    Engine::Loader::setBlobRootDirectory(desc->game_dir + "/" + this->desc->blob_root_path);
 
     data->resources->loadResourcesTable(this->desc->resource_map_file_path);
     data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene);
@@ -111,6 +116,9 @@ void ZSpireEngine::loadGame(){
 
         data->pipeline->render();
 
+        SDL_GL_SwapWindow(window); //Send rendered frame
+
     }
+    Engine::Loader::stop();
     SDL_DestroyWindow(window); //Destroy SDL and opengl
 }

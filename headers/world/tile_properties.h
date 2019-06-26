@@ -82,7 +82,8 @@ public:
 
     void updTexturePtr();
     //void copyTo(GameObjectProperty* dest);
-    //void onUpdate(float deltaTime);
+    void onUpdate(float deltaTime);
+    void onRender(RenderPipeline* pipeline);
 
     TileProperty();
 };

@@ -24,7 +24,8 @@ typedef struct ZSGAME_DESC{
     int app_version;
 
     std::string game_dir; //Game root directory
-    std::string resource_map_file_path; //Relative path to resource map (if blob mode)
+    std::string blob_root_path; //Relative path to directory with blobs
+    std::string resource_map_file_path; //Relative path to resource map
     ZSPERSPECTIVE game_perspective; //Perspective of game scenes
     std::string startup_scene; //Relative path to scene, what loaded on startup
 

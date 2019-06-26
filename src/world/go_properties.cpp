@@ -3,6 +3,7 @@
 
 Engine::GameObjectProperty::GameObjectProperty(){
     type = GO_PROPERTY_TYPE_NONE;
+    active = true;
 }
 
 void Engine::GameObjectProperty::copyTo(GameObjectProperty* dest){
@@ -12,6 +13,9 @@ void Engine::GameObjectProperty::onUpdate(float deltaTime){
 
 }
 void Engine::GameObjectProperty::onPreRender(RenderPipeline* pipeline){
+
+}
+void Engine::GameObjectProperty::onRender(RenderPipeline* pipeline){
 
 }
 Engine::GameObjectProperty::~GameObjectProperty(){
@@ -47,12 +51,13 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
-        /*
+
         case GO_PROPERTY_TYPE_AUDSOURCE:{
             AudioSourceProperty* ptr = new AudioSourceProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
+        /*
         case GO_PROPERTY_TYPE_MATERIAL:{
             MaterialProperty* ptr = new MaterialProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
@@ -175,4 +180,7 @@ void Engine::LightsourceProperty::onPreRender(RenderPipeline* pipeline){
 
 Engine::AudioSourceProperty::AudioSourceProperty(){
     this->type = GO_PROPERTY_TYPE_AUDSOURCE;
+}
+void Engine::AudioSourceProperty::onUpdate(float deltaTime){
+
 }

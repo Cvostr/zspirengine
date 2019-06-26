@@ -1,8 +1,10 @@
 #include "../../headers/engine/resources.h"
+
 #include <fstream>
 
 Engine::ZsResource::ZsResource(){
     this->resource_type = TYPE_NONE;
+    this->resource_state = STATE_NOT_LOADED;
 }
 
 Engine::ResourceManager::ResourceManager(){
@@ -16,6 +18,36 @@ Engine::ResourceManager::ResourceManager(){
 
 Engine::TextureResource::TextureResource(){
     this->resource_type = TYPE_TEXTURE;
+}
+
+void Engine::TextureResource::Use(int slot){
+    if(this->resource_state == STATE_LOADED)
+        this->texture_ptr->Use(slot);
+    if(this->resource_state == STATE_NOT_LOADED){
+        request = new Engine::Loader::LoadRequest;
+        request->isBlob = true;
+        request->data = new unsigned char[this->size];
+        request->offset = this->offset;
+        request->size = this->size;
+        request->file_path = this->blob_path;
+        Engine::Loader::queryLoadingRequest(request);
+        this->resource_state = STATE_LOADING_PROCESS;
+    }
+    if(this->resource_state == STATE_LOADING_PROCESS){
+        if(this->request->done){
+            this->texture_ptr->LoadDDSTextureFromBuffer(request->data);
+            delete[] request->data;
+            delete this->request;
+            this->resource_state = STATE_LOADED;
+        }
+    }
+}
+
+void Engine::TextureResource::Release(){
+    if(this->resource_state == STATE_LOADED){
+        this->texture_ptr->Destroy();
+        this->resource_state = STATE_NOT_LOADED;
+    }
 }
 
 Engine::MeshResource::MeshResource(){
@@ -41,14 +73,15 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
 
         if(prefix.compare("entry") == 0){
             ZsResource resource;
+
             //read relative path
-            file_stream >> resource.rel_path >> resource.resource_label;
+            file_stream >> resource.rel_path >> resource.resource_label >> resource.blob_path;
 
             file_stream.seekg(1, std::ofstream::cur); //Skip space
             //start byte
-            file_stream.read(reinterpret_cast<char*>(&resource.offset), sizeof(int64_t));
+            file_stream.read(reinterpret_cast<char*>(&resource.offset), sizeof(uint64_t));
             //resource size
-            file_stream.read(reinterpret_cast<char*>(&resource.size), sizeof(int));
+            file_stream.read(reinterpret_cast<char*>(&resource.size), sizeof(unsigned int));
             //reading resource type
             file_stream.read(reinterpret_cast<char*>(&resource.resource_type), sizeof(RESTYPE));
             file_stream.seekg(1, std::ofstream::cur); //Skip space
@@ -56,6 +89,9 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
             ZsResource* resource_ptr = nullptr;
 
             switch(resource.resource_type){
+                case TYPE_NONE:{
+                    break;
+                }
                 case TYPE_TEXTURE:{
                     resource_ptr = new Engine::TextureResource;
 
@@ -79,8 +115,10 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
                     break;
                 }
             }
+            resource_ptr->blob_path = resource.blob_path;
             resource_ptr->offset = resource.offset;
             resource_ptr->rel_path = resource.rel_path;
+            resource_ptr->resource_label = resource.resource_label;
             resource_ptr->size = resource.size;
 
             this->resources.push_back(resource_ptr);

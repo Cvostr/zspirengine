@@ -12,3 +12,6 @@ void Engine::TileProperty::updTexturePtr(){
     this->texture_diffuse = this->go_link.world_ptr->getResourceManager()->getTextureByLabel(this->diffuse_relpath);
     this->texture_transparent = this->go_link.world_ptr->getResourceManager()->getTextureByLabel(this->transparent_relpath);
 }
+void Engine::TileProperty::onUpdate(float deltaTime){
+
+}

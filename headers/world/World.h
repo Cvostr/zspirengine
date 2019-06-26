@@ -49,8 +49,9 @@ public:
 class World{
 private:
     ResourceManager* manager;
-    Engine::Camera cam;
+
 public:
+    Engine::Camera cam;
     std::vector<GameObject> objects;
     void loadFromFile(std::string file);
 
@@ -76,7 +77,7 @@ public:
     unsigned int props_num; //amount of properties
     World* world_ptr; //pointer to world, when object placed
 
-    GO_RENDER_TYPE render_type;
+    //GO_RENDER_TYPE render_type;
 
     GameObjectLink parent;
 
@@ -97,6 +98,7 @@ public:
     void Draw(RenderPipeline* pipeline); //On render pipeline wish to draw the object
     void onUpdate(int deltaTime); //calls onUpdate on all properties
     void onPreRender(RenderPipeline* pipeline); //calls onPreRender on all properties
+    void onRender(RenderPipeline* pipeline); //calls onRender on all properties
 
     GameObject();
 };
@@ -107,12 +109,14 @@ class GameObjectProperty{
 public:
     PROPERTY_TYPE type; //type of property
     GameObjectLink go_link;
+    bool active; //Is property working
 
     World* world_ptr;
 
     virtual void copyTo(GameObjectProperty* dest);
     virtual void onUpdate(float deltaTime);
     virtual void onPreRender(RenderPipeline* pipeline);
+    virtual void onRender(RenderPipeline* pipeline);
 
     GameObjectProperty();
     virtual ~GameObjectProperty();
