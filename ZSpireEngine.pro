@@ -57,7 +57,8 @@ HEADERS += \
     headers/engine/EngineManager.h \
     headers/render/zs-texture.h \
     headers/Scripting/LuaScript.h \
-    headers/engine/loader.h
+    headers/engine/loader.h \
+    headers/engine_types.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

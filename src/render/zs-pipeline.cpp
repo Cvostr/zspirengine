@@ -7,7 +7,7 @@
 extern ZSpireEngine* engine_ptr;
 
 void Engine::RenderPipeline::initShaders(){
-    this->tile_shader.compileFromFile("Shaders/2d_tile/tile2d.vs", "Shaders/2d/tile2d.fs", engine_ptr);
+    this->tile_shader.compileFromFile("Shaders/2d_tile/tile2d.vs", "Shaders/2d_tile/tile2d.fs", engine_ptr);
     this->deffered_shader.compileFromFile("Shaders/postprocess/deffered_light/deffered.vs", "Shaders/postprocess/deffered_light/deffered.fs", engine_ptr);
 }
 
@@ -15,15 +15,27 @@ Engine::RenderPipeline::RenderPipeline(){
 
     initShaders();
     Engine::setupDefaultMeshes();
+}
 
-    glDisable(GL_DEPTH_TEST);
-    //depthTest = false;
-    //cullFaces = false;
-    glDisable(GL_CULL_FACE);
+Engine::RenderPipeline::~RenderPipeline(){
+    destroy();
+}
 
+void Engine::RenderPipeline::init(){
+    if(this->game_desc_ptr->game_perspective == PERSP_2D){
+        glDisable(GL_DEPTH_TEST);
+        depthTest = false;
+        cullFaces = false;
+        glDisable(GL_CULL_FACE);
+    }else{
+        glEnable(GL_DEPTH_TEST);
+        depthTest = true;
+        cullFaces = true;
+        glEnable(GL_CULL_FACE);
+    }
     //if we use opengl, then create GBUFFER in GL commands
     if(engine_ptr->engine_info->graphicsApi == OGL32){
-        this->gbuffer.create(640, 480);
+        this->gbuffer.create(this->WIDTH, this->HEIGHT);
     }
 }
 
@@ -45,7 +57,7 @@ void Engine::RenderPipeline::render(){
 
         World* world_ptr = game->world;
 
-        updateShadersCameraInfo(&world_ptr->cam);
+        updateShadersCameraInfo(world_ptr->getCameraPtr());
 
         //Iterate over all objects in the world
         for(unsigned int obj_i = 0; obj_i < world_ptr->objects.size(); obj_i ++){
@@ -71,7 +83,6 @@ void Engine::RenderPipeline::render(){
 }
 
 void Engine::GameObject::processObject(RenderPipeline* pipeline){ //On render pipeline wish to work with object
-    //Obtain EditWindow pointer to check if scene is running
     if(active == false || alive == false) return; //if object is inactive, not to render it
 
     TransformProperty* transform_prop = static_cast<TransformProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
@@ -229,7 +240,12 @@ void Engine::G_BUFFER_GL::Destroy(){
 }
 
 void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
+    tile_shader.Use();
     this->tile_shader.setCamera(cam_ptr);
+
+    deffered_shader.Use();
+    deffered_shader.setCamera(cam_ptr, true);
+
 }
 
 Engine::Shader* Engine::RenderPipeline::getTileShader(){

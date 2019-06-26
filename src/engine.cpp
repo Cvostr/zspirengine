@@ -72,6 +72,7 @@ void* ZSpireEngine::getGameDataPtr(){
 
 void ZSpireEngine::startManager(EngineComponentManager* manager){
     manager->setDpMetrics(this->window_info->Width, this->window_info->Height);
+    manager->game_desc_ptr = this->desc;
     manager->init();
     this->components.push_back(manager);
 }
@@ -88,12 +89,32 @@ void ZSpireEngine::loadGame(){
 
     ZSGAME_DATA* data = new ZSGAME_DATA;
     this->zsgame_ptr = static_cast<void*>(data);
-
+    //Allocate pipeline and start it as manager
     data->pipeline = new Engine::RenderPipeline;
+    startManager(data->pipeline);
+
     data->resources = new Engine::ResourceManager;
     data->world = new Engine::World(data->resources);
+
+    switch(this->desc->game_perspective){
+        case PERSP_2D:{ //2D project
+
+            data->world->getCameraPtr()->setProjectionType(ZSCAMERA_PROJECTION_ORTHOGONAL);
+            data->world->getCameraPtr()->setPosition(ZSVECTOR3(0,0,0));
+            data->world->getCameraPtr()->setFront(ZSVECTOR3(0,0,1));
+            break;
+        }
+        case PERSP_3D:{ //3D project
+            data->world->getCameraPtr()->setProjectionType(ZSCAMERA_PROJECTION_PERSPECTIVE);
+            data->world->getCameraPtr()->setPosition(ZSVECTOR3(0,0,0));
+            data->world->getCameraPtr()->setFront(ZSVECTOR3(0,0,1));
+            data->world->getCameraPtr()->setZplanes(1, 2000);
+            break;
+        }
+    }
+
     Engine::Loader::start();
-    Engine::Loader::setBlobRootDirectory(desc->game_dir + "/" + this->desc->blob_root_path);
+    Engine::Loader::setBlobRootDirectory(this->desc->blob_root_path);
 
     data->resources->loadResourcesTable(this->desc->resource_map_file_path);
     data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene);
@@ -120,5 +141,13 @@ void ZSpireEngine::loadGame(){
 
     }
     Engine::Loader::stop();
+    destroyAllManagers();
     SDL_DestroyWindow(window); //Destroy SDL and opengl
+}
+
+void ZSpireEngine::destroyAllManagers(){
+    //we must do that in reverse order
+    for(unsigned int i = static_cast<unsigned int>(components.size()); i > 0; i --){
+        delete components[i];
+    }
 }

@@ -49,9 +49,8 @@ public:
 class World{
 private:
     ResourceManager* manager;
-
-public:
     Engine::Camera cam;
+public:
     std::vector<GameObject> objects;
     void loadFromFile(std::string file);
 
@@ -76,8 +75,6 @@ public:
 
     unsigned int props_num; //amount of properties
     World* world_ptr; //pointer to world, when object placed
-
-    //GO_RENDER_TYPE render_type;
 
     GameObjectLink parent;
 

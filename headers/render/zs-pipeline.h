@@ -34,6 +34,9 @@ public:
 
 class RenderPipeline : public EngineComponentManager{
 private:
+    bool depthTest; //if enabled, GL will do depth testing
+    bool cullFaces; //if enabled, GL will cull faces
+
     G_BUFFER_GL gbuffer;
 
     Engine::Shader tile_shader;
@@ -46,9 +49,11 @@ public:
     Engine::Shader* getTileShader();
 
     void render();
+    void init();
     void destroy();
 
     RenderPipeline();
+    ~RenderPipeline();
 };
 
 }

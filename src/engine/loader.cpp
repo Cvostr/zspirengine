@@ -13,7 +13,8 @@ void loop(){
             Engine::Loader::LoadRequest* req = requests.front();
 
             std::ifstream stream;
-            stream.open(blob_root_directory + "/" + req->file_path, std::ofstream::binary);
+            std::string file_path = blob_root_directory + req->file_path;
+            stream.open(file_path, std::ofstream::binary);
             stream.seekg(static_cast<long>(req->offset));
             stream.read(reinterpret_cast<char*>(req->data), req->size);
             req->done = true;
@@ -32,6 +33,7 @@ void Engine::Loader::stop(){
 }
 
 void Engine::Loader::queryLoadingRequest(LoadRequest* req){
+    //loader_loop
     requests.push_back(req);
 }
 

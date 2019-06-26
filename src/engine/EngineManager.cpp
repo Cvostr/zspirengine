@@ -18,10 +18,6 @@ void EngineComponentManager::init(){
 
 }
 
-void EngineComponentManager::destroy(){
-
-}
-
 void EngineComponentManager::updateWindowSize(int W, int H){
 
 }

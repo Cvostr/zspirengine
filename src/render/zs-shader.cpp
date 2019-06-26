@@ -240,11 +240,11 @@ void Engine::Shader::setGLuniformInt(const char* uniform_str, int value) {
 }
 
 void Engine::Shader::setHasDiffuseTextureProperty(bool hasDiffuseMap){
-	this->setGLuniformInt("hasDiffuseMap", (int)hasDiffuseMap);
+    this->setGLuniformInt("hasDiffuseMap", static_cast<int>(hasDiffuseMap));
 }
 
 void Engine::Shader::setHasNormalTextureProperty(bool hasNormalMap){
-	this->setGLuniformInt("hasNormalMap", (int)hasNormalMap);
+    this->setGLuniformInt("hasNormalMap", static_cast<int>(hasNormalMap));
 }
 
 void Engine::Shader::setTextureCountProperty(int tX, int tY) {

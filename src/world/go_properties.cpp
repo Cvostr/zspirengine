@@ -145,7 +145,7 @@ void Engine::TransformProperty::getAbsoluteRotationMatrix(ZSMATRIX4x4& m){
 }
 
 void Engine::TransformProperty::onPreRender(RenderPipeline* pipeline){
-
+    this->updateMat();
 }
 
 Engine::LabelProperty::LabelProperty(){
