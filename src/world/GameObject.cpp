@@ -84,18 +84,29 @@ Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByType(PROPERTY_TY
 
 void Engine::GameObject::onUpdate(int deltaTime){   //calls onUpdate on all properties
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
+        if(!properties[i]->active) continue; //if property is inactive, then skip it
         properties[i]->onUpdate(deltaTime); //and call onUpdate on each property
     }
 }
 
 void Engine::GameObject::onPreRender(Engine::RenderPipeline* pipeline){ //calls onPreRender on all properties
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
+        if(!properties[i]->active) continue; //if property is inactive, then skip it
         properties[i]->onPreRender(pipeline); //and call onUpdate on each property
     }
 }
 
 void Engine::GameObject::onRender(RenderPipeline* pipeline){
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
+        if(!properties[i]->active) continue; //if property is inactive, then skip it
         properties[i]->onRender(pipeline); //and call onUpdate on each property
     }
+}
+
+void Engine::GameObject::copyTo(GameObject* dest){
+    dest->alive = this->alive;
+    dest->active = this->active;
+    dest->hasParent = this->hasParent;
+    dest->parent = this->parent;
+    dest->str_id = this->str_id;
 }

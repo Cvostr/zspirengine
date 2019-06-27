@@ -53,6 +53,7 @@ private:
 public:
     std::vector<GameObject> objects;
     void loadFromFile(std::string file);
+    void loadGameObject(GameObject* object_ptr, std::ifstream* world_stream);
 
     GameObject* getGameObjectByStrId(std::string id);
     GameObject* addObject(GameObject obj);
@@ -90,7 +91,7 @@ public:
     TransformProperty* getTransformProperty();
 
     GameObjectLink getLinkToThisObject();
-
+    void copyTo(GameObject* dest);
     void processObject(RenderPipeline* pipeline); //On render pipeline wish to work with object
     void Draw(RenderPipeline* pipeline); //On render pipeline wish to draw the object
     void onUpdate(int deltaTime); //calls onUpdate on all properties
@@ -137,7 +138,7 @@ public:
 
     void updateMat();
     void getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r);
-    //void copyTo(GameObjectProperty* dest);
+    void copyTo(GameObjectProperty* dest);
     void onPreRender(RenderPipeline* pipeline);
     void getAbsoluteRotationMatrix(ZSMATRIX4x4& m);
 

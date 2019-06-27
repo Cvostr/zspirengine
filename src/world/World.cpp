@@ -39,6 +39,44 @@ Engine::GameObject* Engine::World::addObject(GameObject obj){
     return obj_ptr;
 }
 
+void Engine::World::loadGameObject(GameObject* object_ptr, std::ifstream* world_stream){
+    std::string prefix;
+    object_ptr->world_ptr = this; //Assign pointer to world
+    *world_stream >> object_ptr->str_id;
+
+    world_stream->seekg(1, std::ofstream::cur);
+    //stream.read(reinterpret_cast<char*>(&obj.render_type), sizeof(int)); //read render type
+    world_stream->read(reinterpret_cast<char*>(&object_ptr->active), sizeof(bool));
+
+    //Then do the same sh*t, iterate until "G_END" came up
+    while(true){
+        *world_stream >> prefix; //Read prefix
+        if(prefix.compare("G_END") == 0){ //If end reached
+            break; //Then end this infinity loop
+        }
+        if(prefix.compare("G_CHI") == 0) { //Ops, it is chidren header
+            unsigned int amount;
+
+            world_stream->seekg(1, std::ofstream::cur);
+            world_stream->read(reinterpret_cast<char*>(&amount), sizeof(int));
+
+            for(unsigned int ch_i = 0; ch_i < amount; ch_i ++){ //Iterate over all written children to file
+                std::string child_str_id;
+                *world_stream >> child_str_id; //Reading child string id
+
+                GameObjectLink link;
+                link.world_ptr = this; //Setting world pointer
+                link.obj_str_id = child_str_id; //Setting string ID
+                object_ptr->children.push_back(link); //Adding to object
+            }
+
+        }
+        if(prefix.compare("G_PROPERTY") == 0){ //We found an property, zaeb*s'
+            object_ptr->loadProperty(world_stream);
+        }
+    }
+}
+
 void Engine::World::loadFromFile(std::string file){
     std::ifstream stream;
     stream.open(file, std::ifstream::binary); //open world file in binary mode
@@ -59,40 +97,8 @@ void Engine::World::loadFromFile(std::string file){
 
         if(prefix.compare("G_OBJECT") == 0){ //if it is game object
             GameObject obj;
-            obj.world_ptr = this; //Assign pointer to world
-            stream >> obj.str_id;
 
-            stream.seekg(1, std::ofstream::cur);
-            //stream.read(reinterpret_cast<char*>(&obj.render_type), sizeof(int)); //read render type
-            stream.read(reinterpret_cast<char*>(&obj.active), sizeof(bool));
-
-            //Then do the same sh*t, iterate until "G_END" came up
-            while(true){
-                stream >> prefix; //Read prefix
-                if(prefix.compare("G_END") == 0){ //If end reached
-                    break; //Then end this infinity loop
-                }
-                if(prefix.compare("G_CHI") == 0) { //Ops, it is chidren header
-                    unsigned int amount;
-
-                    stream.seekg(1, std::ofstream::cur);
-                    stream.read(reinterpret_cast<char*>(&amount), sizeof(int));
-
-                    for(unsigned int ch_i = 0; ch_i < amount; ch_i ++){ //Iterate over all written children to file
-                        std::string child_str_id;
-                        stream >> child_str_id; //Reading child string id
-
-                        GameObjectLink link;
-                        link.world_ptr = this; //Setting world pointer
-                        link.obj_str_id = child_str_id; //Setting string ID
-                        obj.children.push_back(link); //Adding to object
-                    }
-
-                }
-                if(prefix.compare("G_PROPERTY") == 0){ //We found an property, zaeb*s'
-                    obj.loadProperty(&stream);
-                }
-            }
+            loadGameObject(&obj, &stream);
 
             this->addObject(obj);
         }

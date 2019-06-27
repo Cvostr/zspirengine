@@ -20,7 +20,7 @@ public:
     MeshResource* mesh_ptr; //Pointer to mesh
 
     void updateMeshPtr(); //Updates pointer according to resource_relpath
-    //void copyTo(GameObjectProperty* dest);
+    void copyTo(GameObjectProperty* dest);
     MeshProperty();
 };
 
@@ -54,7 +54,7 @@ public:
 
     Engine::Shader* deffered_shader_ptr;
 
-   // void copyTo(GameObjectProperty* dest);
+    void copyTo(GameObjectProperty* dest);
     void updTransformPtr();
     void onObjectDeleted();
     void onPreRender(RenderPipeline* pipeline);
@@ -73,7 +73,7 @@ public:
     void onValueChanged(); //Update soud buffer pointer and send source props
     void onUpdate(float deltaTime);
     void onObjectDeleted();
-    //void copyTo(GameObjectProperty* dest);
+    void copyTo(GameObjectProperty* dest);
 
     void updateAudioPtr();
     void audio_start();

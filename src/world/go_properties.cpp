@@ -144,6 +144,16 @@ void Engine::TransformProperty::getAbsoluteRotationMatrix(ZSMATRIX4x4& m){
     }
 }
 
+void Engine::TransformProperty::copyTo(GameObjectProperty* dest){
+    if(dest->type != this->type) return; //if it isn't transform
+    //cast pointer and send data
+    TransformProperty* _dest = static_cast<TransformProperty*>(dest);
+    _dest->translation = translation;
+    _dest->scale = scale;
+    _dest->rotation = rotation;
+    _dest->transform_mat = transform_mat;
+}
+
 void Engine::TransformProperty::onPreRender(RenderPipeline* pipeline){
     this->updateMat();
 }
@@ -156,7 +166,13 @@ Engine::LabelProperty::LabelProperty(){
 Engine::MeshProperty::MeshProperty(){
     this->type = GO_PROPERTY_TYPE_MESH;
 }
+void Engine::MeshProperty::copyTo(GameObjectProperty* dest){
+    if(dest->type != this->type) return; //if it isn't transform
 
+    MeshProperty* _dest = static_cast<MeshProperty*>(dest);
+    _dest->resource_relpath = resource_relpath;
+    _dest->mesh_ptr = mesh_ptr;
+}
 void Engine::MeshProperty::updateMeshPtr(){
     this->mesh_ptr = go_link.world_ptr->getResourceManager()->getMeshByLabel(this->resource_relpath);
 }
@@ -174,6 +190,15 @@ void Engine::ScriptGroupProperty::onUpdate(float deltaTime){  //calls update in 
 Engine::LightsourceProperty::LightsourceProperty(){
     this->type = GO_PROPERTY_TYPE_LIGHTSOURCE;
 }
+void Engine::LightsourceProperty::copyTo(GameObjectProperty* dest){
+    if(dest->type != this->type) return; //if it isn't transform
+
+    LightsourceProperty* _dest = static_cast<LightsourceProperty*>(dest);
+    _dest->color = color;
+    _dest->intensity = intensity;
+    _dest->range = range;
+    _dest->light_type = light_type;
+}
 void Engine::LightsourceProperty::onPreRender(RenderPipeline* pipeline){
 
 }
@@ -183,4 +208,16 @@ Engine::AudioSourceProperty::AudioSourceProperty(){
 }
 void Engine::AudioSourceProperty::onUpdate(float deltaTime){
 
+}
+void Engine::AudioSourceProperty::copyTo(GameObjectProperty* dest){
+    if(dest->type != this->type) return; //if it isn't transform
+
+    AudioSourceProperty* _dest = static_cast<AudioSourceProperty*>(dest);
+
+    //_dest->source.Init();
+    _dest->resource_relpath = this->resource_relpath;
+    //_dest->source.source_gain = this->source.source_gain;
+    //_dest->source.source_pitch = this->source.source_pitch;
+    //_dest->source.setPosition(this->source.source_pos);
+    //_dest->buffer_ptr = this->buffer_ptr;
 }
