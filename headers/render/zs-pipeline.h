@@ -16,6 +16,17 @@ enum GO_RENDER_TYPE {
     GO_RENDER_TYPE_MATERIAL
 };
 
+struct RenderSettings {
+    ZSRGBCOLOR ambient_light_color;
+
+    void defaults();
+
+    RenderSettings(){
+        defaults();
+    }
+};
+
+
 class G_BUFFER_GL{
 protected:
     unsigned int depthBuffer;

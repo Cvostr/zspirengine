@@ -90,12 +90,12 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
 
             *world_stream >> lptr->resource_relpath;
             if(rel_path.compare("@none") != 0){
-                //lptr->updateAudioPtr(); //Pointer will now point to mesh resource
+                lptr->updateAudioPtr(); //Pointer will now point to mesh resource
             }
             world_stream->seekg(1, std::ofstream::cur);
             //Load settings
-            //world_stream->read(reinterpret_cast<char*>(&lptr->source.source_gain), sizeof(float));
-            //world_stream->read(reinterpret_cast<char*>(&lptr->source.source_pitch), sizeof(float));
+            world_stream->read(reinterpret_cast<char*>(&lptr->source.source_gain), sizeof(float));
+            world_stream->read(reinterpret_cast<char*>(&lptr->source.source_pitch), sizeof(float));
             //lptr->source.apply_settings(); //Apply settings to openal
 
             break;

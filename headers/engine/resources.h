@@ -7,6 +7,7 @@
 #include "../render/zs-texture.h"
 #include "../render/zs-mesh.h"
 #include "loader.h"
+#include "EngineManager.h"
 
 enum RESTYPE {TYPE_NONE, TYPE_TEXTURE, TYPE_MESH, TYPE_AUDIO, TYPE_MATERIAL};
 
@@ -29,22 +30,29 @@ public:
     uint64_t offset;
     unsigned int size;
 
+    virtual void Release();
+
     ZsResource();
+    virtual ~ZsResource();
 };
 
 class TextureResource;
 class MeshResource;
+class AudioResource;
 
-class ResourceManager{
+class ResourceManager : public EngineComponentManager{
 private:
     std::vector<ZsResource*> resources;
 public:
     void loadResourcesTable(std::string resmap_path);
+    void clear();
 
     TextureResource* getTextureByLabel(std::string label);
     MeshResource* getMeshByLabel(std::string label);
+    AudioResource* getAudioByLabel(std::string label);
 
     ResourceManager();
+    ~ResourceManager();
 };
 
 class TextureResource : public ZsResource{

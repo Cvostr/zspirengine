@@ -3,6 +3,7 @@
 #include "../headers/game.h"
 #include <GL/glew.h>
 #include <iostream>
+#include "../headers/misc/oal_manager.h"
 
 ZSpireEngine* engine_ptr;
 
@@ -55,6 +56,9 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
         if(info->graphicsApi == VULKAN){
             this->vkcontext.init(true, desc->app_label.c_str(), desc->app_version, this->window, win);
         }
+        //initialize OpenAL sound system
+        Engine::SFX::initAL();
+
     }
 }
 
@@ -92,8 +96,10 @@ void ZSpireEngine::loadGame(){
     //Allocate pipeline and start it as manager
     data->pipeline = new Engine::RenderPipeline;
     startManager(data->pipeline);
-
+    //Allocate resource manager
     data->resources = new Engine::ResourceManager;
+    //Start it as manager
+    startManager(data->resources);
     data->world = new Engine::World(data->resources);
 
     switch(this->desc->game_perspective){
@@ -141,13 +147,15 @@ void ZSpireEngine::loadGame(){
 
     }
     Engine::Loader::stop();
+    Engine::SFX::destroyAL();
     destroyAllManagers();
     SDL_DestroyWindow(window); //Destroy SDL and opengl
+    SDL_GL_DeleteContext(glcontext);
 }
 
 void ZSpireEngine::destroyAllManagers(){
     //we must do that in reverse order
-    for(unsigned int i = static_cast<unsigned int>(components.size()); i > 0; i --){
+    for(int i = static_cast<int>(components.size()) - 1; i >= 0; i --){
         delete components[i];
     }
 }

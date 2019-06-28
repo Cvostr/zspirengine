@@ -7,6 +7,14 @@ Engine::ZsResource::ZsResource(){
     this->resource_state = STATE_NOT_LOADED;
 }
 
+Engine::ZsResource::~ZsResource(){
+
+}
+
+void Engine::ZsResource::Release(){
+
+}
+
 Engine::ResourceManager::ResourceManager(){
     MeshResource* plane_resource = new MeshResource;
 
@@ -16,46 +24,15 @@ Engine::ResourceManager::ResourceManager(){
     this->resources.push_back(plane_resource);
 }
 
-Engine::TextureResource::TextureResource(){
-    this->resource_type = TYPE_TEXTURE;
-}
-
-void Engine::TextureResource::Use(int slot){
-    if(this->resource_state == STATE_LOADED)
-        this->texture_ptr->Use(slot);
-    if(this->resource_state == STATE_NOT_LOADED){
-        request = new Engine::Loader::LoadRequest;
-        request->isBlob = true;
-        request->data = new unsigned char[this->size];
-        request->offset = this->offset;
-        request->size = this->size;
-        request->file_path = this->blob_path;
-        Engine::Loader::queryLoadingRequest(request);
-        this->resource_state = STATE_LOADING_PROCESS;
+void Engine::ResourceManager::clear(){
+    for(unsigned int i = 0; i < this->resources.size(); i ++){
+        this->resources[i]->Release();
     }
-    if(this->resource_state == STATE_LOADING_PROCESS){
-        if(this->request->done){
-            this->texture_ptr->LoadDDSTextureFromBuffer(request->data);
-            delete[] request->data;
-            delete this->request;
-            this->resource_state = STATE_LOADED;
-        }
-    }
+    this->resources.clear();
 }
 
-void Engine::TextureResource::Release(){
-    if(this->resource_state == STATE_LOADED){
-        this->texture_ptr->Destroy();
-        this->resource_state = STATE_NOT_LOADED;
-    }
-}
-
-Engine::MeshResource::MeshResource(){
-    this->resource_type = TYPE_MESH;
-}
-
-Engine::AudioResource::AudioResource(){
-    this->resource_type = TYPE_AUDIO;
+Engine::ResourceManager::~ResourceManager(){
+    clear();
 }
 
 void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
@@ -127,6 +104,49 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
     file_stream.close();
 }
 
+
+Engine::TextureResource::TextureResource(){
+    this->resource_type = TYPE_TEXTURE;
+}
+
+void Engine::TextureResource::Use(int slot){
+    if(this->resource_state == STATE_LOADED)
+        this->texture_ptr->Use(slot);
+    if(this->resource_state == STATE_NOT_LOADED){
+        request = new Engine::Loader::LoadRequest;
+        request->isBlob = true;
+        request->data = new unsigned char[this->size];
+        request->offset = this->offset;
+        request->size = this->size;
+        request->file_path = this->blob_path;
+        Engine::Loader::queryLoadingRequest(request);
+        this->resource_state = STATE_LOADING_PROCESS;
+    }
+    if(this->resource_state == STATE_LOADING_PROCESS){
+        if(this->request->done){
+            this->texture_ptr->LoadDDSTextureFromBuffer(request->data);
+            delete[] request->data;
+            delete this->request;
+            this->resource_state = STATE_LOADED;
+        }
+    }
+}
+
+void Engine::TextureResource::Release(){
+    if(this->resource_state == STATE_LOADED){
+        this->texture_ptr->Destroy();
+        this->resource_state = STATE_NOT_LOADED;
+    }
+}
+
+Engine::MeshResource::MeshResource(){
+    this->resource_type = TYPE_MESH;
+}
+
+Engine::AudioResource::AudioResource(){
+    this->resource_type = TYPE_AUDIO;
+}
+
 Engine::TextureResource* Engine::ResourceManager::getTextureByLabel(std::string label){
     for(unsigned int res = 0; res < this->resources.size(); res ++){
         ZsResource* resource_ptr = this->resources[res];
@@ -141,6 +161,14 @@ Engine::MeshResource* Engine::ResourceManager::getMeshByLabel(std::string label)
         ZsResource* resource_ptr = this->resources[res];
         if(resource_ptr->resource_type == TYPE_MESH && resource_ptr->resource_label.compare(label) == 0)
             return static_cast<MeshResource*>(resource_ptr);
+    }
+    return nullptr;
+}
+Engine::AudioResource* Engine::ResourceManager::getAudioByLabel(std::string label){
+    for(unsigned int res = 0; res < this->resources.size(); res ++){
+        ZsResource* resource_ptr = this->resources[res];
+        if(resource_ptr->resource_type == TYPE_AUDIO && resource_ptr->resource_label.compare(label) == 0)
+            return static_cast<AudioResource*>(resource_ptr);
     }
     return nullptr;
 }

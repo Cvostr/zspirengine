@@ -205,19 +205,27 @@ void Engine::LightsourceProperty::onPreRender(RenderPipeline* pipeline){
 
 Engine::AudioSourceProperty::AudioSourceProperty(){
     this->type = GO_PROPERTY_TYPE_AUDSOURCE;
+
+    this->source.source_gain = 1.0f;
+    this->source.source_pitch = 1.0f;
+
+    source.Init();
 }
 void Engine::AudioSourceProperty::onUpdate(float deltaTime){
 
+}
+void Engine::AudioSourceProperty::updateAudioPtr(){
+    this->buffer_ptr = go_link.world_ptr->getResourceManager()->getAudioByLabel(this->resource_relpath);
 }
 void Engine::AudioSourceProperty::copyTo(GameObjectProperty* dest){
     if(dest->type != this->type) return; //if it isn't transform
 
     AudioSourceProperty* _dest = static_cast<AudioSourceProperty*>(dest);
 
-    //_dest->source.Init();
+    _dest->source.Init();
     _dest->resource_relpath = this->resource_relpath;
-    //_dest->source.source_gain = this->source.source_gain;
-    //_dest->source.source_pitch = this->source.source_pitch;
-    //_dest->source.setPosition(this->source.source_pos);
-    //_dest->buffer_ptr = this->buffer_ptr;
+    _dest->source.source_gain = this->source.source_gain;
+    _dest->source.source_pitch = this->source.source_pitch;
+    _dest->source.setPosition(this->source.source_pos);
+    _dest->buffer_ptr = this->buffer_ptr;
 }

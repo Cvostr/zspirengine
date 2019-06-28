@@ -3,6 +3,7 @@
 
 #include "World.h"
 #include "../Scripting/LuaScript.h"
+#include "../misc/oal_manager.h"
 
 namespace Engine {
 
@@ -65,8 +66,8 @@ public:
 class AudioSourceProperty : public GameObjectProperty{
 public:
     std::string resource_relpath; //Relative path to resource
-    //SoundBuffer* buffer_ptr;
-    //SoundSource source;
+    AudioResource* buffer_ptr;
+    SoundSource source;
 
     ZSVECTOR3 last_pos;
 
