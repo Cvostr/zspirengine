@@ -26,6 +26,7 @@ void loop(){
 void Engine::Loader::start(){
     std::thread loader_loop(loop);
     loader_loop.detach();
+    working = true;
 }
 
 void Engine::Loader::stop(){

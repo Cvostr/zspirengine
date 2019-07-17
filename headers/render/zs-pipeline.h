@@ -53,6 +53,8 @@ private:
     Engine::Shader tile_shader;
     Engine::Shader deffered_shader;
 
+    RenderSettings render_settings;
+
     void initShaders();
     void updateShadersCameraInfo(Engine::Camera* cam_ptr);
 public:

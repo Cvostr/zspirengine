@@ -6,6 +6,10 @@
 
 extern ZSpireEngine* engine_ptr;
 
+void Engine::RenderSettings::defaults(){
+    ambient_light_color = ZSRGBCOLOR(255, 255, 255, 255);
+}
+
 void Engine::RenderPipeline::initShaders(){
     this->tile_shader.compileFromFile("Shaders/2d_tile/tile2d.vs", "Shaders/2d_tile/tile2d.fs", engine_ptr);
     this->deffered_shader.compileFromFile("Shaders/postprocess/deffered_light/deffered.vs", "Shaders/postprocess/deffered_light/deffered.fs", engine_ptr);
@@ -72,9 +76,9 @@ void Engine::RenderPipeline::render(){
         gbuffer.bindTextures(); //Bind gBuffer textures
         deffered_shader.Use(); //use deffered shader
 
-        deffered_shader.setGLuniformVec3("ambient_color", ZSVECTOR3(1.0f,
-                                                               1.0f,
-                                                               1.0f));
+        deffered_shader.setGLuniformVec3("ambient_color", ZSVECTOR3(render_settings.ambient_light_color.r / 255.0f,
+                                                                   render_settings.ambient_light_color.g / 255.0f,
+                                                                   render_settings.ambient_light_color.b / 255.0f));
 
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
 
