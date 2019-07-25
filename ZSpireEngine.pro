@@ -39,7 +39,8 @@ SOURCES += \
     src/render/zs-texture.cpp \
     src/Scripting/LuaScript.cpp \
     src/engine/loader.cpp \
-    src/misc/oal_manager.cpp
+    src/misc/oal_manager.cpp \
+    src/Scripting/zsensdk.cpp
 
 HEADERS += \
         headers/engine.h \
@@ -60,7 +61,8 @@ HEADERS += \
     headers/Scripting/LuaScript.h \
     headers/engine/loader.h \
     headers/engine_types.h \
-    headers/misc/oal_manager.h
+    headers/misc/oal_manager.h \
+    headers/Scripting/zsensdk.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

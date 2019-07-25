@@ -110,6 +110,10 @@ void Engine::TransformProperty::updateMat(){
     ZSMATRIX4x4 rotation_mat1 = getIdentity();
     getAbsoluteRotationMatrix(rotation_mat1);
 
+    abs_translation = p_translation + this->translation;
+    abs_scale = p_scale + this->scale;
+    abs_rotation = this->rotation + p_rotation;
+
     ZSMATRIX4x4 rotation_mat = getRotationMat(this->rotation);
     //S * R * T
     this->transform_mat = scale_mat * rotation_mat * rotation_mat1 * translation_mat;
@@ -181,10 +185,18 @@ Engine::ScriptGroupProperty::ScriptGroupProperty(){
     this->type = GO_PROPERTY_TYPE_SCRIPTGROUP;
 }
 void Engine::ScriptGroupProperty::wakeUp(){   //on scene startup
+    for(unsigned int script_i = 0; script_i < static_cast<unsigned int>(scr_num); script_i ++){
+        this->scripts_attached[script_i].link = this->go_link;
 
+        this->scripts_attached[script_i]._InitScript();
+        this->scripts_attached[script_i]._callStart();
+    }
 }
 void Engine::ScriptGroupProperty::onUpdate(float deltaTime){  //calls update in scripts
-
+    for(unsigned int script_i = 0; script_i < this->scripts_attached.size(); script_i ++){
+        ObjectScript* script_ptr = &this->scripts_attached[script_i]; //Obtain pointer to script
+        //script_ptr->_callDraw(deltaTime); //Run onDraw() function in script
+    }
 }
 
 Engine::LightsourceProperty::LightsourceProperty(){
@@ -199,8 +211,21 @@ void Engine::LightsourceProperty::copyTo(GameObjectProperty* dest){
     _dest->range = range;
     _dest->light_type = light_type;
 }
-void Engine::LightsourceProperty::onPreRender(RenderPipeline* pipeline){
 
+void Engine::LightsourceProperty::updTransformPtr(){
+    if(transform == nullptr){
+        transform = this->go_link.updLinkPtr()->getTransformProperty();
+    }
+}
+
+void Engine::LightsourceProperty::onPreRender(RenderPipeline* pipeline){
+    updTransformPtr();
+
+    this->last_pos = transform->abs_translation; //Store old value
+    this->last_rot = transform->abs_rotation;
+    this->direction = _getDirection(last_rot.X, last_rot.Y, last_rot.Z);
+
+    pipeline->addLight(static_cast<void*>(this)); //put light pointer to vector
 }
 
 Engine::AudioSourceProperty::AudioSourceProperty(){
@@ -215,8 +240,20 @@ void Engine::AudioSourceProperty::onUpdate(float deltaTime){
 
 }
 void Engine::AudioSourceProperty::updateAudioPtr(){
-    this->buffer_ptr = go_link.world_ptr->getResourceManager()->getAudioByLabel(this->resource_relpath);
+    //if(buffer_ptr->resource_state == STATE_LOADED)
+       this->buffer_ptr = go_link.world_ptr->getResourceManager()->getAudioByLabel(this->resource_relpath);
+    //else {
+        //this->buffer_ptr->load();
+    //}
 }
+
+void Engine::AudioSourceProperty::audio_start(){
+    this->source.play();
+}
+void Engine::AudioSourceProperty::audio_stop(){
+    this->source.stop();
+}
+
 void Engine::AudioSourceProperty::copyTo(GameObjectProperty* dest){
     if(dest->type != this->type) return; //if it isn't transform
 

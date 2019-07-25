@@ -136,6 +136,10 @@ public:
     ZSVECTOR3 scale;
     ZSVECTOR3 rotation;
 
+    ZSVECTOR3 abs_translation;
+    ZSVECTOR3 abs_scale;
+    ZSVECTOR3 abs_rotation;
+
     void updateMat();
     void getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r);
     void copyTo(GameObjectProperty* dest);

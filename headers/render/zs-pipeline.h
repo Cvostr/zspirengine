@@ -4,9 +4,11 @@
 #include "zs-shader.h"
 #include "zs-mesh.h"
 #include "../../headers/engine/EngineManager.h"
+//#include "../../headers/world/go_properties.h"
 #include "SDL2/SDL.h"
 #include "GL/glew.h"
 #include "../world/zs-camera.h"
+#include <vector>
 
 namespace Engine{
 
@@ -54,12 +56,17 @@ private:
     Engine::Shader deffered_shader;
 
     RenderSettings render_settings;
+    //Vector to store lights
+    std::vector<void*> lights_ptr;
 
     void initShaders();
     void updateShadersCameraInfo(Engine::Camera* cam_ptr);
 public:
 
     Engine::Shader* getTileShader();
+
+    void addLight(void* light_ptr);
+    void removeLights();
 
     void render();
     void init();

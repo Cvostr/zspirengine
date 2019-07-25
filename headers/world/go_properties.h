@@ -27,7 +27,7 @@ public:
 
 class ScriptGroupProperty : public GameObjectProperty {
 public:
-
+    int scr_num;
     std::vector<ObjectScript> scripts_attached;
 
     void wakeUp(); //on scene startup
@@ -49,11 +49,6 @@ public:
     ZSRGBCOLOR color; //Color of light
     float intensity; //Light's intensity
     float range; //Light's range
-
-    ZSLIGHTSOURCE_GL_ID id; //glsl uniform index
-    bool isSent; //is glsl uniform sent to deffered shader
-
-    Engine::Shader* deffered_shader_ptr;
 
     void copyTo(GameObjectProperty* dest);
     void updTransformPtr();

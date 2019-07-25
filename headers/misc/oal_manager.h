@@ -25,6 +25,7 @@ private:
 public:
      void Init();
      bool loadFileWAV(const char* file_path);
+     bool loadBufferWAV(unsigned char* buffer);
      void Destroy();
      unsigned int getBufferIdAL();
      SoundBuffer();

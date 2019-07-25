@@ -6,10 +6,11 @@
 
 #include "../render/zs-texture.h"
 #include "../render/zs-mesh.h"
+#include "../misc/oal_manager.h"
 #include "loader.h"
 #include "EngineManager.h"
 
-enum RESTYPE {TYPE_NONE, TYPE_TEXTURE, TYPE_MESH, TYPE_AUDIO, TYPE_MATERIAL};
+enum RESTYPE {TYPE_NONE, TYPE_TEXTURE, TYPE_MESH, TYPE_AUDIO, TYPE_MATERIAL, TYPE_SCRIPT};
 
 enum RESOURCE_STATE {STATE_LOADED, STATE_NOT_LOADED, STATE_LOADING_PROCESS};
 
@@ -39,6 +40,7 @@ public:
 class TextureResource;
 class MeshResource;
 class AudioResource;
+class ScriptResource;
 
 class ResourceManager : public EngineComponentManager{
 private:
@@ -50,6 +52,7 @@ public:
     TextureResource* getTextureByLabel(std::string label);
     MeshResource* getMeshByLabel(std::string label);
     AudioResource* getAudioByLabel(std::string label);
+    ScriptResource* getScriptByLabel(std::string label);
 
     ResourceManager();
     ~ResourceManager();
@@ -74,8 +77,29 @@ public:
 
 class AudioResource : public ZsResource{
 public:
+    Engine::SoundBuffer* buffer;
+
+    void load();
+
     AudioResource();
 };
+
+class ScriptResource : public ZsResource{
+public:
+    std::string script_content;
+
+    void load();
+
+    ScriptResource();
+};
+
+class MaterialResource : public ZsResource{
+public:
+
+
+    MaterialResource();
+};
+
 
 }
 

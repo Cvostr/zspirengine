@@ -1,6 +1,8 @@
 #include "../../../headers/world/go_properties.h"
 #include "../../../headers/world/tile_properties.h"
 
+extern ZSpireEngine* engine_ptr;
+
 void Engine::GameObject::loadProperty(std::ifstream* world_stream){
     PROPERTY_TYPE type;
     world_stream->seekg(1, std::ofstream::cur); //Skip space
@@ -96,9 +98,29 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             //Load settings
             world_stream->read(reinterpret_cast<char*>(&lptr->source.source_gain), sizeof(float));
             world_stream->read(reinterpret_cast<char*>(&lptr->source.source_pitch), sizeof(float));
-            //lptr->source.apply_settings(); //Apply settings to openal
+            lptr->source.apply_settings(); //Apply settings to openal
 
             break;
         }
+        case GO_PROPERTY_TYPE_SCRIPTGROUP:{
+            ScriptGroupProperty* ptr = static_cast<ScriptGroupProperty*>(prop_ptr);
+            world_stream->seekg(1, std::ofstream::cur);
+            //Read scripts number
+            world_stream->read(reinterpret_cast<char*>(&ptr->scr_num), sizeof(int));
+            world_stream->seekg(1, std::ofstream::cur);
+            //resize arrays
+            ptr->scripts_attached.resize(static_cast<unsigned int>(ptr->scr_num));
+            //iterate over all scripts and read their path
+            for(unsigned int script_w_i = 0; script_w_i < static_cast<unsigned int>(ptr->scr_num); script_w_i ++){
+                std::string script_path;
+                *world_stream >> script_path;
+                //Writing name (file path)
+                ptr->scripts_attached[script_w_i].name = script_path;
+                ScriptResource* res = ptr->go_link.world_ptr->getResourceManager()->getScriptByLabel(script_path);
+                ptr->scripts_attached[script_w_i].content = res->script_content;
+            }
+            ptr->wakeUp();
+        break;
+    }
     }
 }

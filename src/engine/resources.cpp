@@ -87,8 +87,12 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
                     resource_ptr = new Engine::AudioResource;
                     break;
                 }
+                case TYPE_SCRIPT:{
+                    resource_ptr = new Engine::ScriptResource;
+                    break;
+                }
                 case TYPE_MATERIAL:{
-                    resource_ptr = new Engine::AudioResource;
+                    resource_ptr = new Engine::MaterialResource;
                     break;
                 }
             }
@@ -97,6 +101,9 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
             resource_ptr->rel_path = resource.rel_path;
             resource_ptr->resource_label = resource.resource_label;
             resource_ptr->size = resource.size;
+
+            if(resource_ptr->resource_type == TYPE_SCRIPT)
+                static_cast<Engine::ScriptResource*>(resource_ptr)->load();
 
             this->resources.push_back(resource_ptr);
         }
@@ -147,6 +154,53 @@ Engine::AudioResource::AudioResource(){
     this->resource_type = TYPE_AUDIO;
 }
 
+Engine::ScriptResource::ScriptResource(){
+    this->resource_type = TYPE_SCRIPT;
+}
+
+Engine::MaterialResource::MaterialResource(){
+    this->resource_type = TYPE_MATERIAL;
+}
+
+
+void Engine::AudioResource::load(){
+    if(this->resource_state == STATE_NOT_LOADED){
+        request = new Engine::Loader::LoadRequest;
+        request->isBlob = true;
+        request->data = new unsigned char[this->size];
+        request->offset = this->offset;
+        request->size = this->size;
+        request->file_path = this->blob_path;
+        Engine::Loader::queryLoadingRequest(request);
+        this->resource_state = STATE_LOADING_PROCESS;
+    }
+    if(this->resource_state == STATE_LOADING_PROCESS){
+        if(this->request->done){
+            this->buffer->loadBufferWAV(request->data);
+            delete[] request->data;
+            delete this->request;
+            this->resource_state = STATE_LOADED;
+        }
+    }
+}
+
+void Engine::ScriptResource::load(){
+    if(this->resource_state == STATE_NOT_LOADED){
+        request = new Engine::Loader::LoadRequest;
+        request->isBlob = true;
+        request->data = new unsigned char[this->size];
+        request->offset = this->offset;
+        request->size = this->size;
+        request->file_path = this->blob_path;
+        loadImmideately(request);
+        this->resource_state = STATE_LOADED;
+
+        for(unsigned int i = 0; i < this->size; i ++){
+            this->script_content.push_back(static_cast<char>(request->data[i]));
+        }
+    }
+}
+
 Engine::TextureResource* Engine::ResourceManager::getTextureByLabel(std::string label){
     for(unsigned int res = 0; res < this->resources.size(); res ++){
         ZsResource* resource_ptr = this->resources[res];
@@ -169,6 +223,14 @@ Engine::AudioResource* Engine::ResourceManager::getAudioByLabel(std::string labe
         ZsResource* resource_ptr = this->resources[res];
         if(resource_ptr->resource_type == TYPE_AUDIO && resource_ptr->resource_label.compare(label) == 0)
             return static_cast<AudioResource*>(resource_ptr);
+    }
+    return nullptr;
+}
+Engine::ScriptResource* Engine::ResourceManager::getScriptByLabel(std::string label){
+    for(unsigned int res = 0; res < this->resources.size(); res ++){
+        ZsResource* resource_ptr = this->resources[res];
+        if(resource_ptr->resource_type == TYPE_SCRIPT && resource_ptr->resource_label.compare(label) == 0)
+            return static_cast<ScriptResource*>(resource_ptr);
     }
     return nullptr;
 }

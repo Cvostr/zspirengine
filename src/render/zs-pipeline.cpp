@@ -70,6 +70,15 @@ void Engine::RenderPipeline::render(){
                 obj_ptr->processObject(this); //Draw object
         }
 
+        for(unsigned int light_i = 0; light_i < this->lights_ptr.size(); light_i ++){
+            LightsourceProperty* _light_ptr = static_cast<LightsourceProperty*>(lights_ptr[light_i]);
+
+            this->deffered_shader.sendLight(light_i, _light_ptr);
+        }
+        //send amount of lights to deffered shader
+        this->deffered_shader.setGLuniformInt("lights_amount", static_cast<int>(lights_ptr.size()));
+        //free lights array
+        this->removeLights();
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
         glClear(GL_COLOR_BUFFER_BIT); //Clear screen
@@ -254,4 +263,12 @@ void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
 
 Engine::Shader* Engine::RenderPipeline::getTileShader(){
     return &this->tile_shader;
+}
+
+void Engine::RenderPipeline::addLight(void* light_ptr){
+    this->lights_ptr.push_back(light_ptr);
+}
+
+void Engine::RenderPipeline::removeLights(){
+    this->lights_ptr.clear();
 }

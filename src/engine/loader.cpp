@@ -17,6 +17,7 @@ void loop(){
             stream.open(file_path, std::ofstream::binary);
             stream.seekg(static_cast<long>(req->offset));
             stream.read(reinterpret_cast<char*>(req->data), req->size);
+            stream.close();
             req->done = true;
             requests.remove(req);
         }
@@ -36,6 +37,15 @@ void Engine::Loader::stop(){
 void Engine::Loader::queryLoadingRequest(LoadRequest* req){
     //loader_loop
     requests.push_back(req);
+}
+
+void Engine::Loader::loadImmideately(LoadRequest* req){
+    std::ifstream stream;
+    std::string file_path = blob_root_directory + req->file_path;
+    stream.open(file_path, std::ofstream::binary);
+    stream.seekg(static_cast<long>(req->offset));
+    stream.read(reinterpret_cast<char*>(req->data), req->size);
+    stream.close();
 }
 
 void Engine::Loader::setBlobRootDirectory(std::string dir){
