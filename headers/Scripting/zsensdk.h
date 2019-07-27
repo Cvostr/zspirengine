@@ -4,8 +4,6 @@
 
 #include <string>
 #include "../world/World.h"
-//#include "../world/go_properties.h"
-//#include "../world/tile_properties.h"
 
 extern "C" {
 #include <lua5.3/lua.h>
@@ -18,18 +16,10 @@ extern "C" {
 
 namespace ZSENSDK {
 
-class ZSEN_World{
-public:
-    Engine::World* world_ptr;
-
-    Engine::GameObject* getObjectSDK(std::string name);
-    void removeObject(Engine::GameObject* obj);
-    void setCamera(Engine::Camera cam);
-    Engine::Camera getCamera();
+namespace _Engine {
     void loadWorldFromFile(std::string file);
-    void addPrefab(std::string prefab);
-    void Instantiate(Engine::GameObject* obj);
-};
+}
+
 namespace Debug{
     void Log(std::string text);
 }
@@ -73,6 +63,5 @@ void bindSDK(lua_State* state);
 void bindKeyCodesSDK(lua_State* state);
 
 }
-
 
 #endif // ZSENSDK_H

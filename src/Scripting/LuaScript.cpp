@@ -17,8 +17,8 @@ void Engine::ObjectScript::_InitScript() {
     lua_pcall(L, 0, 0, 0);
 
     //Bind DSDK to script
-    //ZSENSDK::bindSDK(L);
-    //ZSENSDK::bindKeyCodesSDK(L);
+    ZSENSDK::bindSDK(L);
+    ZSENSDK::bindKeyCodesSDK(L);
 }
 
 void Engine::ObjectScript::_DestroyScript(){
@@ -26,18 +26,15 @@ void Engine::ObjectScript::_DestroyScript(){
 }
 
 void Engine::ObjectScript::_callStart() {
-    //ZSENSDK::ZSEN_World world;
-    //world.world_ptr = link.world_ptr;
-
     luabridge::LuaRef start = luabridge::getGlobal(L, "onStart");
     int result = 0;
     if (start.isFunction() == true) { //If function found
-        /*try {
-            result = start(getGameObjectSDK(), world); //Call script onStart()
+        try {
+            result = start(this->link.updLinkPtr(), this->link.world_ptr); //Call script onStart()
         }
         catch (luabridge::LuaException e) {
-           std::cout << "SCRIPT" << "Error occured in script (onStart) " << fpath << e.what() << std::endl;
-        }*/
+           SCRIPT_LOG << "SCRIPT" << "Error occured in script (onStart) " << name << e.what() << std::endl;
+        }
     }
     //Some error returned by script
     if(result == 1) SCRIPT_LOG << "Script (onStart) function exited with 1" << name << std::endl;

@@ -29,25 +29,19 @@ typedef struct ZSVIEWPORT{
 namespace Engine{
     class Camera{
         protected:
-            ZSVECTOR3 camera_pos; //Camera position vector
-            ZSVECTOR3 camera_up; //Camera up direction vector
-            ZSVECTOR3 camera_front; //Camera front direction vector
-
-            float FOV; //Field of view
-            float nearZ; //Nearest Z occlusion plane
-            float farZ;
-
-            ZSVIEWPORT viewport;
-
             ZSMATRIX4x4 proj; //Calculated Projection matrix
             ZSMATRIX4x4 view; //Calculated View matrix
 
             ZSCAMERAPROJECTIONTYPE proj_type;
 
-            bool isMoving;
-
         public:
-            ZSVECTOR3 _dest_pos;
+            ZSVECTOR3 camera_pos; //Camera position vector
+            ZSVECTOR3 camera_up; //Camera up direction vector
+            ZSVECTOR3 camera_front; //Camera front direction vector
+            ZSVIEWPORT viewport;
+            float FOV; //Field of view
+            float nearZ; //Nearest Z occlusion plane
+            float farZ;
 
             ZSVECTOR3 getCameraPosition();
             ZSVECTOR3 getCameraUpVec();
@@ -69,7 +63,6 @@ namespace Engine{
             void setViewport(ZSVIEWPORT viewport);
 
             void setProjectionType(ZSCAMERAPROJECTIONTYPE type);
-            void startMoving();
 
             ZSMATRIX4x4 getViewMatrix();
             ZSMATRIX4x4 getProjMatrix();
