@@ -50,7 +50,6 @@ public:
 
     void copyTo(GameObjectProperty* dest);
     void updTransformPtr();
-    void onObjectDeleted();
     void onPreRender(RenderPipeline* pipeline);
 
     LightsourceProperty();
@@ -85,7 +84,6 @@ public:
 
     void onValueChanged();
     void copyTo(GameObjectProperty* dest);
-    void onAddToObject(); //will update render flag
     void onRender(RenderPipeline* pipeline);
 
     MaterialProperty();

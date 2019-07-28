@@ -49,6 +49,30 @@ Engine::GameObject* Engine::World::addObject(GameObject obj){
     return obj_ptr;
 }
 
+void Engine::World::removeObject(GameObject* object){
+    unsigned int children_num = static_cast<unsigned int>(object->children.size());
+
+    for(unsigned int ch_i = 0; ch_i < children_num; ch_i ++){ //Walk through all children an remove them
+        GameObjectLink link = object->children[0]; //Remove first of children because of trim
+        removeObject(link.updLinkPtr());
+    }
+    //Remove all content in heap, related to object class object
+    object->clearAll();
+
+    if(object->hasParent == true){ //If object parented by other obj
+        GameObject* parent = object->parent.updLinkPtr(); //Receive pointer to object's parent
+
+        unsigned int children_am = static_cast<unsigned int>(parent->children.size()); //get children amount
+        for(unsigned int i = 0; i < children_am; i++){ //Iterate over all children in object
+            GameObjectLink* link_ptr = &parent->children[i];
+            if(object->str_id.compare(link_ptr->obj_str_id) == 0){ //if str_id in requested link compares to iteratable link
+                parent->children[i].crack(); //Make link broken
+            }
+        }
+        parent->trimChildrenArray(); //Remove cracked link from vector
+    }
+}
+
 void Engine::World::loadGameObject(GameObject* object_ptr, std::ifstream* world_stream){
     std::string prefix;
     object_ptr->world_ptr = this; //Assign pointer to world

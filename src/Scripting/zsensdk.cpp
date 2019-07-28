@@ -4,22 +4,28 @@
 #include "../../headers/world/go_properties.h"
 #include "../../headers/world/tile_properties.h"
 
-void ZSENSDK::Debug::Log(std::string text){
+void EZSENSDK::Debug::Log(std::string text){
     std::cout << "SCRIPT: " << text << std::endl;
 }
 
-ZSVECTOR3 ZSENSDK::Math::vnormalize(ZSVECTOR3 vec){
+ZSVECTOR3 EZSENSDK::Math::vnormalize(ZSVECTOR3 vec){
     ZSVECTOR3 result = vec;
     vNormalize(&result);
     return result;
 }
 
-ZSVECTOR3 ZSENSDK::Math::vadd(ZSVECTOR3 v1, ZSVECTOR3 v2){
+ZSVECTOR3 EZSENSDK::Math::vadd(ZSVECTOR3 v1, ZSVECTOR3 v2){
     return v1 + v2;
 }
 
-void ZSENSDK::bindSDK(lua_State* state){
+void EZSENSDK::bindSDK(lua_State* state){
     using namespace Engine;
+
+    luabridge::getGlobalNamespace(state)
+        .beginNamespace("debug")
+        .addFunction("Log", &EZSENSDK::Debug::Log)
+        .endNamespace();
+
     luabridge::getGlobalNamespace(state).beginClass <ZSVECTOR3>("Vec3")
         .addData("x", &ZSVECTOR3::X)
         .addData("y", &ZSVECTOR3::Y)
@@ -37,8 +43,8 @@ void ZSENSDK::bindSDK(lua_State* state){
     luabridge::getGlobalNamespace(state)
         .addFunction("length", &length)
         .addFunction("distance", &getDistance)
-        .addFunction("normalize", &ZSENSDK::Math::vnormalize)
-        .addFunction("v_add", &ZSENSDK::Math::vadd)
+        .addFunction("normalize", &EZSENSDK::Math::vnormalize)
+        .addFunction("v_add", &EZSENSDK::Math::vadd)
         .addFunction("v_cross", &vCross);
 
     luabridge::getGlobalNamespace(state).beginClass <ZSVIEWPORT>("CmViewport")
@@ -64,6 +70,8 @@ void ZSENSDK::bindSDK(lua_State* state){
         .addData("farZ", &Camera::farZ, false)
         .endClass()
 
+        .beginNamespace("engine")
+
         .beginClass <GameObject>("GameObject")
         .addData("active", &GameObject::active, false)
         .addData("propsNum", &GameObject::props_num, false)
@@ -85,12 +93,13 @@ void ZSENSDK::bindSDK(lua_State* state){
         .addFunction("findObject", &World::getGameObjectByLabel)
         //.addFunction("instantiate", &World::Instantiate)
         //.addFunction("addFromPrefab", &World::addObjectsFromPrefabStr)
-        //.addFunction("removeObject", &World::removeObjPtr)
+        .addFunction("removeObject", &World::removeObject)
         .addData("camera", &World::cam, true)
-        .endClass();
+        .endClass()
+        .endNamespace();
 
 
 }
-void ZSENSDK::bindKeyCodesSDK(lua_State* state){
+void EZSENSDK::bindKeyCodesSDK(lua_State* state){
 
 }

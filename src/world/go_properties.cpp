@@ -18,6 +18,9 @@ void Engine::GameObjectProperty::onPreRender(RenderPipeline* pipeline){
 void Engine::GameObjectProperty::onRender(RenderPipeline* pipeline){
 
 }
+void Engine::GameObjectProperty::onObjectDeleted(){
+
+}
 Engine::GameObjectProperty::~GameObjectProperty(){
 
 }
@@ -57,12 +60,13 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
-        /*
+
         case GO_PROPERTY_TYPE_MATERIAL:{
             MaterialProperty* ptr = new MaterialProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
+        /*
         case GO_PROPERTY_TYPE_COLLIDER:{
             ColliderProperty* ptr = new ColliderProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
@@ -241,6 +245,9 @@ Engine::AudioSourceProperty::AudioSourceProperty(){
 void Engine::AudioSourceProperty::onUpdate(float deltaTime){
 
 }
+void Engine::AudioSourceProperty::onObjectDeleted(){
+
+}
 void Engine::AudioSourceProperty::updateAudioPtr(){
     //if(buffer_ptr->resource_state == STATE_LOADED)
        this->buffer_ptr = go_link.world_ptr->getResourceManager()->getAudioByLabel(this->resource_relpath);
@@ -267,4 +274,15 @@ void Engine::AudioSourceProperty::copyTo(GameObjectProperty* dest){
     _dest->source.source_pitch = this->source.source_pitch;
     _dest->source.setPosition(this->source.source_pos);
     _dest->buffer_ptr = this->buffer_ptr;
+}
+
+Engine::MaterialProperty::MaterialProperty(){
+    type = GO_PROPERTY_TYPE_MATERIAL;
+}
+
+void Engine::MaterialProperty::copyTo(GameObjectProperty* dest){
+
+}
+void Engine::MaterialProperty::onRender(RenderPipeline* pipeline){
+
 }

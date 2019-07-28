@@ -58,6 +58,7 @@ public:
     virtual void onUpdate(float deltaTime);
     virtual void onPreRender(RenderPipeline* pipeline);
     virtual void onRender(RenderPipeline* pipeline);
+    virtual void onObjectDeleted();
 
     GameObjectProperty();
     virtual ~GameObjectProperty();
@@ -74,6 +75,7 @@ public:
     GameObject* getGameObjectByStrId(std::string id);
     GameObject* getGameObjectByLabel(std::string label);
     GameObject* addObject(GameObject obj);
+    void removeObject(GameObject* object);
 
     ResourceManager* getResourceManager();
 
@@ -105,6 +107,10 @@ public:
     GameObjectProperty* allocProperty(int type);
     bool addProperty(int property); //Adds property with property ID
     GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
+
+    void clearAll();
+    //remove deleted children from vector
+    void trimChildrenArray();
 
     std::string getLabel();
     void setLabel(std::string label);

@@ -14,7 +14,7 @@ extern "C" {
 
 #include "LuaScript.h"
 
-namespace ZSENSDK {
+namespace EZSENSDK {
 
 namespace _Engine {
     void loadWorldFromFile(std::string file);

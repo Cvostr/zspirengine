@@ -126,3 +126,28 @@ void Engine::GameObject::copyTo(GameObject* dest){
     dest->parent = this->parent;
     dest->str_id = this->str_id;
 }
+
+void Engine::GameObject::clearAll(){
+    unsigned int props_num = static_cast<unsigned int>(this->props_num);
+
+    for(unsigned int prop_i = 0; prop_i < props_num; prop_i ++){ //Walk through all children an remove them
+        //Obtain pointer to property
+        GameObjectProperty* prop_ptr = properties[prop_i];
+        prop_ptr->onObjectDeleted(); //Call on object deletion
+        delete prop_ptr; //Destroy property
+    }
+    this->props_num = 0; //Set property counter to zero
+    children.clear();
+
+}
+
+void Engine::GameObject::trimChildrenArray(){
+    for (unsigned int i = 0; i < children.size(); i ++) { //Iterating over all objects
+        if(children[i].isEmpty() == true){ //If object marked as deleted
+            for (unsigned int obj_i = i + 1; obj_i < children.size(); obj_i ++) { //Iterate over all next chidren
+                children[obj_i - 1] = children[obj_i]; //Move it to previous place
+            }
+            children.resize(children.size() - 1); //Reduce vector length
+        }
+    }
+}

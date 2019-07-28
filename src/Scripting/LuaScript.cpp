@@ -11,6 +11,10 @@ void Engine::ObjectScript::_InitScript() {
     L = luaL_newstate();
     luaL_openlibs(L);
 
+    //Bind DSDK to script
+    EZSENSDK::bindSDK(L);
+    EZSENSDK::bindKeyCodesSDK(L);
+
     int start_result = luaL_dostring(L, this->content.c_str());
 
     created = true;
@@ -21,10 +25,6 @@ void Engine::ObjectScript::_InitScript() {
     }
 
     lua_pcall(L, 0, 0, 0);
-
-    //Bind DSDK to script
-    ZSENSDK::bindSDK(L);
-    ZSENSDK::bindKeyCodesSDK(L);
 }
 
 void Engine::ObjectScript::_DestroyScript(){
@@ -45,7 +45,8 @@ void Engine::ObjectScript::_callStart(GameObject* obj, World* world) {
         }
     }
     //Some error returned by script
-    if(result == 1) SCRIPT_LOG << "Script (onStart) function exited with 1" << name << std::endl;
+    if(result == 1)
+        SCRIPT_LOG << "Script (onStart) function exited with 1" << name << std::endl;
 
 }
 
