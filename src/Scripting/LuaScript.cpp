@@ -3,11 +3,17 @@
 
 #define SCRIPT_LOG std::cout << "SCRIPT "
 
+Engine::ObjectScript::ObjectScript(){
+    created = false;
+}
+
 void Engine::ObjectScript::_InitScript() {
     L = luaL_newstate();
     luaL_openlibs(L);
 
     int start_result = luaL_dostring(L, this->content.c_str());
+
+    created = true;
 
     if(start_result == 1){ //if error in script
         SCRIPT_LOG << name << " error loading occured!" << std::endl;
@@ -22,15 +28,17 @@ void Engine::ObjectScript::_InitScript() {
 }
 
 void Engine::ObjectScript::_DestroyScript(){
+    if(!created) return;
     lua_close(L);
+    created = false;
 }
 
-void Engine::ObjectScript::_callStart() {
+void Engine::ObjectScript::_callStart(GameObject* obj, World* world) {
     luabridge::LuaRef start = luabridge::getGlobal(L, "onStart");
     int result = 0;
     if (start.isFunction() == true) { //If function found
         try {
-            result = start(this->link.updLinkPtr(), this->link.world_ptr); //Call script onStart()
+            result = start(obj, world); //Call script onStart()
         }
         catch (luabridge::LuaException e) {
            SCRIPT_LOG << "SCRIPT" << "Error occured in script (onStart) " << name << e.what() << std::endl;

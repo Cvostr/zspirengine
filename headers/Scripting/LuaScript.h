@@ -19,20 +19,22 @@ class ObjectScript {
 private:
     lua_State* L;
 public:
-    GameObjectLink link;
+    bool created;
     std::string name;
     std::string content;
 
     void _InitScript();
     void _DestroyScript();
 
-    void _callStart();
+    void _callStart(GameObject* obj, World* world);
     void _callDraw(float deltaTime);
     void callDrawUI();
 
     unsigned int getArgCount(lua_State *_L);
 
     void func(lua_State *L);
+
+    ObjectScript();
 
 };
 

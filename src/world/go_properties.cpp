@@ -186,16 +186,18 @@ Engine::ScriptGroupProperty::ScriptGroupProperty(){
 }
 void Engine::ScriptGroupProperty::wakeUp(){   //on scene startup
     for(unsigned int script_i = 0; script_i < static_cast<unsigned int>(scr_num); script_i ++){
-        this->scripts_attached[script_i].link = this->go_link;
 
-        this->scripts_attached[script_i]._InitScript();
-        this->scripts_attached[script_i]._callStart();
     }
 }
 void Engine::ScriptGroupProperty::onUpdate(float deltaTime){  //calls update in scripts
     for(unsigned int script_i = 0; script_i < this->scripts_attached.size(); script_i ++){
         ObjectScript* script_ptr = &this->scripts_attached[script_i]; //Obtain pointer to script
-        //script_ptr->_callDraw(deltaTime); //Run onDraw() function in script
+
+        if(!script_ptr->created){
+            this->scripts_attached[script_i]._InitScript();
+            this->scripts_attached[script_i]._callStart(go_link.updLinkPtr(), go_link.world_ptr);
+        }
+        script_ptr->_callDraw(deltaTime); //Run onDraw() function in script
     }
 }
 

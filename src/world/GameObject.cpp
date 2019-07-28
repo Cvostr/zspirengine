@@ -67,8 +67,24 @@ bool Engine::GameObject::addProperty(int property){
     return true;
 }
 
+std::string Engine::GameObject::getLabel(){
+    return *this->label_ptr;
+}
+
+void Engine::GameObject::setLabel(std::string label){
+    this->getLabelProperty()->label = (label);
+}
+
+void Engine::GameObject::setActive(bool active){
+    this->active = active;
+}
+
 Engine::TransformProperty* Engine::GameObject::getTransformProperty(){
     return static_cast<TransformProperty*>(getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+}
+
+Engine::LabelProperty* Engine::GameObject::getLabelProperty(){
+    return static_cast<LabelProperty*>(getPropertyPtrByType(GO_PROPERTY_TYPE_LABEL));
 }
 
 Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByType(PROPERTY_TYPE type){

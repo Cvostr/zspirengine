@@ -29,9 +29,9 @@ enum PROPERTY_TYPE{
 namespace Engine {
 class GameObject;
 class World;
-class GameObjectProperty;
 
 class TransformProperty;
+class LabelProperty;
 
 class GameObjectLink{
 public:
@@ -46,21 +46,39 @@ public:
     GameObjectLink();
 };
 
+class GameObjectProperty{
+public:
+    PROPERTY_TYPE type; //type of property
+    GameObjectLink go_link;
+    bool active; //Is property working
+
+    World* world_ptr;
+
+    virtual void copyTo(GameObjectProperty* dest);
+    virtual void onUpdate(float deltaTime);
+    virtual void onPreRender(RenderPipeline* pipeline);
+    virtual void onRender(RenderPipeline* pipeline);
+
+    GameObjectProperty();
+    virtual ~GameObjectProperty();
+};
+
 class World{
 private:
     ResourceManager* manager;
-    Engine::Camera cam;
 public:
     std::vector<GameObject> objects;
     void loadFromFile(std::string file);
     void loadGameObject(GameObject* object_ptr, std::ifstream* world_stream);
 
     GameObject* getGameObjectByStrId(std::string id);
+    GameObject* getGameObjectByLabel(std::string label);
     GameObject* addObject(GameObject obj);
 
     ResourceManager* getResourceManager();
 
     Engine::Camera* getCameraPtr();
+    Engine::Camera cam;
 
     World(ResourceManager* manager);
 };
@@ -88,7 +106,24 @@ public:
     bool addProperty(int property); //Adds property with property ID
     GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
 
+    std::string getLabel();
+    void setLabel(std::string label);
+    void setActive(bool active);
+
+    template<typename T>
+    T* getPropertyPtr(){
+        unsigned int props = static_cast<unsigned int>(this->props_num);
+        for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
+            auto property_ptr = this->properties[prop_i];
+            if(typeid( *property_ptr) == typeid(T)){ //If object already has one
+                return static_cast<T*>(property_ptr); //return it
+            }
+        }
+        return nullptr;
+    }
+
     TransformProperty* getTransformProperty();
+    LabelProperty* getLabelProperty();
 
     GameObjectLink getLinkToThisObject();
     void copyTo(GameObject* dest);
@@ -101,24 +136,6 @@ public:
     GameObject();
 };
 
-
-
-class GameObjectProperty{
-public:
-    PROPERTY_TYPE type; //type of property
-    GameObjectLink go_link;
-    bool active; //Is property working
-
-    World* world_ptr;
-
-    virtual void copyTo(GameObjectProperty* dest);
-    virtual void onUpdate(float deltaTime);
-    virtual void onPreRender(RenderPipeline* pipeline);
-    virtual void onRender(RenderPipeline* pipeline);
-
-    GameObjectProperty();
-    virtual ~GameObjectProperty();
-};
 
 class LabelProperty : public GameObjectProperty {
 public:

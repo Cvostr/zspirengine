@@ -17,6 +17,16 @@ Engine::GameObject* Engine::World::getGameObjectByStrId(std::string id){
     return nullptr; //if we haven't found one
 }
 
+Engine::GameObject* Engine::World::getGameObjectByLabel(std::string label){
+    unsigned int objs_num = static_cast<unsigned int>(this->objects.size());
+    for(unsigned int obj_it = 0; obj_it < objs_num; obj_it ++){ //Iterate over all objs in scene
+        GameObject* obj_ptr = &this->objects[obj_it]; //Get pointer to checking object
+        if(obj_ptr->label_ptr->compare(label) == 0) //if labels are same
+            return obj_ptr; //Return founded object
+    }
+    return nullptr; //if we haven't found one
+}
+
 Engine::GameObject* Engine::World::addObject(GameObject obj){
     unsigned int free_index = static_cast<unsigned int>(this->objects.size());
     for(unsigned int obj_i = 0; obj_i < this->objects.size(); obj_i ++){

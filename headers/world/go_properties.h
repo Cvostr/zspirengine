@@ -13,8 +13,6 @@ enum LIGHTSOURCE_TYPE {
     LIGHTSOURCE_TYPE_POINT
 };
 
-typedef uint8_t ZSLIGHTSOURCE_GL_ID;
-
 class MeshProperty : public GameObjectProperty{
 public:
     std::string resource_relpath; //Relative path to resource
@@ -76,6 +74,21 @@ public:
     void audio_stop();
 
     AudioSourceProperty();
+};
+
+class MaterialProperty : public GameObjectProperty{
+public:
+    //Pointer to picked material
+    //Material* material_ptr;
+    //Path to material fil
+    std::string material_path;
+
+    void onValueChanged();
+    void copyTo(GameObjectProperty* dest);
+    void onAddToObject(); //will update render flag
+    void onRender(RenderPipeline* pipeline);
+
+    MaterialProperty();
 };
 
 }

@@ -119,7 +119,6 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
                 ScriptResource* res = ptr->go_link.world_ptr->getResourceManager()->getScriptByLabel(script_path);
                 ptr->scripts_attached[script_w_i].content = res->script_content;
             }
-            ptr->wakeUp();
         break;
     }
     }

@@ -1,6 +1,8 @@
 #include <iostream>
 #include "../../headers/Scripting/zsensdk.h"
 #include "../../headers/world/zs-camera.h"
+#include "../../headers/world/go_properties.h"
+#include "../../headers/world/tile_properties.h"
 
 void ZSENSDK::Debug::Log(std::string text){
     std::cout << "SCRIPT: " << text << std::endl;
@@ -39,6 +41,14 @@ void ZSENSDK::bindSDK(lua_State* state){
         .addFunction("v_add", &ZSENSDK::Math::vadd)
         .addFunction("v_cross", &vCross);
 
+    luabridge::getGlobalNamespace(state).beginClass <ZSVIEWPORT>("CmViewport")
+        .addData("startX", &ZSVIEWPORT::startX)
+        .addData("startY", &ZSVIEWPORT::startY)
+        .addData("endX", &ZSVIEWPORT::endX)
+        .addData("endY", &ZSVIEWPORT::endY)
+        .addConstructor <void(*) (unsigned int, unsigned int, unsigned int, unsigned int)>()
+        .endClass();
+
     luabridge::getGlobalNamespace(state)
         .beginClass <Camera>("Camera")
         .addFunction("setPosition", &Camera::setPosition)
@@ -52,7 +62,33 @@ void ZSENSDK::bindSDK(lua_State* state){
         .addData("Fov", &Camera::FOV, false)
         .addData("nearZ", &Camera::nearZ, false)
         .addData("farZ", &Camera::farZ, false)
+        .endClass()
+
+        .beginClass <GameObject>("GameObject")
+        .addData("active", &GameObject::active, false)
+        .addData("propsNum", &GameObject::props_num, false)
+        .addFunction("getLabel", &GameObject::getLabel)
+        .addFunction("setLabel", &GameObject::setLabel)
+        .addFunction("setActive", &GameObject::setActive)
+/*.addFunction("getProperty", &GameObject::getPropertyPtrByTypeI)
+.addFunction("addProperty", &GameObject::addProperty)
+.addFunction("removeProperty", &GameObject::removeProperty) */
+        .addFunction("transform", &GameObject::getPropertyPtr<TransformProperty>)
+        .addFunction("mesh", &GameObject::getPropertyPtr<MeshProperty>)
+        .addFunction("audio", &GameObject::getPropertyPtr<AudioSourceProperty>)
+        .addFunction("light", &GameObject::getPropertyPtr<LightsourceProperty>)
+        .addFunction("tile", &GameObject::getPropertyPtr<TileProperty>)
+        .addFunction("script", &GameObject::getPropertyPtr<ScriptGroupProperty>)
+        .endClass()
+
+        .beginClass <World>("World")
+        .addFunction("findObject", &World::getGameObjectByLabel)
+        //.addFunction("instantiate", &World::Instantiate)
+        //.addFunction("addFromPrefab", &World::addObjectsFromPrefabStr)
+        //.addFunction("removeObject", &World::removeObjPtr)
+        .addData("camera", &World::cam, true)
         .endClass();
+
 
 }
 void ZSENSDK::bindKeyCodesSDK(lua_State* state){
