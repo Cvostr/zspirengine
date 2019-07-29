@@ -54,6 +54,8 @@ public:
 
     World* world_ptr;
 
+    void setActive(bool active);
+
     virtual void copyTo(GameObjectProperty* dest);
     virtual void onUpdate(float deltaTime);
     virtual void onPreRender(RenderPipeline* pipeline);
@@ -76,6 +78,9 @@ public:
     GameObject* getGameObjectByLabel(std::string label);
     GameObject* addObject(GameObject obj);
     void removeObject(GameObject* object);
+    GameObject* dublicateObject(GameObject* original, bool parent = true);
+    GameObject* Instantiate(GameObject* original);
+    void addObjectsFromPrefab(std::string file);
 
     ResourceManager* getResourceManager();
 
@@ -107,6 +112,9 @@ public:
     GameObjectProperty* allocProperty(int type);
     bool addProperty(int property); //Adds property with property ID
     GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
+
+    void addChildObject(GameObjectLink link);
+    void removeChildObject(GameObjectLink link);
 
     void clearAll();
     //remove deleted children from vector

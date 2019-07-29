@@ -40,7 +40,8 @@ SOURCES += \
     src/Scripting/LuaScript.cpp \
     src/engine/loader.cpp \
     src/misc/oal_manager.cpp \
-    src/Scripting/zsensdk.cpp
+    src/Scripting/zsensdk.cpp \
+    src/misc/randomg.cpp
 
 HEADERS += \
         headers/engine.h \
@@ -62,7 +63,8 @@ HEADERS += \
     headers/engine/loader.h \
     headers/engine_types.h \
     headers/misc/oal_manager.h \
-    headers/Scripting/zsensdk.h
+    headers/Scripting/zsensdk.h \
+    headers/misc/randomg.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

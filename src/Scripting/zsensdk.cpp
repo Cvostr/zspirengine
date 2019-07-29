@@ -91,12 +91,36 @@ void EZSENSDK::bindSDK(lua_State* state){
 
         .beginClass <World>("World")
         .addFunction("findObject", &World::getGameObjectByLabel)
-        //.addFunction("instantiate", &World::Instantiate)
-        //.addFunction("addFromPrefab", &World::addObjectsFromPrefabStr)
+        .addFunction("instantiate", &World::Instantiate)
+        .addFunction("addFromPrefab", &World::addObjectsFromPrefab)
         .addFunction("removeObject", &World::removeObject)
         .addData("camera", &World::cam, true)
         .endClass()
+
+        .beginClass <GameObjectProperty>("ObjectProperty")
+        .addFunction("setActive", &GameObjectProperty::setActive)
+        .addData("active", &GameObjectProperty::active, false)
+        .addData("type", &GameObjectProperty::type, false)
+        .endClass()
+
+        //Usual script
+        .beginClass <ObjectScript>("Script")
+        .addFunction("onStart", &ObjectScript::_callStart)
+        .addFunction("onFrame", &ObjectScript::_callDraw)
+        .addFunction("func", &ObjectScript::func)
+           //.addFunction("funcA", &ObjectScript::_func)
+        .endClass()
+
+
+        .deriveClass <LightsourceProperty, GameObjectProperty>("LightSource")
+        .addData("intensity", &LightsourceProperty::intensity)
+        .addData("range", &LightsourceProperty::range)
+        .addData("color", &LightsourceProperty::color)
+        .endClass()
+
+
         .endNamespace();
+
 
 
 }

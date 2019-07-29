@@ -1,4 +1,5 @@
 #include "../../headers/world/World.h"
+#include "../../headers/misc/randomg.h"
 
 Engine::World::World(ResourceManager* manager){
     objects.resize(0);
@@ -73,6 +74,63 @@ void Engine::World::removeObject(GameObject* object){
     }
 }
 
+Engine::GameObject* Engine::World::dublicateObject(GameObject* original, bool parent){
+    GameObject _new_obj;//Create an empty
+    GameObject* new_obj = addObject(_new_obj);
+
+    //Copying properties data
+    for(unsigned int prop_i = 0; prop_i < original->props_num; prop_i ++){
+        //Get pointer to original property
+        auto prop_ptr = original->properties[prop_i];
+        //register new property in new object
+        new_obj->addProperty(prop_ptr->type);
+        //Get created property
+        auto new_prop = new_obj->getPropertyPtrByType(prop_ptr->type);
+        //start property copying
+        prop_ptr->copyTo(new_prop);
+    }
+
+    if(original->hasParent){ //if original has parent
+        TransformProperty* transform = new_obj->getTransformProperty();
+        ZSVECTOR3 p_translation = ZSVECTOR3(0,0,0);
+        ZSVECTOR3 p_scale = ZSVECTOR3(1,1,1);
+        ZSVECTOR3 p_rotation = ZSVECTOR3(0,0,0);
+        original->parent.ptr->getTransformProperty()->getAbsoluteParentTransform(p_translation, p_scale, p_rotation);
+        transform->translation = transform->translation + p_translation;
+        transform->scale = transform->scale * p_scale;
+        transform->rotation = transform->rotation + p_rotation;
+        if(parent == true)
+            original->parent.ptr->addChildObject(new_obj->getLinkToThisObject());
+    }
+
+    //Set new name for object
+    LabelProperty* label_prop = new_obj->getLabelProperty(); //Obtain pointer to label property
+    std::string to_paste;
+
+    genRandomString(&to_paste, 3);
+
+    label_prop->label = label_prop->label + "_" + to_paste;
+
+    new_obj->label_ptr = &label_prop->label;
+    //Dublicate chilldren object
+    unsigned int children_amount = static_cast<unsigned int>(original->children.size());
+    //Iterate over all children
+
+    for(unsigned int child_i = 0; child_i < children_amount; child_i ++){
+        //Get pointer to original child object
+        GameObjectLink link = original->children[child_i];
+        //create new child obect by dublication of original
+        GameObject* new_child = dublicateObject(link.ptr, false);
+        //parenting
+        new_obj->addChildObject(new_child->getLinkToThisObject());
+    }
+
+    return new_obj;
+}
+Engine::GameObject* Engine::World::Instantiate(GameObject* original){
+    return  this->dublicateObject(original);
+}
+
 void Engine::World::loadGameObject(GameObject* object_ptr, std::ifstream* world_stream){
     std::string prefix;
     object_ptr->world_ptr = this; //Assign pointer to world
@@ -109,6 +167,10 @@ void Engine::World::loadGameObject(GameObject* object_ptr, std::ifstream* world_
             object_ptr->loadProperty(world_stream);
         }
     }
+}
+
+void Engine::World::addObjectsFromPrefab(std::string file){
+
 }
 
 void Engine::World::loadFromFile(std::string file){

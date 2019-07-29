@@ -5,7 +5,9 @@ Engine::GameObjectProperty::GameObjectProperty(){
     type = GO_PROPERTY_TYPE_NONE;
     active = true;
 }
-
+void Engine::GameObjectProperty::setActive(bool active){
+    this->active = active;
+}
 void Engine::GameObjectProperty::copyTo(GameObjectProperty* dest){
 
 }

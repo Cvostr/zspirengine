@@ -67,6 +67,68 @@ bool Engine::GameObject::addProperty(int property){
     return true;
 }
 
+void Engine::GameObject::addChildObject(GameObjectLink link){
+    GameObjectLink _link = link;
+    _link.updLinkPtr(); //Calculating object pointer
+    _link.ptr->hasParent = true; //Object now has a parent (if it has't before)
+    _link.ptr->parent.obj_str_id = this->getLinkToThisObject().obj_str_id; //Assigning pointer to new parent
+    _link.ptr->parent.world_ptr = this->getLinkToThisObject().world_ptr;
+    _link.ptr->parent.updLinkPtr();
+
+    //Updating child's transform
+    //Now check, if it is possible
+    TransformProperty* Pobj_transform = static_cast<TransformProperty*>(getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+    TransformProperty* Cobj_transform = static_cast<TransformProperty*>(link.ptr->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+
+    if(Pobj_transform != nullptr && Cobj_transform != nullptr){ //If both objects have mesh property
+
+        ZSVECTOR3 p_translation = ZSVECTOR3(0,0,0);
+        ZSVECTOR3 p_scale = ZSVECTOR3(1,1,1);
+        ZSVECTOR3 p_rotation = ZSVECTOR3(0,0,0);
+        Pobj_transform->getAbsoluteParentTransform(p_translation, p_scale, p_rotation); //Collecting transforms
+
+        Cobj_transform->translation = Cobj_transform->translation - p_translation;
+        Cobj_transform->scale = Cobj_transform->scale / p_scale;
+        Cobj_transform->rotation = Cobj_transform->rotation - p_rotation;
+
+        Cobj_transform->updateMat(); //Update transform matrix
+    }
+
+    this->children.push_back(_link);
+}
+void Engine::GameObject::removeChildObject(GameObjectLink link){
+    unsigned int children_am = static_cast<unsigned int>(children.size()); //get children amount
+    for(unsigned int i = 0; i < children_am; i++){ //Iterate over all children in object
+        GameObjectLink* link_ptr = &children[i];
+        if(link.obj_str_id.compare(link_ptr->obj_str_id) == 0){ //if str_id in requested link compares to iteratable link
+            GameObject* ptr = children[i].updLinkPtr();
+            children[i].crack(); //Make link broken
+
+            //Updating child's transform
+            //Now check, if it is possible
+            TransformProperty* Pobj_transform = static_cast<TransformProperty*>(getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+            TransformProperty* Cobj_transform = static_cast<TransformProperty*>(ptr->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+
+            if(Pobj_transform != nullptr && Cobj_transform != nullptr){ //If both objects have mesh property
+
+                ZSVECTOR3 p_translation = ZSVECTOR3(0,0,0);
+                ZSVECTOR3 p_scale = ZSVECTOR3(1,1,1);
+                ZSVECTOR3 p_rotation = ZSVECTOR3(0,0,0);
+                Pobj_transform->getAbsoluteParentTransform(p_translation, p_scale, p_rotation);
+
+                Cobj_transform->translation = Cobj_transform->translation + p_translation;
+
+                Cobj_transform->scale = Cobj_transform->scale * p_scale;
+
+                Cobj_transform->rotation = Cobj_transform->rotation + Pobj_transform->rotation;
+
+                Cobj_transform->updateMat(); //Update transform matrix
+            }
+        }
+    }
+    trimChildrenArray(); //Remove broken link from vector
+}
+
 std::string Engine::GameObject::getLabel(){
     return *this->label_ptr;
 }
