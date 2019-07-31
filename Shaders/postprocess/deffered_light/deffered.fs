@@ -27,6 +27,7 @@ uniform sampler2D tDiffuse;
 uniform sampler2D tNormal;
 uniform sampler2D tPos;
 uniform sampler2D tTransparent;
+uniform sampler2D tBackground;
 
 uniform int lights_amount;
 uniform Light lights[100];
@@ -36,10 +37,14 @@ uniform vec3 ambient_color;
 uniform vec3 cam_position;
 
 void main(){
-    vec4 Diffuse = texture(tDiffuse, UVCoord);
-    vec3 FragPos = texture(tPos, UVCoord).rgb;
-    vec3 Normal = texture(tNormal, UVCoord).rgb;
-    
+	
+		
+
+    	vec4 Diffuse = texture(tDiffuse, UVCoord);
+    	vec3 FragPos = texture(tPos, UVCoord).rgb;
+	vec3 Normal = texture(tNormal, UVCoord).rgb;
+	vec4 Background = texture(tBackground, UVCoord);   	
+
     vec3 result = Diffuse.xyz * ambient_color;
 
     float specularFactor = Diffuse.w; //Get factor in A channel
@@ -63,6 +68,9 @@ void main(){
 			result += lights[lg].color * factor;
 		}
 	}
-		
+
+	//if(Background.a == 1.0)
+		//result = Background.rgb;
+	
 	FragColor = vec4(result, 1);
 }

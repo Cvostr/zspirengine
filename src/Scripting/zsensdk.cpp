@@ -26,6 +26,23 @@ void EZSENSDK::bindSDK(lua_State* state){
         .addFunction("Log", &EZSENSDK::Debug::Log)
         .endNamespace();
 
+    luabridge::getGlobalNamespace(state)
+        .beginNamespace("input")
+        .addFunction("isKeyPressed", &EZSENSDK::Input::isKeyPressed)
+        .addFunction("isKeyHold", &EZSENSDK::Input::isKeyHold)
+        .addFunction("getMouseState", &EZSENSDK::Input::getMouseState)
+        //Add mouse state class
+        .beginClass <Input::MouseState>("MouseState")
+        .addData("cursorX", &Input::MouseState::mouseX)
+        .addData("cursorY", &Input::MouseState::mouseY)
+        .addData("relX", &Input::MouseState::mouseRelX)
+        .addData("relY", &Input::MouseState::mouseRelY)
+        .addData("isLButtonDown", &Input::MouseState::isLButtonDown)
+        .addData("isRButtonDown", &Input::MouseState::isRButtonDown)
+        .endClass()
+
+        .endNamespace();
+
     luabridge::getGlobalNamespace(state).beginClass <ZSVECTOR3>("Vec3")
         .addData("x", &ZSVECTOR3::X)
         .addData("y", &ZSVECTOR3::Y)
@@ -111,19 +128,43 @@ void EZSENSDK::bindSDK(lua_State* state){
            //.addFunction("funcA", &ObjectScript::_func)
         .endClass()
 
-
-        .deriveClass <LightsourceProperty, GameObjectProperty>("LightSource")
+        //Lightsource class
+        .deriveClass <Engine::LightsourceProperty, GameObjectProperty>("LightSource")
         .addData("intensity", &LightsourceProperty::intensity)
         .addData("range", &LightsourceProperty::range)
         .addData("color", &LightsourceProperty::color)
+        .endClass()
+        //Transform class
+        .deriveClass <Engine::TransformProperty, GameObjectProperty>("Transform")
+        .addData("translation", &Engine::TransformProperty::translation, false)
+        .addData("scale", &Engine::TransformProperty::scale, false)
+        .addData("rotation", &Engine::TransformProperty::rotation, false)
+        .addFunction("setPosition", &Engine::TransformProperty::setTranslation)
+        .addFunction("setScale", &Engine::TransformProperty::setScale)
+        .addFunction("setRotation", &Engine::TransformProperty::setRotation)
+        .endClass()
+        //Audio source
+        .deriveClass <Engine::AudioSourceProperty, Engine::GameObjectProperty>("AudioSource")
+        //.addFunction("setAudioFile", &AudioSourceProperty::setAudioFile)
+        .addFunction("Play", &Engine::AudioSourceProperty::audio_start)
+        .addFunction("Stop", &Engine::AudioSourceProperty::audio_stop)
+        //.addFunction("Pause", &AudioSourceProperty::audio_pause)
+        //.addFunction("getGain", &AudioSourceProperty::getGain)
+        //.addFunction("getPitch", &AudioSourceProperty::getPitch)
+        //.addFunction("setGain", &AudioSourceProperty::setGain)
+        //.addFunction("setPitch", &AudioSourceProperty::setPitch)
+        .endClass()
+
+        //Tile class
+        .deriveClass <Engine::TileProperty, GameObjectProperty>("Tile2D")
+        .addFunction("playAnim", &Engine::TileProperty::playAnim)
+        .addFunction("setDiffuseTexture", &Engine::TileProperty::setDiffuseTexture)
+        .addFunction("stopAnim", &Engine::TileProperty::stopAnim)
         .endClass()
 
 
         .endNamespace();
 
 
-
-}
-void EZSENSDK::bindKeyCodesSDK(lua_State* state){
 
 }

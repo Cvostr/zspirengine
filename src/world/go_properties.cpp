@@ -154,6 +154,19 @@ void Engine::TransformProperty::getAbsoluteRotationMatrix(ZSMATRIX4x4& m){
     }
 }
 
+void Engine::TransformProperty::setTranslation(ZSVECTOR3 new_translation){
+    this->translation = new_translation;
+    this->updateMat();
+}
+void Engine::TransformProperty::setScale(ZSVECTOR3 new_scale){
+    this->scale = new_scale;
+    this->updateMat();
+}
+void Engine::TransformProperty::setRotation(ZSVECTOR3 new_rotation){
+    this->rotation = new_rotation;
+    this->updateMat();
+}
+
 void Engine::TransformProperty::copyTo(GameObjectProperty* dest){
     if(dest->type != this->type) return; //if it isn't transform
     //cast pointer and send data

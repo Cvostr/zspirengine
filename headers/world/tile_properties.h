@@ -81,9 +81,13 @@ public:
     TileAnimationState anim_state;
 
     void updTexturePtr();
-    //void copyTo(GameObjectProperty* dest);
+    void copyTo(GameObjectProperty* dest);
     void onUpdate(float deltaTime);
     void onRender(RenderPipeline* pipeline);
+
+    void playAnim();
+    void stopAnim();
+    void setDiffuseTexture(std::string texture);
 
     TileProperty();
 };

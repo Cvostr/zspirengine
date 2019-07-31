@@ -41,7 +41,8 @@ SOURCES += \
     src/engine/loader.cpp \
     src/misc/oal_manager.cpp \
     src/Scripting/zsensdk.cpp \
-    src/misc/randomg.cpp
+    src/misc/randomg.cpp \
+    src/Scripting/zsensdk_input.cpp
 
 HEADERS += \
         headers/engine.h \

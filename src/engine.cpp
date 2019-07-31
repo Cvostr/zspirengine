@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <iostream>
 #include "../headers/misc/oal_manager.h"
+#include "../headers/Scripting/zsensdk.h"
 
 ZSpireEngine* engine_ptr;
 
@@ -139,6 +140,16 @@ void ZSpireEngine::loadGame(){
         while (SDL_PollEvent(&event)){
             if (event.type == SDL_QUIT)  //If user caused SDL window to close
                 this->gameRuns = false;
+            if (event.type == SDL_KEYDOWN) { //if user pressed a key on keyboard
+                //w.edit_win_ptr->onKeyDown(event.key.keysym); //Call press function on EditWindow
+                EZSENSDK::Input::addPressedKeyToQueue(event.key.keysym.sym);
+                EZSENSDK::Input::addHeldKeyToQueue(event.key.keysym.sym);
+
+            }
+            if (event.type == SDL_KEYUP) { //if user pressed a key on keyboard
+                EZSENSDK::Input::removeHeldKeyFromQueue(event.key.keysym.sym);
+
+            }
         }
 
         data->pipeline->render();

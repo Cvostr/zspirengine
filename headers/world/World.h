@@ -178,6 +178,8 @@ public:
     void getAbsoluteRotationMatrix(ZSMATRIX4x4& m);
 
     void setTranslation(ZSVECTOR3 new_translation);
+    void setScale(ZSVECTOR3 new_scale);
+    void setRotation(ZSVECTOR3 new_rotation);
 
     TransformProperty();
 };

@@ -5,6 +5,7 @@
 layout (location = 0) out vec4 tDiffuse;
 layout (location = 1) out vec3 tNormal;
 layout (location = 2) out vec3 tPos;
+layout (location = 4) out vec4 tBackground;
 
 out vec4 FragColor;
 
@@ -51,4 +52,6 @@ void main(){
 	tDiffuse = vec4(result, result_shininess);
 	tPos = FragPos;
 	tNormal = Normal;
+
+	tBackground.r = 1;
 }

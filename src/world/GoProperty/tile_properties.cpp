@@ -34,3 +34,28 @@ void Engine::TileProperty::onUpdate(float deltaTime){
 
     }
 }
+
+void Engine::TileProperty::copyTo(GameObjectProperty* dest){
+    if(dest->type != this->type) return; //if it isn't transform
+
+    //Do base things
+    GameObjectProperty::copyTo(dest);
+
+    TileProperty* _dest = static_cast<TileProperty*>(dest);
+    _dest->diffuse_relpath = diffuse_relpath;
+    _dest->texture_diffuse = texture_diffuse;
+    _dest->anim_property = anim_property;
+    _dest->geometry = geometry;
+}
+
+void Engine::TileProperty::playAnim(){
+    anim_state.playing = true;
+}
+void Engine::TileProperty::stopAnim(){
+    anim_state.playing = false;
+}
+void Engine::TileProperty::setDiffuseTexture(std::string texture){
+    diffuse_relpath = texture;
+        //Update texture pointer
+    updTexturePtr();
+}
