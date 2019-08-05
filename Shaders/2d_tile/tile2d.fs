@@ -4,7 +4,7 @@
 
 layout (location = 0) out vec4 tDiffuse;
 layout (location = 2) out vec3 tPos;
-layout (location = 4) out vec4 tTransparent;
+layout (location = 3) out vec4 tTransparent;
 
 out vec4 FragColor;
 
