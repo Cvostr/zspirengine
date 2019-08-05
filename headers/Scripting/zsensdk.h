@@ -53,6 +53,7 @@ namespace Input {
 
         bool isLButtonDown;
         bool isRButtonDown;
+        bool isMidBtnDown;
     };
 
     MouseState* getMouseStatePtr();

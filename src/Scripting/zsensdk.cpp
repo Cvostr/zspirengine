@@ -4,6 +4,12 @@
 #include "../../headers/world/go_properties.h"
 #include "../../headers/world/tile_properties.h"
 
+extern ZSpireEngine* engine_ptr;
+
+unsigned int _mode_fullscreen = SDL_WINDOW_FULLSCREEN;
+unsigned int _mode_borderless = SDL_WINDOW_FULLSCREEN_DESKTOP;
+unsigned int _mode_windowed = 0;
+
 void EZSENSDK::Debug::Log(std::string text){
     std::cout << "SCRIPT: " << text << std::endl;
 }
@@ -18,8 +24,24 @@ ZSVECTOR3 EZSENSDK::Math::vadd(ZSVECTOR3 v1, ZSVECTOR3 v2){
     return v1 + v2;
 }
 
+void EZSENSDK::Window::setWindowSize(int W, int H){
+    engine_ptr->updateResolution(W, H);
+}
+void EZSENSDK::Window::setWindowMode(unsigned int mode){
+
+}
+
 void EZSENSDK::bindSDK(lua_State* state){
     using namespace Engine;
+
+    luabridge::getGlobalNamespace(state)
+        .beginNamespace("window")
+        .addVariable("MODE_WINDOWED", &_mode_windowed, false)
+        .addVariable("MODE_FULLSCREEN", &_mode_fullscreen, false)
+        .addVariable("MODE_BORDERLESS", &_mode_borderless, false)
+        .addFunction("setWindowSize", &EZSENSDK::Window::setWindowSize)
+        .addFunction("setWindowMode", &EZSENSDK::Window::setWindowMode)
+        .endNamespace();
 
     luabridge::getGlobalNamespace(state)
         .beginNamespace("debug")
@@ -125,7 +147,6 @@ void EZSENSDK::bindSDK(lua_State* state){
         .addFunction("onStart", &ObjectScript::_callStart)
         .addFunction("onFrame", &ObjectScript::_callDraw)
         .addFunction("func", &ObjectScript::func)
-           //.addFunction("funcA", &ObjectScript::_func)
         .endClass()
 
         //Lightsource class

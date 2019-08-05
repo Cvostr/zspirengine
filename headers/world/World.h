@@ -26,6 +26,8 @@ enum PROPERTY_TYPE{
     GO_PROPERTY_TYPE_TILE = 1001
 };
 
+enum COLLIDER_TYPE {COLLIDER_TYPE_NONE, COLLIDER_TYPE_BOX, COLLIDER_TYPE_CUBE};
+
 namespace Engine {
 class GameObject;
 class World;
@@ -183,6 +185,21 @@ public:
 
     TransformProperty();
 };
+
+class ColliderProperty : public GameObjectProperty{
+public:
+    void onAddToObject(); //will register in world
+    void onObjectDeleted(); //unregister in world
+    void copyTo(GameObjectProperty* dest);
+
+    TransformProperty* getTransformProperty();
+
+    bool isTrigger;
+    COLLIDER_TYPE coll_type;
+
+    ColliderProperty();
+};
+
 
 }
 

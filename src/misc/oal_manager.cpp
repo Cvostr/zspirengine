@@ -76,48 +76,25 @@ bool Engine::SoundBuffer::loadBufferWAV(unsigned char* buffer){
     unsigned int channels = 1;
     int bits;
 
-    /*std::ifstream audio_stream;
-    audio_stream.open(file_path, std::iostream::binary | std::iostream::ate);
-
-    if (audio_stream.fail()) return false;
-
-    int size = static_cast<int>(audio_stream.tellg());
-    data_buffer = new unsigned char[size];
-
-    audio_stream.seekg(0);
-*/
-    //audio_stream.read(reinterpret_cast<char*>(data_buffer), 12);
-
-    //audio_stream.read(reinterpret_cast<char*>(data_buffer), 8);
-    if (buffer[13] != 'f' || buffer[14] != 'm' || buffer[15] != 't' || buffer[16] != ' ')
+    if (buffer[12] != 'f' || buffer[13] != 'm' || buffer[14] != 't' || buffer[15] != ' ')
     {
-        delete [] buffer; //Free heap
         return false;
     }
-    //audio_stream.read(reinterpret_cast<char*>(data_buffer), 2);
-    if (buffer[22] != 0 || buffer[21] != 1)
+    if (buffer[21] != 0 || buffer[20] != 1)
     {
-        delete [] buffer; //Free heap
-        //audio_stream.close();
-        //fprintf(stderr, "Not PCM :(\n"); //Close stream
         return false;
     }
 
-    //audio_stream.read(reinterpret_cast<char*>(data_buffer), 2);
-    channels = static_cast<unsigned int>(buffer[24] << 8);
-    channels |= buffer[23];
+    channels = static_cast<unsigned int>(buffer[23] << 8);
+    channels |= buffer[22];
 
-    //audio_stream.read(reinterpret_cast<char*>(data_buffer), 4);
-    freq = static_cast<unsigned int>(buffer[28] << 24);
-    freq |= static_cast<unsigned int>(buffer[27] << 16);
-    freq |= static_cast<unsigned int>(buffer[26] << 8);
-    freq |= static_cast<unsigned int>(buffer[25]);
+    freq = static_cast<unsigned int>(buffer[27] << 24);
+    freq |= static_cast<unsigned int>(buffer[26] << 16);
+    freq |= static_cast<unsigned int>(buffer[25] << 8);
+    freq |= static_cast<unsigned int>(buffer[24]);
 
-    //audio_stream.read(reinterpret_cast<char*>(data_buffer), 6);
-    //audio_stream.read(reinterpret_cast<char*>(data_buffer), 2);
-
-    bits = buffer[36] << 8;
-    bits |= buffer[35];
+    bits = buffer[35] << 8;
+    bits |= buffer[34];
 
     if (bits == 8)
     {
@@ -135,41 +112,31 @@ bool Engine::SoundBuffer::loadBufferWAV(unsigned char* buffer){
     }
     if (!format)
     {
-        delete [] buffer; //Free heap
-        //audio_stream.close();
         std::cout << "Incompatible format (" << channels << ", " << bits << ") :(" << std::endl;
         return false;
     }
 
-    int start_offset = 36;
+    int start_offset = 35;
 
     //read 4 bytes, until "data" header found
-    while(buffer[0] != 'd' || buffer[1] != 'a' || buffer[2] != 't' || buffer[3] != 'a')
+    while(buffer[start_offset] != 'd' || buffer[start_offset + 1] != 'a' || buffer[start_offset + 2] != 't' || buffer[ start_offset + 3] != 'a')
         start_offset += 1;
         //Read size
-    //audio_stream.read(reinterpret_cast<char*>(data_buffer), 4);
     start_offset += 4;
     //Calculate size
     int _size = buffer[start_offset + 3] << 24; //Getting size, 32 bit value
     _size |= buffer[start_offset + 2] << 16;
     _size |= buffer[start_offset + 1] << 8;
     _size |= buffer[start_offset];
-    start_offset += 4;
-    //read data
-    //audio_stream.read(reinterpret_cast<char*>(data_buffer), _size);
     //Send data to OpenAL
     alBufferData(this->al_buffer_id, format, static_cast<void*>(buffer + start_offset), _size, static_cast<int>(freq));
     int err = alGetError();
     if (err != AL_NO_ERROR)
     {
         std::cout << "Error loading " << err << std::endl;
-        delete [] buffer; //Free heap
-       // audio_stream.close();
         return false;
     }
 
-    delete [] buffer; //Free heap
-   // audio_stream.close();
     return true;
 }
 

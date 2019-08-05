@@ -152,6 +152,7 @@ Engine::MeshResource::MeshResource(){
 
 Engine::AudioResource::AudioResource(){
     this->resource_type = TYPE_AUDIO;
+    buffer = new SoundBuffer;
 }
 
 Engine::ScriptResource::ScriptResource(){

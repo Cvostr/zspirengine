@@ -56,6 +56,8 @@ public:
 };
 
 class AudioSourceProperty : public GameObjectProperty{
+private:
+    bool isPlaySheduled;
 public:
     std::string resource_relpath; //Relative path to resource
     AudioResource* buffer_ptr;
@@ -87,6 +89,20 @@ public:
     void onRender(RenderPipeline* pipeline);
 
     MaterialProperty();
+};
+
+class RigidbodyProperty : public GameObjectProperty{
+public:
+
+    ZSVECTOR3 speed;
+
+    float mass;
+    bool hasGravity;
+
+    void onUpdate(float deltaTime);
+    void copyTo(GameObjectProperty* dest);
+
+    RigidbodyProperty();
 };
 
 }

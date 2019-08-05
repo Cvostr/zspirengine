@@ -89,6 +89,13 @@ void ZSpireEngine::updateDeltaTime(float deltaTime){
     }
 }
 
+void ZSpireEngine::updateResolution(int W, int H){
+    SDL_SetWindowSize(this->window, W, H);
+    for(unsigned int i = 0; i < components.size(); i ++){
+        components[i]->updateWindowSize(W, H);
+    }
+}
+
 void ZSpireEngine::loadGame(){
     gameRuns = true;
 
@@ -137,6 +144,7 @@ void ZSpireEngine::loadGame(){
         updateDeltaTime(deltaTime);
 
         SDL_Event event;
+        EZSENSDK::Input::MouseState* mstate = EZSENSDK::Input::getMouseStatePtr();
         while (SDL_PollEvent(&event)){
             if (event.type == SDL_QUIT)  //If user caused SDL window to close
                 this->gameRuns = false;
@@ -150,9 +158,46 @@ void ZSpireEngine::loadGame(){
                 EZSENSDK::Input::removeHeldKeyFromQueue(event.key.keysym.sym);
 
             }
+            if (event.type == SDL_MOUSEMOTION) { //If user moved mouse
+                //update state in ZSENSDK
+                mstate->mouseX = event.motion.x;
+                mstate->mouseY = event.motion.y;
+                mstate->mouseRelX = event.motion.xrel;
+                mstate->mouseRelY = event.motion.yrel;
+            }
+            if (event.type == SDL_MOUSEBUTTONUP) { //If user released mouse button
+
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    mstate->isLButtonDown = false;
+                }
+                if (event.button.button == SDL_BUTTON_RIGHT) {
+                    mstate->isRButtonDown = false;
+                }
+                if (event.button.button == SDL_BUTTON_MIDDLE) {
+                    mstate->isMidBtnDown = false;
+                }
+            }
+            if (event.type == SDL_MOUSEBUTTONDOWN) { //If user pressed mouse btn
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    mstate->isLButtonDown = true;
+                }
+                if (event.button.button == SDL_BUTTON_RIGHT) {
+                    mstate->isRButtonDown = true;
+                }
+                if (event.button.button == SDL_BUTTON_MIDDLE) {
+                    mstate->isMidBtnDown = true;
+                }
+            }
+            if (event.type == SDL_MOUSEWHEEL) {
+
+            }
+
         }
 
         data->pipeline->render();
+
+        EZSENSDK::Input::clearMouseState();
+        EZSENSDK::Input::clearPressedKeys();
 
         SDL_GL_SwapWindow(window); //Send rendered frame
 

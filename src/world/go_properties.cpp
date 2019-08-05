@@ -255,24 +255,42 @@ Engine::AudioSourceProperty::AudioSourceProperty(){
     this->source.source_gain = 1.0f;
     this->source.source_pitch = 1.0f;
 
+     isPlaySheduled = false;
+
     source.Init();
 }
 void Engine::AudioSourceProperty::onUpdate(float deltaTime){
+    if(buffer_ptr->resource_state == STATE_LOADING_PROCESS)
+        this->buffer_ptr->load();
+    if(buffer_ptr->resource_state == STATE_LOADED && isPlaySheduled){
+        audio_start();
+        isPlaySheduled = false;
+    }
 
+
+    TransformProperty* transform = go_link.updLinkPtr()->getTransformProperty();
+
+    //if(transform->translation != this->last_pos){
+        this->source.setPosition(transform->translation);
 }
 void Engine::AudioSourceProperty::onObjectDeleted(){
 
 }
 void Engine::AudioSourceProperty::updateAudioPtr(){
-    //if(buffer_ptr->resource_state == STATE_LOADED)
-       this->buffer_ptr = go_link.world_ptr->getResourceManager()->getAudioByLabel(this->resource_relpath);
-    //else {
-        //this->buffer_ptr->load();
-    //}
+    this->buffer_ptr = go_link.world_ptr->getResourceManager()->getAudioByLabel(this->resource_relpath);
+
+    if(buffer_ptr == nullptr) return;
+
+    this->source.setAlBuffer(this->buffer_ptr->buffer);
 }
 
 void Engine::AudioSourceProperty::audio_start(){
-    this->source.play();
+    if(buffer_ptr->resource_state == STATE_LOADED)
+        this->source.play();
+    else {
+        this->buffer_ptr->load();
+        isPlaySheduled = true;
+    }
 }
 void Engine::AudioSourceProperty::audio_stop(){
     this->source.stop();
