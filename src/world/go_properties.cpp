@@ -68,13 +68,13 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
-        /*
+
         case GO_PROPERTY_TYPE_COLLIDER:{
             ColliderProperty* ptr = new ColliderProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
-        */
+
         case GO_PROPERTY_TYPE_TILE_GROUP:{
             TileGroupProperty* ptr = new TileGroupProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
@@ -255,7 +255,7 @@ Engine::AudioSourceProperty::AudioSourceProperty(){
     this->source.source_gain = 1.0f;
     this->source.source_pitch = 1.0f;
 
-     isPlaySheduled = false;
+    isPlaySheduled = false;
 
     source.Init();
 }
@@ -278,16 +278,17 @@ void Engine::AudioSourceProperty::onObjectDeleted(){
 }
 void Engine::AudioSourceProperty::updateAudioPtr(){
     this->buffer_ptr = go_link.world_ptr->getResourceManager()->getAudioByLabel(this->resource_relpath);
-
-    if(buffer_ptr == nullptr) return;
-
-    this->source.setAlBuffer(this->buffer_ptr->buffer);
 }
 
 void Engine::AudioSourceProperty::audio_start(){
-    if(buffer_ptr->resource_state == STATE_LOADED)
+    if(buffer_ptr->resource_state == STATE_LOADED){
+        //Update source buffer
+        if(buffer_ptr == nullptr) return;
+        this->source.setAlBuffer(this->buffer_ptr->buffer);
+        //play source
         this->source.play();
-    else {
+
+    }else {
         this->buffer_ptr->load();
         isPlaySheduled = true;
     }
@@ -295,7 +296,23 @@ void Engine::AudioSourceProperty::audio_start(){
 void Engine::AudioSourceProperty::audio_stop(){
     this->source.stop();
 }
-
+void Engine::AudioSourceProperty::audio_pause(){
+    this->source.pause();
+}
+float Engine::AudioSourceProperty::getGain(){
+    return this->source.source_gain;
+}
+float Engine::AudioSourceProperty::getPitch(){
+    return this->source.source_pitch;
+}
+void Engine::AudioSourceProperty::setGain(float gain){
+    source.source_gain = gain;
+    source.apply_settings();
+}
+void Engine::AudioSourceProperty::setPitch(float pitch){
+    source.source_pitch = pitch;
+    source.apply_settings();
+}
 void Engine::AudioSourceProperty::copyTo(GameObjectProperty* dest){
     if(dest->type != this->type) return; //if it isn't transform
 
@@ -317,5 +334,16 @@ void Engine::MaterialProperty::copyTo(GameObjectProperty* dest){
 
 }
 void Engine::MaterialProperty::onRender(RenderPipeline* pipeline){
+
+}
+
+
+Engine::ColliderProperty::ColliderProperty(){
+    type = GO_PROPERTY_TYPE_COLLIDER;
+}
+void Engine::ColliderProperty::onObjectDeleted(){
+
+} //unregister in world
+void Engine::ColliderProperty::copyTo(GameObjectProperty* dest){
 
 }

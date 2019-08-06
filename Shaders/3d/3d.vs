@@ -33,10 +33,10 @@ void main(){
 	vec3 NormalVec = normalize(vec3(object_transform * vec4(normal, 0)));
 	TBN = transpose(mat3(TangentVec, BiTangentVec, NormalVec));
     //Enabled shadows
-	if(hasShadowMap){
+	//if(hasShadowMap){
         vec4 objPosLightSpace = LightProjectionMat * LightViewMat * vec4(FragPos, 1.0);
-        ShadowProjection = (objPosLightSpace.xyz / objPosLightSpace.w) * 0.5 + 0.5;
-	}
+        ShadowProjection = (objPosLightSpace.xyz / objPosLightSpace.w) / 2.0 + 0.5;
+	//}
 	
 	gl_Position =  cam_projection * cam_view * vec4(FragPos, 1.0);
 	

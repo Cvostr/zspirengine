@@ -51,7 +51,7 @@ void main(){
 	}    
 		
     if(hasSpecularMap)
-        result_shininess *= texture(specular_map, uv).x;
+        result_shininess *= texture(specular_map, uv).r;
             
 	tDiffuse = vec4(result, result_shininess);
 	tPos = FragPos;
@@ -59,11 +59,14 @@ void main(){
 
 	tMasks = vec4(1.0, 0, 0, 0);
 	//Shadowmapping enabled
-	if(hasShadowMap){
+	//if(hasShadowMap){
         vec4 shadowmap = texture(shadow_map, ShadowProjection.xy);
         float texture_depth = shadowmap.r;
         float real_depth = ShadowProjection.z;
+        
+        //if(texture_depth > real_depth) tMasks.g = 1;
+       // else tMasks.g = 0;
         tMasks.g = (real_depth - shadow_bias > texture_depth) ? 1.0 : 0.0;
         
-	}
+	//}
 }

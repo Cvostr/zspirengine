@@ -61,6 +61,7 @@ void EZSENSDK::bindSDK(lua_State* state){
         .addData("relY", &Input::MouseState::mouseRelY)
         .addData("isLButtonDown", &Input::MouseState::isLButtonDown)
         .addData("isRButtonDown", &Input::MouseState::isRButtonDown)
+        .addData("isMidButtonDown", &Input::MouseState::isMidBtnDown)
         .endClass()
 
         .endNamespace();
@@ -169,11 +170,11 @@ void EZSENSDK::bindSDK(lua_State* state){
         //.addFunction("setAudioFile", &AudioSourceProperty::setAudioFile)
         .addFunction("Play", &Engine::AudioSourceProperty::audio_start)
         .addFunction("Stop", &Engine::AudioSourceProperty::audio_stop)
-        //.addFunction("Pause", &AudioSourceProperty::audio_pause)
-        //.addFunction("getGain", &AudioSourceProperty::getGain)
-        //.addFunction("getPitch", &AudioSourceProperty::getPitch)
-        //.addFunction("setGain", &AudioSourceProperty::setGain)
-        //.addFunction("setPitch", &AudioSourceProperty::setPitch)
+        .addFunction("Pause", &Engine::AudioSourceProperty::audio_pause)
+        .addFunction("getGain", &Engine::AudioSourceProperty::getGain)
+        .addFunction("getPitch", &Engine::AudioSourceProperty::getPitch)
+        .addFunction("setGain", &Engine::AudioSourceProperty::setGain)
+        .addFunction("setPitch", &Engine::AudioSourceProperty::setPitch)
         .endClass()
 
         //Tile class

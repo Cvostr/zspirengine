@@ -72,5 +72,6 @@ void main(){
             }
         }
 	}
+	//result = vec3(Masks.g, Masks.g, Masks.g);
 	FragColor = vec4(result, 1);
 }

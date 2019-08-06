@@ -73,6 +73,12 @@ public:
     void updateAudioPtr();
     void audio_start();
     void audio_stop();
+    void audio_pause();
+
+    float getGain();
+    float getPitch();
+    void setGain(float gain);
+    void setPitch(float pitch);
 
     AudioSourceProperty();
 };
