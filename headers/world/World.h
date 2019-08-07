@@ -73,7 +73,7 @@ private:
     ResourceManager* manager;
 public:
     std::vector<GameObject> objects;
-    void loadFromFile(std::string file);
+    void loadFromFile(std::string file, RenderSettings* settings_ptr);
     void loadGameObject(GameObject* object_ptr, std::ifstream* world_stream);
 
     GameObject* getGameObjectByStrId(std::string id);

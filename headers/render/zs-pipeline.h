@@ -62,7 +62,7 @@ private:
     void initShaders();
     void updateShadersCameraInfo(Engine::Camera* cam_ptr);
 public:
-
+    RenderSettings* getRenderSettings();
     Engine::Shader* getTileShader();
 
     void addLight(void* light_ptr);

@@ -173,7 +173,7 @@ void Engine::World::addObjectsFromPrefab(std::string file){
 
 }
 
-void Engine::World::loadFromFile(std::string file){
+void Engine::World::loadFromFile(std::string file, RenderSettings* settings_ptr){
     std::ifstream stream;
     stream.open(file, std::ifstream::binary); //open world file in binary mode
 
@@ -190,6 +190,13 @@ void Engine::World::loadFromFile(std::string file){
     while(!stream.eof()){ //until file is over
         std::string prefix;
         stream >> prefix; //define and read prefix
+
+        if(prefix.compare("RENDER_SETTINGS_AMB_COLOR") == 0){ //if it is render setting of ambient light color
+            stream.seekg(1, std::ofstream::cur);
+            stream.read(reinterpret_cast<char*>(&settings_ptr->ambient_light_color.r), sizeof(int)); //Writing R component of amb color
+            stream.read(reinterpret_cast<char*>(&settings_ptr->ambient_light_color.g), sizeof(int)); //Writing G component of amb color
+            stream.read(reinterpret_cast<char*>(&settings_ptr->ambient_light_color.b), sizeof(int)); //Writing B component of amb color
+        }
 
         if(prefix.compare("G_OBJECT") == 0){ //if it is game object
             GameObject obj;

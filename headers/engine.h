@@ -35,6 +35,7 @@ public:
     void startManager(EngineComponentManager* manager);
     void updateDeltaTime(float deltaTime);
     void updateResolution(int W, int H);
+    void setWindowMode(unsigned int mode);
     void destroyAllManagers();
 
     void loadGame();

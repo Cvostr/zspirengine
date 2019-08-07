@@ -96,6 +96,10 @@ void ZSpireEngine::updateResolution(int W, int H){
     }
 }
 
+void ZSpireEngine::setWindowMode(unsigned int mode){
+    SDL_SetWindowFullscreen(this->window, mode);
+}
+
 void ZSpireEngine::loadGame(){
     gameRuns = true;
 
@@ -131,7 +135,7 @@ void ZSpireEngine::loadGame(){
     Engine::Loader::setBlobRootDirectory(this->desc->blob_root_path);
 
     data->resources->loadResourcesTable(this->desc->resource_map_file_path);
-    data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene);
+    data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene, data->pipeline->getRenderSettings());
 
     static uint64_t NOW = SDL_GetPerformanceCounter();
     static uint64_t last = 0;

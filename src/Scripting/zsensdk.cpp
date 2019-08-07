@@ -28,7 +28,7 @@ void EZSENSDK::Window::setWindowSize(int W, int H){
     engine_ptr->updateResolution(W, H);
 }
 void EZSENSDK::Window::setWindowMode(unsigned int mode){
-
+    engine_ptr->setWindowMode(mode);
 }
 
 void EZSENSDK::bindSDK(lua_State* state){
@@ -182,6 +182,10 @@ void EZSENSDK::bindSDK(lua_State* state){
         .addFunction("playAnim", &Engine::TileProperty::playAnim)
         .addFunction("setDiffuseTexture", &Engine::TileProperty::setDiffuseTexture)
         .addFunction("stopAnim", &Engine::TileProperty::stopAnim)
+        .endClass()
+
+        .deriveClass <Engine::ScriptGroupProperty, GameObjectProperty>("ScriptGroup")
+        .addFunction("getScript", &ScriptGroupProperty::getScriptByName)
         .endClass()
 
 

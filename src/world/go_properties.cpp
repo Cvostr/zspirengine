@@ -220,8 +220,17 @@ void Engine::ScriptGroupProperty::onUpdate(float deltaTime){  //calls update in 
     }
 }
 
+Engine::ObjectScript* Engine::ScriptGroupProperty::getScriptByName(std::string name){
+    for(unsigned int script_i = 0; script_i < static_cast<unsigned int>(scr_num); script_i ++){
+        if(!name.compare(scripts_attached[script_i].name))
+            return &scripts_attached[script_i];
+    }
+    return nullptr;
+}
+
 Engine::LightsourceProperty::LightsourceProperty(){
     this->type = GO_PROPERTY_TYPE_LIGHTSOURCE;
+    transform = nullptr;
 }
 void Engine::LightsourceProperty::copyTo(GameObjectProperty* dest){
     if(dest->type != this->type) return; //if it isn't transform

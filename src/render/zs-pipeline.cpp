@@ -70,6 +70,18 @@ void Engine::RenderPipeline::render(){
                 obj_ptr->processObject(this); //Draw object
         }
 
+        //Turn everything off to draw deffered plane correctly
+        if(depthTest == true) //if depth is enabled
+            glDisable(GL_DEPTH_TEST);
+
+        if(cullFaces == true) //if GL face cull is enabled
+            glDisable(GL_CULL_FACE);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
+        glClear(GL_COLOR_BUFFER_BIT); //Clear screen
+        gbuffer.bindTextures(); //Bind gBuffer textures
+        deffered_shader.Use(); //use deffered shader
+
         for(unsigned int light_i = 0; light_i < this->lights_ptr.size(); light_i ++){
             LightsourceProperty* _light_ptr = static_cast<LightsourceProperty*>(lights_ptr[light_i]);
 
@@ -79,11 +91,6 @@ void Engine::RenderPipeline::render(){
         this->deffered_shader.setGLuniformInt("lights_amount", static_cast<int>(lights_ptr.size()));
         //free lights array
         this->removeLights();
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
-        glClear(GL_COLOR_BUFFER_BIT); //Clear screen
-        gbuffer.bindTextures(); //Bind gBuffer textures
-        deffered_shader.Use(); //use deffered shader
 
         deffered_shader.setGLuniformVec3("ambient_color", ZSVECTOR3(render_settings.ambient_light_color.r / 255.0f,
                                                                    render_settings.ambient_light_color.g / 255.0f,
@@ -271,4 +278,8 @@ void Engine::RenderPipeline::addLight(void* light_ptr){
 
 void Engine::RenderPipeline::removeLights(){
     this->lights_ptr.clear();
+}
+
+Engine::RenderSettings* Engine::RenderPipeline::getRenderSettings(){
+    return &this->render_settings;
 }

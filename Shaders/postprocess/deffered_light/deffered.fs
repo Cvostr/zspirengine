@@ -46,10 +46,12 @@ void main(){
 	vec4 Masks = texture(tMasks, UVCoord);   	
 
     vec3 result = Diffuse.xyz;
+
     //Check, if fragment isn't skybox
     if(Masks.r == 1){
+	result *= (1 - Masks.g);
         result *= ambient_color;
-        result *= (1 - Masks.g);
+        
         float specularFactor = Diffuse.w; //Get factor in A channel
         vec3 camToFragDirection = normalize(cam_position - FragPos);
     
