@@ -81,7 +81,7 @@ void EZSENSDK::bindSDK(lua_State* state){
         .endClass();
 
     luabridge::getGlobalNamespace(state)
-        .addFunction("length", &length)
+        .addFunction("length", &getLength)
         .addFunction("distance", &getDistance)
         .addFunction("normalize", &EZSENSDK::Math::vnormalize)
         .addFunction("v_add", &EZSENSDK::Math::vadd)

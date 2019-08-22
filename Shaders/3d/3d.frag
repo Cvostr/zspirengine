@@ -1,39 +1,58 @@
-#version 150 core
-#extension GL_ARB_explicit_attrib_location : require
-#extension GL_ARB_explicit_uniform_location : require
+#version 420 core
 
 layout (location = 0) out vec4 tDiffuse;
 layout (location = 1) out vec3 tNormal;
 layout (location = 2) out vec3 tPos;
 layout (location = 4) out vec4 tMasks;
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
 
-in vec3 FragPos;
-in vec3 InNormal;
-in vec2 UVCoord;
-in mat3 TBN;
-//in vec3 ShadowProjection;
+layout(location = 0) in vec3 FragPos;
+layout(location = 1) in vec3 InNormal;
+layout(location = 2) in vec2 UVCoord;
+layout(location = 3) in mat3 TBN;
 
 //textures
-uniform sampler2D diffuse;
-uniform sampler2D normal_map;
-uniform sampler2D specular_map;
-uniform sampler2D shadow_map;
+layout(binding = 0) uniform sampler2D diffuse;
+layout(binding = 1) uniform sampler2D normal_map;
+layout(binding = 2) uniform sampler2D specular_map;
+layout(binding = 3) uniform sampler2D height_map;
+layout(binding = 6) uniform sampler2D shadow_map;
 
 uniform bool hasDiffuseMap;
 uniform bool hasNormalMap;
 uniform bool hasSpecularMap;
-uniform bool hasShadowMap = false;
+uniform bool hasHeightMap;
 
 uniform float material_shininess;
-
 uniform vec3 diffuse_color = vec3(1.0, 0.078, 0.574);
 
+layout (std140, binding = 0) uniform CamMatrices{
+    uniform mat4 cam_projection;
+    uniform mat4 cam_view;
+    uniform mat4 object_transform;
+    //Camera position
+    uniform vec3 cam_position;
+};
+
+layout (std140, binding = 2) uniform ShadowData{
 //Shadowmapping stuff
-uniform mat4 LightProjectionMat;
-uniform mat4 LightViewMat;
-uniform float shadow_bias;
+    uniform mat4 LightProjectionMat; // 16 * 4
+    uniform mat4 LightViewMat; 
+     // 16 * 4
+    uniform float shadow_bias; //4
+    uniform bool hasShadowMap; //4
+};
+
+vec2 processParallaxMapUv(vec2 uv){
+    if(!hasHeightMap) return uv;
+    
+    float height = texture(height_map, uv).r;
+    vec3 camera_dir = normalize(TBN * FragPos - TBN * cam_position);
+    
+    vec2 uv_offset = camera_dir.xy / camera_dir.z * (height);
+    return uv - uv_offset;
+}
 
 void main(){
 
@@ -44,7 +63,7 @@ void main(){
 	float result_shininess = material_shininess;
 	
 	if(hasDiffuseMap)
-		result = texture(diffuse, uv).xyz ;
+		result = texture(diffuse, processParallaxMapUv(uv)).xyz ;
 		
 	result *= diffuse_color;
 	

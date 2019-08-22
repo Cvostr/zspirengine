@@ -100,6 +100,7 @@ public:
     bool active;
     bool alive;
     bool hasParent;
+    bool IsStatic;
 
     unsigned int props_num; //amount of properties
     World* world_ptr; //pointer to world, when object placed

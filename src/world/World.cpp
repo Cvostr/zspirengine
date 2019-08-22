@@ -139,7 +139,7 @@ void Engine::World::loadGameObject(GameObject* object_ptr, std::ifstream* world_
     world_stream->seekg(1, std::ofstream::cur);
     //stream.read(reinterpret_cast<char*>(&obj.render_type), sizeof(int)); //read render type
     world_stream->read(reinterpret_cast<char*>(&object_ptr->active), sizeof(bool));
-
+    world_stream->read(reinterpret_cast<char*>(&object_ptr->IsStatic), sizeof(bool));
     //Then do the same sh*t, iterate until "G_END" came up
     while(true){
         *world_stream >> prefix; //Read prefix

@@ -102,6 +102,13 @@ void Engine::RenderPipeline::render(){
     }
 }
 
+void Engine::RenderPipeline::render2D(){
+
+}
+void Engine::RenderPipeline::render3D(){
+
+}
+
 void Engine::GameObject::processObject(RenderPipeline* pipeline){ //On render pipeline wish to work with object
     if(active == false || alive == false) return; //if object is inactive, not to render it
 

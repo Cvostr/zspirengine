@@ -1,11 +1,9 @@
-#version 150 core
-#extension GL_ARB_explicit_attrib_location : require
-#extension GL_ARB_explicit_uniform_location : require
+#version 420 core
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec2 uv;
 
-out vec2 UVCoord;
+layout(location = 0) out vec2 UVCoord;
 
 void main(){
 	UVCoord = uv;

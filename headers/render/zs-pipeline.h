@@ -69,6 +69,8 @@ public:
     void removeLights();
 
     void render();
+    void render2D();
+    void render3D();
     void init();
     void destroy();
 

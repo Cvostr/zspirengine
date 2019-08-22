@@ -46,6 +46,8 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             lptr->resource_relpath = rel_path; //Write loaded mesh relative path
             lptr->updateMeshPtr(); //Pointer will now point to mesh resource
 
+            world_stream->seekg(1, std::ofstream::cur);
+            world_stream->read(reinterpret_cast<char*>(&lptr->castShadows), sizeof(bool));
             break;
         }
         case GO_PROPERTY_TYPE_LIGHTSOURCE:{
