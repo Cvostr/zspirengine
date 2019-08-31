@@ -10,6 +10,9 @@
 #include "loader.h"
 #include "EngineManager.h"
 
+#include "../ogl/ogl.h"
+#include "../vulkan/vk_data.h"
+
 enum RESTYPE {TYPE_NONE, TYPE_TEXTURE, TYPE_MESH, TYPE_AUDIO, TYPE_MATERIAL, TYPE_SCRIPT};
 
 enum RESOURCE_STATE {STATE_LOADED, STATE_NOT_LOADED, STATE_LOADING_PROCESS};
@@ -100,6 +103,7 @@ public:
     MaterialResource();
 };
 
+Engine::Mesh* allocateMesh();
 
 }
 

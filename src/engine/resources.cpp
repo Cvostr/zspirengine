@@ -1,6 +1,8 @@
 #include "../../headers/engine/resources.h"
-
 #include <fstream>
+#include "../../headers/engine.h"
+
+extern ZSpireEngine* engine_ptr;
 
 Engine::ZsResource::ZsResource(){
     this->resource_type = TYPE_NONE;
@@ -80,7 +82,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
                     resource_ptr = new MeshResource;
 
                     Engine::MeshResource* mesh_ptr = static_cast<Engine::MeshResource*>(resource_ptr);
-                    mesh_ptr->mesh_ptr = new Engine::Mesh;
+                    mesh_ptr->mesh_ptr = allocateMesh();
                     break;
                 }
                 case TYPE_AUDIO:{
@@ -234,4 +236,19 @@ Engine::ScriptResource* Engine::ResourceManager::getScriptByLabel(std::string la
             return static_cast<ScriptResource*>(resource_ptr);
     }
     return nullptr;
+}
+
+Engine::Mesh* Engine::allocateMesh(){
+    Engine::Mesh* result = nullptr;
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            result = new _ogl_Mesh;
+            break;
+        }
+        case VULKAN : {
+            result = new _vk_Mesh;
+            break;
+        }
+    }
+    return result;
 }

@@ -4,13 +4,17 @@
 #include "zs-shader.h"
 #include "zs-mesh.h"
 #include "../../headers/engine/EngineManager.h"
-//#include "../../headers/world/go_properties.h"
+#include "../../headers/render/zs-uniform-buffer.h"
+#include "../../headers/ogl/ogl.h"
+#include "../../headers/vulkan/vk_data.h"
 #include "SDL2/SDL.h"
 #include "GL/glew.h"
 #include "../world/zs-camera.h"
 #include <vector>
 
 namespace Engine{
+
+UniformBuffer* allocUniformBuffer();
 
 enum GO_RENDER_TYPE {
     GO_RENDER_TYPE_NONE,
@@ -61,7 +65,13 @@ private:
 
     void initShaders();
     void updateShadersCameraInfo(Engine::Camera* cam_ptr);
+    void setLightsToBuffer();
 public:
+    UniformBuffer* transformBuffer;
+    UniformBuffer* lightsBuffer;
+
+    UniformBuffer* tileBuffer;
+
     RenderSettings* getRenderSettings();
     Engine::Shader* getTileShader();
 

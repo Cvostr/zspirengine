@@ -4,20 +4,47 @@
 #include "../../headers/world/go_properties.h"
 #include "../../headers/world/tile_properties.h"
 
+#define MAX_LIGHTS_AMOUNT 150
+
 extern ZSpireEngine* engine_ptr;
 
 void Engine::RenderSettings::defaults(){
     ambient_light_color = ZSRGBCOLOR(255, 255, 255, 255);
 }
 
+Engine::UniformBuffer* Engine::allocUniformBuffer(){
+    Engine::UniformBuffer* result = nullptr;
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            result = new _ogl_UniformBuffer;
+            break;
+        }
+        case VULKAN : {
+            result = new _vk_UniformBuffer;
+            break;
+        }
+    }
+    return result;
+}
+
 void Engine::RenderPipeline::initShaders(){
-    this->tile_shader.compileFromFile("Shaders/2d_tile/tile2d.vs", "Shaders/2d_tile/tile2d.fs", engine_ptr);
-    this->deffered_shader.compileFromFile("Shaders/postprocess/deffered_light/deffered.vs", "Shaders/postprocess/deffered_light/deffered.fs", engine_ptr);
+    this->tile_shader.compileFromFile("Shaders/2d_tile/tile2d.vert", "Shaders/2d_tile/tile2d.frag", engine_ptr);
+    this->deffered_shader.compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag", engine_ptr);
 }
 
 Engine::RenderPipeline::RenderPipeline(){
 
     initShaders();
+    //Allocate transform buffer
+    this->transformBuffer = allocUniformBuffer();
+    transformBuffer->init(0, sizeof (ZSMATRIX4x4) * 3 + 16 * 2);
+    //allocate lights buffer
+    lightsBuffer = allocUniformBuffer();
+    lightsBuffer->init(1, 64 * MAX_LIGHTS_AMOUNT + 16 * 2);
+
+    tileBuffer = allocUniformBuffer();
+    tileBuffer->init(5, 28);
+
     Engine::setupDefaultMeshes();
 }
 
@@ -38,7 +65,7 @@ void Engine::RenderPipeline::init(){
         glEnable(GL_CULL_FACE);
     }
     //if we use opengl, then create GBUFFER in GL commands
-    if(engine_ptr->engine_info->graphicsApi == OGL32){
+    if(engine_ptr->engine_info->graphicsApi == OGL32 && this->game_desc_ptr->game_perspective == PERSP_3D){
         this->gbuffer.create(this->WIDTH, this->HEIGHT);
     }
 }
@@ -49,6 +76,32 @@ void Engine::RenderPipeline::destroy(){
 
     gbuffer.Destroy();
     Engine::freeDefaultMeshes();
+}
+
+void Engine::RenderPipeline::setLightsToBuffer(){
+    this->lightsBuffer->bind();
+    for(unsigned int light_i = 0; light_i < this->lights_ptr.size(); light_i ++){
+        LightsourceProperty* _light_ptr = static_cast<LightsourceProperty*>(lights_ptr[light_i]);
+
+        lightsBuffer->writeData(64 * light_i, sizeof (int), &_light_ptr->light_type);
+        lightsBuffer->writeData(64 * light_i + 4, sizeof (float), &_light_ptr->range);
+        lightsBuffer->writeData(64 * light_i + 8, sizeof (float), &_light_ptr->intensity);
+        lightsBuffer->writeData(64 * light_i + 12, sizeof (float), &_light_ptr->spot_angle);
+        lightsBuffer->writeData(64 * light_i + 16, 12, &_light_ptr->last_pos);
+        lightsBuffer->writeData(64 * light_i + 32, 12, &_light_ptr->direction);
+        lightsBuffer->writeData(64 * light_i + 48, 4, &_light_ptr->color.gl_r);
+        lightsBuffer->writeData(64 * light_i + 52, 4, &_light_ptr->color.gl_g);
+        lightsBuffer->writeData(64 * light_i + 56, 4, &_light_ptr->color.gl_b);
+    }
+
+    int ls = static_cast<int>(lights_ptr.size());
+    lightsBuffer->writeData(64 * MAX_LIGHTS_AMOUNT, 4, &ls);
+
+    ZSVECTOR3 ambient_L = ZSVECTOR3(render_settings.ambient_light_color.r / 255.0f,render_settings.ambient_light_color.g / 255.0f, render_settings.ambient_light_color.b / 255.0f);
+    lightsBuffer->writeData(64 * MAX_LIGHTS_AMOUNT + 16, 12, &ambient_L);
+
+    //free lights array
+    this->removeLights();
 }
 
 void Engine::RenderPipeline::render(){
@@ -69,7 +122,8 @@ void Engine::RenderPipeline::render(){
             if(!obj_ptr->hasParent) //if it is a root object
                 obj_ptr->processObject(this); //Draw object
         }
-
+        setLightsToBuffer();
+/*
         //Turn everything off to draw deffered plane correctly
         if(depthTest == true) //if depth is enabled
             glDisable(GL_DEPTH_TEST);
@@ -97,7 +151,7 @@ void Engine::RenderPipeline::render(){
                                                                    render_settings.ambient_light_color.b / 255.0f));
 
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
-
+*/
 
     }
 }
@@ -158,35 +212,36 @@ void Engine::TileProperty::onRender(RenderPipeline* pipeline){
     if(tile_ptr == nullptr || transform_ptr == nullptr) return;
 
     tile_shader->Use();
-    tile_shader->setTransform(transform_ptr->transform_mat);
+    pipeline->transformBuffer->bind();
+    pipeline->transformBuffer->writeData(2 * sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &transform_ptr->transform_mat);
+    //Bind tile material data
+    pipeline->tileBuffer->bind();
 
     //Checking for diffuse texture
-    if(tile_ptr->texture_diffuse != nullptr){
-        tile_ptr->texture_diffuse->Use(0); //Use this texture
-        tile_shader->setHasDiffuseTextureProperty(true); //Shader will use picked diffuse texture
-
-    }else{
-        tile_shader->setHasDiffuseTextureProperty(false); //Shader will not use diffuse texture
+    if(texture_diffuse != nullptr){
+        texture_diffuse->Use(0); //Use this texture
     }
+
+    int diffuse1_ = texture_diffuse != nullptr;
+    pipeline->tileBuffer->writeData(20, 4, &diffuse1_);
+
     //Checking for transparent texture
-    if(tile_ptr->texture_transparent != nullptr){
-        tile_ptr->texture_transparent->Use(5); //Use this texture
-        tile_shader->setGLuniformInt("hasTransparentMap", 1); //Shader will use picked transparent texture
-
-    }else{
-        tile_shader->setGLuniformInt("hasTransparentMap", 0); //Shader will not use transparent texture
+    if(texture_transparent != nullptr){
+        texture_transparent->Use(1); //Use this texture
     }
+    int diffuse2_ = texture_transparent != nullptr;
+    pipeline->tileBuffer->writeData(24, 4, &diffuse2_);
+    //calculate animation state
+    int anim_state_i = anim_property.isAnimated && anim_state.playing;
     //Sending animation info
-    if(tile_ptr->anim_property.isAnimated && tile_ptr->anim_state.playing == true){ //If tile animated, then send anim state to shader
-        tile_shader->setGLuniformInt("animated", 1); //Send as animated shader
-        //Send current animation state
-        tile_shader->setGLuniformInt("total_rows", tile_ptr->anim_property.framesX);
-        tile_shader->setGLuniformInt("total_cols", tile_ptr->anim_property.framesY);
-
-        tile_shader->setGLuniformInt("selected_row", tile_ptr->anim_state.cur_frameX);
-        tile_shader->setGLuniformInt("selected_col", tile_ptr->anim_state.cur_frameY);
+    if(anim_property.isAnimated && anim_state.playing == true){ //If tile animated, then send anim state to shader
+        pipeline->tileBuffer->writeData(16, 4, &anim_state_i);
+        pipeline->tileBuffer->writeData(0, 4, &anim_property.framesX);
+        pipeline->tileBuffer->writeData(4, 4, &anim_property.framesY);
+        pipeline->tileBuffer->writeData(8, 4, &anim_state.cur_frameX);
+        pipeline->tileBuffer->writeData(12, 4, &anim_state.cur_frameY);
     }else{ //No animation or unplayed
-         tile_shader->setGLuniformInt("animated", 0);
+        pipeline->tileBuffer->writeData(16, 4, &anim_state_i);
     }
 }
 
@@ -267,8 +322,17 @@ void Engine::G_BUFFER_GL::Destroy(){
 }
 
 void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
-    tile_shader.Use();
-    this->tile_shader.setCamera(cam_ptr);
+    //tile_shader.Use();
+    //this->tile_shader.setCamera(cam_ptr);
+
+    this->transformBuffer->bind();
+    ZSMATRIX4x4 proj = cam_ptr->getProjMatrix();
+    ZSMATRIX4x4 view = cam_ptr->getViewMatrix();
+    ZSVECTOR3 cam_pos = cam_ptr->getCameraPosition();
+
+    transformBuffer->writeData(0, sizeof (ZSMATRIX4x4), &proj);
+    transformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &view);
+    transformBuffer->writeData(sizeof (ZSMATRIX4x4) * 3, sizeof (cam_pos), &cam_pos);
 
     deffered_shader.Use();
     deffered_shader.setCamera(cam_ptr, true);

@@ -49,6 +49,7 @@ public:
     ZSRGBCOLOR color; //Color of light
     float intensity; //Light's intensity
     float range; //Light's range
+    float spot_angle;
 
     void copyTo(GameObjectProperty* dest);
     void updTransformPtr();

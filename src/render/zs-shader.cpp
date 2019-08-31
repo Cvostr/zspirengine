@@ -133,17 +133,6 @@ bool Engine::Shader::compileFromFile(std::string VSpath, std::string FSpath, ZSp
         glDeleteShader(VS);
         glDeleteShader(FS);
 
-        Use();
-        setGLuniformInt("diffuse", 0);
-        setGLuniformInt("normal_map", 1);
-        setGLuniformInt("specular_map", 2);
-        setGLuniformInt("transparent", 5);
-
-        setGLuniformInt("tDiffuse", 10);
-        setGLuniformInt("tNormal", 11);
-        setGLuniformInt("tPos", 12);
-        setGLuniformInt("tTransparent", 13);
-
     }
     if(engine->engine_info->graphicsApi == VULKAN){
         std::cout << "VULKAN: Compiling shader " << VSpath << "_vk" << " " << FSpath << "_vk" << std::endl;
@@ -157,8 +146,11 @@ bool Engine::Shader::compileFromFile(std::string VSpath, std::string FSpath, ZSp
 
         int VS_size, FS_size = 0;
 
-        readBinaryShaderFile(VSpath + "_vk", VScontent, &VS_size);
-        readBinaryShaderFile(FSpath + "_vk", FScontent, &FS_size);
+        if(!readBinaryShaderFile(VSpath + "_vk", VScontent, &VS_size) || !readBinaryShaderFile(FSpath + "_vk", FScontent, &FS_size))
+            return false;
+
+        if(VS_size < 0 || FS_size < 0)
+            return false;
 
         VkShaderModuleCreateInfo createVsInfo = {};
         createVsInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -252,50 +244,4 @@ void Engine::Shader::setTextureCountProperty(int tX, int tY) {
 	this->setGLuniformInt("textures_y", tY);
 }
 
-void Engine::Shader::sendLight(unsigned int index, void* _light){
-    LightsourceProperty* light = static_cast<LightsourceProperty*>(_light);
-    if (light->light_type > 0) {
-        std::string id_s = std::to_string(index);
-
-        std::string type;
-        type = "lights[" + id_s + "].type";
-
-        std::string pos;
-        pos = "lights[" + id_s + "].pos";
-
-        std::string color;
-        color = "lights[" + id_s + "].color";
-
-        std::string dir;
-        dir = "lights[" + id_s + "].dir";
-
-        std::string range;
-        range = "lights[" + id_s + "].range";
-
-        std::string intensity;
-        intensity = "lights[" + id_s + "].intensity";
-
-        //std::string spot_angle;
-        //spot_angle = "lights[" + std::to_string(index) + "].spot_angle";
-
-        //std::string spot_oangle;
-        //spot_oangle = "lights[" + std::to_string(index) + "].spot_out_angle";
-
-        setGLuniformInt(type.c_str(), static_cast<int>(light->light_type));
-        setGLuniformVec3(pos.c_str(), light->transform->abs_translation);
-        setGLuniformVec3(dir.c_str(), light->direction);
-        setGLuniformFloat(range.c_str(), light->range);
-        setGLuniformFloat(intensity.c_str(), light->intensity);
-        //setGLuniformFloat(spot_angle.c_str(), light->spot_angle_rad);
-        //setGLuniformFloat(spot_oangle.c_str(), light->outrad);
-        setGLuniformColor(color.c_str(), light->color);
-    }
-}
-
-void Engine::Shader::unsetLight(unsigned int index){
-    std::string type;
-    type = "lights[" + std::to_string(index) + "].type";
-
-    setGLuniformInt(type.c_str(), 0);
-}
 

@@ -42,7 +42,12 @@ SOURCES += \
     src/misc/oal_manager.cpp \
     src/Scripting/zsensdk.cpp \
     src/misc/randomg.cpp \
-    src/Scripting/zsensdk_input.cpp
+    src/Scripting/zsensdk_input.cpp \
+    src/ogl/ogl_mesh.cpp \
+    src/vulkan/vk_mesh.cpp \
+    src/ogl/ogl_uniform_buf.cpp \
+    src/render/zs-uniform-buffer.cpp \
+    src/vulkan/vk_uniform_buf.cpp
 
 HEADERS += \
         headers/engine.h \
@@ -65,7 +70,10 @@ HEADERS += \
     headers/engine_types.h \
     headers/misc/oal_manager.h \
     headers/Scripting/zsensdk.h \
-    headers/misc/randomg.h
+    headers/misc/randomg.h \
+    headers/ogl/ogl.h \
+    headers/vulkan/vk_data.h \
+    headers/render/zs-uniform-buffer.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

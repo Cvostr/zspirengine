@@ -14,21 +14,17 @@ namespace Engine {
         bool alive; //Non destroyed
         std::string label;
 
-        unsigned int meshVAO;
-        unsigned int meshVBO;
-        unsigned int meshEBO;
-
         unsigned int vertices_num;
         unsigned int indices_num;
 
-        void Init();
-        void setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num);
-        void setMeshData(ZSVERTEX* vertices, unsigned int vertices_num);
-        void Draw();
-        void DrawLines();
-        void Destroy();
+        virtual void Init();
+        virtual void setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num);
+        virtual void setMeshData(ZSVERTEX* vertices, unsigned int vertices_num);
+        virtual void Draw();
+        virtual void Destroy();
 
         Mesh();
+        virtual ~Mesh();
     };
 
     void setupDefaultMeshes();
