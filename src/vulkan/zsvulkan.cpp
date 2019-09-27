@@ -2,12 +2,18 @@
 #include "../../headers/render/zs-shader.h"
 #include <iostream>
 
+ZsVulkan* vulkan_ptr = nullptr;
+
 ZsVulkan::ZsVulkan(){
  //Nothing much to do
 }
 
 VkDevice ZsVulkan::getVkDevice(){
     return this->logicalDevice;
+}
+
+VkPhysicalDevice ZsVulkan::getPhysicalDevice(){
+    return this->selected_device;
 }
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -32,6 +38,8 @@ std::vector<const char*> extensions = {
 };
 
 bool ZsVulkan::init(bool validate, const char* app_name, int app_ver, SDL_Window* window, ZSWINDOW_CREATE_INFO* win_info){
+    vulkan_ptr = this;
+
     this->window_ptr = window; //assign window pointer
 
     unsigned int ext_count;

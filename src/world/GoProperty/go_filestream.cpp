@@ -57,6 +57,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             world_stream->read(reinterpret_cast<char*>(&ptr->light_type), sizeof(LIGHTSOURCE_TYPE));
             world_stream->read(reinterpret_cast<char*>(&ptr->intensity), sizeof(float));
             world_stream->read(reinterpret_cast<char*>(&ptr->range), sizeof(float));
+            world_stream->read(reinterpret_cast<char*>(&ptr->spot_angle), sizeof(float));
 
             float cl_r;
             float cl_g;

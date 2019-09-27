@@ -4,3 +4,20 @@
 
 Is an simple opensource game 3D/2D engine, currently in development
 
+## Dependencies
+
+GLEW
+
+OpenAL
+
+SDL2
+
+Assimp
+
+Lua 5.3 (+LuaBridge)
+
+FreeType
+
+Bullet (Physics Library)
+
+Vulkan

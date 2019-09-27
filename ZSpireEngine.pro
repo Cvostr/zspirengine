@@ -47,7 +47,10 @@ SOURCES += \
     src/vulkan/vk_mesh.cpp \
     src/ogl/ogl_uniform_buf.cpp \
     src/render/zs-uniform-buffer.cpp \
-    src/vulkan/vk_uniform_buf.cpp
+    src/vulkan/vk_uniform_buf.cpp \
+    src/vulkan/zsvk_mem.cpp \
+    src/ogl/ogl_shader.cpp \
+    src/vulkan/vk_shader.cpp
 
 HEADERS += \
         headers/engine.h \
@@ -73,7 +76,8 @@ HEADERS += \
     headers/misc/randomg.h \
     headers/ogl/ogl.h \
     headers/vulkan/vk_data.h \
-    headers/render/zs-uniform-buffer.h
+    headers/render/zs-uniform-buffer.h \
+    headers/vulkan/zsvk_mem.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

@@ -27,13 +27,29 @@ Engine::UniformBuffer* Engine::allocUniformBuffer(){
     return result;
 }
 
+Engine::Shader* Engine::allocShader(){
+    Engine::Shader* result = nullptr;
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            result = new _ogl_Shader;
+            break;
+        }
+        case VULKAN : {
+            result = new _vk_Shader;
+            break;
+        }
+    }
+    return result;
+}
+
 void Engine::RenderPipeline::initShaders(){
-    this->tile_shader.compileFromFile("Shaders/2d_tile/tile2d.vert", "Shaders/2d_tile/tile2d.frag", engine_ptr);
-    this->deffered_shader.compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag", engine_ptr);
+    this->tile_shader->compileFromFile("Shaders/2d_tile/tile2d.vert", "Shaders/2d_tile/tile2d.frag");
+    this->deffered_shader->compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag");
 }
 
 Engine::RenderPipeline::RenderPipeline(){
-
+    this->tile_shader = allocShader();
+    this->deffered_shader = allocShader();
     initShaders();
     //Allocate transform buffer
     this->transformBuffer = allocUniformBuffer();
@@ -71,8 +87,12 @@ void Engine::RenderPipeline::init(){
 }
 
 void Engine::RenderPipeline::destroy(){
-    tile_shader.Destroy();
-    deffered_shader.Destroy();
+    this->tileBuffer->Destroy();
+    this->lightsBuffer->Destroy();
+    this->transformBuffer->Destroy();
+
+    tile_shader->Destroy();
+    deffered_shader->Destroy();
 
     gbuffer.Destroy();
     Engine::freeDefaultMeshes();
@@ -106,15 +126,32 @@ void Engine::RenderPipeline::setLightsToBuffer(){
 
 void Engine::RenderPipeline::render(){
     ZSGAME_DATA* game = static_cast<ZSGAME_DATA*>(engine_ptr->getGameDataPtr());
+    World* world_ptr = game->world;
+    //send lights to uniform buffer
+    setLightsToBuffer();
+    //set camera data to transform buffer
+    updateShadersCameraInfo(world_ptr->getCameraPtr());
+
+    switch(engine_ptr->desc->game_perspective){
+        case 2:{
+            render2D();
+            break;
+        }
+        case 3 :{
+            render3D();
+            break;
+        }
+    }
+
+}
+
+void Engine::RenderPipeline::render2D(){
+    ZSGAME_DATA* game = static_cast<ZSGAME_DATA*>(engine_ptr->getGameDataPtr());
+    World* world_ptr = game->world;
 
     if(engine_ptr->engine_info->graphicsApi == OGL32){
-        gbuffer.bindFramebuffer();
         glClearColor(0,0,0,1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        World* world_ptr = game->world;
-
-        updateShadersCameraInfo(world_ptr->getCameraPtr());
 
         //Iterate over all objects in the world
         for(unsigned int obj_i = 0; obj_i < world_ptr->objects.size(); obj_i ++){
@@ -122,11 +159,25 @@ void Engine::RenderPipeline::render(){
             if(!obj_ptr->hasParent) //if it is a root object
                 obj_ptr->processObject(this); //Draw object
         }
-        setLightsToBuffer();
-/*
-        //Turn everything off to draw deffered plane correctly
-        if(depthTest == true) //if depth is enabled
-            glDisable(GL_DEPTH_TEST);
+    }
+}
+void Engine::RenderPipeline::render3D(){
+    ZSGAME_DATA* game = static_cast<ZSGAME_DATA*>(engine_ptr->getGameDataPtr());
+    World* world_ptr = game->world;
+
+    if(engine_ptr->engine_info->graphicsApi == OGL32){
+        gbuffer.bindFramebuffer();
+        glClearColor(0,0,0,1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //Iterate over all objects in the world
+        for(unsigned int obj_i = 0; obj_i < world_ptr->objects.size(); obj_i ++){
+            GameObject* obj_ptr = &world_ptr->objects[obj_i];
+            if(!obj_ptr->hasParent) //if it is a root object
+                obj_ptr->processObject(this); //Draw object
+        }
+
+        glDisable(GL_DEPTH_TEST);
 
         if(cullFaces == true) //if GL face cull is enabled
             glDisable(GL_CULL_FACE);
@@ -134,33 +185,10 @@ void Engine::RenderPipeline::render(){
         glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
         glClear(GL_COLOR_BUFFER_BIT); //Clear screen
         gbuffer.bindTextures(); //Bind gBuffer textures
-        deffered_shader.Use(); //use deffered shader
-
-        for(unsigned int light_i = 0; light_i < this->lights_ptr.size(); light_i ++){
-            LightsourceProperty* _light_ptr = static_cast<LightsourceProperty*>(lights_ptr[light_i]);
-
-            this->deffered_shader.sendLight(light_i, _light_ptr);
-        }
-        //send amount of lights to deffered shader
-        this->deffered_shader.setGLuniformInt("lights_amount", static_cast<int>(lights_ptr.size()));
-        //free lights array
-        this->removeLights();
-
-        deffered_shader.setGLuniformVec3("ambient_color", ZSVECTOR3(render_settings.ambient_light_color.r / 255.0f,
-                                                                   render_settings.ambient_light_color.g / 255.0f,
-                                                                   render_settings.ambient_light_color.b / 255.0f));
+        deffered_shader->Use(); //use deffered shader
 
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
-*/
-
     }
-}
-
-void Engine::RenderPipeline::render2D(){
-
-}
-void Engine::RenderPipeline::render3D(){
-
 }
 
 void Engine::GameObject::processObject(RenderPipeline* pipeline){ //On render pipeline wish to work with object
@@ -322,9 +350,6 @@ void Engine::G_BUFFER_GL::Destroy(){
 }
 
 void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
-    //tile_shader.Use();
-    //this->tile_shader.setCamera(cam_ptr);
-
     this->transformBuffer->bind();
     ZSMATRIX4x4 proj = cam_ptr->getProjMatrix();
     ZSMATRIX4x4 view = cam_ptr->getViewMatrix();
@@ -334,13 +359,10 @@ void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
     transformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &view);
     transformBuffer->writeData(sizeof (ZSMATRIX4x4) * 3, sizeof (cam_pos), &cam_pos);
 
-    deffered_shader.Use();
-    deffered_shader.setCamera(cam_ptr, true);
-
 }
 
 Engine::Shader* Engine::RenderPipeline::getTileShader(){
-    return &this->tile_shader;
+    return this->tile_shader;
 }
 
 void Engine::RenderPipeline::addLight(void* light_ptr){

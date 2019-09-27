@@ -44,6 +44,19 @@ void Engine::UniformBuffer::bind(){
     }
 }
 
+void Engine::UniformBuffer::Destroy(){
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            static_cast<_ogl_UniformBuffer*>(this)->Destroy();
+            break;
+        }
+        case VULKAN : {
+            static_cast<_vk_UniformBuffer*>(this)->Destroy();
+            break;
+        }
+    }
+}
+
 Engine::UniformBuffer::UniformBuffer(){
 
 }

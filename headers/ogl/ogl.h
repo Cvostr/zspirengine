@@ -3,6 +3,7 @@
 
 #include "../render/zs-mesh.h"
 #include "../render/zs-uniform-buffer.h"
+#include "../render/zs-shader.h"
 
 namespace Engine{
 
@@ -31,11 +32,25 @@ public:
     void init(int slot, int size);
     void writeData(unsigned int offset, unsigned int size, void* data);
     void bind();
+    void Destroy();
 
     _ogl_UniformBuffer();
     ~_ogl_UniformBuffer();
 };
 
+class _ogl_Shader : public Engine::Shader{
+private:
+    unsigned int shader_id;
+public:
+    void GLcheckCompileErrors(unsigned int shader, const char* type, const char* filepath = nullptr);
+    bool readShaderFile(const char* path, char* result);
+    bool compileFromFile(std::string VSpath, std::string FSpath);
+    void Use();
+    void Destroy();
+
+    _ogl_Shader();
+    ~_ogl_Shader();
+};
 
 }
 

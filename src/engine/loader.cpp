@@ -32,6 +32,7 @@ void Engine::Loader::start(){
 
 void Engine::Loader::stop(){
     working = false;
+    requests.clear();
 }
 
 void Engine::Loader::queryLoadingRequest(LoadRequest* req){

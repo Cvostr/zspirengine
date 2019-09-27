@@ -15,6 +15,7 @@
 namespace Engine{
 
 UniformBuffer* allocUniformBuffer();
+Engine::Shader* allocShader();
 
 enum GO_RENDER_TYPE {
     GO_RENDER_TYPE_NONE,
@@ -56,8 +57,8 @@ private:
 
     G_BUFFER_GL gbuffer;
 
-    Engine::Shader tile_shader;
-    Engine::Shader deffered_shader;
+    Engine::Shader* tile_shader;
+    Engine::Shader* deffered_shader;
 
     RenderSettings render_settings;
     //Vector to store lights

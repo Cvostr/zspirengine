@@ -27,7 +27,7 @@ layout (std140, binding = 0) uniform CamMatrices{
 };
 
 layout (std140, binding = 4) uniform BonesData{
-    uniform mat4 bone_transform[120];
+    uniform mat4 bone_transform[150];
 };
 
 mat4 getBoneTransform(){
@@ -56,27 +56,29 @@ mat4 getBoneTransform(){
     
     for(int i = 0; i < 8; i++){
         result += bone_transform[_ids[i]] * _weights[i];
-    }
-    
+   }
+	
     return result;
 }
 
 void main(){
 	UVCoord = uv;
 	InNormal = normal;
-	
-	FragPos = (object_transform * vec4(position, 1.0)).xyz;
+		
+	mat4 bone_t = mat4(1.0);
+
+	if(bones > 0)
+		bone_t = getBoneTransform();
+
+	vec4 vertpos = object_transform * bone_t * vec4(position, 1.0);
+
+	FragPos = (vertpos).xyz;
 	
 	vec3 TangentVec = normalize(vec3(object_transform * vec4(tangent, 0)));
 	vec3 BiTangentVec = normalize(vec3(object_transform * vec4(bitangent, 0)));
 	vec3 NormalVec = normalize(vec3(object_transform * vec4(normal, 0)));
 	TBN = transpose(mat3(TangentVec, BiTangentVec, NormalVec));
-	
-	mat4 bone_t = mat4(1.0);
-
-	if(bones > 0)
-		bone_t = getBoneTransform();
-	
-	gl_Position = cam_projection * cam_view * bone_t * vec4(FragPos, 1.0);
+		
+	gl_Position = cam_projection * cam_view * vertpos;
 	
 }

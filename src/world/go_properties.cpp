@@ -203,15 +203,10 @@ void Engine::MeshProperty::updateMeshPtr(){
 Engine::ScriptGroupProperty::ScriptGroupProperty(){
     this->type = GO_PROPERTY_TYPE_SCRIPTGROUP;
 }
-void Engine::ScriptGroupProperty::wakeUp(){   //on scene startup
-    for(unsigned int script_i = 0; script_i < static_cast<unsigned int>(scr_num); script_i ++){
-
-    }
-}
 void Engine::ScriptGroupProperty::onUpdate(float deltaTime){  //calls update in scripts
     for(unsigned int script_i = 0; script_i < this->scripts_attached.size(); script_i ++){
         ObjectScript* script_ptr = &this->scripts_attached[script_i]; //Obtain pointer to script
-
+        //if script isn't created, then create it!
         if(!script_ptr->created){
             this->scripts_attached[script_i]._InitScript();
             this->scripts_attached[script_i]._callStart(go_link.updLinkPtr(), go_link.world_ptr);

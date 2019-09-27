@@ -15,6 +15,10 @@ void Engine::_ogl_UniformBuffer::bind(){
     glBindBuffer(GL_UNIFORM_BUFFER, buffer_id);
 }
 
+void Engine::_ogl_UniformBuffer::Destroy(){
+    glDeleteBuffers(1, &buffer_id);
+}
+
 Engine::_ogl_UniformBuffer::_ogl_UniformBuffer(){
 
 }

@@ -29,7 +29,6 @@ public:
     int scr_num;
     std::vector<ObjectScript> scripts_attached;
 
-    void wakeUp(); //on scene startup
     void onUpdate(float deltaTime); //calls update in scripts
     ObjectScript* getScriptByName(std::string name);
 

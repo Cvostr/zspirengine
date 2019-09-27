@@ -77,6 +77,7 @@ public:
     bool initSwapChain(ZSWINDOW_CREATE_INFO* win_info);
 
     VkDevice getVkDevice();
+    VkPhysicalDevice getPhysicalDevice();
 
     SwapChainSupportDetails getSwapChainDetails();
 
