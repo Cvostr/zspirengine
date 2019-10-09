@@ -53,15 +53,18 @@ layout (std140, binding = 3) uniform TerrainData{
     bool hasDiffuse[12];
     bool hasNormal[12];
     uniform int isPicking;
+    uniform int terrain_Width;
+    uniform int terrain_Height;
 };
 
 layout (std140, binding = 2) uniform ShadowData{
 //Shadowmapping stuff
     uniform mat4 LightProjectionMat; // 16 * 4
-    uniform mat4 LightViewMat; 
-     // 16 * 4
+    uniform mat4 LightViewMat; // 16 * 4
     uniform float shadow_bias; //4
     uniform bool hasShadowMap; //4
+    uniform int shadowmap_Width; //4
+    uniform int shadowmap_Height; //4
 };
 
 float getFactor(int id, vec2 uv){
@@ -259,7 +262,10 @@ void _shadow(){
             for(int y = 0; y < 8; y ++){
                 vec2 _offset = vec2(x, y);
             
-                vec4 shadowmap = texture(shadow_map, ShadowProjection.xy + _offset / 2048);
+                _offset.x /= shadowmap_Width;
+                _offset.y /= shadowmap_Height;
+
+                vec4 shadowmap = texture(shadow_map, ShadowProjection.xy + _offset);
                 float texture_depth = shadowmap.r;
                 tMasks.g += (real_depth - shadow_bias > texture_depth) ? 0.01 : 0.0;
             }
@@ -284,7 +290,10 @@ void main(){
 	tMasks = vec4(1.0, 0, 0, 0);
 	
 	if(isPicking == 1){
-		FragColor = vec4(_id / (255 * 2), 1);
+        float id_r = _id.r / terrain_Width;
+        float id_b = _id.b / terrain_Height;
+
+		FragColor = vec4(id_r, 0, id_b, 1);
 	}
     if(isPicking == 0){
         _shadow();
