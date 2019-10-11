@@ -1,10 +1,10 @@
 #ifndef ZSMATH
 #define ZSMATH
 
-
+#include "math.h"
 #define ZS_PI 3.14159265f
-#define REAL_NUM_EQ(x, y) (fabs((x) - (y)) < 0.000001)
-
+#define REAL_NUM_EQ(x, y) (fabs((x) - (y)) < 0.000001f)
+#define MAX_BONE_PER_VERTEX 12
 
 	typedef struct ZSVECTOR2 {
 		float X;
@@ -46,6 +46,26 @@
 
 	}ZSVECTOR3;
 
+    typedef struct ZSQUATERNION{
+        float X;
+        float Y;
+        float Z;
+        float W;
+
+        ZSQUATERNION() {
+            X = 0;
+            Y = 0;
+            Z = 0;
+            W = 0;
+        }
+
+        ZSQUATERNION(float x, float y, float z, float w) {
+            this->X = x;
+            this->Y = y;
+            this->Z = z;
+            this->W = w;
+        }
+    }ZSQUATERNION;
 
 	typedef struct ZSVECTOR4 {
 
@@ -82,15 +102,27 @@
 
 		ZSVECTOR3 bitangent;
 
-		ZSVERTEX() {}
-		ZSVERTEX(ZSVECTOR3 npos, ZSVECTOR2 nuv) : pos(npos.X, npos.Y, npos.Z), uv(nuv.X, nuv.Y) {}
-		ZSVERTEX(ZSVECTOR3 npos, ZSVECTOR2 nuv, ZSVECTOR3 nnormal) : pos(npos.X, npos.Y, npos.Z), uv(nuv.X, nuv.Y), normal(nnormal.X, nnormal.Y, nnormal.Z) {}
+        unsigned int ids[MAX_BONE_PER_VERTEX];
+        float weights[MAX_BONE_PER_VERTEX];
+        unsigned int bones_num;
+
+        ZSVERTEX() {
+            bones_num = 0;
+        }
+        ZSVERTEX(ZSVECTOR3 npos, ZSVECTOR2 nuv) : pos(npos.X, npos.Y, npos.Z), uv(nuv.X, nuv.Y) {
+            bones_num = 0;
+        }
+        ZSVERTEX(ZSVECTOR3 npos, ZSVECTOR2 nuv, ZSVECTOR3 nnormal) : pos(npos.X, npos.Y, npos.Z), uv(nuv.X, nuv.Y), normal(nnormal.X, nnormal.Y, nnormal.Z) {
+            bones_num = 0;
+        }
 		ZSVERTEX(ZSVECTOR3 npos, ZSVECTOR2 nuv, ZSVECTOR3 nnormal, ZSVECTOR3 ntangent, ZSVECTOR3 nbitangent) 
 			: pos(npos.X, npos.Y, npos.Z), 
 			uv(nuv.X, nuv.Y), 
 			normal(nnormal.X, nnormal.Y, nnormal.Z),
 			tangent(ntangent.X, ntangent.Y, ntangent.Z),
-			bitangent(nbitangent.X, nbitangent.Y, nbitangent.Z){}
+            bitangent(nbitangent.X, nbitangent.Y, nbitangent.Z){
+            bones_num = 0;
+        }
 
 	}ZSVERTEX;
 
@@ -161,18 +193,30 @@
     float DegToRad(float degrees);
     //Get vector with identity lenght
 	void vNormalize(ZSVECTOR3* v);
+    void qNormalize(ZSQUATERNION* q);
+    ZSQUATERNION eulerToQuat(ZSVECTOR3 v);
+    ZSVECTOR3 quatToEuler(ZSQUATERNION q);
 	ZSVECTOR3 vCross(ZSVECTOR3 v1, ZSVECTOR3 v2);
 	float vDot(ZSVECTOR3 v1, ZSVECTOR3 v2);
     bool isDistanceFits(ZSVECTOR3 pos1, ZSVECTOR3 pos2, float max_dist);
 
+    ZSVECTOR3 lerp(ZSVECTOR3 v1, ZSVECTOR3 v2, float factor);
+    ZSQUATERNION slerp(ZSQUATERNION q1, ZSQUATERNION q2, float factor);
+
 	ZSMATRIX4x4 getIdentity();
 	ZSMATRIX4x4 transpose(ZSMATRIX4x4 mat);
+    float determinant(ZSMATRIX4x4 mat);
+    float determinant(float a, float b, float c, float d, float e, float f, float g, float h, float i);
+    ZSMATRIX4x4 invert(ZSMATRIX4x4 mat);
 	ZSMATRIX4x4 matrixMM(ZSMATRIX4x4 l, ZSMATRIX4x4 r);
+    ZSMATRIX4x4 matrixSum(ZSMATRIX4x4 l, ZSMATRIX4x4 r);
 	ZSMATRIX4x4 getPerspective(float fovy, float aspect, float zNear, float zFar);
 	ZSMATRIX4x4 getOrthogonal(float left, float right, float bottom, float top);
 	ZSMATRIX4x4 getOrthogonal(float left, float right, float bottom, float top, float zNear, float zFar);
 	ZSMATRIX4x4 matrixLookAt(ZSVECTOR3 eye, ZSVECTOR3 center, ZSVECTOR3 up);
-	
+    ZSMATRIX4x4 removeTranslationFromViewMat(ZSMATRIX4x4 viewMat);
+    ZSMATRIX4x4 removeRotationFromTransformMat(ZSMATRIX4x4 transform, ZSMATRIX4x4 view);
+
 	ZSMATRIX4x4 getScaleMat(float scaleX, float scaleY, float scaleZ);
     ZSMATRIX4x4 getScaleMat(ZSVECTOR3 scale);
 	ZSMATRIX4x4 getTranslationMat(float trX, float trY, float trZ);
@@ -183,6 +227,7 @@
     ZSMATRIX4x4 getRotationMat(float thetaX, float thetaY, float thetaZ);
     ZSMATRIX4x4 getRotationMat(ZSVECTOR3 rotation);
     ZSMATRIX4x4 getRotationMat(ZSVECTOR3 rotation, ZSVECTOR3 center);
+    ZSMATRIX4x4 getRotationMat(ZSQUATERNION quat);
     //ZSMATRIX4x4 parent
 
 
@@ -195,6 +240,33 @@
 		return matrixMM(l, r);
 
 	}
+
+    inline ZSMATRIX4x4 operator*(const ZSMATRIX4x4& l, const float& r)
+    {
+        ZSMATRIX4x4 result = l;
+        for (unsigned int i = 0; i < 4; i++) {
+            for (unsigned int b = 0; b < 4; b++) {
+                result.m[i][b] *= r;
+            }
+        }
+
+        return l;
+
+    }
+
+    inline ZSMATRIX4x4 operator+(const ZSMATRIX4x4& l, const ZSMATRIX4x4& r)
+    {
+        return matrixSum(l, r);
+
+    }
+
+    inline ZSVECTOR2 operator-(const ZSVECTOR2& l, const ZSVECTOR2& r)
+    {
+        ZSVECTOR2 Ret(l.X - r.X, l.Y - r.Y);
+
+        return Ret;
+    }
+
 
 	inline ZSVECTOR3 operator-(const ZSVECTOR3& l, const ZSVECTOR3& r)
 	{
@@ -237,14 +309,14 @@
     inline bool operator==(const ZSVECTOR3& l, const ZSVECTOR3& r)
     {
         bool result = false;
-        if(l.X == r.X && l.Y == r.Y && l.Z == r.Z) result = true;
+        if(REAL_NUM_EQ(l.X, r.X) && REAL_NUM_EQ(l.Y, r.Y) && REAL_NUM_EQ(l.Z, r.Z)) result = true;
 
         return result;
     }
     inline bool operator!=(const ZSVECTOR3& l, const ZSVECTOR3& r)
     {
         bool result = false;
-        if(l.X != r.X || l.Y != r.Y|| l.Z != r.Z) result = true;
+        if(!REAL_NUM_EQ(l.X , r.X) || !REAL_NUM_EQ(l.Y, r.Y) || !REAL_NUM_EQ(l.Z, r.Z)) result = true;
 
         return result;
     }
