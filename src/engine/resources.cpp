@@ -119,8 +119,11 @@ Engine::TextureResource::TextureResource(){
 }
 
 void Engine::TextureResource::Use(int slot){
+    //Check, if texture already loaded
     if(this->resource_state == STATE_LOADED)
+        //If loaded, just use it in slot
         this->texture_ptr->Use(slot);
+    //Otherwise perform texture loading
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
         request->isBlob = true;

@@ -14,8 +14,8 @@ namespace Engine {
         bool alive; //Non destroyed
         std::string label;
 
-        unsigned int vertices_num;
-        unsigned int indices_num;
+        int vertices_num;
+        int indices_num;
 
         virtual void Init();
         virtual void setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num);

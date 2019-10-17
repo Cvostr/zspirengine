@@ -17,6 +17,7 @@ public:
     void Init();
     void setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num);
     void setMeshData(ZSVERTEX* vertices, unsigned int vertices_num);
+    void setMeshOffsets();
     void Draw();
     void Destroy();
 

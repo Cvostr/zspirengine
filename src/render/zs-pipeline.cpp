@@ -57,7 +57,16 @@ Engine::RenderPipeline::RenderPipeline(){
     //allocate lights buffer
     lightsBuffer = allocUniformBuffer();
     lightsBuffer->init(1, 64 * MAX_LIGHTS_AMOUNT + 16 * 2);
-
+    //Shadow uniform buffer
+    shadowBuffer = allocUniformBuffer();
+    shadowBuffer->init(2, sizeof (ZSMATRIX4x4) * 2 + 16);
+    //Terrain uniform buffer
+    terrainUniformBuffer = allocUniformBuffer();
+    terrainUniformBuffer->init(3, 12 * 16 * 2 + 4 * 3);
+    //Skinning uniform buffer
+    skinningUniformBuffer = allocUniformBuffer();
+    skinningUniformBuffer->init(4, sizeof (ZSMATRIX4x4) * 150);
+    //Tile uniform buffer
     tileBuffer = allocUniformBuffer();
     tileBuffer->init(5, 28);
 

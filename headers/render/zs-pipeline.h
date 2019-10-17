@@ -70,7 +70,9 @@ private:
 public:
     UniformBuffer* transformBuffer;
     UniformBuffer* lightsBuffer;
-
+    UniformBuffer* shadowBuffer;
+    UniformBuffer* terrainUniformBuffer;
+    UniformBuffer* skinningUniformBuffer;
     UniformBuffer* tileBuffer;
 
     RenderSettings* getRenderSettings();

@@ -114,6 +114,8 @@
         }
         ZSVERTEX(ZSVECTOR3 npos, ZSVECTOR2 nuv, ZSVECTOR3 nnormal) : pos(npos.X, npos.Y, npos.Z), uv(nuv.X, nuv.Y), normal(nnormal.X, nnormal.Y, nnormal.Z) {
             bones_num = 0;
+            tangent = ZSVECTOR3(0, 0, 0);
+            bitangent = ZSVECTOR3(0, 0, 0);
         }
 		ZSVERTEX(ZSVECTOR3 npos, ZSVECTOR2 nuv, ZSVECTOR3 nnormal, ZSVECTOR3 ntangent, ZSVECTOR3 nbitangent) 
 			: pos(npos.X, npos.Y, npos.Z), 
