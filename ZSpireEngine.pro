@@ -50,7 +50,8 @@ SOURCES += \
     src/vulkan/vk_uniform_buf.cpp \
     src/vulkan/zsvk_mem.cpp \
     src/ogl/ogl_shader.cpp \
-    src/vulkan/vk_shader.cpp
+    src/vulkan/vk_shader.cpp \
+    src/render/zs-animation.cpp
 
 HEADERS += \
         headers/engine.h \
