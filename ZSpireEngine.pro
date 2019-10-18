@@ -77,7 +77,8 @@ HEADERS += \
     headers/ogl/ogl.h \
     headers/vulkan/vk_data.h \
     headers/render/zs-uniform-buffer.h \
-    headers/vulkan/zsvk_mem.h
+    headers/vulkan/zsvk_mem.h \
+    headers/render/zs-animation.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
