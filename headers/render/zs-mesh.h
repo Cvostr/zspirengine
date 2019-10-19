@@ -24,10 +24,13 @@ namespace Engine {
     class Mesh {
     public:
         bool alive; //Non destroyed
-        std::string label;
+        std::string mesh_label;
 
         int vertices_num;
         int indices_num;
+
+        ZSVERTEX* vertices_arr;
+        unsigned int* indices_arr;
 
         std::vector<Bone> bones;
         bool hasBones();
@@ -36,6 +39,7 @@ namespace Engine {
         virtual void setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num);
         virtual void setMeshData(ZSVERTEX* vertices, unsigned int vertices_num);
         virtual void Draw();
+        virtual void DrawLines();
         virtual void Destroy();
 
         Mesh();
@@ -45,10 +49,18 @@ namespace Engine {
     void setupDefaultMeshes();
     void freeDefaultMeshes();
 
+    Engine::Mesh* allocateMesh();
+    Engine::Mesh* allocateMesh(unsigned int size);
+
+    void processTangentSpace(ZSVERTEX* vert_array, unsigned int* indices_array, int indices_num);
+    void processTangentSpace(ZSVERTEX* vert_array, int vertices_num);
+
     Mesh* getPlaneMesh2D();
     Mesh* getUiSpriteMesh2D();
     Mesh* getIsoTileMesh2D();
     Mesh* getCubeMesh3D();
+    Mesh* getSphereMesh();
+    Mesh* getSkyboxMesh();
 
 }
 

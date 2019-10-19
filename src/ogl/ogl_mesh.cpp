@@ -46,7 +46,7 @@ void Engine::_ogl_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_nu
     glBindVertexArray(this->meshVAO); //Bind vertex array
 
     glBindBuffer(GL_ARRAY_BUFFER, this->meshVBO); //Bind vertex buffer
-    glBufferData(GL_ARRAY_BUFFER, vertices_num * sizeof(ZSMATRIX4x4), vertices, GL_STATIC_DRAW); //send vertices to buffer
+    glBufferData(GL_ARRAY_BUFFER, vertices_num * sizeof(ZSVERTEX), vertices, GL_STATIC_DRAW); //send vertices to buffer
     //Bind mesh offsets
     setMeshOffsets();
 }
@@ -99,5 +99,22 @@ void Engine::_ogl_Mesh::Draw(){
     else {
         //Indexed draw
         glDrawElements(GL_TRIANGLES, this->indices_num, GL_UNSIGNED_INT, nullptr);
+    }
+}
+
+void Engine::_ogl_Mesh::DrawLines(){
+
+    glBindVertexArray(this->meshVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, this->meshVBO);
+    if(this->indices_num != NO_INDICES) //if object uses indices
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->meshEBO);
+
+    if (this->indices_num == NO_INDICES) {
+        //Draw without indices
+        glDrawArrays(GL_LINE_LOOP, 0, static_cast<int>(this->vertices_num));
+    }
+    else {
+        //Indexed draw
+        glDrawElements(GL_LINE_LOOP, static_cast<int>(this->indices_num), GL_UNSIGNED_INT, nullptr);
     }
 }

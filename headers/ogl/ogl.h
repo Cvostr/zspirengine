@@ -19,6 +19,7 @@ public:
     void setMeshData(ZSVERTEX* vertices, unsigned int vertices_num);
     void setMeshOffsets();
     void Draw();
+    void DrawLines();
     void Destroy();
 
     _ogl_Mesh();

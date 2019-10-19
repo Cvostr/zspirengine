@@ -8,6 +8,10 @@
 
 ZSpireEngine* engine_ptr;
 
+ZSpireEngine::ZSpireEngine(){
+
+}
+
 ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win, ZSGAME_DESC* desc)
 {
     engine_ptr = this;

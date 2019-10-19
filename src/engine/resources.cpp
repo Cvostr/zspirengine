@@ -241,6 +241,21 @@ Engine::ScriptResource* Engine::ResourceManager::getScriptByLabel(std::string la
     return nullptr;
 }
 
+Engine::Mesh* Engine::allocateMesh(unsigned int size){
+    Engine::Mesh* result = nullptr;
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            result = new _ogl_Mesh[size];
+            break;
+        }
+        case VULKAN : {
+            result = new _vk_Mesh[size];
+            break;
+        }
+    }
+    return result;
+}
+
 Engine::Mesh* Engine::allocateMesh(){
     Engine::Mesh* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){

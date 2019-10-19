@@ -27,6 +27,7 @@ public:
     ZSWINDOW_CREATE_INFO* window_info;
 
     ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win, ZSGAME_DESC* desc);
+    ZSpireEngine();
 
     SDL_Window* getWindowSDL();
     ZsVulkan* getVulkanContext();

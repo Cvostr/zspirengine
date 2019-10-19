@@ -103,8 +103,6 @@ public:
     MaterialResource();
 };
 
-Engine::Mesh* allocateMesh();
-
 }
 
 #endif
