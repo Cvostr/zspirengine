@@ -14,5 +14,7 @@ public:
     virtual ~UniformBuffer();
 };
 
+UniformBuffer* allocUniformBuffer();
+
 }
 #endif // ZSUNIFORMBUFFER_H

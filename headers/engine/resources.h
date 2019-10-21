@@ -6,6 +6,7 @@
 
 #include "../render/zs-texture.h"
 #include "../render/zs-mesh.h"
+#include "../misc/zs3m-master.h"
 #include "../misc/oal_manager.h"
 #include "loader.h"
 #include "EngineManager.h"
@@ -13,7 +14,7 @@
 #include "../ogl/ogl.h"
 #include "../vulkan/vk_data.h"
 
-enum RESTYPE {TYPE_NONE, TYPE_TEXTURE, TYPE_MESH, TYPE_AUDIO, TYPE_MATERIAL, TYPE_SCRIPT};
+enum RESTYPE {TYPE_NONE, TYPE_TEXTURE, TYPE_MESH, TYPE_AUDIO, TYPE_MATERIAL, TYPE_SCRIPT, TYPE_ANIMATION};
 
 enum RESOURCE_STATE {STATE_LOADED, STATE_NOT_LOADED, STATE_LOADING_PROCESS};
 
@@ -75,6 +76,9 @@ class MeshResource : public ZsResource{
 public:
     Engine::Mesh* mesh_ptr;
 
+    void Draw();
+    void Release();
+
     MeshResource();
 };
 
@@ -101,6 +105,13 @@ public:
 
 
     MaterialResource();
+};
+
+class AnimationResource : public ZsResource{
+public:
+
+
+    AnimationResource();
 };
 
 }

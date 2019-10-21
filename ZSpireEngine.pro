@@ -51,7 +51,8 @@ SOURCES += \
     src/vulkan/zsvk_mem.cpp \
     src/ogl/ogl_shader.cpp \
     src/vulkan/vk_shader.cpp \
-    src/render/zs-animation.cpp
+    src/render/zs-animation.cpp \
+    src/misc/zs3m-master.cpp
 
 HEADERS += \
         headers/engine.h \
@@ -79,7 +80,8 @@ HEADERS += \
     headers/vulkan/vk_data.h \
     headers/render/zs-uniform-buffer.h \
     headers/vulkan/zsvk_mem.h \
-    headers/render/zs-animation.h
+    headers/render/zs-animation.h \
+    headers/misc/zs3m-master.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

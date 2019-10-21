@@ -97,6 +97,10 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
                     resource_ptr = new Engine::MaterialResource;
                     break;
                 }
+                case TYPE_ANIMATION:{
+                    resource_ptr = new Engine::AnimationResource;
+                    break;
+                }
             }
             resource_ptr->blob_path = resource.blob_path;
             resource_ptr->offset = resource.offset;
@@ -155,6 +159,47 @@ Engine::MeshResource::MeshResource(){
     this->resource_type = TYPE_MESH;
 }
 
+void Engine::MeshResource::Draw(){
+    //Check, if texture already loaded
+    if(this->resource_state == STATE_LOADED)
+        //If loaded, just use it in slot
+        this->mesh_ptr->Draw();
+    //Otherwise perform texture loading
+    if(this->resource_state == STATE_NOT_LOADED){
+        request = new Engine::Loader::LoadRequest;
+        request->isBlob = true;
+        request->data = new unsigned char[this->size];
+        request->offset = this->offset;
+        request->size = this->size;
+        request->file_path = this->blob_path;
+        Engine::Loader::queryLoadingRequest(request);
+        this->resource_state = STATE_LOADING_PROCESS;
+    }
+    if(this->resource_state == STATE_LOADING_PROCESS){
+        if(this->request->done){
+            ZS3M::ImportedSceneFile isf;
+            isf.loadFromBuffer((char*)request->data, request->size);
+
+            for(unsigned int i = 0; i < isf.meshes_toWrite.size(); i ++){
+                Engine::Mesh* mMesh = isf.meshes_toWrite[i];
+                if(mMesh->mesh_label.compare(resource_label) == false)
+                    mesh_ptr = mMesh;
+            }
+
+            //this->texture_ptr->LoadDDSTextureFromBuffer(request->data);
+            delete[] request->data;
+            delete this->request;
+            this->resource_state = STATE_LOADED;
+        }
+    }
+}
+void Engine::MeshResource::Release(){
+    if(this->resource_state == STATE_LOADED){
+        this->mesh_ptr->Destroy();
+        this->resource_state = STATE_NOT_LOADED;
+    }
+}
+
 Engine::AudioResource::AudioResource(){
     this->resource_type = TYPE_AUDIO;
     buffer = new SoundBuffer;
@@ -166,6 +211,10 @@ Engine::ScriptResource::ScriptResource(){
 
 Engine::MaterialResource::MaterialResource(){
     this->resource_type = TYPE_MATERIAL;
+}
+
+Engine::AnimationResource::AnimationResource(){
+    this->resource_type = TYPE_ANIMATION;
 }
 
 

@@ -12,21 +12,6 @@ void Engine::RenderSettings::defaults(){
     ambient_light_color = ZSRGBCOLOR(255, 255, 255, 255);
 }
 
-Engine::UniformBuffer* Engine::allocUniformBuffer(){
-    Engine::UniformBuffer* result = nullptr;
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            result = new _ogl_UniformBuffer;
-            break;
-        }
-        case VULKAN : {
-            result = new _vk_UniformBuffer;
-            break;
-        }
-    }
-    return result;
-}
-
 Engine::Shader* Engine::allocShader(){
     Engine::Shader* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){

@@ -66,3 +66,18 @@ Engine::UniformBuffer::UniformBuffer(int slot, int size){
 Engine::UniformBuffer::~UniformBuffer(){
 
 }
+
+Engine::UniformBuffer* Engine::allocUniformBuffer(){
+    Engine::UniformBuffer* result = nullptr;
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            result = new _ogl_UniformBuffer;
+            break;
+        }
+        case VULKAN : {
+            result = new _vk_UniformBuffer;
+            break;
+        }
+    }
+    return result;
+}
