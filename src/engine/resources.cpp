@@ -19,11 +19,22 @@ void Engine::ZsResource::Release(){
 
 Engine::ResourceManager::ResourceManager(){
     MeshResource* plane_resource = new MeshResource;
-
     plane_resource->rel_path = "@plane";
     plane_resource->resource_label = plane_resource->rel_path;
     plane_resource->mesh_ptr = Engine::getPlaneMesh2D();
     this->resources.push_back(plane_resource);
+
+    MeshResource* cube_resource = new MeshResource;
+    cube_resource->rel_path = "@cube";
+    cube_resource->resource_label = cube_resource->rel_path;
+    cube_resource->mesh_ptr = Engine::getCubeMesh3D();
+    this->resources.push_back(cube_resource);
+
+    MeshResource* sphere_resource = new MeshResource;
+    sphere_resource->rel_path = "@sphere";
+    sphere_resource->resource_label = sphere_resource->rel_path;
+    sphere_resource->mesh_ptr = Engine::getSphereMesh();
+    this->resources.push_back(sphere_resource);
 }
 
 void Engine::ResourceManager::clear(){

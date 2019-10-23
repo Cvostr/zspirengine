@@ -4,13 +4,13 @@ namespace Engine {
 
 class UniformBuffer{
 public:
-    virtual void init(int slot, int size);
+    virtual void init(unsigned int slot, unsigned int size);
     virtual void bind();
     virtual void writeData(unsigned int offset, unsigned int size, void* data);
     virtual void Destroy();
 
     UniformBuffer();
-    UniformBuffer(int slot, int size);
+    UniformBuffer(unsigned int slot, unsigned int size);
     virtual ~UniformBuffer();
 };
 

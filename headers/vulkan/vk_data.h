@@ -27,7 +27,7 @@ class _vk_UniformBuffer : public UniformBuffer{
 private:
 
 public:
-    void init(int slot, int size);
+    void init(unsigned int slot, unsigned int size);
     void writeData(unsigned int offset, unsigned int size, void* data);
     void bind();
 

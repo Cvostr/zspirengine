@@ -95,7 +95,46 @@ bool Engine::_ogl_Shader::compileFromFile(std::string VSpath, std::string FSpath
     //Clear shaders, we don't need them anymore
     glDeleteShader(VS);
     glDeleteShader(FS);
+}
+bool Engine::_ogl_Shader::compileFromStr(const char* _VS, const char* _FS){
+    std::cout << "OGL: Compiling shader " << std::endl;
 
+    this->shader_id = glCreateProgram();
+    unsigned int VS = glCreateShader(GL_VERTEX_SHADER);
+    unsigned int FS = glCreateShader(GL_FRAGMENT_SHADER);
+
+    GLchar vs_data[SHADER_STR_LEN];
+    GLchar fs_data[SHADER_STR_LEN];
+
+    strcpy(vs_data, _VS);
+    strcpy(fs_data, _FS);
+
+    const GLchar* vs = &vs_data[0];
+    const GLchar* fs = &fs_data[0];
+
+    glShaderSource(VS, 1, &vs, nullptr); //Setting shader code text on vs
+    glShaderSource(FS, 1, &fs, nullptr); //Setting shader code text on fs
+
+    glCompileShader(VS); //Compile VS shader code
+    GLcheckCompileErrors(VS, "VERTEX", "VSpath"); //Check vertex errors
+    glCompileShader(FS); //Compile FS shader code
+    GLcheckCompileErrors(FS, "FRAGMENT", "FSpath"); //Check fragment compile errors
+
+    glAttachShader(this->shader_id, VS);
+    glAttachShader(this->shader_id, FS);
+
+    glLinkProgram(this->shader_id);
+    GLcheckCompileErrors(shader_id, "PROGRAM");
+    //Clear shaders, we don't need them anymore
+    glDeleteShader(VS);
+    glDeleteShader(FS);
+
+    this->isCreated = true; //Shader created & compiled now
+    return true;
+}
+void Engine::_ogl_Shader::setUniformBufferBinding(const char* UB_NAME, unsigned int binding){
+    unsigned int SBI = glGetUniformBlockIndex(this->shader_id, UB_NAME);
+    glUniformBlockBinding(this->shader_id, SBI, binding);
 }
 void Engine::_ogl_Shader::Destroy(){
     glDeleteProgram(this->shader_id);

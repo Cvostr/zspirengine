@@ -12,29 +12,16 @@ void Engine::RenderSettings::defaults(){
     ambient_light_color = ZSRGBCOLOR(255, 255, 255, 255);
 }
 
-Engine::Shader* Engine::allocShader(){
-    Engine::Shader* result = nullptr;
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            result = new _ogl_Shader;
-            break;
-        }
-        case VULKAN : {
-            result = new _vk_Shader;
-            break;
-        }
-    }
-    return result;
-}
-
 void Engine::RenderPipeline::initShaders(){
     this->tile_shader->compileFromFile("Shaders/2d_tile/tile2d.vert", "Shaders/2d_tile/tile2d.frag");
     this->deffered_shader->compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag");
+    this->default3d->compileFromFile("Shaders/3d/3d.vert", "Shaders/3d/3d.frag");
 }
 
 Engine::RenderPipeline::RenderPipeline(){
     this->tile_shader = allocShader();
     this->deffered_shader = allocShader();
+    this->default3d = allocShader();
     initShaders();
     //Allocate transform buffer
     this->transformBuffer = allocUniformBuffer();
@@ -54,6 +41,12 @@ Engine::RenderPipeline::RenderPipeline(){
     //Tile uniform buffer
     tileBuffer = allocUniformBuffer();
     tileBuffer->init(5, 28);
+    //Skybox uniform buffer
+    skyboxTransformUniformBuffer = Engine::allocUniformBuffer();
+    skyboxTransformUniformBuffer->init(6, sizeof (ZSMATRIX4x4) * 2);
+
+    uiUniformBuffer = Engine::allocUniformBuffer();
+    uiUniformBuffer->init(7, sizeof (ZSMATRIX4x4) * 2 + 16 + 16);
 
     Engine::setupDefaultMeshes();
 }
@@ -87,6 +80,7 @@ void Engine::RenderPipeline::destroy(){
 
     tile_shader->Destroy();
     deffered_shader->Destroy();
+    default3d->Destroy();
 
     gbuffer.Destroy();
     Engine::freeDefaultMeshes();
@@ -189,6 +183,9 @@ void Engine::GameObject::processObject(RenderPipeline* pipeline){ //On render pi
     if(active == false || alive == false) return; //if object is inactive, not to render it
 
     TransformProperty* transform_prop = static_cast<TransformProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+    pipeline->transformBuffer->bind();
+    pipeline->transformBuffer->writeData(2 * sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &transform_prop->transform_mat);
+
     //Call update on every property in objects
     this->onUpdate(static_cast<int>(pipeline->deltaTime));
 
@@ -214,7 +211,7 @@ void Engine::GameObject::Draw(RenderPipeline* pipeline){    //On render pipeline
     this->onPreRender(pipeline);
 
     MeshProperty* mesh_prop = static_cast<MeshProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_MESH));
-
+    //Render all properties
     this->onRender(pipeline);
 
     if(mesh_prop != nullptr){
@@ -222,6 +219,10 @@ void Engine::GameObject::Draw(RenderPipeline* pipeline){    //On render pipeline
             mesh_prop->mesh_ptr->mesh_ptr->Draw();
         }
     }
+}
+
+void Engine::MaterialProperty::onRender(RenderPipeline* pipeline){
+    pipeline->default3d->Use();
 }
 
 void Engine::TileProperty::onRender(RenderPipeline* pipeline){
@@ -234,9 +235,7 @@ void Engine::TileProperty::onRender(RenderPipeline* pipeline){
     if(tile_ptr == nullptr || transform_ptr == nullptr) return;
 
     tile_shader->Use();
-    pipeline->transformBuffer->bind();
-    pipeline->transformBuffer->writeData(2 * sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &transform_ptr->transform_mat);
-    //Bind tile material data
+       //Bind tile material data
     pipeline->tileBuffer->bind();
 
     //Checking for diffuse texture
@@ -352,6 +351,14 @@ void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
     transformBuffer->writeData(0, sizeof (ZSMATRIX4x4), &proj);
     transformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &view);
     transformBuffer->writeData(sizeof (ZSMATRIX4x4) * 3, sizeof (cam_pos), &cam_pos);
+
+    //Setting cameras to skybox shader
+    proj = cam_ptr->getProjMatrix();
+    view = cam_ptr->getViewMatrix();
+    view = removeTranslationFromViewMat(view);
+    skyboxTransformUniformBuffer->bind();
+    skyboxTransformUniformBuffer->writeData(0, sizeof (ZSMATRIX4x4), &proj);
+    skyboxTransformUniformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &view);
 
 }
 

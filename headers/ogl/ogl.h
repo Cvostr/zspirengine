@@ -31,7 +31,7 @@ private:
     //openGL integer ID
     unsigned int buffer_id;
 public:
-    void init(int slot, int size);
+    void init(unsigned int slot, unsigned int size);
     void writeData(unsigned int offset, unsigned int size, void* data);
     void bind();
     void Destroy();
@@ -47,6 +47,8 @@ public:
     void GLcheckCompileErrors(unsigned int shader, const char* type, const char* filepath = nullptr);
     bool readShaderFile(const char* path, char* result);
     bool compileFromFile(std::string VSpath, std::string FSpath);
+    bool compileFromStr(const char* _VS, const char* _FS);
+    void setUniformBufferBinding(const char* UB_NAME, unsigned int binding);
     void Use();
     void Destroy();
 

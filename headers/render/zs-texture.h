@@ -8,7 +8,6 @@
 namespace Engine {
 	class Texture {
 	public:
-		Texture();
 
 		unsigned int TEXTURE_ID;
 
@@ -22,6 +21,8 @@ namespace Engine {
 		void Use(int slot);
 		void Destroy();
 
+        Texture();
+        ~Texture();
 	};
 }
 

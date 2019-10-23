@@ -337,9 +337,6 @@ Engine::MaterialProperty::MaterialProperty(){
 void Engine::MaterialProperty::copyTo(GameObjectProperty* dest){
 
 }
-void Engine::MaterialProperty::onRender(RenderPipeline* pipeline){
-
-}
 
 
 Engine::ColliderProperty::ColliderProperty(){

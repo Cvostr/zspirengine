@@ -6,7 +6,6 @@
 #include <vulkan/vulkan.hpp>
 #include "../engine.h"
 
-#include "../world/zs-camera.h"
 #define SHADER_STR_LEN 16384
 
 namespace Engine {
@@ -17,12 +16,16 @@ namespace Engine {
 	public:
 
         virtual bool compileFromFile(std::string VSpath, std::string FSpath);
+        virtual bool compileFromStr(const char* _VS, const char* _FS);
+        virtual void setUniformBufferBinding(const char* UB_NAME, unsigned int binding);
         virtual void Use();
         virtual void Destroy();
 
         Shader(); //Construct to set isCreated var to false
         virtual ~Shader();
 	};
+
+    Engine::Shader* allocShader();
 
 }
 

@@ -248,11 +248,9 @@ void Engine::freeDefaultMeshes(){
 Engine::Mesh* Engine::getPlaneMesh2D() {
     return plane2Dmesh;
 }
-
 Engine::Mesh* Engine::getUiSpriteMesh2D() {
     return uiSprite2Dmesh;
 }
-
 Engine::Mesh* Engine::getIsoTileMesh2D(){
     return iso_tile2Dmesh;
 }

@@ -1,6 +1,6 @@
 #include "../../headers/ogl/ogl.h"
 
-void Engine::_ogl_UniformBuffer::init(int slot, int size){
+void Engine::_ogl_UniformBuffer::init(unsigned int slot, unsigned int size){
     glGenBuffers(1, &buffer_id);
     glBindBuffer(GL_UNIFORM_BUFFER, buffer_id);
     glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STATIC_DRAW);

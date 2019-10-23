@@ -6,7 +6,7 @@
 
 extern ZSpireEngine* engine_ptr;
 
-void Engine::UniformBuffer::init(int slot, int size){
+void Engine::UniformBuffer::init(unsigned int slot, unsigned int size){
     switch(engine_ptr->engine_info->graphicsApi){
         case OGL32 : {
             static_cast<_ogl_UniformBuffer*>(this)->init(slot, size);
@@ -60,7 +60,7 @@ void Engine::UniformBuffer::Destroy(){
 Engine::UniformBuffer::UniformBuffer(){
 
 }
-Engine::UniformBuffer::UniformBuffer(int slot, int size){
+Engine::UniformBuffer::UniformBuffer(unsigned int slot, unsigned int size){
     init(slot, size);
 }
 Engine::UniformBuffer::~UniformBuffer(){

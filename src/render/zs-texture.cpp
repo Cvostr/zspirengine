@@ -28,6 +28,10 @@ Engine::Texture::Texture() {
 
 }
 
+Engine::Texture::~Texture(){
+
+}
+
 void Engine::Texture::Use(int slot) {
 
     //if ((slot < SLOTS_COUNT) && (this->TEXTURE_ID != tex_slots[slot])) {

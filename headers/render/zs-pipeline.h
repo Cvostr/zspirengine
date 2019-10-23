@@ -15,7 +15,7 @@
 namespace Engine{
 
 UniformBuffer* allocUniformBuffer();
-Engine::Shader* allocShader();
+
 
 enum GO_RENDER_TYPE {
     GO_RENDER_TYPE_NONE,
@@ -57,9 +57,6 @@ private:
 
     G_BUFFER_GL gbuffer;
 
-    Engine::Shader* tile_shader;
-    Engine::Shader* deffered_shader;
-
     RenderSettings render_settings;
     //Vector to store lights
     std::vector<void*> lights_ptr;
@@ -68,12 +65,18 @@ private:
     void updateShadersCameraInfo(Engine::Camera* cam_ptr);
     void setLightsToBuffer();
 public:
+    Engine::Shader* tile_shader;
+    Engine::Shader* deffered_shader;
+    Engine::Shader* default3d;
+
     UniformBuffer* transformBuffer;
     UniformBuffer* lightsBuffer;
     UniformBuffer* shadowBuffer;
     UniformBuffer* terrainUniformBuffer;
     UniformBuffer* skinningUniformBuffer;
     UniformBuffer* tileBuffer;
+    UniformBuffer* skyboxTransformUniformBuffer;
+    UniformBuffer* uiUniformBuffer;
 
     RenderSettings* getRenderSettings();
     Engine::Shader* getTileShader();

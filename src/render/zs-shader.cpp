@@ -36,6 +36,30 @@ bool Engine::Shader::compileFromFile(std::string VSpath, std::string FSpath){
     this->isCreated = true;
 }
 
+bool Engine::Shader::compileFromStr(const char* _VS, const char* _FS){
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            static_cast<_ogl_Shader*>(this)->compileFromFile(_VS, _FS);
+            break;
+        }
+    }
+    this->isCreated = true;
+}
+
+void Engine::Shader::setUniformBufferBinding(const char* UB_NAME, unsigned int binding){
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            static_cast<_ogl_Shader*>(this)->setUniformBufferBinding(UB_NAME, binding);
+            //static_cast<_ogl_Shader*>(this)->compileFromFile(VSpath, FSpath);
+            break;
+        }
+        case VULKAN : {
+            //static_cast<_vk_Shader*>(this)->compileFromFile(VSpath, FSpath);
+            break;
+        }
+    }
+}
+
 void Engine::Shader::Destroy() {
     switch(engine_ptr->engine_info->graphicsApi){
         case OGL32 : {
@@ -63,3 +87,17 @@ void Engine::Shader::Use() {
     }
 }
 
+Engine::Shader* Engine::allocShader(){
+    Engine::Shader* result = nullptr;
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            result = new _ogl_Shader;
+            break;
+        }
+        case VULKAN : {
+            result = new _vk_Shader;
+            break;
+        }
+    }
+    return result;
+}
