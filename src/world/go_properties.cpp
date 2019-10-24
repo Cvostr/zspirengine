@@ -44,7 +44,11 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
-
+        case GO_PROPERTY_TYPE_NODE:{
+            NodeProperty* ptr = new NodeProperty;
+            _ptr = static_cast<GameObjectProperty*>(ptr);
+            break;
+        }
         case GO_PROPERTY_TYPE_LIGHTSOURCE:{
             LightsourceProperty* ptr = new LightsourceProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
@@ -338,6 +342,15 @@ void Engine::MaterialProperty::copyTo(GameObjectProperty* dest){
 
 }
 
+Engine::NodeProperty::NodeProperty(){
+    type = GO_PROPERTY_TYPE_NODE;
+}
+void Engine::NodeProperty::onPreRender(RenderPipeline* pipeline){
+
+}
+void Engine::NodeProperty::copyTo(GameObjectProperty* dest){
+
+}
 
 Engine::ColliderProperty::ColliderProperty(){
     type = GO_PROPERTY_TYPE_COLLIDER;

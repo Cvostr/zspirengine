@@ -1,5 +1,5 @@
 #include "../../headers/vulkan/zsvulkan.h"
-#include "../../headers/render/zs-shader.h"
+#include "../../headers/vulkan/vk_data.h"
 #include <iostream>
 
 ZsVulkan* vulkan_ptr = nullptr;
@@ -307,7 +307,24 @@ bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
 }
 
 void ZsVkPipeline::create(void* shader, ZsVkPipelineConf conf, ZsVulkan* vulkan){
-    Engine::Shader* shader_ptr = static_cast<Engine::Shader*>(shader);
+    Engine::_vk_Shader* shader_ptr = static_cast<Engine::_vk_Shader*>(shader);
+    VkPipelineShaderStageCreateInfo vertexStageCreateInfo = {}, fragmentStageCreateInfo = {};
+
+    vertexStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    vertexStageCreateInfo.flags = 0;
+    vertexStageCreateInfo.pNext = nullptr;
+    vertexStageCreateInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+    vertexStageCreateInfo.module = shader_ptr->vertexShader;
+    vertexStageCreateInfo.pName = "main";
+
+    fragmentStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    fragmentStageCreateInfo.flags = 0;
+    fragmentStageCreateInfo.pNext = nullptr;
+    fragmentStageCreateInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    fragmentStageCreateInfo.module = shader_ptr->fragmentShader;
+    fragmentStageCreateInfo.pName = "main";
+
+
     //IA state
     VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -359,7 +376,6 @@ void ZsVkPipeline::create(void* shader, ZsVkPipelineConf conf, ZsVulkan* vulkan)
     pipeline_info.pSetLayouts = nullptr;
     pipeline_info.pushConstantRangeCount = 0;
     pipeline_info.pPushConstantRanges = nullptr;
-
     vkCreatePipelineLayout(vulkan->getVkDevice(), &pipeline_info, nullptr, &this->pipelineLayout);
 }
 

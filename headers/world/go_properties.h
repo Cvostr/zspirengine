@@ -85,6 +85,26 @@ public:
     AudioSourceProperty();
 };
 
+class NodeProperty : public GameObjectProperty {
+public:
+    std::string node_label;
+
+    ZSVECTOR3 translation;
+    ZSVECTOR3 scale;
+    ZSQUATERNION rotation;
+    //Node transform from file
+    ZSMATRIX4x4 transform_mat;
+    //Caclulated node transform
+    ZSMATRIX4x4 abs;
+
+    bool hasBone;
+
+    void onPreRender(RenderPipeline* pipeline);
+    void copyTo(GameObjectProperty* dest);
+
+    NodeProperty();
+};
+
 class MaterialProperty : public GameObjectProperty{
 public:
     //Pointer to picked material

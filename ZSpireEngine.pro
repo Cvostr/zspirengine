@@ -52,7 +52,9 @@ SOURCES += \
     src/ogl/ogl_shader.cpp \
     src/vulkan/vk_shader.cpp \
     src/render/zs-animation.cpp \
-    src/misc/zs3m-master.cpp
+    src/misc/zs3m-master.cpp \
+    src/ogl/ogl_texture.cpp \
+    src/vulkan/vk_texture.cpp
 
 HEADERS += \
         headers/engine.h \

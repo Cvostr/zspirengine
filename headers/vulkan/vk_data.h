@@ -4,6 +4,7 @@
 #include "../render/zs-mesh.h"
 #include "../render/zs-uniform-buffer.h"
 #include "../render/zs-shader.h"
+#include "../render/zs-texture.h"
 #include "../vulkan/zsvulkan.h"
 
 namespace Engine{
@@ -23,6 +24,21 @@ public:
     ~_vk_Mesh();
 };
 
+class _vk_Texture : public Engine::Texture{
+public:
+
+    void Init();
+    //Loads texture from buffer
+    bool LoadDDSTextureFromBuffer(unsigned char* data);
+    //Use in rendering pipeline
+    void Use(int slot);
+    void Destroy();
+
+    _vk_Texture();
+    ~_vk_Texture();
+};
+
+
 class _vk_UniformBuffer : public UniformBuffer{
 private:
 
@@ -37,12 +53,11 @@ public:
 
 class _vk_Shader : public Engine::Shader{
 private:
+
+public:
     VkShaderModule vertexShader;
     VkShaderModule fragmentShader;
 
-    VkPipelineShaderStageCreateInfo vertStageInfo;
-    VkPipelineShaderStageCreateInfo fragStageInfo;
-public:
     bool readBinaryShaderFile(std::string path, char* result, int* size);
     bool compileFromFile(std::string VSpath, std::string FSpath);
     void Use();

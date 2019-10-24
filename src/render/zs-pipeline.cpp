@@ -216,7 +216,7 @@ void Engine::GameObject::Draw(RenderPipeline* pipeline){    //On render pipeline
 
     if(mesh_prop != nullptr){
         if(mesh_prop->mesh_ptr != nullptr){
-            mesh_prop->mesh_ptr->mesh_ptr->Draw();
+            mesh_prop->mesh_ptr->Draw();
         }
     }
 }

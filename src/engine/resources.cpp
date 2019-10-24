@@ -19,18 +19,21 @@ void Engine::ZsResource::Release(){
 
 Engine::ResourceManager::ResourceManager(){
     MeshResource* plane_resource = new MeshResource;
+    plane_resource->resource_state = STATE_LOADED;
     plane_resource->rel_path = "@plane";
     plane_resource->resource_label = plane_resource->rel_path;
     plane_resource->mesh_ptr = Engine::getPlaneMesh2D();
     this->resources.push_back(plane_resource);
 
     MeshResource* cube_resource = new MeshResource;
+    cube_resource->resource_state = STATE_LOADED;
     cube_resource->rel_path = "@cube";
     cube_resource->resource_label = cube_resource->rel_path;
     cube_resource->mesh_ptr = Engine::getCubeMesh3D();
     this->resources.push_back(cube_resource);
 
     MeshResource* sphere_resource = new MeshResource;
+    sphere_resource->resource_state = STATE_LOADED;
     sphere_resource->rel_path = "@sphere";
     sphere_resource->resource_label = sphere_resource->rel_path;
     sphere_resource->mesh_ptr = Engine::getSphereMesh();
@@ -86,7 +89,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
                     resource_ptr = new Engine::TextureResource;
 
                     Engine::TextureResource* texture_ptr = static_cast<Engine::TextureResource*>(resource_ptr);
-                    texture_ptr->texture_ptr = new Engine::Texture;
+                    texture_ptr->texture_ptr = allocTexture();
                     break;
                 }
                 case TYPE_MESH:{

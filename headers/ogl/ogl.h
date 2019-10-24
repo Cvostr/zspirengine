@@ -4,6 +4,7 @@
 #include "../render/zs-mesh.h"
 #include "../render/zs-uniform-buffer.h"
 #include "../render/zs-shader.h"
+#include "../render/zs-texture.h"
 
 namespace Engine{
 
@@ -24,6 +25,23 @@ public:
 
     _ogl_Mesh();
     ~_ogl_Mesh();
+};
+
+class _ogl_Texture : public Engine::Texture{
+public:
+
+    unsigned int TEXTURE_ID;
+
+    //Only for OGL : initialize texture in GL
+    void Init();
+    //Loads texture from buffer
+    bool LoadDDSTextureFromBuffer(unsigned char* data);
+    //Use in rendering pipeline
+    void Use(int slot);
+    void Destroy();
+
+    _ogl_Texture();
+    ~_ogl_Texture();
 };
 
 class _ogl_UniformBuffer : public UniformBuffer{

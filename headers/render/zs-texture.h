@@ -1,29 +1,30 @@
-#ifdef _WIN32
-#include <cstring>
-#endif
-
 #ifndef zs_texture
 #define zs_texture
+
+#define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
+#define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
+#define FOURCC_DXT5 0x35545844 // Equivalent to "DXT5" in ASCII
+#define SLOTS_COUNT 4
 
 namespace Engine {
 	class Texture {
 	public:
 
-		unsigned int TEXTURE_ID;
-
 		//Only for OGL : initialize texture in GL
-		void Init();
+        virtual void Init();
 		//Loads texture from buffer
-        bool LoadDDSTextureFromBuffer(unsigned char* data);
+        virtual bool LoadDDSTextureFromBuffer(unsigned char* data);
 		//Loads texture from file
-		bool LoadDDSTextureFromFile(const char* path);
+        bool LoadDDSTextureFromFile(const char* path);
 		//Use in rendering pipeline
-		void Use(int slot);
-		void Destroy();
+        virtual void Use(int slot);
+        virtual void Destroy();
 
         Texture();
-        ~Texture();
+        virtual ~Texture();
 	};
+
+    Texture* allocTexture();
 }
 
 
