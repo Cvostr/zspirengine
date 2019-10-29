@@ -27,7 +27,7 @@ public:
     ~_ogl_Mesh();
 };
 
-class _ogl_Texture : public Engine::Texture{
+class _ogl_Texture : public Texture{
 public:
 
     unsigned int TEXTURE_ID;
@@ -43,6 +43,21 @@ public:
     _ogl_Texture();
     ~_ogl_Texture();
 };
+
+class _ogl_Texture3D : public Texture3D{
+public:
+    unsigned int TEXTURE_ID;
+
+    void Init();
+    bool pushTextureBuffer(int index, unsigned char* data);
+    //Use in rendering pipeline
+    void Use(int slot);
+    void Destroy();
+
+    _ogl_Texture3D();
+    ~_ogl_Texture3D();
+};
+
 
 class _ogl_UniformBuffer : public UniformBuffer{
 private:

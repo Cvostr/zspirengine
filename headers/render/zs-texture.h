@@ -1,6 +1,8 @@
 #ifndef zs_texture
 #define zs_texture
 
+#include <string>
+
 #define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
 #define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
 #define FOURCC_DXT5 0x35545844 // Equivalent to "DXT5" in ASCII
@@ -24,7 +26,24 @@ namespace Engine {
         virtual ~Texture();
 	};
 
+    class Texture3D{
+    public:
+
+        bool created;
+
+        virtual void Init();
+        virtual bool pushTextureBuffer(int index, unsigned char* data);
+        virtual bool pushTexture(int index, std::string path);
+        //Use in rendering pipeline
+        virtual void Use(int slot);
+        virtual void Destroy();
+
+        Texture3D();
+        virtual ~Texture3D();
+    };
+
     Texture* allocTexture();
+    Texture3D* allocTexture3D();
 }
 
 

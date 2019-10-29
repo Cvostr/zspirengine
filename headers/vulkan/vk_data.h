@@ -55,6 +55,8 @@ class _vk_Shader : public Engine::Shader{
 private:
 
 public:
+    ZsVkPipeline* pipeline;
+
     VkShaderModule vertexShader;
     VkShaderModule fragmentShader;
 

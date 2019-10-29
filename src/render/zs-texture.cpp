@@ -21,6 +21,21 @@ Engine::Texture* Engine::allocTexture(){
     return result;
 }
 
+Engine::Texture3D* Engine::allocTexture3D(){
+    Engine::Texture3D* result = nullptr;
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            result = new _ogl_Texture3D;
+            break;
+        }
+        case VULKAN : {
+            //result = new _vk_Texture;
+            break;
+        }
+    }
+    return result;
+}
+
 //Only for OGL : initialize texture in GL
 void Engine::Texture::Init(){
     switch(engine_ptr->engine_info->graphicsApi){
@@ -120,3 +135,92 @@ Engine::Texture::~Texture(){
 
 }
 
+
+void Engine::Texture3D::Init(){
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            static_cast<_ogl_Texture3D*>(this)->Init();
+            break;
+        }
+        case VULKAN : {
+            //static_cast<_vk_Texture3D*>(this)->Init();
+            break;
+        }
+    }
+}
+bool Engine::Texture3D::pushTextureBuffer(int index, unsigned char* data){
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            static_cast<_ogl_Texture3D*>(this)->pushTextureBuffer(index, data);
+            break;
+        }
+        case VULKAN : {
+            //static_cast<_vk_Texture3D*>(this)->Use(slot);
+            break;
+        }
+    }
+}
+bool Engine::Texture3D::pushTexture(int index, std::string path){
+    std::ifstream texture_stream;
+    texture_stream.open(path, std::ifstream::binary | std::ifstream::ate);
+
+    if (texture_stream.fail()) { //Opening file stream failed, no file
+        //std::cout << "TEXTURE: FATAL: Error opening file stream! Perhaps, file " << path << " is missing!" << std::endl;
+        return false;
+    }
+
+    //texture file size
+    unsigned int size = static_cast<unsigned int>(texture_stream.tellg());
+    texture_stream.seekg(0);
+
+    unsigned char header[128];
+    //reading texture header
+    texture_stream.read(reinterpret_cast<char*>(&header[0]), 128);
+
+    if (header[0] != 'D' && header[1] != 'D' && header[2] != 'S') { //File found, but isn't DDS texture
+        //std::cout << "TEXTURE: FATAL: Error processing file! Perhaps, file " << path << " is not DDS texture!" << std::endl;
+        texture_stream.close();
+        return false;
+    }
+    //back to start
+    texture_stream.seekg(0);
+
+    unsigned char * data = new unsigned char[size]; //Allocating buffer for file in heap
+    texture_stream.read(reinterpret_cast<char*>(data), size); //Reading file to buffer
+    pushTextureBuffer(index, data); //Read texture from buffer
+
+    delete[] (data); //freeing buffer
+    texture_stream.close(); //closing stream
+}
+    //Use in rendering pipeline
+void Engine::Texture3D::Use(int slot){
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            static_cast<_ogl_Texture3D*>(this)->Use(slot);
+            break;
+        }
+        case VULKAN : {
+            //static_cast<_vk_Texture3D*>(this)->Use(slot);
+            break;
+        }
+    }
+}
+void Engine::Texture3D::Destroy(){
+    switch(engine_ptr->engine_info->graphicsApi){
+        case OGL32 : {
+            static_cast<_ogl_Texture3D*>(this)->Destroy();
+            break;
+        }
+        case VULKAN : {
+            //static_cast<_vk_Texture3D*>(this)->Use(slot);
+            break;
+        }
+    }
+}
+
+Engine::Texture3D::Texture3D(){
+    created = false;
+}
+Engine::Texture3D::~Texture3D(){
+
+}
