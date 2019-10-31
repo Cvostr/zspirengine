@@ -345,7 +345,7 @@ Engine::Mesh::~Mesh(){
 }
 
 
-Engine::Bone::Bone(std::string name, uint vertices){
+Engine::Bone::Bone(std::string name, unsigned int vertices){
     this->bone_name = name;
     this->vertices_affected = vertices;
 }

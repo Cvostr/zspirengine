@@ -38,6 +38,18 @@ public:
     ~_vk_Texture();
 };
 
+class _vk_Texture3D : public Engine::Texture3D{
+public:
+
+    void Init();
+    bool pushTextureBuffer(int index, unsigned char* data);
+    //Use in rendering pipeline
+    void Use(int slot);
+    void Destroy();
+
+    _vk_Texture3D();
+    ~_vk_Texture3D();
+};
 
 class _vk_UniformBuffer : public UniformBuffer{
 private:

@@ -29,7 +29,7 @@ Engine::Texture3D* Engine::allocTexture3D(){
             break;
         }
         case VULKAN : {
-            //result = new _vk_Texture;
+            result = new _vk_Texture3D;
             break;
         }
     }
@@ -51,16 +51,18 @@ void Engine::Texture::Init(){
 }
 //Loads texture from buffer
 bool Engine::Texture::LoadDDSTextureFromBuffer(unsigned char* data){
+    bool result = false;
     switch(engine_ptr->engine_info->graphicsApi){
         case OGL32 : {
-            static_cast<_ogl_Texture*>(this)->LoadDDSTextureFromBuffer(data);
+            result = static_cast<_ogl_Texture*>(this)->LoadDDSTextureFromBuffer(data);
             break;
         }
         case VULKAN : {
-            static_cast<_vk_Texture*>(this)->LoadDDSTextureFromBuffer(data);
+            result = static_cast<_vk_Texture*>(this)->LoadDDSTextureFromBuffer(data);
             break;
         }
     }
+    return result;
 }
 //Loads texture from file
 bool Engine::Texture::LoadDDSTextureFromFile(const char* path){
@@ -143,22 +145,24 @@ void Engine::Texture3D::Init(){
             break;
         }
         case VULKAN : {
-            //static_cast<_vk_Texture3D*>(this)->Init();
+            static_cast<_vk_Texture3D*>(this)->Init();
             break;
         }
     }
 }
 bool Engine::Texture3D::pushTextureBuffer(int index, unsigned char* data){
+    bool result = false;
     switch(engine_ptr->engine_info->graphicsApi){
         case OGL32 : {
-            static_cast<_ogl_Texture3D*>(this)->pushTextureBuffer(index, data);
+            result = static_cast<_ogl_Texture3D*>(this)->pushTextureBuffer(index, data);
             break;
         }
         case VULKAN : {
-            //static_cast<_vk_Texture3D*>(this)->Use(slot);
+            result = static_cast<_vk_Texture3D*>(this)->pushTextureBuffer(index, data);
             break;
         }
     }
+    return result;
 }
 bool Engine::Texture3D::pushTexture(int index, std::string path){
     std::ifstream texture_stream;
@@ -191,6 +195,8 @@ bool Engine::Texture3D::pushTexture(int index, std::string path){
 
     delete[] (data); //freeing buffer
     texture_stream.close(); //closing stream
+
+    return true;
 }
     //Use in rendering pipeline
 void Engine::Texture3D::Use(int slot){
@@ -200,7 +206,7 @@ void Engine::Texture3D::Use(int slot){
             break;
         }
         case VULKAN : {
-            //static_cast<_vk_Texture3D*>(this)->Use(slot);
+            static_cast<_vk_Texture3D*>(this)->Use(slot);
             break;
         }
     }
@@ -212,7 +218,7 @@ void Engine::Texture3D::Destroy(){
             break;
         }
         case VULKAN : {
-            //static_cast<_vk_Texture3D*>(this)->Use(slot);
+            static_cast<_vk_Texture3D*>(this)->Destroy();
             break;
         }
     }
