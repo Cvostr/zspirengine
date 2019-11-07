@@ -135,6 +135,7 @@ static Engine::Mesh* iso_tile2Dmesh;
 static Engine::Mesh* cube3Dmesh;
 static Engine::Mesh* skyboxMesh;
 static Engine::Mesh* sphereMesh;
+static Engine::Mesh* grassMesh;
 
 void Engine::setupDefaultMeshes() {
     plane2Dmesh = allocateMesh();
@@ -143,6 +144,7 @@ void Engine::setupDefaultMeshes() {
     cube3Dmesh = allocateMesh();
     skyboxMesh = allocateMesh();
     sphereMesh = allocateMesh();
+    grassMesh = allocateMesh();
 
     picked_mesh = nullptr;
 
@@ -341,15 +343,17 @@ Engine::Mesh::Mesh(){
 }
 
 Engine::Mesh::~Mesh(){
-
+    delete vertices_arr;
+    delete vertices_coord;
+    delete indices_arr;
 }
 
 
-Engine::Bone::Bone(std::string name, unsigned int vertices){
+Engine::Bone::Bone(std::string& name, unsigned int vertices){
     this->bone_name = name;
     this->vertices_affected = vertices;
 }
-Engine::Bone::Bone(std::string name){
+Engine::Bone::Bone(std::string& name){
     this->bone_name = name;
 }
 

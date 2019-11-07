@@ -261,11 +261,13 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
             //Allocate arrays for vectors
             newmesh->vertices_arr = new ZSVERTEX[vertexNum];
             newmesh->indices_arr = new unsigned int[indexNum];
+            newmesh->vertices_coord = new float[vertexNum * 3];
 
             for(unsigned int v_i = 0; v_i < vertexNum; v_i ++){
                 ZSVERTEX v_ptr;
                 //Read vertex vectors
                 memcpy(reinterpret_cast<char*>(&v_ptr.pos), &buffer[cur_pos], sizeof(float) * 3);
+                memcpy(reinterpret_cast<char*>(&newmesh->vertices_coord[v_i * 3]), &buffer[cur_pos], sizeof(float) * 3);
                 cur_pos += sizeof(float) * 3;
                 memcpy(reinterpret_cast<char*>(&v_ptr.uv), &buffer[cur_pos], sizeof(float) * 2);
                 cur_pos += sizeof(float) * 2;
@@ -315,7 +317,8 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
                 strcpy(&bone_label[0], &buffer[cur_pos]);
                 cur_pos += strlen(bone_label) + 1;
 
-                Engine::Bone bone(bone_label);
+                std::string bone_label_strstd = std::string(bone_label);
+                Engine::Bone bone(bone_label_strstd);
                 for(unsigned int m_i = 0; m_i < 4; m_i ++){
                     for(unsigned int m_j = 0; m_j < 4; m_j ++){
                         float* m_v = &bone.offset.m[m_i][m_j];

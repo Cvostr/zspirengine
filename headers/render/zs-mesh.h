@@ -17,8 +17,8 @@ namespace Engine {
 
         unsigned int vertices_affected;
 
-        Bone(std::string name, unsigned int vertices);
-        Bone(std::string name);
+        Bone(std::string& name, unsigned int vertices);
+        Bone(std::string& name);
     };
 
     class Mesh {
@@ -29,7 +29,11 @@ namespace Engine {
         int vertices_num;
         int indices_num;
 
+        //Used to store vertex data (in editor only)
         ZSVERTEX* vertices_arr;
+        //Used to store vertex coordinates for bullet physics
+        float* vertices_coord;
+        //Used to store index data
         unsigned int* indices_arr;
 
         std::vector<Bone> bones;

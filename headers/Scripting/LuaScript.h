@@ -9,7 +9,6 @@ extern "C" {
 }
 #include <LuaBridge/LuaBridge.h>
 
-#include "zsensdk.h"
 #include "../world/World.h"
 
 namespace Engine {

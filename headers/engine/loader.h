@@ -24,7 +24,7 @@ namespace Engine {
         void queryLoadingRequest(LoadRequest* req);
         void loadImmideately(LoadRequest* req);
 
-        void setBlobRootDirectory(std::string dir);
+        void setBlobRootDirectory(std::string& dir);
     }
 }
 #endif // LOADER_H

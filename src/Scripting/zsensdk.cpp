@@ -50,9 +50,9 @@ void EZSENSDK::bindSDK(lua_State* state){
 
     luabridge::getGlobalNamespace(state)
         .beginNamespace("input")
-        .addFunction("isKeyPressed", &EZSENSDK::Input::isKeyPressed)
-        .addFunction("isKeyHold", &EZSENSDK::Input::isKeyHold)
-        .addFunction("getMouseState", &EZSENSDK::Input::getMouseState)
+        .addFunction("isKeyPressed", &Input::isKeyPressed)
+        .addFunction("isKeyHold", &Input::isKeyHold)
+        .addFunction("getMouseState", &Input::getMouseState)
         //Add mouse state class
         .beginClass <Input::MouseState>("MouseState")
         .addData("cursorX", &Input::MouseState::mouseX)

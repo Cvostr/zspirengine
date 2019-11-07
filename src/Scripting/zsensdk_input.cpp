@@ -2,12 +2,6 @@
 #include "../../headers/Scripting/zsensdk.h"
 #include <SDL2/SDL.h>
 
-
-#define KEYS_QUEUE_SIZE 10
-#define KEY_NONE -200
-
-static EZSENSDK::Input::MouseState mouse;
-
 namespace keycodes {
     static int kq = SDLK_q;
     static int kw = SDLK_w;
@@ -44,75 +38,6 @@ namespace keycodes {
     static int kescape = SDLK_ESCAPE;
 }
 
-static int pressed_keys_queue[KEYS_QUEUE_SIZE];
-static int pressed_keys_q_size = 0;
-static int hold_keys_queue[KEYS_QUEUE_SIZE];
-static int hold_keys_q_size = 0;
-
-
-void EZSENSDK::Input::addPressedKeyToQueue(int keycode){
-    //if we have enough free space
-    if(pressed_keys_q_size > KEYS_QUEUE_SIZE) return;
-    pressed_keys_queue[pressed_keys_q_size] = keycode;
-    pressed_keys_q_size += 1;
-}
-void EZSENSDK::Input::addHeldKeyToQueue(int keycode){
-    //if key already held, do nothing
-    if(isKeyHold(keycode)) return;
-
-    bool insertable = false;
-    int insert_pos = 0;
-
-    for(int iterator = 0; iterator < hold_keys_q_size; iterator ++){
-        if(hold_keys_queue[iterator] == KEY_NONE){
-            insertable = true;
-            insert_pos = iterator;
-        }
-    }
-    if(!insertable){
-        if(hold_keys_q_size > KEYS_QUEUE_SIZE) return;
-        hold_keys_queue[hold_keys_q_size] = keycode;
-        hold_keys_q_size += 1;
-    }else{
-        hold_keys_queue[insert_pos] = keycode;
-    }
-}
-void EZSENSDK::Input::removeHeldKeyFromQueue(int keycode){
-    for(int iterator = 0; iterator < hold_keys_q_size; iterator ++){
-        if(hold_keys_queue[iterator] == keycode){
-            hold_keys_queue[iterator] = KEY_NONE;
-        }
-    }
-}
-void EZSENSDK::Input::clearPressedKeys(){
-    pressed_keys_q_size = 0;
-}
-bool EZSENSDK::Input::isKeyPressed(int keycode){
-    for(int i = 0; i < pressed_keys_q_size; i ++){
-        if(pressed_keys_queue[i] == keycode)
-            return true;
-    }
-    return false;
-}
-bool EZSENSDK::Input::isKeyHold(int keycode){
-    for(int i = 0; i < hold_keys_q_size; i ++){
-        if(hold_keys_queue[i] == keycode)
-            return true;
-    }
-    return false;
-}
-
-EZSENSDK::Input::MouseState* EZSENSDK::Input::getMouseStatePtr(){
-    return &mouse;
-}
-EZSENSDK::Input::MouseState EZSENSDK::Input::getMouseState(){
-    return mouse;
-}
-
-void EZSENSDK::Input::clearMouseState(){
-    mouse.mouseRelX = 0;
-    mouse.mouseRelY = 0;
-}
 
 void EZSENSDK::bindKeyCodesSDK(lua_State* state){
 

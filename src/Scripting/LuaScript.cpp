@@ -1,5 +1,6 @@
 #include "../../headers/Scripting/LuaScript.h"
 #include <iostream>
+#include "../../headers/Scripting/zsensdk.h"
 
 #define SCRIPT_LOG std::cout << "SCRIPT "
 

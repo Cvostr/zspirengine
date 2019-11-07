@@ -49,6 +49,6 @@ void Engine::Loader::loadImmideately(LoadRequest* req){
     stream.close();
 }
 
-void Engine::Loader::setBlobRootDirectory(std::string dir){
+void Engine::Loader::setBlobRootDirectory(std::string& dir){
     blob_root_directory = dir;
 }

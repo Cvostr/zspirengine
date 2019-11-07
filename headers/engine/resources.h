@@ -15,7 +15,16 @@
 #include "../vulkan/vk_data.h"
 
 enum RESTYPE {TYPE_NONE, TYPE_TEXTURE, TYPE_MESH, TYPE_AUDIO, TYPE_MATERIAL, TYPE_SCRIPT, TYPE_ANIMATION};
-
+/*
+enum RESOURCE_TYPE {RESOURCE_TYPE_NONE,
+                    RESOURCE_TYPE_TEXTURE,
+                    RESOURCE_TYPE_MESH,
+                    RESOURCE_TYPE_AUDIO,
+                    RESOURCE_TYPE_MATERIAL,
+                    RESOURCE_TYPE_SCRIPT,
+                    RESOURCE_TYPE_ANIMATION,
+                    RESOURCE_TYPE_FILE = 1000};
+*/
 enum RESOURCE_STATE {STATE_LOADED, STATE_NOT_LOADED, STATE_LOADING_PROCESS};
 
 namespace Engine {
