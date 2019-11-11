@@ -200,7 +200,6 @@ void Engine::MeshResource::Draw(){
                     mesh_ptr = mMesh;
             }
 
-            //this->texture_ptr->LoadDDSTextureFromBuffer(request->data);
             delete[] request->data;
             delete this->request;
             this->resource_state = STATE_LOADED;

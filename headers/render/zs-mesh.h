@@ -65,7 +65,7 @@ namespace Engine {
     Mesh* getCubeMesh3D();
     Mesh* getSphereMesh();
     Mesh* getSkyboxMesh();
-
+    Mesh* getGrassMesh();
 }
 
 

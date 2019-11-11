@@ -126,8 +126,24 @@ static ZSVERTEX skyboxVertices[] = {
     ZSVERTEX(ZSVECTOR3(1.0f, -1.0f,  1.0f))
 };
 
+
+static ZSVERTEX grass_vertices[] = {
+    // back face
+    ZSVERTEX(ZSVECTOR3(-0.5f, 0.0f, 0.0f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // bottom-left
+    ZSVERTEX(ZSVECTOR3(0.5f, 0.0f, 0.0f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // top-right
+    ZSVERTEX(ZSVECTOR3(0.5f, 0.5f, 0.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // bottom-right
+    ZSVERTEX(ZSVECTOR3(-0.5f, 0.5f, 0.0f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // top-right
+
+    ZSVERTEX(ZSVECTOR3(0.0f, 0.0f, 0.5f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // bottom-left
+    ZSVERTEX(ZSVECTOR3(0.0f, 0.0f, -0.5f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // top-left
+    ZSVERTEX(ZSVECTOR3(0.0f, 0.5f, 0.5f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f,  1.0f)), // bottom-left
+    ZSVERTEX(ZSVECTOR3(0.0f, 0.5f, -0.5f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f,  1.0f)), // bottom-right
+
+};
+
 static unsigned int plane_inds[] = { 0,1,2, 0,2,3 };
 static unsigned int isotile_ind[] = { 0,1,2, 2,3,4, 2,4,5, 2,5,0 };
+static unsigned int grass_ind[] = {0,1,2,2,1,0,  0,2,3,3,2,0,   4,5,7,7,5,4,  4,7,6,6,4,7};
 
 static Engine::Mesh* plane2Dmesh;
 static Engine::Mesh* uiSprite2Dmesh;
@@ -236,6 +252,9 @@ void Engine::setupDefaultMeshes() {
 
     skyboxMesh->Init();
     skyboxMesh->setMeshData(&skyboxVertices[0], 36); //Send plane data
+
+    grassMesh->Init();
+    grassMesh->setMeshData(grass_vertices, grass_ind, 8, 24);
 }
 
 void Engine::freeDefaultMeshes(){
@@ -264,6 +283,10 @@ Engine::Mesh* Engine::getSphereMesh(){
 }
 Engine::Mesh* Engine::getSkyboxMesh(){
     return skyboxMesh;
+}
+Engine::Mesh* Engine::getGrassMesh(){
+    return grassMesh;
+
 }
 void Engine::Mesh::Init(){
     switch(engine_ptr->engine_info->graphicsApi){

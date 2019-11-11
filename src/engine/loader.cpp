@@ -3,12 +3,12 @@
 #include <list>
 #include <fstream>
 
-static bool working = true;
+static bool loader_thread_working = true;
 static std::string blob_root_directory;
 std::list<Engine::Loader::LoadRequest*> requests;
 
 void loop(){
-    while(working){
+    while(loader_thread_working){
         if(requests.size() > 0){
             Engine::Loader::LoadRequest* req = requests.front();
 
@@ -27,11 +27,11 @@ void loop(){
 void Engine::Loader::start(){
     std::thread loader_loop(loop);
     loader_loop.detach();
-    working = true;
+    loader_thread_working = true;
 }
 
 void Engine::Loader::stop(){
-    working = false;
+    loader_thread_working = false;
     requests.clear();
 }
 
