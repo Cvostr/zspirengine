@@ -57,7 +57,8 @@ SOURCES += \
     src/vulkan/vk_texture.cpp \
     src/input/zs-input.cpp \
     src/ui/zs-uibutton.cpp \
-    src/ui/zs-uiwidget.cpp
+    src/ui/zs-uiwidget.cpp \
+    src/render/zs-material-defines.cpp \
 
 HEADERS += \
         headers/engine.h \
@@ -89,7 +90,8 @@ HEADERS += \
     headers/misc/zs3m-master.h \
     headers/input/zs-input.h \
     headers/ui/zs-uiwidget.h \
-    headers/ui/zs-uibutton.h
+    headers/ui/zs-uibutton.h \
+    headers/render/zs-materials.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
