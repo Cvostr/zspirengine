@@ -55,7 +55,9 @@ SOURCES += \
     src/misc/zs3m-master.cpp \
     src/ogl/ogl_texture.cpp \
     src/vulkan/vk_texture.cpp \
-    src/input/zs-input.cpp
+    src/input/zs-input.cpp \
+    src/ui/zs-uibutton.cpp \
+    src/ui/zs-uiwidget.cpp
 
 HEADERS += \
         headers/engine.h \
@@ -85,7 +87,9 @@ HEADERS += \
     headers/vulkan/zsvk_mem.h \
     headers/render/zs-animation.h \
     headers/misc/zs3m-master.h \
-    headers/input/zs-input.h
+    headers/input/zs-input.h \
+    headers/ui/zs-uiwidget.h \
+    headers/ui/zs-uibutton.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
