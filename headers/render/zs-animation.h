@@ -4,7 +4,7 @@
 #include <string>
 #include "zs-math.h"
 
-namespace ZSPIRE {
+namespace Engine {
 
 class AnimationChannel;
 

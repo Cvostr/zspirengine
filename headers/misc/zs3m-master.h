@@ -47,13 +47,13 @@ public:
 
 class AnimationFileExport{
 private:
-    ZSPIRE::Animation* anim_ptr;
+    Engine::Animation* anim_ptr;
 public:
 
     void writeChannel(std::ofstream* stream, unsigned int index);
     void write(std::string output_file);
 
-    AnimationFileExport(ZSPIRE::Animation* anim_ptr);
+    AnimationFileExport(Engine::Animation* anim_ptr);
 };
 
 class ImportedSceneFile{
@@ -73,7 +73,7 @@ public:
 
 class ImportedAnimationFile{
 public:
-    ZSPIRE::Animation* anim_ptr;
+    Engine::Animation* anim_ptr;
 
     void loadFromBuffer(char* buffer, unsigned int size);
     void loadFromFile(std::string file);

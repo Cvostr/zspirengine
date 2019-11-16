@@ -1,20 +1,20 @@
 #include "../../headers/render/zs-animation.h"
 #include <cassert>
 
-ZSPIRE::Animation::Animation(){
+Engine::Animation::Animation(){
 
 }
-ZSPIRE::Animation::~Animation(){
+Engine::Animation::~Animation(){
     delete[] this->channels;
 }
 
-ZSPIRE::AnimationChannel::AnimationChannel(){
+Engine::AnimationChannel::AnimationChannel(){
     this->posKeysNum = 0;
     this->rotationKeysNum = 0;
     this->scaleKeysNum = 0;
 }
 
-ZSPIRE::AnimationChannel::~AnimationChannel(){
+Engine::AnimationChannel::~AnimationChannel(){
     delete[] this->pos;
     delete[] this->rot;
     delete[] this->scale;
@@ -24,7 +24,7 @@ ZSPIRE::AnimationChannel::~AnimationChannel(){
     delete[] this->scaleTimes;
 }
 
-ZSPIRE::AnimationChannel* ZSPIRE::Animation::getChannelByNodeName(std::string node_name){
+Engine::AnimationChannel* Engine::Animation::getChannelByNodeName(std::string node_name){
     for(unsigned int i = 0; i < this->NumChannels; i ++){
         AnimationChannel* cha = &this->channels[i];
         if(cha->bone_name.compare(node_name) == false) return cha;
@@ -32,7 +32,7 @@ ZSPIRE::AnimationChannel* ZSPIRE::Animation::getChannelByNodeName(std::string no
     return nullptr;
 }
 
-unsigned int ZSPIRE::AnimationChannel::getPositionIndex(double Time){
+unsigned int Engine::AnimationChannel::getPositionIndex(double Time){
     for(unsigned int i = 0; i < this->posKeysNum - 1; i ++){
         double _time = posTimes[i + 1];
         if(_time > Time){
@@ -42,7 +42,7 @@ unsigned int ZSPIRE::AnimationChannel::getPositionIndex(double Time){
     assert(0);
     return 0;
 }
-unsigned int ZSPIRE::AnimationChannel::getScaleIndex(double Time){
+unsigned int Engine::AnimationChannel::getScaleIndex(double Time){
     for(unsigned int i = 0; i < this->scaleKeysNum - 1; i ++){
         double _time = scaleTimes[i + 1];
         if(_time > Time)
@@ -51,7 +51,7 @@ unsigned int ZSPIRE::AnimationChannel::getScaleIndex(double Time){
     assert(0);
     return 0;
 }
-unsigned int ZSPIRE::AnimationChannel::getRotationIndex(double Time){
+unsigned int Engine::AnimationChannel::getRotationIndex(double Time){
     for(unsigned int i = 0; i < this->rotationKeysNum - 1; i ++){
         double _time = rotTimes[i + 1];
         if(_time > Time){
@@ -62,7 +62,7 @@ unsigned int ZSPIRE::AnimationChannel::getRotationIndex(double Time){
     return 0;
 }
 
-ZSVECTOR3 ZSPIRE::AnimationChannel::getPostitionInterpolated(double Time){
+ZSVECTOR3 Engine::AnimationChannel::getPostitionInterpolated(double Time){
     unsigned int index1 = getPositionIndex(Time);
     unsigned int index2 = index1 + 1;
 
@@ -75,7 +75,7 @@ ZSVECTOR3 ZSPIRE::AnimationChannel::getPostitionInterpolated(double Time){
     return lerp(v1, v2, static_cast<float>(delta));
 }
 
-ZSVECTOR3 ZSPIRE::AnimationChannel::getScaleInterpolated(double Time){
+ZSVECTOR3 Engine::AnimationChannel::getScaleInterpolated(double Time){
     unsigned int index1 = getScaleIndex(Time);
     unsigned int index2 = index1 + 1;
 
@@ -88,7 +88,7 @@ ZSVECTOR3 ZSPIRE::AnimationChannel::getScaleInterpolated(double Time){
     return lerp(v1, v2, static_cast<float>(delta));
 }
 
-ZSQUATERNION ZSPIRE::AnimationChannel::getRotationInterpolated(double Time){
+ZSQUATERNION Engine::AnimationChannel::getRotationInterpolated(double Time){
     unsigned int index1 = getRotationIndex(Time);
     unsigned int index2 = index1 + 1;
 

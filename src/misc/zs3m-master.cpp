@@ -383,12 +383,12 @@ ZS3M::ImportedSceneFile::ImportedSceneFile(){
 }
 
 
-ZS3M::AnimationFileExport::AnimationFileExport(ZSPIRE::Animation* anim_ptr){
+ZS3M::AnimationFileExport::AnimationFileExport(Engine::Animation* anim_ptr){
     this->anim_ptr = anim_ptr;
 }
 
 void ZS3M::AnimationFileExport::writeChannel(std::ofstream* stream, unsigned int index){
-    ZSPIRE::AnimationChannel* channel = &anim_ptr->channels[index];
+    Engine::AnimationChannel* channel = &anim_ptr->channels[index];
     //Write channel prefix and its name
     *stream << "_CHAN" << '\0' << channel->bone_name + '\0';
 
@@ -457,7 +457,7 @@ void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size
         return;
     }
     //Allocate animation class
-    anim_ptr = new ZSPIRE::Animation; //allocate animation
+    anim_ptr = new Engine::Animation; //allocate animation
     //Read animation name
     strcpy(&prefix[0], &buffer[byte_offset]);
     byte_offset += strlen(prefix) + 1;
@@ -473,7 +473,7 @@ void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size
     memcpy(reinterpret_cast<char*>(&anim_ptr->NumChannels), &buffer[byte_offset], sizeof (unsigned int));
     byte_offset += sizeof (unsigned int);
     //Allocate all channels
-    anim_ptr->channels = new ZSPIRE::AnimationChannel[anim_ptr->NumChannels];
+    anim_ptr->channels = new Engine::AnimationChannel[anim_ptr->NumChannels];
     unsigned int ch_i = 0;
 
     while (byte_offset < size) {
@@ -486,7 +486,7 @@ void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size
             strcpy(&prefix[0], &buffer[byte_offset]);
             byte_offset += strlen(prefix) + 1;
             //Allocate animation channel
-            ZSPIRE::AnimationChannel* chan = &anim_ptr->channels[ch_i];
+            Engine::AnimationChannel* chan = &anim_ptr->channels[ch_i];
             chan->bone_name = std::string(prefix);
             chan->anim_ptr = anim_ptr;
 

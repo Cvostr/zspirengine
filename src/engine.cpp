@@ -7,6 +7,7 @@
 #include "../headers/Scripting/zsensdk.h"
 
 ZSpireEngine* engine_ptr;
+ZSGAME_DATA* data;
 
 ZSpireEngine::ZSpireEngine(){
 
@@ -107,7 +108,7 @@ void ZSpireEngine::setWindowMode(unsigned int mode){
 void ZSpireEngine::loadGame(){
     gameRuns = true;
 
-    ZSGAME_DATA* data = new ZSGAME_DATA;
+    data = new ZSGAME_DATA;
     this->zsgame_ptr = static_cast<void*>(data);
     //Allocate pipeline and start it as manager
     data->pipeline = new Engine::RenderPipeline;

@@ -6,6 +6,8 @@
 
 #include "../render/zs-texture.h"
 #include "../render/zs-mesh.h"
+#include "../render/zs-materials.h"
+#include "../render/zs-animation.h"
 #include "../misc/zs3m-master.h"
 #include "../misc/oal_manager.h"
 #include "loader.h"
@@ -40,8 +42,9 @@ public:
     std::string resource_label; //Label of resource
 
     std::string blob_path;
-
+    //Offset of file from blob start
     uint64_t offset;
+    //Size of file in blob
     unsigned int size;
 
     virtual void Release();
@@ -66,6 +69,18 @@ public:
     MeshResource* getMeshByLabel(std::string label);
     AudioResource* getAudioByLabel(std::string label);
     ScriptResource* getScriptByLabel(std::string label);
+
+    template<typename T>
+    T* getResource(std::string label){
+        unsigned int res = static_cast<unsigned int>(this->resources.size());
+        for(unsigned int res_i = 0; res_i < res; res_i ++){
+            auto property_ptr = this->resources[res_i];
+            if(typeid( *property_ptr) == typeid(T) && !property_ptr->resource_label.compare(label)){ //If object already has one
+                return static_cast<T*>(property_ptr); //return it
+            }
+        }
+        return nullptr;
+    }
 
     ResourceManager();
     ~ResourceManager();
@@ -96,6 +111,7 @@ public:
     Engine::SoundBuffer* buffer;
 
     void load();
+    void Release();
 
     AudioResource();
 };
@@ -111,14 +127,14 @@ public:
 
 class MaterialResource : public ZsResource{
 public:
-
+    Material* material;
 
     MaterialResource();
 };
 
 class AnimationResource : public ZsResource{
 public:
-
+    Engine::Animation* animation_ptr;
 
     AnimationResource();
 };

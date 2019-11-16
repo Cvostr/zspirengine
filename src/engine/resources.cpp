@@ -113,6 +113,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
                 }
                 case TYPE_ANIMATION:{
                     resource_ptr = new Engine::AnimationResource;
+                    static_cast<Engine::AnimationResource*>(resource_ptr)->animation_ptr = new Engine::Animation;
                     break;
                 }
             }
@@ -152,6 +153,7 @@ void Engine::TextureResource::Use(int slot){
         Engine::Loader::queryLoadingRequest(request);
         this->resource_state = STATE_LOADING_PROCESS;
     }
+    //Check, if texture reading process finished
     if(this->resource_state == STATE_LOADING_PROCESS){
         if(this->request->done){
             this->texture_ptr->LoadDDSTextureFromBuffer(request->data);
@@ -192,7 +194,7 @@ void Engine::MeshResource::Draw(){
     if(this->resource_state == STATE_LOADING_PROCESS){
         if(this->request->done){
             ZS3M::ImportedSceneFile isf;
-            isf.loadFromBuffer((char*)request->data, request->size);
+            isf.loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
 
             for(unsigned int i = 0; i < isf.meshes_toWrite.size(); i ++){
                 Engine::Mesh* mMesh = isf.meshes_toWrite[i];
@@ -218,19 +220,6 @@ Engine::AudioResource::AudioResource(){
     buffer = new SoundBuffer;
 }
 
-Engine::ScriptResource::ScriptResource(){
-    this->resource_type = TYPE_SCRIPT;
-}
-
-Engine::MaterialResource::MaterialResource(){
-    this->resource_type = TYPE_MATERIAL;
-}
-
-Engine::AnimationResource::AnimationResource(){
-    this->resource_type = TYPE_ANIMATION;
-}
-
-
 void Engine::AudioResource::load(){
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
@@ -251,6 +240,26 @@ void Engine::AudioResource::load(){
         }
     }
 }
+
+void Engine::AudioResource::Release(){
+    if(this->resource_state == STATE_LOADED){
+        this->buffer->Destroy();
+        this->resource_state = STATE_NOT_LOADED;
+    }
+}
+
+Engine::ScriptResource::ScriptResource(){
+    this->resource_type = TYPE_SCRIPT;
+}
+
+Engine::MaterialResource::MaterialResource(){
+    this->resource_type = TYPE_MATERIAL;
+}
+
+Engine::AnimationResource::AnimationResource(){
+    this->resource_type = TYPE_ANIMATION;
+}
+
 
 void Engine::ScriptResource::load(){
     if(this->resource_state == STATE_NOT_LOADED){
