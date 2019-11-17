@@ -41,6 +41,7 @@ public:
     std::string rel_path; //Path to resource
     std::string resource_label; //Label of resource
 
+    //Relative path to blob file
     std::string blob_path;
     //Offset of file from blob start
     uint64_t offset;

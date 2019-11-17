@@ -2,6 +2,7 @@
 
 Engine::TileGroupProperty::TileGroupProperty(){
     type = GO_PROPERTY_TYPE_TILE_GROUP;
+    isCreated = false;
 }
 
 Engine::TileProperty::TileProperty(){

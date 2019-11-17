@@ -135,6 +135,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
 
 Engine::TextureResource::TextureResource(){
     this->resource_type = TYPE_TEXTURE;
+    texture_ptr = nullptr;
 }
 
 void Engine::TextureResource::Use(int slot){
@@ -173,6 +174,7 @@ void Engine::TextureResource::Release(){
 
 Engine::MeshResource::MeshResource(){
     this->resource_type = TYPE_MESH;
+    mesh_ptr = nullptr;
 }
 
 void Engine::MeshResource::Draw(){
@@ -254,10 +256,12 @@ Engine::ScriptResource::ScriptResource(){
 
 Engine::MaterialResource::MaterialResource(){
     this->resource_type = TYPE_MATERIAL;
+    material = nullptr;
 }
 
 Engine::AnimationResource::AnimationResource(){
     this->resource_type = TYPE_ANIMATION;
+    animation_ptr = nullptr;
 }
 
 

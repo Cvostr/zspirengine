@@ -2,6 +2,7 @@
 
 MaterialShaderProperty::MaterialShaderProperty(){
     type = MATSHPROP_TYPE_NONE;
+    start_offset = 0;
 }
 
 MaterialShaderPropertyConf::MaterialShaderPropertyConf(){

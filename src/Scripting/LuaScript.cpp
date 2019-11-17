@@ -6,6 +6,7 @@
 
 Engine::ObjectScript::ObjectScript(){
     created = false;
+    L = nullptr;
 }
 
 void Engine::ObjectScript::_InitScript() {

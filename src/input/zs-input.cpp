@@ -12,7 +12,7 @@ static int hold_keys_q_size = 0;
 
 void Input::addPressedKeyToQueue(int keycode){
     //if we have enough free space
-    if(pressed_keys_q_size > KEYS_QUEUE_SIZE) return;
+    if(pressed_keys_q_size > KEYS_QUEUE_SIZE - 1) return;
     pressed_keys_queue[pressed_keys_q_size] = keycode;
     pressed_keys_q_size += 1;
 }
@@ -30,7 +30,7 @@ void Input::addHeldKeyToQueue(int keycode){
         }
     }
     if(!insertable){
-        if(hold_keys_q_size > KEYS_QUEUE_SIZE) return;
+        if(hold_keys_q_size > KEYS_QUEUE_SIZE - 1) return;
         hold_keys_queue[hold_keys_q_size] = keycode;
         hold_keys_q_size += 1;
     }else{

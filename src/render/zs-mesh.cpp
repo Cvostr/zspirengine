@@ -378,6 +378,7 @@ Engine::Bone::Bone(std::string& name, unsigned int vertices){
 }
 Engine::Bone::Bone(std::string& name){
     this->bone_name = name;
+    vertices_affected = 0;
 }
 
 void Engine::processTangentSpace(ZSVERTEX* vert_array, unsigned int* indices_array, int indices_num){

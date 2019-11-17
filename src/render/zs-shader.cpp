@@ -1,5 +1,4 @@
 #include "../../headers/render/zs-shader.h"
-//#include "../World/headers/World.h"
 #include "../../headers/world/go_properties.h"
 #include <GL/glew.h>
 

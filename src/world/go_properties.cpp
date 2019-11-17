@@ -4,6 +4,7 @@
 Engine::GameObjectProperty::GameObjectProperty(){
     type = GO_PROPERTY_TYPE_NONE;
     active = true;
+    world_ptr = nullptr;
 }
 void Engine::GameObjectProperty::setActive(bool active){
     this->active = active;
@@ -192,6 +193,7 @@ Engine::LabelProperty::LabelProperty(){
 
 Engine::MeshProperty::MeshProperty(){
     this->type = GO_PROPERTY_TYPE_MESH;
+    mesh_ptr = nullptr;
 }
 void Engine::MeshProperty::copyTo(GameObjectProperty* dest){
     if(dest->type != this->type) return; //if it isn't transform
@@ -206,6 +208,7 @@ void Engine::MeshProperty::updateMeshPtr(){
 
 Engine::ScriptGroupProperty::ScriptGroupProperty(){
     this->type = GO_PROPERTY_TYPE_SCRIPTGROUP;
+    scr_num = 0;
 }
 void Engine::ScriptGroupProperty::onUpdate(float deltaTime){  //calls update in scripts
     for(unsigned int script_i = 0; script_i < this->scripts_attached.size(); script_i ++){
@@ -264,6 +267,7 @@ Engine::AudioSourceProperty::AudioSourceProperty(){
     this->source.source_pitch = 1.0f;
 
     isPlaySheduled = false;
+    buffer_ptr = nullptr;
 
     source.Init();
 }
