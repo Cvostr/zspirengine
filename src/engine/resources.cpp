@@ -5,8 +5,10 @@
 extern ZSpireEngine* engine_ptr;
 
 Engine::ZsResource::ZsResource(){
-    this->resource_type = TYPE_NONE;
+    this->resource_type = RESOURCE_TYPE_NONE;
     this->resource_state = STATE_NOT_LOADED;
+    size = 0;
+    loadInstantly = false;
 }
 
 Engine::ZsResource::~ZsResource(){
@@ -51,6 +53,11 @@ Engine::ResourceManager::~ResourceManager(){
     clear();
 }
 
+//Push manually configured ZsResource from outside
+void Engine::ResourceManager::pushResource(ZsResource* resource){
+    this->resources.push_back(resource);
+}
+
 void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
     std::ifstream file_stream;
     file_stream.open(resmap_path, std::ifstream::binary); //open resources map file
@@ -76,42 +83,42 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
             //resource size
             file_stream.read(reinterpret_cast<char*>(&resource.size), sizeof(unsigned int));
             //reading resource type
-            file_stream.read(reinterpret_cast<char*>(&resource.resource_type), sizeof(RESTYPE));
+            file_stream.read(reinterpret_cast<char*>(&resource.resource_type), sizeof(RESOURCE_TYPE));
             file_stream.seekg(1, std::ofstream::cur); //Skip space
 
             ZsResource* resource_ptr = nullptr;
 
             switch(resource.resource_type){
-                case TYPE_NONE:{
+                case RESOURCE_TYPE_NONE:{
                     break;
                 }
-                case TYPE_TEXTURE:{
+                case RESOURCE_TYPE_TEXTURE:{
                     resource_ptr = new Engine::TextureResource;
 
                     Engine::TextureResource* texture_ptr = static_cast<Engine::TextureResource*>(resource_ptr);
                     texture_ptr->texture_ptr = allocTexture();
                     break;
                 }
-                case TYPE_MESH:{
+                case RESOURCE_TYPE_MESH:{
                     resource_ptr = new MeshResource;
 
                     Engine::MeshResource* mesh_ptr = static_cast<Engine::MeshResource*>(resource_ptr);
                     mesh_ptr->mesh_ptr = allocateMesh();
                     break;
                 }
-                case TYPE_AUDIO:{
+                case RESOURCE_TYPE_AUDIO:{
                     resource_ptr = new Engine::AudioResource;
                     break;
                 }
-                case TYPE_SCRIPT:{
+                case RESOURCE_TYPE_SCRIPT:{
                     resource_ptr = new Engine::ScriptResource;
                     break;
                 }
-                case TYPE_MATERIAL:{
+                case RESOURCE_TYPE_MATERIAL:{
                     resource_ptr = new Engine::MaterialResource;
                     break;
                 }
-                case TYPE_ANIMATION:{
+                case RESOURCE_TYPE_ANIMATION:{
                     resource_ptr = new Engine::AnimationResource;
                     static_cast<Engine::AnimationResource*>(resource_ptr)->animation_ptr = new Engine::Animation;
                     break;
@@ -123,7 +130,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
             resource_ptr->resource_label = resource.resource_label;
             resource_ptr->size = resource.size;
 
-            if(resource_ptr->resource_type == TYPE_SCRIPT)
+            if(resource_ptr->loadInstantly)
                 static_cast<Engine::ScriptResource*>(resource_ptr)->load();
 
             this->resources.push_back(resource_ptr);
@@ -134,7 +141,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
 
 
 Engine::TextureResource::TextureResource(){
-    this->resource_type = TYPE_TEXTURE;
+    this->resource_type = RESOURCE_TYPE_TEXTURE;
     texture_ptr = nullptr;
 }
 
@@ -173,7 +180,7 @@ void Engine::TextureResource::Release(){
 }
 
 Engine::MeshResource::MeshResource(){
-    this->resource_type = TYPE_MESH;
+    this->resource_type = RESOURCE_TYPE_MESH;
     mesh_ptr = nullptr;
 }
 
@@ -218,7 +225,7 @@ void Engine::MeshResource::Release(){
 }
 
 Engine::AudioResource::AudioResource(){
-    this->resource_type = TYPE_AUDIO;
+    this->resource_type = RESOURCE_TYPE_AUDIO;
     buffer = new SoundBuffer;
 }
 
@@ -251,16 +258,17 @@ void Engine::AudioResource::Release(){
 }
 
 Engine::ScriptResource::ScriptResource(){
-    this->resource_type = TYPE_SCRIPT;
+    this->resource_type = RESOURCE_TYPE_SCRIPT;
+    loadInstantly = true;
 }
 
 Engine::MaterialResource::MaterialResource(){
-    this->resource_type = TYPE_MATERIAL;
+    this->resource_type = RESOURCE_TYPE_MATERIAL;
     material = nullptr;
 }
 
 Engine::AnimationResource::AnimationResource(){
-    this->resource_type = TYPE_ANIMATION;
+    this->resource_type = RESOURCE_TYPE_ANIMATION;
     animation_ptr = nullptr;
 }
 
@@ -285,7 +293,7 @@ void Engine::ScriptResource::load(){
 Engine::TextureResource* Engine::ResourceManager::getTextureByLabel(std::string label){
     for(unsigned int res = 0; res < this->resources.size(); res ++){
         ZsResource* resource_ptr = this->resources[res];
-        if(resource_ptr->resource_type == TYPE_TEXTURE && resource_ptr->rel_path.compare(label) == 0)
+        if(resource_ptr->resource_type == RESOURCE_TYPE_TEXTURE && resource_ptr->rel_path.compare(label) == 0)
             return static_cast<TextureResource*>(resource_ptr);
     }
     return nullptr;
@@ -294,7 +302,7 @@ Engine::TextureResource* Engine::ResourceManager::getTextureByLabel(std::string 
 Engine::MeshResource* Engine::ResourceManager::getMeshByLabel(std::string label){
     for(unsigned int res = 0; res < this->resources.size(); res ++){
         ZsResource* resource_ptr = this->resources[res];
-        if(resource_ptr->resource_type == TYPE_MESH && resource_ptr->resource_label.compare(label) == 0)
+        if(resource_ptr->resource_type == RESOURCE_TYPE_MESH && resource_ptr->resource_label.compare(label) == 0)
             return static_cast<MeshResource*>(resource_ptr);
     }
     return nullptr;
@@ -302,7 +310,7 @@ Engine::MeshResource* Engine::ResourceManager::getMeshByLabel(std::string label)
 Engine::AudioResource* Engine::ResourceManager::getAudioByLabel(std::string label){
     for(unsigned int res = 0; res < this->resources.size(); res ++){
         ZsResource* resource_ptr = this->resources[res];
-        if(resource_ptr->resource_type == TYPE_AUDIO && resource_ptr->resource_label.compare(label) == 0)
+        if(resource_ptr->resource_type == RESOURCE_TYPE_AUDIO && resource_ptr->resource_label.compare(label) == 0)
             return static_cast<AudioResource*>(resource_ptr);
     }
     return nullptr;
@@ -310,7 +318,7 @@ Engine::AudioResource* Engine::ResourceManager::getAudioByLabel(std::string labe
 Engine::ScriptResource* Engine::ResourceManager::getScriptByLabel(std::string label){
     for(unsigned int res = 0; res < this->resources.size(); res ++){
         ZsResource* resource_ptr = this->resources[res];
-        if(resource_ptr->resource_type == TYPE_SCRIPT && resource_ptr->resource_label.compare(label) == 0)
+        if(resource_ptr->resource_type == RESOURCE_TYPE_SCRIPT && resource_ptr->resource_label.compare(label) == 0)
             return static_cast<ScriptResource*>(resource_ptr);
     }
     return nullptr;

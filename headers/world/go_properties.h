@@ -10,7 +10,8 @@ namespace Engine {
 enum LIGHTSOURCE_TYPE {
     LIGHTSOURCE_TYPE_NONE,
     LIGHTSOURCE_TYPE_DIRECTIONAL,
-    LIGHTSOURCE_TYPE_POINT
+    LIGHTSOURCE_TYPE_POINT,
+    LIGHTSOURCE_TYPE_SPOT
 };
 
 class MeshProperty : public GameObjectProperty{

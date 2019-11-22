@@ -362,7 +362,8 @@ bool Engine::Mesh::hasBones(){
 }
 
 Engine::Mesh::Mesh(){
-
+    this->vertices_num = 0;
+    this->indices_num = 0;
 }
 
 Engine::Mesh::~Mesh(){

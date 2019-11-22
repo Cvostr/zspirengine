@@ -16,8 +16,6 @@
 #include "../ogl/ogl.h"
 #include "../vulkan/vk_data.h"
 
-enum RESTYPE {TYPE_NONE, TYPE_TEXTURE, TYPE_MESH, TYPE_AUDIO, TYPE_MATERIAL, TYPE_SCRIPT, TYPE_ANIMATION};
-/*
 enum RESOURCE_TYPE {RESOURCE_TYPE_NONE,
                     RESOURCE_TYPE_TEXTURE,
                     RESOURCE_TYPE_MESH,
@@ -26,7 +24,7 @@ enum RESOURCE_TYPE {RESOURCE_TYPE_NONE,
                     RESOURCE_TYPE_SCRIPT,
                     RESOURCE_TYPE_ANIMATION,
                     RESOURCE_TYPE_FILE = 1000};
-*/
+
 enum RESOURCE_STATE {STATE_LOADED, STATE_NOT_LOADED, STATE_LOADING_PROCESS};
 
 namespace Engine {
@@ -35,7 +33,7 @@ class ZsResource{
 public:
     Engine::Loader::LoadRequest* request;
 
-    RESTYPE resource_type; //Type of resource
+    RESOURCE_TYPE resource_type; //Type of resource
     RESOURCE_STATE resource_state; //State of resource
 
     std::string rel_path; //Path to resource
@@ -47,6 +45,8 @@ public:
     uint64_t offset;
     //Size of file in blob
     unsigned int size;
+
+    bool loadInstantly;
 
     virtual void Release();
 
@@ -65,6 +65,8 @@ private:
 public:
     void loadResourcesTable(std::string resmap_path);
     void clear();
+    //Push manually configured ZsResource from outside
+    void pushResource(ZsResource* resource);
 
     TextureResource* getTextureByLabel(std::string label);
     MeshResource* getMeshByLabel(std::string label);

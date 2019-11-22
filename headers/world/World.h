@@ -33,7 +33,12 @@ enum PROPERTY_TYPE{
     GO_PROPERTY_TYPE_TILE = 1001
 };
 
-enum COLLIDER_TYPE {COLLIDER_TYPE_NONE, COLLIDER_TYPE_BOX, COLLIDER_TYPE_CUBE};
+enum COLLIDER_TYPE {COLLIDER_TYPE_NONE,
+                    COLLIDER_TYPE_BOX,
+                    COLLIDER_TYPE_CUBE,
+                    COLLIDER_TYPE_SPHERE,
+                    COLLIDER_TYPE_CONVEX_HULL,
+                    COLLIDER_TYPE_MESH};
 
 namespace Engine {
 class GameObject;

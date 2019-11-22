@@ -4,6 +4,7 @@
 #include <cstring>
 
 ZS3M::SceneFileExport::SceneFileExport(){
+    rootNode = nullptr;
 
 }
 void ZS3M::SceneFileExport::pushMesh(Engine::Mesh* mesh){
@@ -143,7 +144,8 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
     char header[10];
     memcpy(&header, buffer, 9);
 
-    if(strcmp(header, "zs3mscene") == true){
+    if(strcmp(header, "zs3mscene") == 1){
+        //File's header is incorrect
         return;
     }
 
@@ -444,7 +446,7 @@ void ZS3M::AnimationFileExport::write(std::string output_file){
 }
 
 ZS3M::ImportedAnimationFile::ImportedAnimationFile(){
-
+    anim_ptr = nullptr;
 }
 
 void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size){
@@ -453,7 +455,8 @@ void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size
 
     strcpy(&prefix[0], &buffer[byte_offset]);
     byte_offset += strlen(prefix) + 1;
-    if(strcmp(prefix, "zs3manim") == true){
+    if(strcmp(prefix, "zs3manim") == 1){
+        //File's header is incorrect
         return;
     }
     //Allocate animation class
@@ -480,7 +483,7 @@ void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size
         byte_offset += 1;
         memcpy(&prefix, &buffer[byte_offset], 6);
 
-        if(strcmp(prefix, "_CHAN") == false){
+        if(strcmp(prefix, "_CHAN") == 0){
             byte_offset += 6;
             //Read node, channel will work with
             strcpy(&prefix[0], &buffer[byte_offset]);

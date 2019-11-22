@@ -7,7 +7,7 @@
 #include "../headers/Scripting/zsensdk.h"
 
 ZSpireEngine* engine_ptr;
-ZSGAME_DATA* data;
+ZSGAME_DATA* game_data;
 
 ZSpireEngine::ZSpireEngine(){
 
@@ -108,30 +108,30 @@ void ZSpireEngine::setWindowMode(unsigned int mode){
 void ZSpireEngine::loadGame(){
     gameRuns = true;
 
-    data = new ZSGAME_DATA;
-    this->zsgame_ptr = static_cast<void*>(data);
+    game_data = new ZSGAME_DATA;
+    this->zsgame_ptr = static_cast<void*>(game_data);
     //Allocate pipeline and start it as manager
-    data->pipeline = new Engine::RenderPipeline;
-    startManager(data->pipeline);
+    game_data->pipeline = new Engine::RenderPipeline;
+    startManager(game_data->pipeline);
     //Allocate resource manager
-    data->resources = new Engine::ResourceManager;
+    game_data->resources = new Engine::ResourceManager;
     //Start it as manager
-    startManager(data->resources);
-    data->world = new Engine::World(data->resources);
+    startManager(game_data->resources);
+    game_data->world = new Engine::World(game_data->resources);
 
     switch(this->desc->game_perspective){
         case PERSP_2D:{ //2D project
 
-            data->world->getCameraPtr()->setProjectionType(ZSCAMERA_PROJECTION_ORTHOGONAL);
-            data->world->getCameraPtr()->setPosition(ZSVECTOR3(0,0,0));
-            data->world->getCameraPtr()->setFront(ZSVECTOR3(0,0,1));
+            game_data->world->getCameraPtr()->setProjectionType(ZSCAMERA_PROJECTION_ORTHOGONAL);
+            game_data->world->getCameraPtr()->setPosition(ZSVECTOR3(0,0,0));
+            game_data->world->getCameraPtr()->setFront(ZSVECTOR3(0,0,1));
             break;
         }
         case PERSP_3D:{ //3D project
-            data->world->getCameraPtr()->setProjectionType(ZSCAMERA_PROJECTION_PERSPECTIVE);
-            data->world->getCameraPtr()->setPosition(ZSVECTOR3(0,0,0));
-            data->world->getCameraPtr()->setFront(ZSVECTOR3(0,0,1));
-            data->world->getCameraPtr()->setZplanes(1, 2000);
+            game_data->world->getCameraPtr()->setProjectionType(ZSCAMERA_PROJECTION_PERSPECTIVE);
+            game_data->world->getCameraPtr()->setPosition(ZSVECTOR3(0,0,0));
+            game_data->world->getCameraPtr()->setFront(ZSVECTOR3(0,0,1));
+            game_data->world->getCameraPtr()->setZplanes(1, 2000);
             break;
         }
     }
@@ -139,8 +139,8 @@ void ZSpireEngine::loadGame(){
     Engine::Loader::start();
     Engine::Loader::setBlobRootDirectory(this->desc->blob_root_path);
 
-    data->resources->loadResourcesTable(this->desc->resource_map_file_path);
-    data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene, data->pipeline->getRenderSettings());
+    game_data->resources->loadResourcesTable(this->desc->resource_map_file_path);
+    game_data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene, game_data->pipeline->getRenderSettings());
 
     static uint64_t NOW = SDL_GetPerformanceCounter();
     static uint64_t last = 0;
@@ -203,7 +203,7 @@ void ZSpireEngine::loadGame(){
 
         }
 
-        data->pipeline->render();
+        game_data->pipeline->render();
 
         Input::clearMouseState();
         Input::clearPressedKeys();

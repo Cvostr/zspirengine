@@ -14,8 +14,15 @@ void loop(){
 
             std::ifstream stream;
             std::string file_path = blob_root_directory + req->file_path;
-            stream.open(file_path, std::ofstream::binary);
-            stream.seekg(static_cast<long>(req->offset));
+            if(req->size > 0){
+                stream.open(file_path, std::ofstream::binary);
+                stream.seekg(static_cast<long>(req->offset));
+            }else{
+                stream.open(file_path, std::ofstream::binary | std::ofstream::ate);
+                req->size = static_cast<unsigned int>(stream.tellg());
+                stream.seekg(0);
+            }
+
             stream.read(reinterpret_cast<char*>(req->data), req->size);
             stream.close();
             req->done = true;

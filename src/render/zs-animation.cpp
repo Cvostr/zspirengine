@@ -12,6 +12,14 @@ Engine::AnimationChannel::AnimationChannel(){
     this->posKeysNum = 0;
     this->rotationKeysNum = 0;
     this->scaleKeysNum = 0;
+
+    //Set all pointers to nullptr
+    rotTimes = nullptr;
+    scaleTimes = nullptr;
+    posTimes = nullptr;
+    pos = nullptr;
+    rot = nullptr;
+    scale = nullptr;
 }
 
 Engine::AnimationChannel::~AnimationChannel(){

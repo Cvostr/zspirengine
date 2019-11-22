@@ -7,6 +7,7 @@ Engine::TileGroupProperty::TileGroupProperty(){
 
 Engine::TileProperty::TileProperty(){
     type = GO_PROPERTY_TYPE_TILE;
+    lastAnimState = false;
 }
 
 void Engine::TileProperty::updTexturePtr(){

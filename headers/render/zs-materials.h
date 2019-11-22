@@ -1,9 +1,9 @@
 #ifndef matshaderprops
 #define matshaderprops
 
-#include "../../headers/render/zs-texture.h"
-#include "../../headers/render/zs-shader.h"
-#include "../../headers/render/zs-uniform-buffer.h"
+#include "zs-texture.h"
+#include "zs-shader.h"
+#include "zs-uniform-buffer.h"
 #include <vector>
 
 enum MATSHPROP_TYPE{
@@ -69,6 +69,7 @@ public:
 
     MaterialShaderPropertyConf* addPropertyConf(int type);
     void loadFromFile(std::string fpath);
+    void loadFromBuffer(char* buffer, unsigned int size);
     void saveToFile();
     void setPropertyGroup(MtShaderPropertiesGroup* group_ptr);
     void clear();
