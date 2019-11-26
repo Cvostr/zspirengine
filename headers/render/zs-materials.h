@@ -156,10 +156,10 @@ public:
 //Property configurations
 class TextureMtShPropConf : public MaterialShaderPropertyConf{
 public:
-     Engine::Texture* texture;
-     std::string path;
+    void* texture;
+    std::string path;
 
-     TextureMtShPropConf();
+    TextureMtShPropConf();
 };
 class IntegerMtShPropConf : public MaterialShaderPropertyConf{
 public:

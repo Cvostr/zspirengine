@@ -83,7 +83,7 @@ void Engine::RenderPipeline::destroy(){
     default3d->Destroy();
 
     gbuffer.Destroy();
-    Engine::freeDefaultMeshes();
+    //Engine::freeDefaultMeshes();
 }
 
 void Engine::RenderPipeline::setLightsToBuffer(){

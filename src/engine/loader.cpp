@@ -22,7 +22,7 @@ void loop(){
                 req->size = static_cast<unsigned int>(stream.tellg());
                 stream.seekg(0);
             }
-
+            req->data = new unsigned char[req->size];
             stream.read(reinterpret_cast<char*>(req->data), req->size);
             stream.close();
             req->done = true;

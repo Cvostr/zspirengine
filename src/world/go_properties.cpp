@@ -282,8 +282,10 @@ void Engine::AudioSourceProperty::onUpdate(float deltaTime){
 
     TransformProperty* transform = go_link.updLinkPtr()->getTransformProperty();
 
-    //if(transform->translation != this->last_pos){
+    if(transform->translation != this->last_pos){
         this->source.setPosition(transform->translation);
+        this->last_pos = transform->translation;
+    }
 }
 void Engine::AudioSourceProperty::onObjectDeleted(){
 

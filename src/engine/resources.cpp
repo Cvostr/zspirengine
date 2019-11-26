@@ -55,6 +55,40 @@ Engine::ResourceManager::~ResourceManager(){
 
 //Push manually configured ZsResource from outside
 void Engine::ResourceManager::pushResource(ZsResource* resource){
+    switch(resource->resource_type){
+        case RESOURCE_TYPE_NONE:{
+            break;
+        }
+        case RESOURCE_TYPE_TEXTURE:{
+            Engine::TextureResource* texture_ptr = static_cast<Engine::TextureResource*>(resource);
+            texture_ptr->texture_ptr = allocTexture();
+            break;
+        }
+        case RESOURCE_TYPE_MESH:{
+
+            Engine::MeshResource* mesh_ptr = static_cast<Engine::MeshResource*>(resource);
+            mesh_ptr->mesh_ptr = allocateMesh();
+            break;
+        }
+        case RESOURCE_TYPE_AUDIO:{
+            //resource_ptr = new Engine::AudioResource;
+            break;
+        }
+        case RESOURCE_TYPE_SCRIPT:{
+            //resource_ptr = new Engine::ScriptResource;
+            break;
+        }
+        case RESOURCE_TYPE_MATERIAL:{
+            //resource_ptr = new Engine::MaterialResource;
+            break;
+        }
+        case RESOURCE_TYPE_ANIMATION:{
+            //resource_ptr = new Engine::AnimationResource;
+            static_cast<Engine::AnimationResource*>(resource)->animation_ptr = new Engine::Animation;
+            break;
+        }
+    }
+
     this->resources.push_back(resource);
 }
 
@@ -139,7 +173,13 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
     file_stream.close();
 }
 
+Engine::ZsResource* Engine::ResourceManager::getResourceByIndex(unsigned int index){
+    return resources[index];
+}
 
+unsigned int Engine::ResourceManager::getResourcesSize(){
+    return resources.size();
+}
 Engine::TextureResource::TextureResource(){
     this->resource_type = RESOURCE_TYPE_TEXTURE;
     texture_ptr = nullptr;
@@ -154,7 +194,6 @@ void Engine::TextureResource::Use(int slot){
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
         request->isBlob = true;
-        request->data = new unsigned char[this->size];
         request->offset = this->offset;
         request->size = this->size;
         request->file_path = this->blob_path;
@@ -193,7 +232,6 @@ void Engine::MeshResource::Draw(){
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
         request->isBlob = true;
-        request->data = new unsigned char[this->size];
         request->offset = this->offset;
         request->size = this->size;
         request->file_path = this->blob_path;
@@ -233,7 +271,6 @@ void Engine::AudioResource::load(){
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
         request->isBlob = true;
-        request->data = new unsigned char[this->size];
         request->offset = this->offset;
         request->size = this->size;
         request->file_path = this->blob_path;

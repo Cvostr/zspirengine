@@ -67,6 +67,8 @@ public:
     void clear();
     //Push manually configured ZsResource from outside
     void pushResource(ZsResource* resource);
+    ZsResource* getResourceByIndex(unsigned int index);
+    unsigned int getResourcesSize();
 
     TextureResource* getTextureByLabel(std::string label);
     MeshResource* getMeshByLabel(std::string label);

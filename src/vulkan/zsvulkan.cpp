@@ -5,7 +5,7 @@
 ZsVulkan* vulkan_ptr = nullptr;
 
 ZsVulkan::ZsVulkan(){
- //Nothing much to do
+    this->window_ptr = nullptr;
 }
 
 VkDevice ZsVulkan::getVkDevice(){
