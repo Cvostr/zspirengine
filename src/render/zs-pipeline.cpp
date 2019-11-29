@@ -13,15 +13,17 @@ void Engine::RenderSettings::defaults(){
 }
 
 void Engine::RenderPipeline::initShaders(){
+    this->tile_shader = allocShader();
+    this->deffered_shader = allocShader();
+    this->default3d = allocShader();
+    this->terrain_shader = allocShader();
+
     this->tile_shader->compileFromFile("Shaders/2d_tile/tile2d.vert", "Shaders/2d_tile/tile2d.frag");
     this->deffered_shader->compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag");
     this->default3d->compileFromFile("Shaders/3d/3d.vert", "Shaders/3d/3d.frag");
 }
 
 Engine::RenderPipeline::RenderPipeline(){
-    this->tile_shader = allocShader();
-    this->deffered_shader = allocShader();
-    this->default3d = allocShader();
     initShaders();
     //Allocate transform buffer
     this->transformBuffer = allocUniformBuffer();

@@ -3,6 +3,7 @@
 #include <list>
 #include <fstream>
 
+std::thread* loader_thr;
 static bool loader_thread_working = true;
 static std::string blob_root_directory;
 std::list<Engine::Loader::LoadRequest*> requests;
@@ -32,13 +33,19 @@ void loop(){
 }
 
 void Engine::Loader::start(){
-    std::thread loader_loop(loop);
-    loader_loop.detach();
+    //Set loop condition to true
     loader_thread_working = true;
+    //Start thread
+    std::thread loader_loop(loop);
+    loader_thr = &loader_loop;
+    //Send thread to background
+    loader_loop.detach();
 }
 
 void Engine::Loader::stop(){
+    //Finish thread
     loader_thread_working = false;
+    //Clear queue
     requests.clear();
 }
 

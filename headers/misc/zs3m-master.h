@@ -19,14 +19,11 @@ public:
     ZSVECTOR3 node_scaling;
     ZSQUATERNION node_rotation;
 
-    bool hasBone;
-
     std::vector<std::string> child_node_labels;
     std::vector<SceneNode*> children;
     std::vector<std::string> mesh_names;
 
     SceneNode() {
-        hasBone = false;
     }
 };
 

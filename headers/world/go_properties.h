@@ -109,7 +109,7 @@ public:
 class MaterialProperty : public GameObjectProperty{
 public:
     //Pointer to picked material
-    //Material* material_ptr;
+    MaterialResource* material_ptr;
     //Path to material fil
     std::string material_path;
 

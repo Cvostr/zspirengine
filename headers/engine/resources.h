@@ -49,6 +49,7 @@ public:
     bool loadInstantly;
 
     virtual void Release();
+    virtual void load();
 
     ZsResource();
     virtual ~ZsResource();
@@ -58,6 +59,7 @@ class TextureResource;
 class MeshResource;
 class AudioResource;
 class ScriptResource;
+class MaterialResource;
 
 class ResourceManager : public EngineComponentManager{
 private:
@@ -74,6 +76,7 @@ public:
     MeshResource* getMeshByLabel(std::string label);
     AudioResource* getAudioByLabel(std::string label);
     ScriptResource* getScriptByLabel(std::string label);
+    MaterialResource* getMaterialByLabel(std::string label);
 
     template<typename T>
     T* getResource(std::string label){
@@ -133,6 +136,8 @@ public:
 class MaterialResource : public ZsResource{
 public:
     Material* material;
+
+    void load();
 
     MaterialResource();
 };

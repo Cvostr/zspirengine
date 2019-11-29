@@ -23,6 +23,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         src/engine.cpp \
+    src/render/MatShaderProps.cpp \
     src/vulkan/zsvulkan.cpp \
     src/render/zs-pipeline.cpp \
     src/render/zs-shader.cpp \

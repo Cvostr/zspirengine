@@ -19,6 +19,10 @@ void Engine::ZsResource::Release(){
 
 }
 
+void Engine::ZsResource::load(){
+
+}
+
 Engine::ResourceManager::ResourceManager(){
     MeshResource* plane_resource = new MeshResource;
     plane_resource->resource_state = STATE_LOADED;
@@ -79,7 +83,8 @@ void Engine::ResourceManager::pushResource(ZsResource* resource){
             break;
         }
         case RESOURCE_TYPE_MATERIAL:{
-            //resource_ptr = new Engine::MaterialResource;
+            Engine::MaterialResource* mat_ptr = static_cast<Engine::MaterialResource*>(resource);
+            mat_ptr->material = new Material;
             break;
         }
         case RESOURCE_TYPE_ANIMATION:{
@@ -88,6 +93,9 @@ void Engine::ResourceManager::pushResource(ZsResource* resource){
             break;
         }
     }
+
+    if(resource->loadInstantly)
+        (resource)->load();
 
     this->resources.push_back(resource);
 }
@@ -165,7 +173,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
             resource_ptr->size = resource.size;
 
             if(resource_ptr->loadInstantly)
-                static_cast<Engine::ScriptResource*>(resource_ptr)->load();
+                (resource_ptr)->load();
 
             this->resources.push_back(resource_ptr);
         }
@@ -178,7 +186,7 @@ Engine::ZsResource* Engine::ResourceManager::getResourceByIndex(unsigned int ind
 }
 
 unsigned int Engine::ResourceManager::getResourcesSize(){
-    return resources.size();
+    return static_cast<unsigned int>(resources.size());
 }
 Engine::TextureResource::TextureResource(){
     this->resource_type = RESOURCE_TYPE_TEXTURE;
@@ -192,11 +200,15 @@ void Engine::TextureResource::Use(int slot){
         this->texture_ptr->Use(slot);
     //Otherwise perform texture loading
     if(this->resource_state == STATE_NOT_LOADED){
+        //Create loading request
         request = new Engine::Loader::LoadRequest;
         request->isBlob = true;
+        //Set offset of resource in blob
         request->offset = this->offset;
+        //Set size of resource in blob
         request->size = this->size;
         request->file_path = this->blob_path;
+        //Send request to queue
         Engine::Loader::queryLoadingRequest(request);
         this->resource_state = STATE_LOADING_PROCESS;
     }
@@ -302,6 +314,7 @@ Engine::ScriptResource::ScriptResource(){
 Engine::MaterialResource::MaterialResource(){
     this->resource_type = RESOURCE_TYPE_MATERIAL;
     material = nullptr;
+    loadInstantly = true;
 }
 
 Engine::AnimationResource::AnimationResource(){
@@ -324,6 +337,21 @@ void Engine::ScriptResource::load(){
         for(unsigned int i = 0; i < this->size; i ++){
             this->script_content.push_back(static_cast<char>(request->data[i]));
         }
+    }
+}
+
+void Engine::MaterialResource::load(){
+    if(this->resource_state == STATE_NOT_LOADED){
+        request = new Engine::Loader::LoadRequest;
+        request->isBlob = true;
+        request->data = new unsigned char[this->size];
+        request->offset = this->offset;
+        request->size = this->size;
+        request->file_path = this->blob_path;
+        loadImmideately(request);
+        this->resource_state = STATE_LOADED;
+
+            this->material->loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
     }
 }
 
@@ -357,6 +385,14 @@ Engine::ScriptResource* Engine::ResourceManager::getScriptByLabel(std::string la
         ZsResource* resource_ptr = this->resources[res];
         if(resource_ptr->resource_type == RESOURCE_TYPE_SCRIPT && resource_ptr->resource_label.compare(label) == 0)
             return static_cast<ScriptResource*>(resource_ptr);
+    }
+    return nullptr;
+}
+Engine::MaterialResource* Engine::ResourceManager::getMaterialByLabel(std::string label){
+    for(unsigned int res = 0; res < this->resources.size(); res ++){
+        ZsResource* resource_ptr = this->resources[res];
+        if(resource_ptr->resource_type == RESOURCE_TYPE_MATERIAL && resource_ptr->resource_label.compare(label) == 0)
+            return static_cast<MaterialResource*>(resource_ptr);
     }
     return nullptr;
 }
