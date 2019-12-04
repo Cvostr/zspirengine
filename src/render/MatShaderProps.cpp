@@ -178,6 +178,12 @@ void Material::saveToFile(){
 
     std::ofstream mat_stream;
     mat_stream.open(file_path, std::ofstream::out);
+
+    if(!mat_stream){ //File isn't opened
+        std::cout << "Error opening output stream " << file_path;
+        return;
+    }
+
     //Write material header
     mat_stream << "ZSP_MATERIAL\n";
     //Write group string
@@ -374,6 +380,12 @@ void Material::loadFromFile(std::string fpath){
     std::ifstream mat_stream;
     //Open stream
     mat_stream.open(fpath, std::ifstream::in | std::ifstream::ate);
+
+    if(!mat_stream){ //File isn't opened
+        std::cout << "Error opening file " << fpath;
+        return;
+    }
+
     //Allocate space for file
     unsigned int fileSize = static_cast<unsigned int>(mat_stream.tellg());
     char* data = new char[fileSize];

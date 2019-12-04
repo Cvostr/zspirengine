@@ -158,6 +158,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
                 }
                 case RESOURCE_TYPE_MATERIAL:{
                     resource_ptr = new Engine::MaterialResource;
+                    static_cast<Engine::MaterialResource*>(resource_ptr)->material = new Material;
                     break;
                 }
                 case RESOURCE_TYPE_ANIMATION:{
@@ -327,7 +328,6 @@ void Engine::ScriptResource::load(){
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
         request->isBlob = true;
-        request->data = new unsigned char[this->size];
         request->offset = this->offset;
         request->size = this->size;
         request->file_path = this->blob_path;
@@ -344,14 +344,15 @@ void Engine::MaterialResource::load(){
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
         request->isBlob = true;
-        request->data = new unsigned char[this->size];
         request->offset = this->offset;
         request->size = this->size;
         request->file_path = this->blob_path;
-        loadImmideately(request);
-        this->resource_state = STATE_LOADED;
 
-            this->material->loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
+        std::string absolute = "";
+        loadImmideately(request, &absolute);
+        this->resource_state = STATE_LOADED;
+        this->material->loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
+        this->material->file_path = absolute;
     }
 }
 

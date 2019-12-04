@@ -54,13 +54,26 @@ void Engine::Loader::queryLoadingRequest(LoadRequest* req){
     requests.push_back(req);
 }
 
-void Engine::Loader::loadImmideately(LoadRequest* req){
+void Engine::Loader::loadImmideately(LoadRequest* req, std::string* absolute_path){
     std::ifstream stream;
     std::string file_path = blob_root_directory + req->file_path;
-    stream.open(file_path, std::ofstream::binary);
-    stream.seekg(static_cast<long>(req->offset));
+
+    if(req->size > 0){
+        stream.open(file_path, std::ofstream::binary);
+        stream.seekg(static_cast<long>(req->offset));
+    }else{
+        stream.open(file_path, std::ofstream::binary | std::ofstream::ate);
+        req->size = static_cast<unsigned int>(stream.tellg());
+        stream.seekg(0);
+    }
+
+    req->data = new unsigned char[req->size];
     stream.read(reinterpret_cast<char*>(req->data), req->size);
     stream.close();
+    req->done = true;
+
+    if(absolute_path != nullptr)
+        *absolute_path = file_path;
 }
 
 void Engine::Loader::setBlobRootDirectory(std::string& dir){
