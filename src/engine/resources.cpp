@@ -31,6 +31,13 @@ Engine::ResourceManager::ResourceManager(){
     plane_resource->mesh_ptr = Engine::getPlaneMesh2D();
     this->resources.push_back(plane_resource);
 
+    MeshResource* isotile_resource = new MeshResource;
+    isotile_resource->resource_state = STATE_LOADED;
+    isotile_resource->rel_path = "@isotile";
+    isotile_resource->resource_label = isotile_resource->rel_path;
+    isotile_resource->mesh_ptr = Engine::getIsoTileMesh2D();
+    this->resources.push_back(isotile_resource);
+
     MeshResource* cube_resource = new MeshResource;
     cube_resource->resource_state = STATE_LOADED;
     cube_resource->rel_path = "@cube";
@@ -63,6 +70,9 @@ void Engine::ResourceManager::pushResource(ZsResource* resource){
         case RESOURCE_TYPE_NONE:{
             break;
         }
+        case RESOURCE_TYPE_FILE:{
+            break;
+        }
         case RESOURCE_TYPE_TEXTURE:{
             Engine::TextureResource* texture_ptr = static_cast<Engine::TextureResource*>(resource);
             texture_ptr->texture_ptr = allocTexture();
@@ -75,11 +85,9 @@ void Engine::ResourceManager::pushResource(ZsResource* resource){
             break;
         }
         case RESOURCE_TYPE_AUDIO:{
-            //resource_ptr = new Engine::AudioResource;
             break;
         }
         case RESOURCE_TYPE_SCRIPT:{
-            //resource_ptr = new Engine::ScriptResource;
             break;
         }
         case RESOURCE_TYPE_MATERIAL:{
@@ -88,8 +96,7 @@ void Engine::ResourceManager::pushResource(ZsResource* resource){
             break;
         }
         case RESOURCE_TYPE_ANIMATION:{
-            //resource_ptr = new Engine::AnimationResource;
-            static_cast<Engine::AnimationResource*>(resource)->animation_ptr = new Engine::Animation;
+            //static_cast<Engine::AnimationResource*>(resource)->animation_ptr = new Engine::Animation;
             break;
         }
     }
@@ -132,6 +139,9 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
 
             switch(resource.resource_type){
                 case RESOURCE_TYPE_NONE:{
+                    break;
+                }
+                case RESOURCE_TYPE_FILE:{
                     break;
                 }
                 case RESOURCE_TYPE_TEXTURE:{
@@ -322,7 +332,30 @@ Engine::AnimationResource::AnimationResource(){
     this->resource_type = RESOURCE_TYPE_ANIMATION;
     animation_ptr = nullptr;
 }
+void Engine::AnimationResource::load(){
+    if(this->resource_state == STATE_NOT_LOADED){
+        request = new Engine::Loader::LoadRequest;
+        request->isBlob = true;
+        request->offset = this->offset;
+        request->size = this->size;
+        request->file_path = this->blob_path;
+        Engine::Loader::queryLoadingRequest(request);
+        this->resource_state = STATE_LOADING_PROCESS;
+    }
+    if(this->resource_state == STATE_LOADING_PROCESS){
+        if(this->request->done){
+            ZS3M::ImportedAnimationFile iaf;
+            iaf.loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
+            this->animation_ptr = iaf.anim_ptr;
 
+            delete[] request->data;
+            delete this->request;
+            this->resource_state = STATE_LOADED;
+            this->resource_label = iaf.anim_ptr->name;
+        }
+    }
+
+}
 
 void Engine::ScriptResource::load(){
     if(this->resource_state == STATE_NOT_LOADED){
@@ -334,7 +367,7 @@ void Engine::ScriptResource::load(){
         loadImmideately(request);
         this->resource_state = STATE_LOADED;
 
-        for(unsigned int i = 0; i < this->size; i ++){
+        for(unsigned int i = 0; i < this->request->size; i ++){
             this->script_content.push_back(static_cast<char>(request->data[i]));
         }
     }
@@ -397,6 +430,15 @@ Engine::MaterialResource* Engine::ResourceManager::getMaterialByLabel(std::strin
     }
     return nullptr;
 }
+Engine::AnimationResource* Engine::ResourceManager::getAnimationByLabel(std::string label){
+    for(unsigned int res = 0; res < this->resources.size(); res ++){
+        ZsResource* resource_ptr = this->resources[res];
+        if(resource_ptr->resource_type == RESOURCE_TYPE_ANIMATION && resource_ptr->resource_label.compare(label) == 0)
+            return static_cast<AnimationResource*>(resource_ptr);
+    }
+    return nullptr;
+}
+
 
 Engine::Mesh* Engine::allocateMesh(unsigned int size){
     Engine::Mesh* result = nullptr;

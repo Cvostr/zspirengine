@@ -60,6 +60,7 @@ class MeshResource;
 class AudioResource;
 class ScriptResource;
 class MaterialResource;
+class AnimationResource;
 
 class ResourceManager : public EngineComponentManager{
 private:
@@ -77,6 +78,7 @@ public:
     AudioResource* getAudioByLabel(std::string label);
     ScriptResource* getScriptByLabel(std::string label);
     MaterialResource* getMaterialByLabel(std::string label);
+    AnimationResource* getAnimationByLabel(std::string label);
 
     template<typename T>
     T* getResource(std::string label){
@@ -145,6 +147,8 @@ public:
 class AnimationResource : public ZsResource{
 public:
     Engine::Animation* animation_ptr;
+
+    void load();
 
     AnimationResource();
 };
