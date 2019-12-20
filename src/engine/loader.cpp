@@ -13,7 +13,9 @@ void loop(){
         if(requests.size() > 0){
             Engine::Loader::LoadRequest* req = requests.front();
 
+            //Declare blob loader stream
             std::ifstream stream;
+            //Get absolute path to blob file
             std::string file_path = blob_root_directory + req->file_path;
             if(req->size > 0){
                 stream.open(file_path, std::ofstream::binary);
@@ -23,6 +25,9 @@ void loop(){
                 req->size = static_cast<unsigned int>(stream.tellg());
                 stream.seekg(0);
             }
+            if(!stream.is_open())
+                requests.remove(req);
+
             req->data = new unsigned char[req->size];
             stream.read(reinterpret_cast<char*>(req->data), req->size);
             stream.close();

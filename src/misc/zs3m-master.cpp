@@ -81,7 +81,7 @@ void ZS3M::SceneFileExport::write(std::string output_file){
             }
             stream << "\n"; //Write divider
         }
-
+        stream << "\n";
     }
     stream.close();
 }
@@ -261,11 +261,11 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
             newmesh->vertices_num = vertexNum;
             newmesh->indices_num = indexNum;
             //Allocate arrays for vectors
-            newmesh->vertices_arr = new ZSVERTEX[vertexNum];
-            newmesh->indices_arr = new unsigned int[indexNum];
-            newmesh->vertices_coord = new float[vertexNum * 3];
+            newmesh->vertices_arr = new ZSVERTEX[static_cast<unsigned int>(vertexNum)];
+            newmesh->indices_arr = new unsigned int[static_cast<unsigned int>(indexNum)];
+            newmesh->vertices_coord = new float[static_cast<unsigned int>(vertexNum * 3)];
 
-            for(unsigned int v_i = 0; v_i < vertexNum; v_i ++){
+            for(unsigned int v_i = 0; v_i < static_cast<unsigned int>(vertexNum); v_i ++){
                 ZSVERTEX v_ptr;
                 //Read vertex vectors
                 memcpy(reinterpret_cast<char*>(&v_ptr.pos), &buffer[cur_pos], sizeof(float) * 3);
@@ -301,7 +301,7 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
                 newmesh->vertices_arr[v_i] = v_ptr;
             }
             //Read mesh indices
-            for(unsigned int in_i = 0; in_i < indexNum; in_i ++){
+            for(unsigned int in_i = 0; in_i < static_cast<unsigned int>(indexNum); in_i ++){
                 memcpy(reinterpret_cast<char*>(&newmesh->indices_arr[in_i]), &buffer[cur_pos], sizeof(unsigned int));
                 cur_pos += sizeof(unsigned int);
             }
@@ -371,13 +371,17 @@ ZS3M::SceneNode* ZS3M::ImportedSceneFile::getSceneNodeWithName(std::string label
 void ZS3M::ImportedSceneFile::loadFromFile(std::string file){
     std::ifstream stream;
     stream.open(file, std::iostream::binary | std::iostream::ate);
+    //Get size of file
     unsigned int zs3m_size = static_cast<unsigned int>(stream.tellg());
+    //Seek to start
     stream.seekg(0, std::ifstream::beg);
+    //Allocate memory for file
     char* file_buffer = new char[zs3m_size];
     stream.read(file_buffer, zs3m_size);
 
     loadFromBuffer(file_buffer, zs3m_size);
-
+    //free memory
+    delete[] file_buffer;
 }
 
 ZS3M::ImportedSceneFile::ImportedSceneFile(){
@@ -559,4 +563,6 @@ void ZS3M::ImportedAnimationFile::loadFromFile(std::string file){
     stream.read(file_buffer, zs3m_size);
 
     loadFromBuffer(file_buffer, zs3m_size);
+
+    delete[] file_buffer;
 }

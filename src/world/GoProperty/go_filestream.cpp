@@ -124,5 +124,17 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             }
         break;
     }
+    case GO_PROPERTY_TYPE_MATERIAL:{
+        MaterialProperty* ptr = static_cast<MaterialProperty*>(prop_ptr);
+        //reading path
+        *world_stream >> ptr->material_path;
+
+        ptr->onValueChanged(); //find it and process
+
+        world_stream->seekg(1, std::ofstream::cur);
+        world_stream->read(reinterpret_cast<char*>(&ptr->receiveShadows), sizeof(bool));
+
+        break;
+    }
     }
 }

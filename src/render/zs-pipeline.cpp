@@ -16,11 +16,20 @@ void Engine::RenderPipeline::initShaders(){
     this->tile_shader = allocShader();
     this->deffered_shader = allocShader();
     this->default3d = allocShader();
+    skybox_shader = allocShader();
     this->terrain_shader = allocShader();
 
-    this->tile_shader->compileFromFile("Shaders/2d_tile/tile2d.vert", "Shaders/2d_tile/tile2d.frag");
-    this->deffered_shader->compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag");
-    this->default3d->compileFromFile("Shaders/3d/3d.vert", "Shaders/3d/3d.frag");
+    if(engine_ptr->desc->game_perspective == PERSP_2D){
+        this->tile_shader->compileFromFile("Shaders/2d_tile/tile2d.vert", "Shaders/2d_tile/tile2d.frag");
+    }
+    if(engine_ptr->desc->game_perspective == PERSP_2D){
+        this->deffered_shader->compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag");
+        this->default3d->compileFromFile("Shaders/3d/3d.vert", "Shaders/3d/3d.frag");
+        this->skybox_shader->compileFromFile("Shaders/skybox/skybox.vert", "Shaders/skybox/skybox.frag");
+        terrain_shader->compileFromFile("Shaders/heightmap/heightmap.vert", "Shaders/heightmap/heightmap.frag");
+    }
+
+    MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, 8);
 }
 
 Engine::RenderPipeline::RenderPipeline(){
@@ -79,13 +88,17 @@ void Engine::RenderPipeline::destroy(){
     this->tileBuffer->Destroy();
     this->lightsBuffer->Destroy();
     this->transformBuffer->Destroy();
+    this->terrainUniformBuffer->Destroy();
+    this->skinningUniformBuffer->Destroy();
+    skyboxTransformUniformBuffer->Destroy();
 
     tile_shader->Destroy();
     deffered_shader->Destroy();
     default3d->Destroy();
+    skybox_shader->Destroy();
+    terrain_shader->Destroy();
 
     gbuffer.Destroy();
-    //Engine::freeDefaultMeshes();
 }
 
 void Engine::RenderPipeline::setLightsToBuffer(){
@@ -123,11 +136,11 @@ void Engine::RenderPipeline::render(){
     updateShadersCameraInfo(world_ptr->getCameraPtr());
 
     switch(engine_ptr->desc->game_perspective){
-        case 2:{
+        case PERSP_2D:{
             render2D();
             break;
         }
-        case 3 :{
+        case PERSP_3D :{
             render3D();
             break;
         }
@@ -225,6 +238,7 @@ void Engine::GameObject::Draw(RenderPipeline* pipeline){    //On render pipeline
 
 void Engine::MaterialProperty::onRender(RenderPipeline* pipeline){
     pipeline->default3d->Use();
+    this->material_ptr->material->applyMatToPipeline();
 }
 
 void Engine::TileProperty::onRender(RenderPipeline* pipeline){

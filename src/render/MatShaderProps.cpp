@@ -419,7 +419,7 @@ void Material::applyMatToPipeline(){
 
                 int db = 0;
                 //If correct path is set to texture
-                if(texture_conf->path.compare("@none") == 1){
+                if(texture_conf->path.compare("@none")){
                     //if texture isn't loaded
                     if(texture_conf->texture == nullptr){
                         //Try to find texture

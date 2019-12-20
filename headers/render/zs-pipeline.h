@@ -69,6 +69,7 @@ public:
     Engine::Shader* deffered_shader;
     Engine::Shader* default3d;
     Engine::Shader* terrain_shader;
+    Engine::Shader* skybox_shader;
 
     UniformBuffer* transformBuffer;
     UniformBuffer* lightsBuffer;

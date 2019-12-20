@@ -1,6 +1,7 @@
 #ifndef ZSMATH
 #define ZSMATH
 
+#include <typeinfo>
 #include "math.h"
 #define ZS_PI 3.14159265f
 #define REAL_NUM_EQ(x, y) (fabs((x) - (y)) < 0.000001f)
@@ -204,6 +205,11 @@
 	ZSVECTOR3 vCross(ZSVECTOR3 v1, ZSVECTOR3 v2);
 	float vDot(ZSVECTOR3 v1, ZSVECTOR3 v2);
     bool isDistanceFits(ZSVECTOR3 pos1, ZSVECTOR3 pos2, float max_dist);
+    template<typename T>
+    int sign(T value){
+        if(typeid (value) == typeid (int) || typeid (value) == typeid (float))
+            return (static_cast<float>(value) > 0) ? 1 : -1;
+    }
 
     ZSVECTOR3 lerp(ZSVECTOR3 v1, ZSVECTOR3 v2, float factor);
     ZSQUATERNION slerp(ZSQUATERNION q1, ZSQUATERNION q2, float factor);
@@ -234,7 +240,6 @@
     ZSMATRIX4x4 getRotationMat(ZSVECTOR3 rotation, ZSVECTOR3 center);
     ZSMATRIX4x4 getRotationMat(ZSQUATERNION quat);
     //ZSMATRIX4x4 parent
-
 
 	float getDistance(ZSVECTOR3 p1, ZSVECTOR3 p2);
     float getLength(ZSVECTOR3 vec); //Calculates module length of vector

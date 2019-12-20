@@ -113,6 +113,9 @@ public:
     //Path to material fil
     std::string material_path;
 
+    //Draw shadows on object
+    bool receiveShadows;
+
     void onValueChanged();
     void copyTo(GameObjectProperty* dest);
     void onRender(RenderPipeline* pipeline);
@@ -133,6 +136,31 @@ public:
 
     RigidbodyProperty();
 };
+
+class AnimationProperty : public GameObjectProperty {
+private:
+public:
+    bool Playing;
+    double start_sec;
+
+    Engine::AnimationResource* anim_prop_ptr;
+    std::string anim_label;
+
+    void onPreRender(RenderPipeline* pipeline);
+    void onValueChanged();
+    void copyTo(GameObjectProperty* dest);
+
+    void play();
+    void stop();
+    void setAnimation(std::string anim);
+
+    void updateAnimationPtr();
+    void updateNodeTransform(GameObject* obj, ZSMATRIX4x4 parent);
+
+
+    AnimationProperty();
+};
+
 
 }
 

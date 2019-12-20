@@ -9,6 +9,7 @@ QT       -= core gui
 TARGET = zsengine
 TEMPLATE = lib
 CONFIG += staticlib
+unix:INCLUDEPATH += /usr/include/bullet/
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -68,6 +69,7 @@ HEADERS += \
     headers/render/zs-shader.h \
     headers/render/zs-math.h \
     headers/engine/resources.h \
+    headers/world/Physics.h \
     headers/world/World.h \
     headers/world/go_properties.h \
     headers/game.h \
