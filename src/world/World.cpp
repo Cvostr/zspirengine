@@ -5,6 +5,8 @@ Engine::World::World(ResourceManager* manager){
     objects.resize(0);
 
     this->manager = manager;
+
+    physical_world = new PhysicalWorld(&phys_settngs);
 }
 
 

@@ -12,10 +12,11 @@ namespace Engine {
             unsigned long offset;
             unsigned int size;
             bool done;
-            bool isBlob;
             LoadRequest(){
                 done = false;
-                isBlob = false;
+                size = 0;
+                offset = 0;
+                data = nullptr;
             }
         }LoadRequest;
 

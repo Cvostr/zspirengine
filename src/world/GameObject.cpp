@@ -203,6 +203,7 @@ void Engine::GameObject::clearAll(){
 
 }
 
+
 void Engine::GameObject::trimChildrenArray(){
     for (unsigned int i = 0; i < children.size(); i ++) { //Iterating over all objects
         if(children[i].isEmpty() == true){ //If object marked as deleted

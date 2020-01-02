@@ -73,3 +73,49 @@ void Input::clearMouseState(){
     mouse.mouseRelX = 0;
     mouse.mouseRelY = 0;
 }
+
+void Input::processEventsSDL(SDL_Event* event){
+    if (event->type == SDL_KEYDOWN) { //if user pressed a key on keyboard
+        //w.edit_win_ptr->onKeyDown(event.key.keysym); //Call press function on EditWindow
+        Input::addPressedKeyToQueue(event->key.keysym.sym);
+        Input::addHeldKeyToQueue(event->key.keysym.sym);
+
+    }
+    if (event->type == SDL_KEYUP) { //if user pressed a key on keyboard
+        Input::removeHeldKeyFromQueue(event->key.keysym.sym);
+
+    }
+    if (event->type == SDL_MOUSEMOTION) { //If user moved mouse
+        //update state in ZSENSDK
+        mouse.mouseX = event->motion.x;
+        mouse.mouseY = event->motion.y;
+        mouse.mouseRelX = event->motion.xrel;
+        mouse.mouseRelY = event->motion.yrel;
+    }
+    if (event->type == SDL_MOUSEBUTTONUP) { //If user released mouse button
+
+        if (event->button.button == SDL_BUTTON_LEFT) {
+            mouse.isLButtonDown = false;
+        }
+        if (event->button.button == SDL_BUTTON_RIGHT) {
+            mouse.isRButtonDown = false;
+        }
+        if (event->button.button == SDL_BUTTON_MIDDLE) {
+            mouse.isMidBtnDown = false;
+        }
+    }
+    if (event->type == SDL_MOUSEBUTTONDOWN) { //If user pressed mouse btn
+        if (event->button.button == SDL_BUTTON_LEFT) {
+            mouse.isLButtonDown = true;
+        }
+        if (event->button.button == SDL_BUTTON_RIGHT) {
+            mouse.isRButtonDown = true;
+        }
+        if (event->button.button == SDL_BUTTON_MIDDLE) {
+            mouse.isMidBtnDown = true;
+        }
+    }
+    if (event->type == SDL_MOUSEWHEEL) {
+
+    }
+}

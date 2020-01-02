@@ -3,7 +3,7 @@
 #include "../../headers/engine.h"
 
 extern ZSpireEngine* engine_ptr;
-
+extern Material* default3dmat;
 Engine::ZsResource::ZsResource(){
     this->resource_type = RESOURCE_TYPE_NONE;
     this->resource_state = STATE_NOT_LOADED;
@@ -51,6 +51,13 @@ Engine::ResourceManager::ResourceManager(){
     sphere_resource->resource_label = sphere_resource->rel_path;
     sphere_resource->mesh_ptr = Engine::getSphereMesh();
     this->resources.push_back(sphere_resource);
+
+    MaterialResource* material_resource = new MaterialResource;
+    material_resource->resource_state = STATE_LOADED;
+    material_resource->rel_path = "@default";
+    material_resource->resource_label = material_resource->rel_path;
+    material_resource->material = default3dmat;
+    this->resources.push_back(material_resource);
 }
 
 void Engine::ResourceManager::clear(){
@@ -213,7 +220,6 @@ void Engine::TextureResource::Use(int slot){
     if(this->resource_state == STATE_NOT_LOADED){
         //Create loading request
         request = new Engine::Loader::LoadRequest;
-        request->isBlob = true;
         //Set offset of resource in blob
         request->offset = this->offset;
         //Set size of resource in blob
@@ -254,7 +260,6 @@ void Engine::MeshResource::Draw(){
     //Otherwise perform texture loading
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
-        request->isBlob = true;
         request->offset = this->offset;
         request->size = this->size;
         request->file_path = this->blob_path;
@@ -293,7 +298,6 @@ Engine::AudioResource::AudioResource(){
 void Engine::AudioResource::load(){
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
-        request->isBlob = true;
         request->offset = this->offset;
         request->size = this->size;
         request->file_path = this->blob_path;
@@ -335,7 +339,6 @@ Engine::AnimationResource::AnimationResource(){
 void Engine::AnimationResource::load(){
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
-        request->isBlob = true;
         request->offset = this->offset;
         request->size = this->size;
         request->file_path = this->blob_path;
@@ -360,7 +363,6 @@ void Engine::AnimationResource::load(){
 void Engine::ScriptResource::load(){
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
-        request->isBlob = true;
         request->offset = this->offset;
         request->size = this->size;
         request->file_path = this->blob_path;
@@ -376,7 +378,6 @@ void Engine::ScriptResource::load(){
 void Engine::MaterialResource::load(){
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
-        request->isBlob = true;
         request->offset = this->offset;
         request->size = this->size;
         request->file_path = this->blob_path;

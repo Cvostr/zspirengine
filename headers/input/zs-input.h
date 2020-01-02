@@ -1,6 +1,8 @@
 #ifndef zs_input
 #define zs_input
 
+#include <SDL2/SDL.h>
+
 namespace Input {
     void addPressedKeyToQueue(int keycode);
     void addHeldKeyToQueue(int keycode);
@@ -25,6 +27,8 @@ namespace Input {
 
     MouseState* getMouseStatePtr();
     MouseState getMouseState();
+
+    void processEventsSDL(SDL_Event* event);
 }
 
 #endif

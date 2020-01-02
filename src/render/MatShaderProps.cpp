@@ -2,11 +2,9 @@
 #include <fstream>
 #include <iostream>
 #include <GL/glew.h>
-//#include "../Misc/headers/zs_types.h"
 #include "../../headers/game.h"
 #include "../../headers/engine/resources.h"
 
-//extern Project* project_ptr;
 Material* default3dmat;
 static std::vector<MtShaderPropertiesGroup*> MatGroups;
 //Hack to support resources
@@ -259,9 +257,9 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
 
     char test_header[13];
     //Read header
-    memcpy(test_header, &buffer[position], 13);
+    memcpy(test_header, &buffer[position], 12);
 
-    if(strcmp(test_header, "ZSP_MATERIAL\n") != 0) //If it isn't zspire scene
+    if(strcmp(test_header, "ZSP_MATERIAL") == 1) //If it isn't zspire material
         return; //Go out, we have nothing to do
 
     position += 13;

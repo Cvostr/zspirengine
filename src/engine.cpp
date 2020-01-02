@@ -153,56 +153,14 @@ void ZSpireEngine::loadGame(){
         updateDeltaTime(deltaTime);
 
         SDL_Event event;
-        Input::MouseState* mstate = Input::getMouseStatePtr();
         while (SDL_PollEvent(&event)){
             if (event.type == SDL_QUIT)  //If user caused SDL window to close
                 this->gameRuns = false;
-            if (event.type == SDL_KEYDOWN) { //if user pressed a key on keyboard
-                //w.edit_win_ptr->onKeyDown(event.key.keysym); //Call press function on EditWindow
-                Input::addPressedKeyToQueue(event.key.keysym.sym);
-                Input::addHeldKeyToQueue(event.key.keysym.sym);
-
-            }
-            if (event.type == SDL_KEYUP) { //if user pressed a key on keyboard
-                Input::removeHeldKeyFromQueue(event.key.keysym.sym);
-
-            }
-            if (event.type == SDL_MOUSEMOTION) { //If user moved mouse
-                //update state in ZSENSDK
-                mstate->mouseX = event.motion.x;
-                mstate->mouseY = event.motion.y;
-                mstate->mouseRelX = event.motion.xrel;
-                mstate->mouseRelY = event.motion.yrel;
-            }
-            if (event.type == SDL_MOUSEBUTTONUP) { //If user released mouse button
-
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    mstate->isLButtonDown = false;
-                }
-                if (event.button.button == SDL_BUTTON_RIGHT) {
-                    mstate->isRButtonDown = false;
-                }
-                if (event.button.button == SDL_BUTTON_MIDDLE) {
-                    mstate->isMidBtnDown = false;
-                }
-            }
-            if (event.type == SDL_MOUSEBUTTONDOWN) { //If user pressed mouse btn
-                if (event.button.button == SDL_BUTTON_LEFT) {
-                    mstate->isLButtonDown = true;
-                }
-                if (event.button.button == SDL_BUTTON_RIGHT) {
-                    mstate->isRButtonDown = true;
-                }
-                if (event.button.button == SDL_BUTTON_MIDDLE) {
-                    mstate->isMidBtnDown = true;
-                }
-            }
-            if (event.type == SDL_MOUSEWHEEL) {
-
-            }
+            //Update input state from SDL event
+            Input::processEventsSDL(&event);
 
         }
-
+        game_data->world->physical_world->stepSimulation(deltaTime);
         game_data->pipeline->render();
 
         Input::clearMouseState();

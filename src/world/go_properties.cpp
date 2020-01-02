@@ -377,6 +377,24 @@ void Engine::ColliderProperty::copyTo(GameObjectProperty* dest){
 
 }
 
+Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(std::string label){
+    //This function works recursively
+    //Iterate over all children in current object
+    for (unsigned int i = 0; i < this->children.size(); i ++) {
+        GameObjectLink* l = &this->children[i];
+        Engine::NodeProperty* node_p = l->updLinkPtr()->getPropertyPtr<Engine::NodeProperty>();
+        //if node's name match
+        if(!node_p->node_label.compare(label))
+            //Then return object with this node
+            return l->updLinkPtr();
+        //call function from this child
+        GameObject* obj_ch = l->updLinkPtr()->getChildObjectWithNodeLabel(label);
+        if(obj_ch != nullptr) return obj_ch;
+
+    }
+    return nullptr;
+}
+
 Engine::AnimationProperty::AnimationProperty(){
     type = GO_PROPERTY_TYPE_ANIMATION;
     this->anim_label = "@none";
@@ -420,12 +438,12 @@ void Engine::AnimationProperty::onPreRender(RenderPipeline* pipeline){
 
         for(unsigned int channels_i = 0; channels_i < anim_prop_ptr->NumChannels; channels_i ++){
             Engine::AnimationChannel* ch = &anim_prop_ptr->channels[channels_i];
-            //GameObject* node = obj->getChildObjectWithNodeLabel(ch->bone_name);
-            //NodeProperty* prop = node->getPropertyPtr<NodeProperty>();
+            GameObject* node = obj->getChildObjectWithNodeLabel(ch->bone_name);
+            NodeProperty* prop = node->getPropertyPtr<NodeProperty>();
 
-            //prop->translation = ch->getPostitionInterpolated(animTime);
-            //prop->scale = ch->getScaleInterpolated(animTime);
-            //prop->rotation = ch->getRotationInterpolated(animTime);
+            prop->translation = ch->getPostitionInterpolated(animTime);
+            prop->scale = ch->getScaleInterpolated(animTime);
+            prop->rotation = ch->getRotationInterpolated(animTime);
         }
     }
     ZSMATRIX4x4 identity_matrix = getIdentity();

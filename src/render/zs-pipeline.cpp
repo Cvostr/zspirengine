@@ -22,7 +22,7 @@ void Engine::RenderPipeline::initShaders(){
     if(engine_ptr->desc->game_perspective == PERSP_2D){
         this->tile_shader->compileFromFile("Shaders/2d_tile/tile2d.vert", "Shaders/2d_tile/tile2d.frag");
     }
-    if(engine_ptr->desc->game_perspective == PERSP_2D){
+    if(engine_ptr->desc->game_perspective == PERSP_3D){
         this->deffered_shader->compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag");
         this->default3d->compileFromFile("Shaders/3d/3d.vert", "Shaders/3d/3d.frag");
         this->skybox_shader->compileFromFile("Shaders/skybox/skybox.vert", "Shaders/skybox/skybox.frag");

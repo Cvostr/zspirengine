@@ -8,6 +8,7 @@
 #include "../engine/resources.h"
 #include "zs-camera.h"
 
+#include "Physics.h"
 #include "../render/zs-pipeline.h"
 
 #define OBJ_PROPS_SIZE 11
@@ -84,6 +85,9 @@ class World{
 private:
     ResourceManager* manager;
 public:
+    PhysicalWorldSettings phys_settngs;
+    PhysicalWorld* physical_world;
+
     std::vector<GameObject> objects;
     void loadFromFile(std::string file, RenderSettings* settings_ptr);
     void loadGameObject(GameObject* object_ptr, std::ifstream* world_stream);
@@ -150,6 +154,8 @@ public:
         }
         return nullptr;
     }
+
+    GameObject* getChildObjectWithNodeLabel(std::string label);
 
     TransformProperty* getTransformProperty();
     LabelProperty* getLabelProperty();

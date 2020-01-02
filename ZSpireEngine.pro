@@ -9,6 +9,7 @@ QT       -= core gui
 TARGET = zsengine
 TEMPLATE = lib
 CONFIG += staticlib
+unix:LIBS += -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath
 unix:INCLUDEPATH += /usr/include/bullet/
 
 # The following define makes your compiler emit warnings if you use
@@ -30,6 +31,7 @@ SOURCES += \
     src/render/zs-shader.cpp \
     src/render/zs-math.cpp \
     src/engine/resources.cpp \
+    src/world/PhysicalWorld.cpp \
     src/world/World.cpp \
     src/world/go_properties.cpp \
     src/world/GoProperty/tile_properties.cpp \
