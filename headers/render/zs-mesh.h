@@ -7,6 +7,7 @@
 #include <vector>
 
 #define NO_INDICES 0
+#define MAX_MESH_BONES 150
 
 namespace Engine {
 

@@ -6,6 +6,8 @@
 #include "../../headers/engine/resources.h"
 
 Material* default3dmat;
+Material* defaultTerrainMat;
+Material* defaultSkyMat;
 static std::vector<MtShaderPropertiesGroup*> MatGroups;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
@@ -128,7 +130,13 @@ MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d
 
     //Create default base material
     default3dmat = new Material(default_group);
-    default3dmat->file_path = "@none";
+    default3dmat->file_path = "@default";
+
+    defaultTerrainMat = new Material(default_heightmap_group);
+    defaultTerrainMat->file_path = "@defaultHeightmap";
+
+    defaultSkyMat = new Material(default_sky_group);
+    defaultSkyMat->file_path = "@defaultSkybox";
 
     return default_group;
 }
@@ -266,10 +274,14 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
 
     while(position <= size){ //While file not finished reading
         char prefix[7];
+        prefix[6] = '\0';
         memcpy(prefix, &buffer[position], 6);
-        position += 7;
+
+        if(strcmp(prefix, "_GROUP") && strcmp(prefix, "_ENTRY"))
+            position ++;
 
         if(strcmp(prefix, "_GROUP") == 0){ //if it is game object
+            position += 7;
             char group_name[100];
             strcpy(group_name, &buffer[position]);
             position += strlen(group_name) + 2;
@@ -278,6 +290,7 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
         }
 
         if(strcmp(prefix, "_ENTRY") == 0){ //if it is game object
+            position += 7;
             char _prop_identifier[100];
             strcpy(_prop_identifier, &buffer[position]);
             std::string prop_identifier = std::string(_prop_identifier);
@@ -400,6 +413,8 @@ void Material::loadFromFile(std::string fpath){
 
 void Material::applyMatToPipeline(){
     Engine::Shader* shader = this->group_ptr->render_shader;
+    if(shader == nullptr)
+        return;
     shader->Use();
     //iterate over all properties, send them all!
     unsigned int offset = 0;

@@ -71,14 +71,15 @@ public:
     Engine::Shader* terrain_shader;
     Engine::Shader* skybox_shader;
 
-    UniformBuffer* transformBuffer;
-    UniformBuffer* lightsBuffer;
-    UniformBuffer* shadowBuffer;
-    UniformBuffer* terrainUniformBuffer;
-    UniformBuffer* skinningUniformBuffer;
-    UniformBuffer* tileBuffer;
-    UniformBuffer* skyboxTransformUniformBuffer;
-    UniformBuffer* uiUniformBuffer;
+    UniformBuffer* transformBuffer; //0
+    UniformBuffer* lightsBuffer;    //1
+    UniformBuffer* shadowBuffer;    //2
+    UniformBuffer* terrainUniformBuffer; //3
+    UniformBuffer* skinningUniformBuffer; //4
+    UniformBuffer* tileBuffer;  //5
+    UniformBuffer* skyboxTransformUniformBuffer; //6
+    UniformBuffer* uiUniformBuffer; //7
+    UniformBuffer* instancedTransformBuffer; //8
 
     RenderSettings* getRenderSettings();
     Engine::Shader* getTileShader();

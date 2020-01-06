@@ -4,6 +4,8 @@
 
 extern ZSpireEngine* engine_ptr;
 extern Material* default3dmat;
+extern Material* defaultTerrainMat;
+extern Material* defaultSkyMat;
 Engine::ZsResource::ZsResource(){
     this->resource_type = RESOURCE_TYPE_NONE;
     this->resource_state = STATE_NOT_LOADED;
@@ -52,12 +54,29 @@ Engine::ResourceManager::ResourceManager(){
     sphere_resource->mesh_ptr = Engine::getSphereMesh();
     this->resources.push_back(sphere_resource);
 
-    MaterialResource* material_resource = new MaterialResource;
-    material_resource->resource_state = STATE_LOADED;
-    material_resource->rel_path = "@default";
-    material_resource->resource_label = material_resource->rel_path;
-    material_resource->material = default3dmat;
-    this->resources.push_back(material_resource);
+    //This material should be created only in 3D projects
+    if(engine_ptr->desc->game_perspective == PERSP_3D){
+        MaterialResource* material3d_resource = new MaterialResource;
+        material3d_resource->resource_state = STATE_LOADED;
+        material3d_resource->rel_path = "@default";
+        material3d_resource->resource_label = material3d_resource->rel_path;
+        material3d_resource->material = default3dmat;
+        this->resources.push_back(material3d_resource);
+
+        MaterialResource* materialTerrain_resource = new MaterialResource;
+        materialTerrain_resource->resource_state = STATE_LOADED;
+        materialTerrain_resource->rel_path = "@defaultHeightmap";
+        materialTerrain_resource->resource_label = materialTerrain_resource->rel_path;
+        materialTerrain_resource->material = defaultTerrainMat;
+        this->resources.push_back(materialTerrain_resource);
+
+        MaterialResource* materialSky_resource = new MaterialResource;
+        materialSky_resource->resource_state = STATE_LOADED;
+        materialSky_resource->rel_path = "@defaultSky";
+        materialSky_resource->resource_label = materialSky_resource->rel_path;
+        materialSky_resource->material = defaultSkyMat;
+        this->resources.push_back(materialSky_resource);
+    }
 }
 
 void Engine::ResourceManager::clear(){

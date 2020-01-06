@@ -29,7 +29,7 @@ void Engine::RenderPipeline::initShaders(){
         terrain_shader->compileFromFile("Shaders/heightmap/heightmap.vert", "Shaders/heightmap/heightmap.frag");
     }
 
-    MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, 8);
+    MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, 9);
 }
 
 Engine::RenderPipeline::RenderPipeline(){
@@ -46,9 +46,15 @@ Engine::RenderPipeline::RenderPipeline(){
     //Terrain uniform buffer
     terrainUniformBuffer = allocUniformBuffer();
     terrainUniformBuffer->init(3, 12 * 16 * 2 + 4 * 3);
-    //Skinning uniform buffer
-    skinningUniformBuffer = allocUniformBuffer();
-    skinningUniformBuffer->init(4, sizeof (ZSMATRIX4x4) * 150);
+    {
+        //Skinning uniform buffer
+        skinningUniformBuffer = allocUniformBuffer();
+        skinningUniformBuffer->init(4, sizeof (ZSMATRIX4x4) * MAX_MESH_BONES);
+        for(unsigned int i = 0; i < MAX_MESH_BONES; i ++){
+            ZSMATRIX4x4 m = getIdentity();
+            skinningUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * i, sizeof (ZSMATRIX4x4), &m);
+        }
+    }
     //Tile uniform buffer
     tileBuffer = allocUniformBuffer();
     tileBuffer->init(5, 28);
@@ -58,6 +64,17 @@ Engine::RenderPipeline::RenderPipeline(){
 
     uiUniformBuffer = Engine::allocUniformBuffer();
     uiUniformBuffer->init(7, sizeof (ZSMATRIX4x4) * 2 + 16 + 16);
+
+    {
+        instancedTransformBuffer = Engine::allocUniformBuffer();
+        instancedTransformBuffer->init(9, sizeof (ZSMATRIX4x4) * 150);
+
+        for(unsigned int i = 0; i < MAX_LIGHTS_AMOUNT; i ++){
+            ZSMATRIX4x4 m = getIdentity();
+            instancedTransformBuffer->writeData(sizeof (ZSMATRIX4x4) * i, sizeof (ZSMATRIX4x4), &m);
+        }
+    }
+
 
     Engine::setupDefaultMeshes();
 }
@@ -237,7 +254,6 @@ void Engine::GameObject::Draw(RenderPipeline* pipeline){    //On render pipeline
 }
 
 void Engine::MaterialProperty::onRender(RenderPipeline* pipeline){
-    pipeline->default3d->Use();
     this->material_ptr->material->applyMatToPipeline();
 }
 

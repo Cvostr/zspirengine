@@ -2,6 +2,7 @@
 #include <thread>
 #include <list>
 #include <fstream>
+#include <iostream>
 
 std::thread* loader_thr;
 static bool loader_thread_working = true;
@@ -9,6 +10,8 @@ static std::string blob_root_directory;
 std::list<Engine::Loader::LoadRequest*> requests;
 
 void _LDR_load(Engine::Loader::LoadRequest* req){
+    std::cout << "Loading resource " << req->file_path << std::endl;
+
     //Declare blob loader stream
     std::ifstream stream;
     //Get absolute path to blob file

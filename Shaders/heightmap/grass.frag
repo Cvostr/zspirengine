@@ -35,6 +35,6 @@ void main(){
 	if(diffuse.a == 0)
         discard;
         
-        
+    FragColor = diffuse;    
 }
  
