@@ -8,6 +8,8 @@
 
 #define SHADER_STR_LEN 16384
 
+#define MAX_LIGHTS_AMOUNT 150
+
 namespace Engine {
 
 	class Shader {

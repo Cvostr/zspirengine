@@ -7,7 +7,8 @@
 #include <vector>
 
 #define NO_INDICES 0
-#define MAX_MESH_BONES 150
+#define MAX_MESH_BONES 170
+#define INSTANCED_RENDER_BUFFER_SIZE 300
 
 namespace Engine {
 

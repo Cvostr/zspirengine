@@ -4,8 +4,6 @@
 #include "../../headers/world/go_properties.h"
 #include "../../headers/world/tile_properties.h"
 
-#define MAX_LIGHTS_AMOUNT 150
-
 extern ZSpireEngine* engine_ptr;
 
 void Engine::RenderSettings::defaults(){
@@ -67,9 +65,9 @@ Engine::RenderPipeline::RenderPipeline(){
 
     {
         instancedTransformBuffer = Engine::allocUniformBuffer();
-        instancedTransformBuffer->init(9, sizeof (ZSMATRIX4x4) * 150);
+        instancedTransformBuffer->init(9, sizeof (ZSMATRIX4x4) * INSTANCED_RENDER_BUFFER_SIZE);
 
-        for(unsigned int i = 0; i < MAX_LIGHTS_AMOUNT; i ++){
+        for(unsigned int i = 0; i < INSTANCED_RENDER_BUFFER_SIZE; i ++){
             ZSMATRIX4x4 m = getIdentity();
             instancedTransformBuffer->writeData(sizeof (ZSMATRIX4x4) * i, sizeof (ZSMATRIX4x4), &m);
         }

@@ -300,9 +300,9 @@ void Engine::AudioSourceProperty::updateAudioPtr(){
 }
 
 void Engine::AudioSourceProperty::audio_start(){
+    if(buffer_ptr == nullptr) return;
     if(buffer_ptr->resource_state == STATE_LOADED){
         //Update source buffer
-        if(buffer_ptr == nullptr) return;
         this->source.setAlBuffer(this->buffer_ptr->buffer);
         //play source
         this->source.play();
