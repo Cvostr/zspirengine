@@ -7,7 +7,6 @@
 
 Material* default3dmat;
 Material* defaultTerrainMat;
-Material* defaultSkyMat;
 static std::vector<MtShaderPropertiesGroup*> MatGroups;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
@@ -135,9 +134,6 @@ MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d
     defaultTerrainMat = new Material(default_heightmap_group);
     defaultTerrainMat->file_path = "@defaultHeightmap";
 
-    defaultSkyMat = new Material(default_sky_group);
-    defaultSkyMat->file_path = "@defaultSkybox";
-
     return default_group;
 }
 MtShaderPropertiesGroup* MtShProps::getDefaultMtShGroup(){
@@ -242,6 +238,18 @@ void Material::saveToFile(){
                 mat_stream.write(reinterpret_cast<char*>(&fvec3_conf->value.X), sizeof (float));
                 mat_stream.write(reinterpret_cast<char*>(&fvec3_conf->value.Y), sizeof (float));
                 mat_stream.write(reinterpret_cast<char*>(&fvec3_conf->value.Z), sizeof (float));
+                break;
+            }
+            case MATSHPROP_TYPE_FVEC2:{
+                //Cast pointer
+                Float2MtShPropConf* fvec2_conf = static_cast<Float2MtShPropConf*>(conf_ptr);
+                //Write value
+                mat_stream.write(reinterpret_cast<char*>(&fvec2_conf->value.X), sizeof (float));
+                mat_stream.write(reinterpret_cast<char*>(&fvec2_conf->value.Y), sizeof (float));
+                break;
+            }
+            case MATSHPROP_TYPE_IVEC2:{
+
                 break;
             }
             case MATSHPROP_TYPE_TEXTURE3:{
@@ -354,15 +362,34 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                             //Cast pointer
                             Float3MtShPropConf* fvec3_conf = static_cast<Float3MtShPropConf*>(conf_ptr);
                             //Read float vector values
-                            memcpy(&fvec3_conf->value.X, &buffer[position], sizeof(int));
-                            position += sizeof (int);
-                            memcpy(&fvec3_conf->value.Y, &buffer[position], sizeof(int));
-                            position += sizeof (int);
-                            memcpy(&fvec3_conf->value.Z, &buffer[position], sizeof(int));
-                            position += sizeof (int);
+                            memcpy(&fvec3_conf->value.X, &buffer[position], sizeof(float));
+                            position += sizeof (float);
+                            memcpy(&fvec3_conf->value.Y, &buffer[position], sizeof(float));
+                            position += sizeof (float);
+                            memcpy(&fvec3_conf->value.Z, &buffer[position], sizeof(float));
+                            position += sizeof (float);
                             position += 1;
                             break;
                         }
+
+                        case MATSHPROP_TYPE_FVEC2:{
+                            //Cast pointer
+                            Float2MtShPropConf* fvec2_conf = static_cast<Float2MtShPropConf*>(conf_ptr);
+                            //Read float vector values
+                            memcpy(&fvec2_conf->value.X, &buffer[position], sizeof(float));
+                            position += sizeof (float);
+                            memcpy(&fvec2_conf->value.Y, &buffer[position], sizeof(float));
+                            position += sizeof (float);
+
+                            position += 1;
+                            break;
+                        }
+
+                        case MATSHPROP_TYPE_IVEC2:{
+
+                            break;
+                        }
+
                         case MATSHPROP_TYPE_TEXTURE3:{
                             //Cast pointer
                             Texture3MtShPropConf* texture3_conf = static_cast<Texture3MtShPropConf*>(conf_ptr);
@@ -501,6 +528,14 @@ void Material::applyMatToPipeline(){
                 break;
             }
             case MATSHPROP_TYPE_FVEC2:{
+                //Cast pointer
+                Float2MaterialShaderProperty* fvec2_p = static_cast<Float2MaterialShaderProperty*>(prop_ptr);
+                Float2MtShPropConf* fvec2_conf = static_cast<Float2MtShPropConf*>(conf_ptr);
+
+                offset = fvec2_p->start_offset;
+                //Write color to buffer
+                group_ptr->setUB_Data(offset, 4, &fvec2_conf->value.X);
+                group_ptr->setUB_Data(offset + 4, 4, &fvec2_conf->value.Y);
                 break;
             }
             case MATSHPROP_TYPE_IVEC2:{
@@ -515,7 +550,7 @@ void Material::applyMatToPipeline(){
                     texture_conf->texture3D->Init();
 
                     for(int i = 0; i < 6; i ++){
-                        //texture_conf->texture3D->pushTexture(i, project_ptr->root_path + "/" + texture_conf->texture_str[i]);
+                        texture_conf->texture3D->pushTexture(i, texture_conf->texture_str[i]);
                     }
                     texture_conf->texture3D->created = true;
                     texture_conf->texture3D->Use(texture_p->slotToBind);

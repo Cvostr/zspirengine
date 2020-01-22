@@ -33,8 +33,8 @@ void main(){
 	vec4 diffuse = texture(diffuse, uv);
 	
 	if(diffuse.a == 0)
-        discard;
+       discard;
         
-    FragColor = diffuse;    
+    FragColor = vec4(diffuse.xyz, 0);    
 }
  

@@ -165,7 +165,8 @@ bool Engine::Texture3D::pushTextureBuffer(int index, unsigned char* data){
     return result;
 }
 bool Engine::Texture3D::pushTexture(int index, std::string path){
-    std::ifstream texture_stream;
+    if(index > 5) return false;
+    /*std::ifstream texture_stream;
     texture_stream.open(path, std::ifstream::binary | std::ifstream::ate);
 
     if (texture_stream.fail()) { //Opening file stream failed, no file
@@ -196,7 +197,17 @@ bool Engine::Texture3D::pushTexture(int index, std::string path){
     delete[] (data); //freeing buffer
     texture_stream.close(); //closing stream
 
-    return true;
+    return true;*/
+
+
+    this->units[index].path = path;
+    this->units[index].req = new Engine::Loader::LoadRequest;
+    this->units[index].req->size = 0;
+    this->units[index].req->file_path = path;
+    this->units[index].req->offset = 0;
+
+    Engine::Loader::loadImmideately(this->units[index].req);
+    pushTextureBuffer(index, this->units[index].req->data);
 }
     //Use in rendering pipeline
 void Engine::Texture3D::Use(int slot){

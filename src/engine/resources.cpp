@@ -5,7 +5,6 @@
 extern ZSpireEngine* engine_ptr;
 extern Material* default3dmat;
 extern Material* defaultTerrainMat;
-extern Material* defaultSkyMat;
 Engine::ZsResource::ZsResource(){
     this->resource_type = RESOURCE_TYPE_NONE;
     this->resource_state = STATE_NOT_LOADED;
@@ -70,12 +69,6 @@ Engine::ResourceManager::ResourceManager(){
         materialTerrain_resource->material = defaultTerrainMat;
         this->resources.push_back(materialTerrain_resource);
 
-        MaterialResource* materialSky_resource = new MaterialResource;
-        materialSky_resource->resource_state = STATE_LOADED;
-        materialSky_resource->rel_path = "@defaultSky";
-        materialSky_resource->resource_label = materialSky_resource->rel_path;
-        materialSky_resource->material = defaultSkyMat;
-        this->resources.push_back(materialSky_resource);
     }
 }
 

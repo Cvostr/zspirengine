@@ -253,6 +253,7 @@ void Engine::setupDefaultMeshes() {
     skyboxMesh->Init();
     skyboxMesh->setMeshData(&skyboxVertices[0], 36); //Send plane data
 
+    processTangentSpace(grass_vertices, grass_ind, 24);
     grassMesh->Init();
     grassMesh->setMeshData(grass_vertices, grass_ind, 8, 24);
 }

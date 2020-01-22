@@ -19,6 +19,10 @@ layout (std140, binding = 0) uniform CamMatrices{
 	uniform vec3 cam_position;
 };
 
+layout (std140, binding = 9) uniform InstMatrices{
+    uniform mat4 transform[400];
+};
+
 void main(){
 	_id = position;
 	UVCoord = uv;

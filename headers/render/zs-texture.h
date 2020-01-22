@@ -2,11 +2,23 @@
 #define zs_texture
 
 #include <string>
+#include "../engine/loader.h"
 
 #define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
 #define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
 #define FOURCC_DXT5 0x35545844 // Equivalent to "DXT5" in ASCII
 #define SLOTS_COUNT 4
+
+typedef struct Texture3D_Unit{
+
+    std::string path;
+    Engine::Loader::LoadRequest* req;
+
+    Texture3D_Unit(){
+        req = nullptr;
+    }
+
+}Texture3D_Unit;
 
 namespace Engine {
 	class Texture {
@@ -30,6 +42,8 @@ namespace Engine {
     public:
 
         bool created;
+
+        Texture3D_Unit units[6];
 
         virtual void Init();
         virtual bool pushTextureBuffer(int index, unsigned char* data);

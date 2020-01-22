@@ -8,7 +8,7 @@
 
 #define NO_INDICES 0
 #define MAX_MESH_BONES 170
-#define INSTANCED_RENDER_BUFFER_SIZE 300
+#define INSTANCED_RENDER_BUFFER_SIZE 400
 
 namespace Engine {
 
