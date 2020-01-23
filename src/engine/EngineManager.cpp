@@ -13,6 +13,9 @@ void EngineComponentManager::setDpMetrics(int W, int H){
     this->HEIGHT = H;
 }
 
+void EngineComponentManager::setProjectStructPtr(Project* ptr){
+    this->project_struct_ptr = ptr;
+}
 
 void EngineComponentManager::init(){
 

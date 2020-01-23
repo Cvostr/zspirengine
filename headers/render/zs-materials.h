@@ -187,7 +187,7 @@ public:
 };
 class Int2MtShPropConf : public MaterialShaderPropertyConf{
 public:
-    ZSVECTOR3 value;
+    int value[2];
     //Construct
     Int2MtShPropConf();
 };

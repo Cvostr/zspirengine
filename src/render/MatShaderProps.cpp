@@ -52,7 +52,7 @@ MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d
                                                         Engine::Shader* heightmap,
                                                         unsigned int uniform_buf_id_took){
 
-    MtShaderPropertiesGroup* default_group = new MtShaderPropertiesGroup(shader3d, "Default3d", uniform_buf_id_took + 1, 36);
+    MtShaderPropertiesGroup* default_group = new MtShaderPropertiesGroup(shader3d, "Default3d", uniform_buf_id_took + 1, 40);
     default_group->acceptShadows = true;
     default_group->str_path = "@default";
     default_group->groupCaption = "Default 3D";
@@ -103,6 +103,13 @@ MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d
     shininess_factor_prop->prop_caption = "Shininess";
     shininess_factor_prop->prop_identifier = "f_shininess"; //Identifier to save
     shininess_factor_prop->start_offset = 28;
+
+    Int2MaterialShaderProperty* uv_factor_prop =
+            static_cast<Int2MaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_IVEC2));
+    uv_factor_prop->floatUniform = "uv_repeat";
+    uv_factor_prop->prop_caption = "UV repeat";
+    uv_factor_prop->prop_identifier = "i_uv_repeat"; //Identifier to save
+    uv_factor_prop->start_offset = 32;
 
     MtShProps::addMtShaderPropertyGroup(default_group);
 
@@ -249,7 +256,11 @@ void Material::saveToFile(){
                 break;
             }
             case MATSHPROP_TYPE_IVEC2:{
-
+                //Cast pointer
+                Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
+                //Write value
+                mat_stream.write(reinterpret_cast<char*>(&ivec2_conf->value[0]), sizeof (int));
+                mat_stream.write(reinterpret_cast<char*>(&ivec2_conf->value[1]), sizeof (int));
                 break;
             }
             case MATSHPROP_TYPE_TEXTURE3:{
@@ -386,7 +397,15 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                         }
 
                         case MATSHPROP_TYPE_IVEC2:{
+                            //Cast pointer
+                            Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
+                            //Read float vector values
+                            memcpy(&ivec2_conf->value[0], &buffer[position], sizeof(int));
+                            position += sizeof (int);
+                            memcpy(&ivec2_conf->value[1], &buffer[position], sizeof(int));
+                            position += sizeof (int);
 
+                            position += 1;
                             break;
                         }
 
@@ -539,6 +558,14 @@ void Material::applyMatToPipeline(){
                 break;
             }
             case MATSHPROP_TYPE_IVEC2:{
+                //Cast pointer
+                Int2MaterialShaderProperty* ivec2_p = static_cast<Int2MaterialShaderProperty*>(prop_ptr);
+                Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
+
+                offset = ivec2_p->start_offset;
+                //Write color to buffer
+                group_ptr->setUB_Data(offset, 4, &ivec2_conf->value[0]);
+                group_ptr->setUB_Data(offset + 4, 4, &ivec2_conf->value[1]);
                 break;
             }
             case MATSHPROP_TYPE_TEXTURE3:{

@@ -9,8 +9,9 @@ QT       -= core gui
 TARGET = zsengine
 TEMPLATE = lib
 CONFIG += staticlib
-unix:LIBS += -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath
+#unix:LIBS += -lBulletSoftBody -lBulletDynamics -lBulletCollision -lLinearMath -lfreetype
 unix:INCLUDEPATH += /usr/include/bullet/
+unix:INCLUDEPATH += /usr/include/freetype2/
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -25,6 +26,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         src/engine.cpp \
+    src/misc/GlyphManager.cpp \
     src/render/MatShaderProps.cpp \
     src/vulkan/zsvulkan.cpp \
     src/render/zs-pipeline.cpp \
@@ -66,6 +68,7 @@ SOURCES += \
 
 HEADERS += \
         headers/engine.h \
+    headers/misc/GlyphManager.h \
     headers/vulkan/zsvulkan.h \
     headers/render/zs-pipeline.h \
     headers/render/zs-shader.h \
