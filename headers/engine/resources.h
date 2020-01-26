@@ -10,6 +10,7 @@
 #include "../render/zs-animation.h"
 #include "../misc/zs3m-master.h"
 #include "../misc/oal_manager.h"
+#include "../misc/GlyphManager.h"
 #include "loader.h"
 #include "EngineManager.h"
 
@@ -23,6 +24,7 @@ enum RESOURCE_TYPE {RESOURCE_TYPE_NONE,
                     RESOURCE_TYPE_MATERIAL,
                     RESOURCE_TYPE_SCRIPT,
                     RESOURCE_TYPE_ANIMATION,
+                    RESOURCE_TYPE_FONT,
                     RESOURCE_TYPE_FILE = 1000};
 
 enum RESOURCE_STATE {STATE_LOADED, STATE_NOT_LOADED, STATE_LOADING_PROCESS, RESOURCE_LOAD_FAILED};
@@ -152,6 +154,16 @@ public:
 
     AnimationResource();
 };
+
+class GlyphResource : public ZsResource{
+public:
+    GlyphFontContainer* font_ptr;
+
+    void load();
+
+    GlyphResource();
+};
+
 
 }
 

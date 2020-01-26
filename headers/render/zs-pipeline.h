@@ -16,26 +16,23 @@ namespace Engine{
 
 UniformBuffer* allocUniformBuffer();
 
-
-enum GO_RENDER_TYPE {
-    GO_RENDER_TYPE_NONE,
-    GO_RENDER_TYPE_TILE,
-    GO_RENDER_TYPE_MATERIAL
-};
-
 struct RenderSettings {
     ZSRGBCOLOR ambient_light_color;
 
+    void* skybox_ptr;
+    void* shadowcaster_ptr;
+
     void defaults();
+    void resetPointers();
 
     RenderSettings(){
         defaults();
     }
 };
 
-
 class G_BUFFER_GL{
 protected:
+
     unsigned int depthBuffer;
     unsigned int gBuffer; //framebuffer
     unsigned int tDiffuse; //To store RGB diffuse Color A - shininess
@@ -43,6 +40,7 @@ protected:
     unsigned int tPos; //To store position coordinate
     unsigned int tTransparent; //To store color with alpha
 public:
+    bool created;
     G_BUFFER_GL();
     void create(int width, int height);
     void bindFramebuffer();

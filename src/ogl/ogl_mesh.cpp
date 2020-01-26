@@ -68,20 +68,18 @@ void Engine::_ogl_Mesh::setMeshOffsets(){
     glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 11));
     glEnableVertexAttribArray(4);
 
-    //Skinning data
-    glVertexAttribIPointer(5, 4, GL_UNSIGNED_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 14));
-    glEnableVertexAttribArray(5);
-    glVertexAttribIPointer(6, 4, GL_UNSIGNED_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 18));
-    glEnableVertexAttribArray(6);
-    glVertexAttribIPointer(7, 4, GL_UNSIGNED_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 22));
-    glEnableVertexAttribArray(7);
-    //Weights
-    glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 26));
-    glEnableVertexAttribArray(8);
-    glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 30));
-    glEnableVertexAttribArray(9);
-    glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 34));
-    glEnableVertexAttribArray(10);
+    for(unsigned int i = 0; i < MAX_BONE_PER_VERTEX / 4; i ++){
+        //Skinning data
+        glVertexAttribIPointer(5 + i, 4, GL_UNSIGNED_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * (14 + i * 4)));
+        glEnableVertexAttribArray(5 + i);
+    }
+
+    for(unsigned int i = 0; i < MAX_BONE_PER_VERTEX / 4; i ++){
+        //Weights
+        glVertexAttribPointer(8 + i, 4, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * (26 + i * 4)));
+        glEnableVertexAttribArray(8 + i);
+    }
+
     //Bones num
     glVertexAttribIPointer(11, 1, GL_UNSIGNED_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 38));
     glEnableVertexAttribArray(11);

@@ -9,6 +9,7 @@ typedef struct ZSGAME_DATA{
     Engine::ResourceManager* resources;
     Engine::World* world;
     Engine::RenderPipeline* pipeline;
+    GlyphManager* glyph_manager;
 
 }ZSGAME_DATA;
 

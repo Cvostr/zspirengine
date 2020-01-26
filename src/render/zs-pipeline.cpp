@@ -8,6 +8,12 @@ extern ZSpireEngine* engine_ptr;
 
 void Engine::RenderSettings::defaults(){
     ambient_light_color = ZSRGBCOLOR(255, 255, 255, 255);
+    resetPointers();
+}
+
+void Engine::RenderSettings::resetPointers(){
+    this->skybox_ptr = nullptr;
+    this->shadowcaster_ptr = nullptr;
 }
 
 void Engine::RenderPipeline::initShaders(){
@@ -298,7 +304,7 @@ void Engine::TileProperty::onRender(RenderPipeline* pipeline){
 
 
 Engine::G_BUFFER_GL::G_BUFFER_GL(){
-
+    created = false;
 }
 
 void Engine::G_BUFFER_GL::create(int width, int height){
@@ -342,6 +348,8 @@ void Engine::G_BUFFER_GL::create(int width, int height){
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); //return back to default
+
+    created = true;
 }
 void Engine::G_BUFFER_GL::bindFramebuffer(){
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);

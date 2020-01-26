@@ -195,6 +195,11 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
                     static_cast<Engine::AnimationResource*>(resource_ptr)->animation_ptr = new Engine::Animation;
                     break;
                 }
+                case RESOURCE_TYPE_FONT:{
+                    resource_ptr = new GlyphResource;
+                    //static_cast<GlyphResource*>(resource_ptr)->font_ptr = new GlyphFontContainer;
+                    break;
+                }
             }
             resource_ptr->blob_path = resource.blob_path;
             resource_ptr->offset = resource.offset;
@@ -348,6 +353,12 @@ Engine::AnimationResource::AnimationResource(){
     this->resource_type = RESOURCE_TYPE_ANIMATION;
     animation_ptr = nullptr;
 }
+
+Engine::GlyphResource::GlyphResource(){
+    this->resource_type = RESOURCE_TYPE_FONT;
+    font_ptr = nullptr;
+}
+
 void Engine::AnimationResource::load(){
     if(this->resource_state == STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
@@ -399,6 +410,21 @@ void Engine::MaterialResource::load(){
         this->resource_state = STATE_LOADED;
         this->material->loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
         this->material->file_path = absolute;
+    }
+}
+
+void Engine::GlyphResource::load(){
+    if(this->resource_state == STATE_NOT_LOADED){
+        request = new Engine::Loader::LoadRequest;
+        request->offset = this->offset;
+        request->size = this->size;
+        request->file_path = this->blob_path;
+
+        std::string absolute = "";
+        loadImmideately(request, &absolute);
+        this->resource_state = STATE_LOADED;
+        //this->material->loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
+        //this->material->file_path = absolute;
     }
 }
 

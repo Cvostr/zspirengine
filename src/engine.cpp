@@ -117,6 +117,10 @@ void ZSpireEngine::loadGame(){
     game_data->resources = new Engine::ResourceManager;
     //Start it as manager
     startManager(game_data->resources);
+
+    game_data->glyph_manager = new GlyphManager;
+    startManager(game_data->glyph_manager);
+
     game_data->world = new Engine::World(game_data->resources);
 
     switch(this->desc->game_perspective){
