@@ -17,23 +17,32 @@ void Engine::RenderSettings::resetPointers(){
 }
 
 void Engine::RenderPipeline::initShaders(){
-    this->tile_shader = allocShader();
-    this->deffered_shader = allocShader();
-    this->default3d = allocShader();
-    skybox_shader = allocShader();
-    this->terrain_shader = allocShader();
+    this->ui_shader = Engine::allocShader();
+    this->ui_shader->compileFromFile("Shaders/ui/ui.vert", "Shaders/ui/ui.frag");
 
     if(engine_ptr->desc->game_perspective == PERSP_2D){
+        this->tile_shader = allocShader();
         this->tile_shader->compileFromFile("Shaders/2d_tile/tile2d.vert", "Shaders/2d_tile/tile2d.frag");
     }
     if(engine_ptr->desc->game_perspective == PERSP_3D){
-        this->deffered_shader->compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag");
+        this->default3d = allocShader();
+        this->deffered_light = allocShader();
+        this->skybox_shader = allocShader();
+        this->terrain_shader = allocShader();
+        this->grass_shader = Engine::allocShader();
+        this->shadowMap = Engine::allocShader();
+
+        this->deffered_light->compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag");
         this->default3d->compileFromFile("Shaders/3d/3d.vert", "Shaders/3d/3d.frag");
         this->skybox_shader->compileFromFile("Shaders/skybox/skybox.vert", "Shaders/skybox/skybox.frag");
-        terrain_shader->compileFromFile("Shaders/heightmap/heightmap.vert", "Shaders/heightmap/heightmap.frag");
-    }
+        this->terrain_shader->compileFromFile("Shaders/heightmap/heightmap.vert", "Shaders/heightmap/heightmap.frag");
+        this->grass_shader->compileFromFile("Shaders/heightmap/grass.vert", "Shaders/heightmap/grass.frag");
+        this->shadowMap->compileFromFile("Shaders/shadowmap/shadowmap.vert", "Shaders/shadowmap/shadowmap.frag");
 
-    MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, 9);
+        MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, 9);
+
+
+    }
 }
 
 Engine::RenderPipeline::RenderPipeline(){
@@ -88,6 +97,8 @@ Engine::RenderPipeline::~RenderPipeline(){
 }
 
 void Engine::RenderPipeline::init(){
+
+
     if(this->game_desc_ptr->game_perspective == PERSP_2D){
         glDisable(GL_DEPTH_TEST);
         depthTest = false;
@@ -106,20 +117,33 @@ void Engine::RenderPipeline::init(){
 }
 
 void Engine::RenderPipeline::destroy(){
-    this->tileBuffer->Destroy();
+    if(engine_ptr->desc->game_perspective == PERSP_2D){
+        this->tileBuffer->Destroy();
+        tile_shader->Destroy();
+    }
+
+    ui_shader->Destroy();
+
     this->lightsBuffer->Destroy();
+    this->tileBuffer->Destroy();
     this->transformBuffer->Destroy();
     this->terrainUniformBuffer->Destroy();
     this->skinningUniformBuffer->Destroy();
-    skyboxTransformUniformBuffer->Destroy();
+    this->skyboxTransformUniformBuffer->Destroy();
+    this->instancedTransformBuffer->Destroy();
 
-    tile_shader->Destroy();
-    deffered_shader->Destroy();
-    default3d->Destroy();
-    skybox_shader->Destroy();
-    terrain_shader->Destroy();
+    if(engine_ptr->desc->game_perspective == PERSP_3D){
+        deffered_light->Destroy();
+        default3d->Destroy();
+        skybox_shader->Destroy();
+        terrain_shader->Destroy();
+        grass_shader->Destroy();
+        shadowMap->Destroy();
 
-    gbuffer.Destroy();
+        gbuffer.Destroy();
+    }
+
+    freeDefaultMeshes();
 }
 
 void Engine::RenderPipeline::setLightsToBuffer(){
@@ -133,9 +157,9 @@ void Engine::RenderPipeline::setLightsToBuffer(){
         lightsBuffer->writeData(64 * light_i + 12, sizeof (float), &_light_ptr->spot_angle);
         lightsBuffer->writeData(64 * light_i + 16, 12, &_light_ptr->last_pos);
         lightsBuffer->writeData(64 * light_i + 32, 12, &_light_ptr->direction);
-        lightsBuffer->writeData(64 * light_i + 48, 4, &_light_ptr->color.gl_r);
-        lightsBuffer->writeData(64 * light_i + 52, 4, &_light_ptr->color.gl_g);
-        lightsBuffer->writeData(64 * light_i + 56, 4, &_light_ptr->color.gl_b);
+        lightsBuffer->writeData(64 * light_i + 48, sizeof (int), &_light_ptr->color.gl_r);
+        lightsBuffer->writeData(64 * light_i + 52, sizeof (int), &_light_ptr->color.gl_g);
+        lightsBuffer->writeData(64 * light_i + 56, sizeof (int), &_light_ptr->color.gl_b);
     }
 
     int ls = static_cast<int>(lights_ptr.size());
@@ -209,7 +233,7 @@ void Engine::RenderPipeline::render3D(){
         glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
         glClear(GL_COLOR_BUFFER_BIT); //Clear screen
         gbuffer.bindTextures(); //Bind gBuffer textures
-        deffered_shader->Use(); //use deffered shader
+        deffered_light->Use(); //use deffered shader
 
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
     }

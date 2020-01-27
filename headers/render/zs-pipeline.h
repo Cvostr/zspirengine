@@ -49,25 +49,31 @@ public:
 };
 
 class RenderPipeline : public EngineComponentManager{
-private:
-    bool depthTest; //if enabled, GL will do depth testing
-    bool cullFaces; //if enabled, GL will cull faces
-
-    G_BUFFER_GL gbuffer;
-
-    RenderSettings render_settings;
+protected:
     //Vector to store lights
     std::vector<void*> lights_ptr;
+    RenderSettings render_settings;
+    G_BUFFER_GL gbuffer;
+
+    void setLightsToBuffer();
+
+private:
 
     void initShaders();
     void updateShadersCameraInfo(Engine::Camera* cam_ptr);
-    void setLightsToBuffer();
+
 public:
+    bool depthTest; //if enabled, GL will do depth testing
+    bool cullFaces; //if enabled, GL will cull faces
+
     Engine::Shader* tile_shader;
-    Engine::Shader* deffered_shader;
+    Engine::Shader* deffered_light;
     Engine::Shader* default3d;
     Engine::Shader* terrain_shader;
     Engine::Shader* skybox_shader;
+    Engine::Shader* grass_shader;
+    Engine::Shader* shadowMap;
+    Engine::Shader* ui_shader;
 
     UniformBuffer* transformBuffer; //0
     UniformBuffer* lightsBuffer;    //1
