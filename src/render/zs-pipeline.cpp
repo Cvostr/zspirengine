@@ -4,6 +4,7 @@
 #include "../../headers/world/go_properties.h"
 #include "../../headers/world/tile_properties.h"
 
+#define LIGHT_STRUCT_SIZE 64
 extern ZSpireEngine* engine_ptr;
 
 void Engine::RenderSettings::defaults(){
@@ -40,8 +41,6 @@ void Engine::RenderPipeline::initShaders(){
         this->shadowMap->compileFromFile("Shaders/shadowmap/shadowmap.vert", "Shaders/shadowmap/shadowmap.frag");
 
         MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, 9);
-
-
     }
 }
 
@@ -52,7 +51,7 @@ Engine::RenderPipeline::RenderPipeline(){
     transformBuffer->init(0, sizeof (ZSMATRIX4x4) * 3 + 16 * 2);
     //allocate lights buffer
     lightsBuffer = allocUniformBuffer();
-    lightsBuffer->init(1, 64 * MAX_LIGHTS_AMOUNT + 16 * 2);
+    lightsBuffer->init(1, LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16 * 2);
     //Shadow uniform buffer
     shadowBuffer = allocUniformBuffer();
     shadowBuffer->init(2, sizeof (ZSMATRIX4x4) * 2 + 16);
@@ -151,22 +150,22 @@ void Engine::RenderPipeline::setLightsToBuffer(){
     for(unsigned int light_i = 0; light_i < this->lights_ptr.size(); light_i ++){
         LightsourceProperty* _light_ptr = static_cast<LightsourceProperty*>(lights_ptr[light_i]);
 
-        lightsBuffer->writeData(64 * light_i, sizeof (int), &_light_ptr->light_type);
-        lightsBuffer->writeData(64 * light_i + 4, sizeof (float), &_light_ptr->range);
-        lightsBuffer->writeData(64 * light_i + 8, sizeof (float), &_light_ptr->intensity);
-        lightsBuffer->writeData(64 * light_i + 12, sizeof (float), &_light_ptr->spot_angle);
-        lightsBuffer->writeData(64 * light_i + 16, 12, &_light_ptr->last_pos);
-        lightsBuffer->writeData(64 * light_i + 32, 12, &_light_ptr->direction);
-        lightsBuffer->writeData(64 * light_i + 48, sizeof (int), &_light_ptr->color.gl_r);
-        lightsBuffer->writeData(64 * light_i + 52, sizeof (int), &_light_ptr->color.gl_g);
-        lightsBuffer->writeData(64 * light_i + 56, sizeof (int), &_light_ptr->color.gl_b);
+        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i, sizeof (int), &_light_ptr->light_type);
+        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 4, sizeof (float), &_light_ptr->range);
+        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 8, sizeof (float), &_light_ptr->intensity);
+        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 12, sizeof (float), &_light_ptr->spot_angle);
+        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 16, 12, &_light_ptr->last_pos);
+        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 32, 12, &_light_ptr->direction);
+        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 48, sizeof (int), &_light_ptr->color.gl_r);
+        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 52, sizeof (int), &_light_ptr->color.gl_g);
+        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 56, sizeof (int), &_light_ptr->color.gl_b);
     }
 
     int ls = static_cast<int>(lights_ptr.size());
-    lightsBuffer->writeData(64 * MAX_LIGHTS_AMOUNT, 4, &ls);
+    lightsBuffer->writeData(LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT, 4, &ls);
 
     ZSVECTOR3 ambient_L = ZSVECTOR3(render_settings.ambient_light_color.r / 255.0f,render_settings.ambient_light_color.g / 255.0f, render_settings.ambient_light_color.b / 255.0f);
-    lightsBuffer->writeData(64 * MAX_LIGHTS_AMOUNT + 16, 12, &ambient_L);
+    lightsBuffer->writeData(LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16, 12, &ambient_L);
 
     //free lights array
     this->removeLights();
@@ -190,7 +189,6 @@ void Engine::RenderPipeline::render(){
             break;
         }
     }
-
 }
 
 void Engine::RenderPipeline::render2D(){
@@ -405,15 +403,17 @@ void Engine::G_BUFFER_GL::Destroy(){
 }
 
 void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
-    this->transformBuffer->bind();
+    transformBuffer->bind();
     ZSMATRIX4x4 proj = cam_ptr->getProjMatrix();
     ZSMATRIX4x4 view = cam_ptr->getViewMatrix();
     ZSVECTOR3 cam_pos = cam_ptr->getCameraPosition();
-
     transformBuffer->writeData(0, sizeof (ZSMATRIX4x4), &proj);
     transformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &view);
-    transformBuffer->writeData(sizeof (ZSMATRIX4x4) * 3, sizeof (cam_pos), &cam_pos);
-
+    transformBuffer->writeData(sizeof (ZSMATRIX4x4) * 3, sizeof(ZSVECTOR3), &cam_pos);
+    //Setting UI camera to UI buffer
+    uiUniformBuffer->bind();
+    proj = cam_ptr->getUiProjMatrix();
+    uiUniformBuffer->writeData(0, sizeof (ZSMATRIX4x4), &proj);
     //Setting cameras to skybox shader
     proj = cam_ptr->getProjMatrix();
     view = cam_ptr->getViewMatrix();
@@ -421,8 +421,53 @@ void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
     skyboxTransformUniformBuffer->bind();
     skyboxTransformUniformBuffer->writeData(0, sizeof (ZSMATRIX4x4), &proj);
     skyboxTransformUniformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &view);
-
 }
+
+void Engine::RenderPipeline::renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY){
+    this->ui_shader->Use();
+    uiUniformBuffer->bind();
+
+    int _render_mode = 1;
+    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 , 4, &_render_mode);
+    //Use texture at 0 slot
+    texture_sprite->Use(0);
+
+    ZSMATRIX4x4 translation = getTranslationMat(X, Y, 0.0f);
+    ZSMATRIX4x4 scale = getScaleMat(scaleX, scaleY, 0.0f);
+    ZSMATRIX4x4 transform = scale * translation;
+
+    //Push glyph transform
+    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &transform);
+
+    Engine::getUiSpriteMesh2D()->Draw();
+}
+
+void Engine::RenderPipeline::renderGlyph(unsigned int texture_id, int X, int Y, int scaleX, int scaleY, ZSRGBCOLOR color){
+    this->ui_shader->Use();
+    uiUniformBuffer->bind();
+    //tell shader, that we will render glyph
+    int _render_mode = 2;
+    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 , 4, &_render_mode);
+    //sending glyph color
+    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 16, 4, &color.gl_r);
+    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 4 + 16, 4, &color.gl_g);
+    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 8 + 16, 4, &color.gl_b);
+
+    //Use texture at 0 slot
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
+    ZSMATRIX4x4 translation = getTranslationMat(X, Y, 0.0f);
+    ZSMATRIX4x4 scale = getScaleMat(scaleX, scaleY, 0.0f);
+    ZSMATRIX4x4 transform = scale * translation;
+
+    //Push glyph transform
+    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &transform);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    Engine::getUiSpriteMesh2D()->Draw();
+}
+
 
 Engine::Shader* Engine::RenderPipeline::getTileShader(){
     return this->tile_shader;

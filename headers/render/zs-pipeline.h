@@ -56,11 +56,11 @@ protected:
     G_BUFFER_GL gbuffer;
 
     void setLightsToBuffer();
-
+    void updateShadersCameraInfo(Engine::Camera* cam_ptr);
 private:
 
     void initShaders();
-    void updateShadersCameraInfo(Engine::Camera* cam_ptr);
+
 
 public:
     bool depthTest; //if enabled, GL will do depth testing
@@ -90,6 +90,9 @@ public:
 
     void addLight(void* light_ptr);
     void removeLights();
+
+    void renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY);
+    void renderGlyph(unsigned int texture_id, int X, int Y, int scaleX, int scaleY, ZSRGBCOLOR color);
 
     void render();
     void render2D();
