@@ -1,9 +1,10 @@
 #include "../../headers/misc/GlyphManager.h"
+#include "../../headers/game.h"
 
 #include <GL/glew.h>
 #include <iostream>
 
-//extern RenderPipeline* renderer;
+extern ZSGAME_DATA* game_data;
 
 GlyphManager::GlyphManager(){
     if (FT_Init_FreeType(&this->ftlib))
@@ -111,7 +112,7 @@ void GlyphFontContainer::DrawChar(int _char, ZSVECTOR2 pos, unsigned int* char_l
     CharacterGlyph* glyph = this->characters.at(static_cast<unsigned int>(_char));
     *char_length = static_cast<unsigned int>(glyph->glyph_bearing.X + glyph->glyph_size.X);
 
-    //renderer->renderGlyph(glyph->gl_texture_id, static_cast<int>(pos.X), static_cast<int>(pos.Y - (glyph->glyph_size.Y - glyph->glyph_bearing.Y)), static_cast<int>(glyph->glyph_size.X), static_cast<int>(glyph->glyph_size.Y), color);
+    game_data->pipeline->renderGlyph(glyph->gl_texture_id, static_cast<int>(pos.X), static_cast<int>(pos.Y - (glyph->glyph_size.Y - glyph->glyph_bearing.Y)), static_cast<int>(glyph->glyph_size.X), static_cast<int>(glyph->glyph_size.Y), color);
 }
 void GlyphFontContainer::DrawString(int* string, unsigned int len, ZSVECTOR2 pos, ZSRGBCOLOR color){
     unsigned int xpos_offset = static_cast<unsigned int>(pos.X);
