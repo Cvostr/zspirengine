@@ -89,6 +89,8 @@ Engine::RenderPipeline::RenderPipeline(){
 
 
     Engine::setupDefaultMeshes();
+    //to avoid memory reallocations
+    this->lights_ptr.reserve(MAX_LIGHTS_AMOUNT);
 }
 
 Engine::RenderPipeline::~RenderPipeline(){
@@ -495,6 +497,15 @@ void Engine::RenderPipeline::addLight(void* light_ptr){
 
 void Engine::RenderPipeline::removeLights(){
     this->lights_ptr.clear();
+}
+
+void Engine::RenderPipeline::updateWindowSize(int W, int H){
+     glViewport(0, 0, W, H);
+    //Recreate gBuffer with new resolution
+    if(gbuffer.created){
+        this->gbuffer.Destroy();
+        this->gbuffer.create(W, H);
+    }
 }
 
 Engine::RenderSettings* Engine::RenderPipeline::getRenderSettings(){

@@ -1,10 +1,13 @@
 #include "../../headers/engine/resources.h"
 #include <fstream>
 #include "../../headers/engine.h"
+#include "../../headers/game.h"
 
 extern ZSpireEngine* engine_ptr;
 extern Material* default3dmat;
 extern Material* defaultTerrainMat;
+extern ZSGAME_DATA* game_data;
+
 Engine::ZsResource::ZsResource(){
     this->resource_type = RESOURCE_TYPE_NONE;
     this->resource_state = STATE_NOT_LOADED;
@@ -118,6 +121,10 @@ void Engine::ResourceManager::pushResource(ZsResource* resource){
             //static_cast<Engine::AnimationResource*>(resource)->animation_ptr = new Engine::Animation;
             break;
         }
+        case RESOURCE_TYPE_FONT:{
+
+            break;
+        }
     }
 
     if(resource->loadInstantly)
@@ -197,7 +204,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
                 }
                 case RESOURCE_TYPE_FONT:{
                     resource_ptr = new GlyphResource;
-                    //static_cast<GlyphResource*>(resource_ptr)->font_ptr = new GlyphFontContainer;
+
                     break;
                 }
             }
@@ -357,6 +364,7 @@ Engine::AnimationResource::AnimationResource(){
 Engine::GlyphResource::GlyphResource(){
     this->resource_type = RESOURCE_TYPE_FONT;
     font_ptr = nullptr;
+    this->loadInstantly = true;
 }
 
 void Engine::AnimationResource::load(){
@@ -420,11 +428,11 @@ void Engine::GlyphResource::load(){
         request->size = this->size;
         request->file_path = this->blob_path;
 
-        std::string absolute = "";
-        loadImmideately(request, &absolute);
+        loadImmideately(request);
         this->resource_state = STATE_LOADED;
-        //this->material->loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
-        //this->material->file_path = absolute;
+
+        font_ptr = new GlyphFontContainer(request->data, request->size, 48, game_data->glyph_manager);
+        font_ptr->loadGlyphs();
     }
 }
 
@@ -478,6 +486,14 @@ Engine::AnimationResource* Engine::ResourceManager::getAnimationByLabel(std::str
     return nullptr;
 }
 
+Engine::GlyphResource* Engine::ResourceManager::getFontByLabel(std::string label){
+    for(unsigned int res = 0; res < this->resources.size(); res ++){
+        ZsResource* resource_ptr = this->resources[res];
+        if(resource_ptr->resource_type == RESOURCE_TYPE_FONT && resource_ptr->resource_label.compare(label) == 0)
+            return static_cast<GlyphResource*>(resource_ptr);
+    }
+    return nullptr;
+}
 
 Engine::Mesh* Engine::allocateMesh(unsigned int size){
     Engine::Mesh* result = nullptr;

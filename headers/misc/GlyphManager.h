@@ -7,7 +7,6 @@
 #include "../render/zs-math.h"
 #include "../engine/EngineManager.h"
 #include "../render/zs-shader.h"
-//#include "../../Render/headers/zs-pipeline.h"
 #include "ft2build.h"
 
 #include FT_FREETYPE_H
@@ -34,8 +33,7 @@ private:
     std::map<unsigned int, CharacterGlyph*> characters;
     GlyphManager* manager_ptr;
 public:
-    std::string path;
-    GlyphFontContainer(std::string path, unsigned int size, GlyphManager* manager);
+    GlyphFontContainer(unsigned char* data, unsigned int bsize, unsigned int size, GlyphManager* manager);
     void loadGlyphs();
     void loadGlyph(unsigned int index);
 
@@ -50,7 +48,6 @@ private:
 public:
 
     void addFontContainer(GlyphFontContainer* ptr); //add font container to vector
-    GlyphFontContainer* getFontContainer(std::string path);
 
     FT_Library getFreetypeLibraryInstance();
     GlyphManager();

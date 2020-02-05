@@ -99,6 +99,7 @@ public:
     void render2D();
     void render3D();
     void init();
+    void updateWindowSize(int W, int H);
     void destroy();
 
     RenderPipeline();

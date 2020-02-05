@@ -70,6 +70,7 @@ public:
     World* world_ptr;
 
     void setActive(bool active);
+    bool isActive();
 
     virtual void copyTo(GameObjectProperty* dest);
     virtual void onUpdate(float deltaTime);

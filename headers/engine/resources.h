@@ -63,6 +63,7 @@ class AudioResource;
 class ScriptResource;
 class MaterialResource;
 class AnimationResource;
+class GlyphResource;
 
 class ResourceManager : public EngineComponentManager{
 private:
@@ -81,6 +82,7 @@ public:
     ScriptResource* getScriptByLabel(std::string label);
     MaterialResource* getMaterialByLabel(std::string label);
     AnimationResource* getAnimationByLabel(std::string label);
+    GlyphResource* getFontByLabel(std::string label);
 
     template<typename T>
     T* getResource(std::string label){

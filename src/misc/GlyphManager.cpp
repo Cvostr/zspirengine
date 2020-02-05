@@ -22,27 +22,12 @@ FT_Library GlyphManager::getFreetypeLibraryInstance(){
 void GlyphManager::addFontContainer(GlyphFontContainer* ptr){
     this->fonts.push_back(ptr);
 }
-GlyphFontContainer* GlyphManager::getFontContainer(std::string path){
-    for(unsigned int i = 0; i < this->fonts.size(); i ++){
-        if(this->fonts[i]->path.compare(path) == 0){
-            return fonts[i];
-        }
-    }
-    return nullptr;
-}
 
-GlyphFontContainer::GlyphFontContainer(std::string path, unsigned int size, GlyphManager* manager){
-    std::cout << "FREETYPE: Loading font " << path << std::endl;
-
+GlyphFontContainer::GlyphFontContainer(unsigned char* data, unsigned int bsize, unsigned int size, GlyphManager* manager){
     manager_ptr = manager;
-
-    for(unsigned int i = static_cast<unsigned int>(this->manager_ptr->project_struct_ptr->root_path.size() + 1); i < path.size() ; i ++){
-        this->path.push_back(path[i]);
-    }
     //Load font by freetype
-    FT_New_Face(manager->getFreetypeLibraryInstance(), path.c_str(), 0, &this->font);
+    FT_New_Memory_Face(manager->getFreetypeLibraryInstance(), data, bsize, 0, &this->font);
     FT_Set_Pixel_Sizes(this->font, 0, size);
-
 }
 
 void GlyphFontContainer::loadGlyphs(){

@@ -9,6 +9,9 @@ Engine::GameObjectProperty::GameObjectProperty(){
 void Engine::GameObjectProperty::setActive(bool active){
     this->active = active;
 }
+bool Engine::GameObjectProperty::isActive(){
+    return active && go_link.updLinkPtr()->active;
+}
 void Engine::GameObjectProperty::copyTo(GameObjectProperty* dest){
 
 }
