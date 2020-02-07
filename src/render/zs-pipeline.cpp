@@ -460,6 +460,11 @@ void Engine::RenderPipeline::renderSprite(Engine::Texture* texture_sprite, int X
     Engine::getUiSpriteMesh2D()->Draw();
 }
 
+void Engine::RenderPipeline::renderSprite(Engine::TextureResource* texture_sprite, int X, int Y, int scaleX, int scaleY){
+    texture_sprite->Use(0);
+    renderSprite(texture_sprite->texture_ptr, X, Y, scaleX, scaleY);
+}
+
 void Engine::RenderPipeline::renderGlyph(unsigned int texture_id, int X, int Y, int scaleX, int scaleY, ZSRGBCOLOR color){
     this->ui_shader->Use();
     uiUniformBuffer->bind();

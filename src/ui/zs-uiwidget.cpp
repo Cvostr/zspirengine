@@ -9,8 +9,8 @@ ZSUI::Widget::~Widget(){
 }
 
 void ZSUI::Widget::resize(unsigned int Width, unsigned int Height){
-    this->metrics.WIDTH = Width;
-    this->metrics.HEIGHT = Height;
+    this->size.WIDTH = Width;
+    this->size.HEIGHT = Height;
 
 }
 void ZSUI::Widget::move(unsigned int x, unsigned int y){
@@ -20,7 +20,7 @@ void ZSUI::Widget::move(unsigned int x, unsigned int y){
 bool ZSUI::Widget::isHoveredByMouse(){
     Input::MouseState mstate = Input::getMouseState();
 
-    if(pos.posX < mstate.mouseX && pos.posY < mstate.mouseY && pos.posX + metrics.WIDTH > mstate.mouseX && pos.posY + metrics.HEIGHT > mstate.mouseY)
+    if(pos.posX < mstate.mouseX && pos.posY < mstate.mouseY && pos.posX + size.WIDTH > mstate.mouseX && pos.posY + size.HEIGHT > mstate.mouseY)
         return true;
 
     return false;

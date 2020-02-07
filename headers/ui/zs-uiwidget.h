@@ -1,15 +1,15 @@
 #ifndef zsuiwidget
 #define zsuiwidget
 
-typedef struct WidgetMetrics{
+typedef struct WidgetSize{
     unsigned int WIDTH;
     unsigned int HEIGHT;
 
-    WidgetMetrics(){
+    WidgetSize(){
         WIDTH = 0;
         HEIGHT = 0;
     }
-}WidgetMetrics;
+}WidgetSize;
 
 typedef struct WidgetPosition{
     unsigned int posX;
@@ -23,8 +23,8 @@ typedef struct WidgetPosition{
 
 namespace ZSUI {
     class Widget{
-    private:
-        WidgetMetrics metrics;
+    protected:
+        WidgetSize size;
         WidgetPosition pos;
     public:
         virtual void resize(unsigned int Width, unsigned int Height);

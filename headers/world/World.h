@@ -76,7 +76,9 @@ public:
     virtual void onUpdate(float deltaTime);
     virtual void onPreRender(RenderPipeline* pipeline);
     virtual void onRender(RenderPipeline* pipeline);
+    virtual void onAddToObject();
     virtual void onObjectDeleted();
+    virtual void onTrigger(Engine::GameObject* obj);
 
     GameObjectProperty();
     virtual ~GameObjectProperty();

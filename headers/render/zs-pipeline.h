@@ -10,6 +10,7 @@
 #include "SDL2/SDL.h"
 #include "GL/glew.h"
 #include "../world/zs-camera.h"
+#include "../../headers/engine/resources.h"
 #include <vector>
 
 namespace Engine{
@@ -93,6 +94,7 @@ public:
     void removeLights();
 
     void renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY);
+    void renderSprite(Engine::TextureResource* texture_sprite, int X, int Y, int scaleX, int scaleY);
     void renderGlyph(unsigned int texture_id, int X, int Y, int scaleX, int scaleY, ZSRGBCOLOR color);
 
     void render();

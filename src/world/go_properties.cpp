@@ -24,8 +24,14 @@ void Engine::GameObjectProperty::onPreRender(RenderPipeline* pipeline){
 void Engine::GameObjectProperty::onRender(RenderPipeline* pipeline){
 
 }
+void Engine::GameObjectProperty::onAddToObject(){
+
+}
 void Engine::GameObjectProperty::onObjectDeleted(){
 
+}
+void Engine::GameObjectProperty::onTrigger(Engine::GameObject* obj){
+    assert(obj);
 }
 Engine::GameObjectProperty::~GameObjectProperty(){
 
@@ -362,16 +368,30 @@ void Engine::MaterialProperty::onValueChanged(){
 
 Engine::NodeProperty::NodeProperty(){
     type = GO_PROPERTY_TYPE_NODE;
+
+    scale = ZSVECTOR3(1.f, 1.f, 1.f);
+    translation = ZSVECTOR3(0.f, 0.f, 0.f);
+    rotation = ZSQUATERNION(0.f, 0.f, 0.f, 0.f);
 }
 void Engine::NodeProperty::onPreRender(RenderPipeline* pipeline){
 
 }
 void Engine::NodeProperty::copyTo(GameObjectProperty* dest){
+    if(dest->type != this->type) return; //if it isn't Node property
 
+    //Do base things
+    GameObjectProperty::copyTo(dest);
+    NodeProperty* _dest = static_cast<NodeProperty*>(dest);
+
+    _dest->transform_mat = this->transform_mat;
+    _dest->node_label = this->node_label;
 }
 
 Engine::ColliderProperty::ColliderProperty(){
     type = GO_PROPERTY_TYPE_COLLIDER;
+}
+void Engine::ColliderProperty::onAddToObject(){
+
 }
 void Engine::ColliderProperty::onObjectDeleted(){
 
