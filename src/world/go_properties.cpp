@@ -15,7 +15,8 @@ bool Engine::GameObjectProperty::isActive(){
     return active && go_link.updLinkPtr()->active;
 }
 void Engine::GameObjectProperty::copyTo(GameObjectProperty* dest){
-
+    dest->active = this->active;
+    dest->world_ptr = this->world_ptr;
 }
 void Engine::GameObjectProperty::onUpdate(float deltaTime){
 
@@ -35,6 +36,14 @@ void Engine::GameObjectProperty::onObjectDeleted(){
 void Engine::GameObjectProperty::onTrigger(Engine::GameObject* obj){
     assert(obj);
 }
+
+void Engine::GameObjectProperty::addPropertyInterfaceToInspector(){
+}
+
+void Engine::GameObjectProperty::onValueChanged(){
+
+}
+
 Engine::GameObjectProperty::~GameObjectProperty(){
 
 }
@@ -275,7 +284,6 @@ void Engine::LightsourceProperty::onPreRender(RenderPipeline* pipeline){
 
     pipeline->addLight(static_cast<void*>(this)); //put light pointer to vector
 }
-
 Engine::AudioSourceProperty::AudioSourceProperty(){
     this->type = GO_PROPERTY_TYPE_AUDSOURCE;
 

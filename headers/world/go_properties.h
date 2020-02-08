@@ -69,7 +69,6 @@ public:
 
     ZSVECTOR3 last_pos;
 
-    void onValueChanged(); //Update soud buffer pointer and send source props
     void onUpdate(float deltaTime);
     void onObjectDeleted();
     void copyTo(GameObjectProperty* dest);

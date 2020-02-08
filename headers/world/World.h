@@ -75,11 +75,14 @@ public:
 
     virtual void copyTo(GameObjectProperty* dest);
     virtual void onUpdate(float deltaTime);
-    virtual void onPreRender(RenderPipeline* pipeline);
-    virtual void onRender(RenderPipeline* pipeline);
+    virtual void onPreRender(RenderPipeline* pipeline = nullptr);
+    virtual void onRender(RenderPipeline* pipeline = nullptr);
     virtual void onAddToObject();
     virtual void onObjectDeleted();
     virtual void onTrigger(Engine::GameObject* obj);
+    //Editor specific functions
+    virtual void addPropertyInterfaceToInspector();
+    virtual void onValueChanged();
 
     GameObjectProperty();
     virtual ~GameObjectProperty();
