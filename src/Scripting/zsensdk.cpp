@@ -134,7 +134,7 @@ void EZSENSDK::bindSDK(lua_State* state){
         .addFunction("instantiate", &World::Instantiate)
         .addFunction("addFromPrefab", &World::addObjectsFromPrefab)
         .addFunction("removeObject", &World::removeObject)
-        .addData("camera", &World::cam, true)
+        .addData("camera", &World::world_camera, true)
         .endClass()
 
         .beginClass <GameObjectProperty>("ObjectProperty")

@@ -1,10 +1,10 @@
 #include "../../headers/world/World.h"
 #include "../../headers/misc/randomg.h"
 
-Engine::World::World(ResourceManager* manager){
+Engine::World::World(){
     objects.resize(0);
+    objects.reserve(MAX_OBJS);
 
-    this->manager = manager;
 
     physical_world = new PhysicalWorld(&phys_settngs);
 }
@@ -222,10 +222,7 @@ void Engine::World::loadFromFile(std::string file, RenderSettings* settings_ptr)
     stream.close();
 }
 
-Engine::ResourceManager* Engine::World::getResourceManager(){
-    return this->manager;
-}
 
 Engine::Camera* Engine::World::getCameraPtr(){
-    return &this->cam;
+    return &this->world_camera;
 }

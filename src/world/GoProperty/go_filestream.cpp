@@ -2,6 +2,7 @@
 #include "../../../headers/world/tile_properties.h"
 
 extern ZSpireEngine* engine_ptr;
+extern ZSGAME_DATA* game_data;
 
 void Engine::GameObject::loadProperty(std::ifstream* world_stream){
     PROPERTY_TYPE type;
@@ -119,7 +120,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
                 *world_stream >> script_path;
                 //Writing name (file path)
                 ptr->scripts_attached[script_w_i].name = script_path;
-                ScriptResource* res = ptr->go_link.world_ptr->getResourceManager()->getScriptByLabel(script_path);
+                ScriptResource* res = game_data->resources->getScriptByLabel(script_path);
                 ptr->scripts_attached[script_w_i].content = res->script_content;
             }
         break;

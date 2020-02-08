@@ -121,7 +121,7 @@ void ZSpireEngine::loadGame(){
     game_data->glyph_manager = new GlyphManager;
     startManager(game_data->glyph_manager);
 
-    game_data->world = new Engine::World(game_data->resources);
+    game_data->world = new Engine::World();
 
     switch(this->desc->game_perspective){
         case PERSP_2D:{ //2D project

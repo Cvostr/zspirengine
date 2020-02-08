@@ -4,6 +4,7 @@
 #include "World.h"
 #include "../Scripting/LuaScript.h"
 #include "../misc/oal_manager.h"
+#include "../game.h"
 
 namespace Engine {
 

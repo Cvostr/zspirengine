@@ -1,5 +1,7 @@
 #include "../../../headers/world/tile_properties.h"
 
+extern ZSGAME_DATA* game_data;
+
 Engine::TileGroupProperty::TileGroupProperty(){
     type = GO_PROPERTY_TYPE_TILE_GROUP;
     isCreated = false;
@@ -11,8 +13,8 @@ Engine::TileProperty::TileProperty(){
 }
 
 void Engine::TileProperty::updTexturePtr(){
-    this->texture_diffuse = this->go_link.world_ptr->getResourceManager()->getTextureByLabel(this->diffuse_relpath);
-    this->texture_transparent = this->go_link.world_ptr->getResourceManager()->getTextureByLabel(this->transparent_relpath);
+    this->texture_diffuse = game_data->resources->getTextureByLabel(this->diffuse_relpath);
+    this->texture_transparent = game_data->resources->getTextureByLabel(this->transparent_relpath);
 }
 void Engine::TileProperty::onUpdate(float deltaTime){
     if(this->anim_state.playing == true){ //if we playing anim

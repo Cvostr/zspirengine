@@ -12,6 +12,7 @@
 #include "../render/zs-pipeline.h"
 
 #define OBJ_PROPS_SIZE 11
+#define MAX_OBJS 15000
 
 enum PROPERTY_TYPE{
     GO_PROPERTY_TYPE_NONE,
@@ -86,7 +87,6 @@ public:
 
 class World{
 private:
-    ResourceManager* manager;
 public:
     PhysicalWorldSettings phys_settngs;
     PhysicalWorld* physical_world;
@@ -103,12 +103,10 @@ public:
     GameObject* Instantiate(GameObject* original);
     void addObjectsFromPrefab(std::string file);
 
-    ResourceManager* getResourceManager();
-
     Engine::Camera* getCameraPtr();
-    Engine::Camera cam;
+    Engine::Camera world_camera;
 
-    World(ResourceManager* manager);
+    World();
 };
 
 class GameObject{

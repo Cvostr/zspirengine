@@ -1,6 +1,8 @@
 #include "../../headers/world/go_properties.h"
 #include "../../headers/world/tile_properties.h"
 
+extern ZSGAME_DATA* game_data;
+
 Engine::GameObjectProperty::GameObjectProperty(){
     type = GO_PROPERTY_TYPE_NONE;
     active = true;
@@ -217,7 +219,7 @@ void Engine::MeshProperty::copyTo(GameObjectProperty* dest){
     _dest->mesh_ptr = mesh_ptr;
 }
 void Engine::MeshProperty::updateMeshPtr(){
-    this->mesh_ptr = go_link.world_ptr->getResourceManager()->getMeshByLabel(this->resource_relpath);
+    this->mesh_ptr = game_data->resources->getMeshByLabel(this->resource_relpath);
 }
 
 Engine::ScriptGroupProperty::ScriptGroupProperty(){
@@ -305,7 +307,7 @@ void Engine::AudioSourceProperty::onObjectDeleted(){
 
 }
 void Engine::AudioSourceProperty::updateAudioPtr(){
-    this->buffer_ptr = go_link.world_ptr->getResourceManager()->getAudioByLabel(this->resource_relpath);
+    this->buffer_ptr = game_data->resources->getAudioByLabel(this->resource_relpath);
 }
 
 void Engine::AudioSourceProperty::audio_start(){
@@ -363,7 +365,7 @@ void Engine::MaterialProperty::copyTo(GameObjectProperty* dest){
 }
 
 void Engine::MaterialProperty::onValueChanged(){
-    this->material_ptr = go_link.world_ptr->getResourceManager()->getMaterialByLabel(this->material_path);
+    this->material_ptr = game_data->resources->getMaterialByLabel(this->material_path);
 }
 
 Engine::NodeProperty::NodeProperty(){
@@ -521,5 +523,5 @@ void Engine::AnimationProperty::setAnimation(std::string anim){
 }
 
 void Engine::AnimationProperty::updateAnimationPtr(){
-    anim_prop_ptr = go_link.world_ptr->getResourceManager()->getAnimationByLabel(this->anim_label);
+    anim_prop_ptr = game_data->resources->getAnimationByLabel(this->anim_label);
 }
