@@ -29,11 +29,13 @@ void Engine::GameObjectLink::crack(){
 
 
 Engine::GameObject::GameObject(){
-    props_num = 0;
-    alive = true;
-    hasParent = false;
+    props_num = 0; //No props by default
+    alive = true; //Object exist by default
+    hasParent = false; //No parent by default
+    active = true;
 
     world_ptr = nullptr;
+    label_ptr = nullptr;
 
     for(int prop_i = 0; prop_i < OBJ_PROPS_SIZE; prop_i ++){ //iterate over all property pointers and clear them
         properties[prop_i] = nullptr;

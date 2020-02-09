@@ -114,10 +114,12 @@ public:
 
 class GameObject{
 public:
+    //Index in objects vector
+    int array_index;
     std::string str_id; //Object's unique string ID
     std::string* label_ptr;
 
-    bool active;
+    bool active; //if true, object will be active in scene
     bool alive;
     bool hasParent;
     bool IsStatic;
