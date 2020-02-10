@@ -29,4 +29,12 @@ void PhysicalWorld::removeRidigbodyFromWorld(btRigidBody* body){
 
 void PhysicalWorld::stepSimulation(float stepSimulation){
     this->physic_world->stepSimulation(stepSimulation);
+    physic_world->performDiscreteCollisionDetection();
+}
+
+unsigned int PhysicalWorld::getManifolsNum(){
+    return static_cast<unsigned int>(dispatcher->getNumManifolds());
+}
+btPersistentManifold* PhysicalWorld::getManifold(unsigned int i){
+    return dispatcher->getManifoldByIndexInternal(i);
 }

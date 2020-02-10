@@ -33,6 +33,9 @@ private:
     btDiscreteDynamicsWorld* physic_world;
 
 public:
+    unsigned int getManifolsNum();
+    btPersistentManifold* getManifold(unsigned int i);
+
     void stepSimulation(float stepSimulation);
     void addRidigbodyToWorld(btRigidBody* body);
     void removeRidigbodyFromWorld(btRigidBody* body);

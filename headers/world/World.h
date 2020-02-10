@@ -65,7 +65,7 @@ public:
 class GameObjectProperty{
 public:
     PROPERTY_TYPE type; //type of property
-    GameObjectLink go_link;
+    GameObjectLink go_link; //link to object, that holds this property
     bool active; //Is property working
 
     World* world_ptr;
@@ -129,7 +129,7 @@ public:
 
     GameObjectLink parent;
 
-    std::vector<GameObjectLink> children;
+    std::vector<GameObjectLink> children; //Vector to store links to children of object
     GameObjectProperty* properties[OBJ_PROPS_SIZE];
 
     void loadProperty(std::ifstream* world_stream); //Loads one property from stream
@@ -140,6 +140,7 @@ public:
 
     void addChildObject(GameObjectLink link);
     void removeChildObject(GameObjectLink link);
+    void removeProperty(int index);
 
     void clearAll();
     //remove deleted children from vector
@@ -173,6 +174,7 @@ public:
     void onUpdate(int deltaTime); //calls onUpdate on all properties
     void onPreRender(RenderPipeline* pipeline); //calls onPreRender on all properties
     void onRender(RenderPipeline* pipeline); //calls onRender on all properties
+    bool isRigidbody();
 
     GameObject();
 };

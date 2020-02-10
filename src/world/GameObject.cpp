@@ -33,6 +33,7 @@ Engine::GameObject::GameObject(){
     alive = true; //Object exist by default
     hasParent = false; //No parent by default
     active = true;
+    IsStatic = false; //Object is dynamic by default
 
     world_ptr = nullptr;
     label_ptr = nullptr;
@@ -68,6 +69,19 @@ bool Engine::GameObject::addProperty(int property){
     this->props_num += 1;
     return true;
 }
+
+void Engine::GameObject::removeProperty(int index){
+    GameObjectProperty* prop_ptr = static_cast<GameObjectProperty*>(this->properties[index]);
+    prop_ptr->onObjectDeleted();
+    this->properties[index] = nullptr; //set as deleted
+
+    for(unsigned int i = static_cast<unsigned int>(index); i < props_num - 1; i ++){
+        properties[i] = properties[i + 1];
+    }
+
+    props_num -= 1;
+}
+
 
 void Engine::GameObject::addChildObject(GameObjectLink link){
     GameObjectLink _link = link;
