@@ -12,7 +12,8 @@ void Engine::GameObjectProperty::setActive(bool active){
     this->active = active;
 }
 bool Engine::GameObjectProperty::isActive(){
-    return active && go_link.updLinkPtr()->active;
+    //return active && go_link.updLinkPtr()->active;
+    return active;
 }
 void Engine::GameObjectProperty::copyTo(GameObjectProperty* dest){
     dest->active = this->active;
@@ -209,6 +210,9 @@ void Engine::TransformProperty::copyTo(GameObjectProperty* dest){
 
 void Engine::TransformProperty::onPreRender(RenderPipeline* pipeline){
     this->updateMat();
+    //Send transform matrix to transform buffer
+    pipeline->transformBuffer->bind();
+    pipeline->transformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2, sizeof (ZSMATRIX4x4), &transform_mat);
 }
 
 Engine::LabelProperty::LabelProperty(){

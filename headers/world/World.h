@@ -136,10 +136,13 @@ public:
 
     GameObjectProperty* allocProperty(int type);
     bool addProperty(int property); //Adds property with property ID
+    //returns pointer to property by property type
     GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
+    Engine::GameObjectProperty* getPropertyPtrByTypeI(int property);
 
     void addChildObject(GameObjectLink link);
     void removeChildObject(GameObjectLink link);
+    //Remove property with type
     void removeProperty(int index);
 
     void clearAll();

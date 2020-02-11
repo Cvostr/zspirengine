@@ -118,9 +118,9 @@ void EZSENSDK::bindSDK(lua_State* state){
         .addFunction("getLabel", &GameObject::getLabel)
         .addFunction("setLabel", &GameObject::setLabel)
         .addFunction("setActive", &GameObject::setActive)
-/*.addFunction("getProperty", &GameObject::getPropertyPtrByTypeI)
-.addFunction("addProperty", &GameObject::addProperty)
-.addFunction("removeProperty", &GameObject::removeProperty) */
+        .addFunction("getProperty", &GameObject::getPropertyPtrByTypeI)
+        //.addFunction("addProperty", &GameObject::addProperty)
+        .addFunction("removeProperty", &GameObject::removeProperty)
         .addFunction("transform", &GameObject::getPropertyPtr<TransformProperty>)
         .addFunction("mesh", &GameObject::getPropertyPtr<MeshProperty>)
         .addFunction("audio", &GameObject::getPropertyPtr<AudioSourceProperty>)

@@ -248,8 +248,6 @@ void Engine::GameObject::processObject(RenderPipeline* pipeline){ //On render pi
     if(active == false || alive == false) return; //if object is inactive, not to render it
 
     TransformProperty* transform_prop = static_cast<TransformProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
-    pipeline->transformBuffer->bind();
-    pipeline->transformBuffer->writeData(2 * sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &transform_prop->transform_mat);
 
     //Call update on every property in objects
     this->onUpdate(static_cast<int>(pipeline->deltaTime));

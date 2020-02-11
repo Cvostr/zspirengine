@@ -176,6 +176,17 @@ Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByType(PROPERTY_TY
     return nullptr;
 }
 
+Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByTypeI(int property){
+    unsigned int props = static_cast<unsigned int>(this->props_num);
+    for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
+        Engine::GameObjectProperty* property_ptr = this->properties[prop_i];
+        if(property_ptr->type == property){ //If object already has one
+            return property_ptr; //return it
+        }
+    }
+    return nullptr;
+}
+
 void Engine::GameObject::onUpdate(int deltaTime){   //calls onUpdate on all properties
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
         if(!properties[i]->active) continue; //if property is inactive, then skip it
