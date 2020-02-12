@@ -21,8 +21,17 @@ public:
     MeshResource* mesh_ptr; //Pointer to mesh
     bool castShadows;
 
+    std::string rootNodeStr;
+    GameObject* skinning_root_node;
+
     void updateMeshPtr(); //Updates pointer according to resource_relpath
     void copyTo(GameObjectProperty* dest);
+    void onRender(Engine::RenderPipeline* pipeline);
+
+    //EDITOR STUFF
+    void addPropertyInterfaceToInspector();
+    void onValueChanged(); //Update mesh    pointer
+
     MeshProperty();
 };
 
@@ -98,10 +107,8 @@ public:
     //Caclulated node transform
     ZSMATRIX4x4 abs;
 
-    bool hasBone;
-
-    void onPreRender(RenderPipeline* pipeline);
     void copyTo(GameObjectProperty* dest);
+   // void addPropertyInterfaceToInspector();
 
     NodeProperty();
 };

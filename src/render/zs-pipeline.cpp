@@ -208,7 +208,7 @@ void Engine::RenderPipeline::render2D(){
 
         //Iterate over all objects in the world
         for(unsigned int obj_i = 0; obj_i < world_ptr->objects.size(); obj_i ++){
-            GameObject* obj_ptr = &world_ptr->objects[obj_i];
+            GameObject* obj_ptr = world_ptr->objects[obj_i];
             if(!obj_ptr->hasParent) //if it is a root object
                 obj_ptr->processObject(this); //Draw object
         }
@@ -225,7 +225,7 @@ void Engine::RenderPipeline::render3D(){
 
         //Iterate over all objects in the world
         for(unsigned int obj_i = 0; obj_i < world_ptr->objects.size(); obj_i ++){
-            GameObject* obj_ptr = &world_ptr->objects[obj_i];
+            GameObject* obj_ptr = world_ptr->objects[obj_i];
             if(!obj_ptr->hasParent) //if it is a root object
                 obj_ptr->processObject(this); //Draw object
         }

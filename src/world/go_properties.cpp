@@ -12,8 +12,7 @@ void Engine::GameObjectProperty::setActive(bool active){
     this->active = active;
 }
 bool Engine::GameObjectProperty::isActive(){
-    //return active && go_link.updLinkPtr()->active;
-    return active;
+    return active && go_link.updLinkPtr()->active;
 }
 void Engine::GameObjectProperty::copyTo(GameObjectProperty* dest){
     dest->active = this->active;
@@ -219,10 +218,14 @@ Engine::LabelProperty::LabelProperty(){
     this->type = GO_PROPERTY_TYPE_LABEL;
 }
 
-
 Engine::MeshProperty::MeshProperty(){
     this->type = GO_PROPERTY_TYPE_MESH;
     mesh_ptr = nullptr;
+
+    castShadows = true;
+
+    this->skinning_root_node = nullptr;
+    this->rootNodeStr = "@none";
 }
 void Engine::MeshProperty::copyTo(GameObjectProperty* dest){
     if(dest->type != this->type) return; //if it isn't transform
@@ -230,9 +233,16 @@ void Engine::MeshProperty::copyTo(GameObjectProperty* dest){
     MeshProperty* _dest = static_cast<MeshProperty*>(dest);
     _dest->resource_relpath = resource_relpath;
     _dest->mesh_ptr = mesh_ptr;
+    _dest->castShadows = castShadows;
+    _dest->rootNodeStr = rootNodeStr;
 }
 void Engine::MeshProperty::updateMeshPtr(){
     this->mesh_ptr = game_data->resources->getMeshByLabel(this->resource_relpath);
+}
+
+void Engine::MeshProperty::onRender(Engine::RenderPipeline* pipeline){
+    if(this->skinning_root_node == nullptr)
+        skinning_root_node = world_ptr->getGameObjectByLabel(this->rootNodeStr);
 }
 
 Engine::ScriptGroupProperty::ScriptGroupProperty(){
@@ -387,9 +397,7 @@ Engine::NodeProperty::NodeProperty(){
     translation = ZSVECTOR3(0.f, 0.f, 0.f);
     rotation = ZSQUATERNION(0.f, 0.f, 0.f, 0.f);
 }
-void Engine::NodeProperty::onPreRender(RenderPipeline* pipeline){
 
-}
 void Engine::NodeProperty::copyTo(GameObjectProperty* dest){
     if(dest->type != this->type) return; //if it isn't Node property
 
@@ -412,24 +420,6 @@ void Engine::ColliderProperty::onObjectDeleted(){
 } //unregister in world
 void Engine::ColliderProperty::copyTo(GameObjectProperty* dest){
 
-}
-
-Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(std::string label){
-    //This function works recursively
-    //Iterate over all children in current object
-    for (unsigned int i = 0; i < this->children.size(); i ++) {
-        GameObjectLink* l = &this->children[i];
-        Engine::NodeProperty* node_p = l->updLinkPtr()->getPropertyPtr<Engine::NodeProperty>();
-        //if node's name match
-        if(!node_p->node_label.compare(label))
-            //Then return object with this node
-            return l->updLinkPtr();
-        //call function from this child
-        GameObject* obj_ch = l->updLinkPtr()->getChildObjectWithNodeLabel(label);
-        if(obj_ch != nullptr) return obj_ch;
-
-    }
-    return nullptr;
 }
 
 Engine::AnimationProperty::AnimationProperty(){

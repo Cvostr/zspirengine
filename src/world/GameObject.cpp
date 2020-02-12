@@ -1,5 +1,5 @@
 #include "../../headers/world/World.h"
-
+#include "../../headers/world/go_properties.h"
 
 Engine::GameObjectLink::GameObjectLink(){
     ptr = nullptr;
@@ -26,7 +26,6 @@ bool Engine::GameObjectLink::isEmpty(){
 void Engine::GameObjectLink::crack(){
     this->world_ptr = nullptr; //It will now pass isEmpty() check
 }
-
 
 Engine::GameObject::GameObject(){
     props_num = 0; //No props by default
@@ -208,7 +207,15 @@ void Engine::GameObject::onRender(RenderPipeline* pipeline){
     }
 }
 
+void Engine::GameObject::onTrigger(GameObject* obj){
+    for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
+        if(!properties[i]->active) continue; //if property is inactive, then skip it
+        properties[i]->onTrigger(obj); //and call onUpdate on each property
+    }
+}
+
 void Engine::GameObject::copyTo(GameObject* dest){
+    dest->array_index = this->array_index;
     dest->alive = this->alive;
     dest->active = this->active;
     dest->hasParent = this->hasParent;
@@ -241,3 +248,31 @@ void Engine::GameObject::trimChildrenArray(){
         }
     }
 }
+
+bool Engine::GameObject::hasMesh(){
+    Engine::MeshProperty* mesh_prop = static_cast<Engine::MeshProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_MESH));
+    if(mesh_prop != nullptr){
+        if(!mesh_prop->active) return false;
+        if(mesh_prop->mesh_ptr != nullptr) return true;
+    }
+    return false;
+}
+
+Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(std::string label){
+    //This function works recursively
+    //Iterate over all children in current object
+    for (unsigned int i = 0; i < this->children.size(); i ++) {
+        Engine::GameObjectLink* l = &this->children[i];
+        Engine::NodeProperty* node_p = (l)->updLinkPtr()->getPropertyPtr<Engine::NodeProperty>();
+        //if node's name match
+        if(!node_p->node_label.compare(label))
+            //Then return object with this node
+            return l->updLinkPtr();
+        //call function from this child
+        GameObject* obj_ch = l->updLinkPtr()->getChildObjectWithNodeLabel(label);
+        if(obj_ch != nullptr) return obj_ch;
+
+    }
+    return nullptr;
+}
+

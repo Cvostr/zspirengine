@@ -2,8 +2,8 @@
 #include "../../headers/misc/randomg.h"
 
 Engine::World::World(){
-    objects.resize(0);
     objects.reserve(MAX_OBJS);
+    objects.resize(0);
 
 
     physical_world = new PhysicalWorld(&phys_settngs);
@@ -13,7 +13,7 @@ Engine::World::World(){
 Engine::GameObject* Engine::World::getGameObjectByStrId(std::string id){
     unsigned int objs_num = static_cast<unsigned int>(this->objects.size());
     for(unsigned int obj_it = 0; obj_it < objs_num; obj_it ++){ //Iterate over all objs in scene
-        GameObject* obj_ptr = &this->objects[obj_it]; //Get pointer to checking object
+        GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
         if(obj_ptr->str_id.compare(id) == 0) //if labels are same
             return obj_ptr; //Return founded object
     }
@@ -23,7 +23,7 @@ Engine::GameObject* Engine::World::getGameObjectByStrId(std::string id){
 Engine::GameObject* Engine::World::getGameObjectByLabel(std::string label){
     unsigned int objs_num = static_cast<unsigned int>(this->objects.size());
     for(unsigned int obj_it = 0; obj_it < objs_num; obj_it ++){ //Iterate over all objs in scene
-        GameObject* obj_ptr = &this->objects[obj_it]; //Get pointer to checking object
+        GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
         if(obj_ptr->label_ptr->compare(label) == 0) //if labels are same
             return obj_ptr; //Return founded object
     }
@@ -31,21 +31,24 @@ Engine::GameObject* Engine::World::getGameObjectByLabel(std::string label){
 }
 
 Engine::GameObject* Engine::World::addObject(GameObject obj){
+    GameObject* newobj = new GameObject;
+    *newobj = obj;
+
     unsigned int free_index = static_cast<unsigned int>(this->objects.size());
     for(unsigned int obj_i = 0; obj_i < this->objects.size(); obj_i ++){
-        GameObject* obj_ptr = &this->objects[obj_i];
+        GameObject* obj_ptr = this->objects[obj_i];
         if(obj_ptr->alive == false){
             free_index = static_cast<unsigned int>(obj_i);
         }
     }
 
     if(free_index == objects.size()){ //all indeces are busy
-        this->objects.push_back(obj);
+        this->objects.push_back(newobj);
     }else{
-        this->objects[free_index] = obj;
+        this->objects[free_index] = newobj;
     }
 
-    GameObject* obj_ptr = &this->objects[free_index];
+    GameObject* obj_ptr = this->objects[free_index];
 
     obj_ptr->world_ptr = this;
 
@@ -210,7 +213,7 @@ void Engine::World::loadFromFile(std::string file, RenderSettings* settings_ptr)
     }
     //Now iterate over all objects and set depencies
     for(unsigned int obj_i = 0; obj_i < this->objects.size(); obj_i ++){
-        GameObject* obj_ptr = &this->objects[obj_i];
+        GameObject* obj_ptr = this->objects[obj_i];
         for(unsigned int chi_i = 0; chi_i < obj_ptr->children.size(); chi_i ++){ //Now iterate over all children
             GameObjectLink* child_ptr = &obj_ptr->children[chi_i];
             GameObject* child_go_ptr = child_ptr->updLinkPtr();

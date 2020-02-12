@@ -94,7 +94,7 @@ public:
     PhysicalWorldSettings phys_settngs;
     PhysicalWorld* physical_world;
 
-    std::vector<GameObject> objects;
+    std::vector<GameObject*> objects; //Vector, containing all gameobjects
     void loadFromFile(std::string file, RenderSettings* settings_ptr);
     void loadGameObject(GameObject* object_ptr, std::ifstream* world_stream);
 
@@ -145,6 +145,8 @@ public:
     //Remove property with type
     void removeProperty(int index);
 
+    GameObject* getChildObjectWithNodeLabel(std::string label);
+
     void clearAll();
     //remove deleted children from vector
     void trimChildrenArray();
@@ -165,8 +167,6 @@ public:
         return nullptr;
     }
 
-    GameObject* getChildObjectWithNodeLabel(std::string label);
-
     TransformProperty* getTransformProperty();
     LabelProperty* getLabelProperty();
 
@@ -177,7 +177,10 @@ public:
     void onUpdate(int deltaTime); //calls onUpdate on all properties
     void onPreRender(RenderPipeline* pipeline); //calls onPreRender on all properties
     void onRender(RenderPipeline* pipeline); //calls onRender on all properties
+    void onTrigger(GameObject* obj);
     bool isRigidbody();
+
+    bool hasMesh(); //Check if gameobject has mesh property and mesh inside
 
     GameObject();
 };
@@ -212,9 +215,13 @@ public:
     void setTranslation(ZSVECTOR3 new_translation);
     void setScale(ZSVECTOR3 new_scale);
     void setRotation(ZSVECTOR3 new_rotation);
+    //Editor stuff
+    //void onValueChanged();
+    //void addPropertyInterfaceToInspector();
 
     TransformProperty();
 };
+
 
 class ColliderProperty : public GameObjectProperty{
 public:
