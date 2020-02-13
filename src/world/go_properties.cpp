@@ -269,12 +269,12 @@ Engine::ObjectScript* Engine::ScriptGroupProperty::getScriptByName(std::string n
     return nullptr;
 }
 
-Engine::LightsourceProperty::LightsourceProperty(){
-    this->type = GO_PROPERTY_TYPE_LIGHTSOURCE;
-    transform = nullptr;
-}
-void Engine::LightsourceProperty::copyTo(GameObjectProperty* dest){
-    if(dest->type != this->type) return; //if it isn't transform
+
+void Engine::LightsourceProperty::copyTo(Engine::GameObjectProperty* dest){
+    if(dest->type != this->type) return; //if it isn't Lightsource, then exit
+
+    //Do base things
+    GameObjectProperty::copyTo(dest);
 
     LightsourceProperty* _dest = static_cast<LightsourceProperty*>(dest);
     _dest->color = color;
@@ -283,32 +283,58 @@ void Engine::LightsourceProperty::copyTo(GameObjectProperty* dest){
     _dest->light_type = light_type;
 }
 
-void Engine::LightsourceProperty::updTransformPtr(){
-    if(transform == nullptr){
-        transform = this->go_link.updLinkPtr()->getTransformProperty();
+void Engine::LightsourceProperty::onPreRender(Engine::RenderPipeline* pipeline){
+    Engine::TransformProperty* transform_prop = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
+
+    pipeline->addLight(static_cast<void*>(this)); //put light pointer to vector
+
+    //check, if light transformation changed
+    if((this->last_pos != transform_prop->abs_translation || this->last_rot != transform_prop->rotation)){
+        ZSVECTOR3* rot_vec_ptr = &transform_prop->rotation;
+        this->direction = _getDirection(rot_vec_ptr->X, rot_vec_ptr->Y, rot_vec_ptr->Z);
+        //store new transform values
+        this->last_pos = transform_prop->abs_translation;
+        this->last_rot = transform_prop->abs_rotation;
     }
 }
 
-void Engine::LightsourceProperty::onPreRender(RenderPipeline* pipeline){
-    updTransformPtr();
+Engine::LightsourceProperty::LightsourceProperty(){
+    type = GO_PROPERTY_TYPE_LIGHTSOURCE;
+    active = true;
+    light_type = LIGHTSOURCE_TYPE_DIRECTIONAL; //base type is directional
 
-    this->last_pos = transform->abs_translation; //Store old value
-    this->last_rot = transform->abs_rotation;
-    this->direction = _getDirection(last_rot.X, last_rot.Y, last_rot.Z);
-
-    pipeline->addLight(static_cast<void*>(this)); //put light pointer to vector
+    intensity = 1.0f; //base light instensity is 1
+    range = 10.0f;
+    spot_angle = 12.5f;
 }
+
 Engine::AudioSourceProperty::AudioSourceProperty(){
-    this->type = GO_PROPERTY_TYPE_AUDSOURCE;
+    type = GO_PROPERTY_TYPE_AUDSOURCE;
+
+    buffer_ptr = nullptr;
+    this->resource_relpath = "@none";
+    isPlaySheduled = false;
 
     this->source.source_gain = 1.0f;
     this->source.source_pitch = 1.0f;
 
-    isPlaySheduled = false;
-    buffer_ptr = nullptr;
-
     source.Init();
 }
+
+void Engine::AudioSourceProperty::onValueChanged(){
+    updateAudioPtr();
+
+    this->source.apply_settings();
+}
+
+void Engine::AudioSourceProperty::updateAudioPtr(){
+    this->buffer_ptr = game_data->resources->getAudioByLabel(resource_relpath);
+
+    if(buffer_ptr == nullptr) return;
+
+    this->source.setAlBuffer(this->buffer_ptr->buffer);
+}
+
 void Engine::AudioSourceProperty::onUpdate(float deltaTime){
     if(buffer_ptr->resource_state == STATE_LOADING_PROCESS)
         this->buffer_ptr->load();
@@ -317,25 +343,39 @@ void Engine::AudioSourceProperty::onUpdate(float deltaTime){
         isPlaySheduled = false;
     }
 
-
-    TransformProperty* transform = go_link.updLinkPtr()->getTransformProperty();
-
+    Engine::TransformProperty* transform = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
+    //if object position changed
     if(transform->translation != this->last_pos){
+        //apply new position to openal audio source
         this->source.setPosition(transform->translation);
         this->last_pos = transform->translation;
     }
 }
-void Engine::AudioSourceProperty::onObjectDeleted(){
 
-}
-void Engine::AudioSourceProperty::updateAudioPtr(){
-    this->buffer_ptr = game_data->resources->getAudioByLabel(this->resource_relpath);
-}
+void Engine::AudioSourceProperty::copyTo(Engine::GameObjectProperty* dest){
+    if(dest->type != this->type) return; //if it isn't audiosource then exit
 
+    AudioSourceProperty* _dest = static_cast<AudioSourceProperty*>(dest);
+
+    //Do base things
+    GameObjectProperty::copyTo(dest);
+
+    _dest->source.Init();
+    _dest->resource_relpath = this->resource_relpath;
+    _dest->source.source_gain = this->source.source_gain;
+    _dest->source.source_pitch = this->source.source_pitch;
+    _dest->source.setPosition(this->source.source_pos);
+    _dest->buffer_ptr = this->buffer_ptr;
+    //_dest->source.setAlBuffer(this->buffer_ptr);
+}
+void Engine::AudioSourceProperty::setAudioFile(std::string relpath){
+    this->resource_relpath = relpath;
+    this->updateAudioPtr();
+}
 void Engine::AudioSourceProperty::audio_start(){
-    if(buffer_ptr == nullptr) return;
     if(buffer_ptr->resource_state == STATE_LOADED){
         //Update source buffer
+        if(buffer_ptr == nullptr) return;
         this->source.setAlBuffer(this->buffer_ptr->buffer);
         //play source
         this->source.play();
@@ -345,17 +385,20 @@ void Engine::AudioSourceProperty::audio_start(){
         isPlaySheduled = true;
     }
 }
+
 void Engine::AudioSourceProperty::audio_stop(){
     this->source.stop();
 }
+
 void Engine::AudioSourceProperty::audio_pause(){
     this->source.pause();
 }
+
 float Engine::AudioSourceProperty::getGain(){
-    return this->source.source_gain;
+    return source.source_gain;
 }
 float Engine::AudioSourceProperty::getPitch(){
-    return this->source.source_pitch;
+    return source.source_pitch;
 }
 void Engine::AudioSourceProperty::setGain(float gain){
     source.source_gain = gain;
@@ -365,17 +408,10 @@ void Engine::AudioSourceProperty::setPitch(float pitch){
     source.source_pitch = pitch;
     source.apply_settings();
 }
-void Engine::AudioSourceProperty::copyTo(GameObjectProperty* dest){
-    if(dest->type != this->type) return; //if it isn't transform
 
-    AudioSourceProperty* _dest = static_cast<AudioSourceProperty*>(dest);
-
-    _dest->source.Init();
-    _dest->resource_relpath = this->resource_relpath;
-    _dest->source.source_gain = this->source.source_gain;
-    _dest->source.source_pitch = this->source.source_pitch;
-    _dest->source.setPosition(this->source.source_pos);
-    _dest->buffer_ptr = this->buffer_ptr;
+void Engine::AudioSourceProperty::onObjectDeleted(){
+    this->source.stop(); //Stop at first
+    this->source.Destroy();
 }
 
 Engine::MaterialProperty::MaterialProperty(){
@@ -599,10 +635,6 @@ void Engine::AnimationProperty::copyTo(GameObjectProperty *dest){
 
     _dest->anim_label = this->anim_label;
     _dest->anim_prop_ptr = this->anim_prop_ptr;
-}
-
-void Engine::AnimationProperty::onValueChanged(){
-    updateAnimationPtr();
 }
 
 void Engine::AnimationProperty::setAnimation(std::string anim){

@@ -46,10 +46,9 @@ public:
     ScriptGroupProperty();
 };
 
-class LightsourceProperty : public GameObjectProperty{
+class LightsourceProperty : public Engine::GameObjectProperty{
 public:
     LIGHTSOURCE_TYPE light_type; //type of lightsource
-    TransformProperty* transform; //pointer to object's transform
 
     ZSVECTOR3 direction; //direction for directional & spotlight in quats
     //To compare differences
@@ -61,31 +60,36 @@ public:
     float range; //Light's range
     float spot_angle;
 
-    void copyTo(GameObjectProperty* dest);
-    void updTransformPtr();
-    void onPreRender(RenderPipeline* pipeline);
+    //ZSLIGHTSOURCE_GL_ID id; //glsl uniform index
+
+    void addPropertyInterfaceToInspector();
+    void copyTo(Engine::GameObjectProperty* dest);
+    void onPreRender(Engine::RenderPipeline* pipeline);
 
     LightsourceProperty();
 };
 
-class AudioSourceProperty : public GameObjectProperty{
+class AudioSourceProperty : public Engine::GameObjectProperty{
 private:
     bool isPlaySheduled;
 public:
     std::string resource_relpath; //Relative path to resource
-    AudioResource* buffer_ptr;
-    SoundSource source;
+    Engine::AudioResource* buffer_ptr;
+    Engine::SoundSource source;
 
     ZSVECTOR3 last_pos;
 
+    void addPropertyInterfaceToInspector();
+    void onValueChanged(); //Update soud buffer pointer and send source props
     void onUpdate(float deltaTime);
     void onObjectDeleted();
-    void copyTo(GameObjectProperty* dest);
+    void copyTo(Engine::GameObjectProperty* dest);
 
+    void setAudioFile(std::string relpath);
     void updateAudioPtr();
     void audio_start();
-    void audio_stop();
     void audio_pause();
+    void audio_stop();
 
     float getGain();
     float getPitch();
@@ -94,6 +98,7 @@ public:
 
     AudioSourceProperty();
 };
+
 
 class NodeProperty : public GameObjectProperty {
 public:
@@ -181,7 +186,7 @@ public:
     RigidbodyProperty();
 };
 
-class AnimationProperty : public GameObjectProperty {
+class AnimationProperty : public Engine::GameObjectProperty {
 private:
 public:
     bool Playing;
@@ -190,9 +195,10 @@ public:
     Engine::AnimationResource* anim_prop_ptr;
     std::string anim_label;
 
-    void onPreRender(RenderPipeline* pipeline);
+    void addPropertyInterfaceToInspector();
+    void onPreRender(Engine::RenderPipeline* pipeline);
     void onValueChanged();
-    void copyTo(GameObjectProperty* dest);
+    void copyTo(Engine::GameObjectProperty* dest);
 
     void play();
     void stop();
@@ -204,8 +210,6 @@ public:
 
     AnimationProperty();
 };
-
-
 }
 
 #endif
