@@ -14,6 +14,9 @@
 #include <BulletCollision/CollisionShapes/btTriangleShape.h>
 #include <LinearMath/btDefaultMotionState.h>
 
+#include <BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h>
+#include <BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h>
+
 #include "../render/zs-math.h"
 
 typedef struct PhysicalWorldSettings{

@@ -178,6 +178,7 @@ public:
     void onPreRender(RenderPipeline* pipeline); //calls onPreRender on all properties
     void onRender(RenderPipeline* pipeline); //calls onRender on all properties
     void onTrigger(GameObject* obj);
+    //true, if object has rigidbody component
     bool isRigidbody();
 
     bool hasMesh(); //Check if gameobject has mesh property and mesh inside
@@ -216,27 +217,11 @@ public:
     void setScale(ZSVECTOR3 new_scale);
     void setRotation(ZSVECTOR3 new_rotation);
     //Editor stuff
-    //void onValueChanged();
-    //void addPropertyInterfaceToInspector();
+    void onValueChanged();
+    void addPropertyInterfaceToInspector();
 
     TransformProperty();
 };
-
-
-class ColliderProperty : public GameObjectProperty{
-public:
-    void onAddToObject(); //will register in world
-    void onObjectDeleted(); //unregister in world
-    void copyTo(GameObjectProperty* dest);
-
-    TransformProperty* getTransformProperty();
-
-    bool isTrigger;
-    COLLIDER_TYPE coll_type;
-
-    ColliderProperty();
-};
-
 
 }
 

@@ -130,16 +130,53 @@ public:
     MaterialProperty();
 };
 
-class RigidbodyProperty : public GameObjectProperty{
+class PhysicalProperty : public Engine::GameObjectProperty{
+protected:
+
+    void init();
+    void updateCollisionShape();
 public:
+    bool isCustomPhysicalSize;
+    ZSVECTOR3 cust_size;
 
-    ZSVECTOR3 speed;
-
+    bool created;
+    btRigidBody* rigidBody;
+    btCollisionShape* shape;
+    COLLIDER_TYPE coll_type;
     float mass;
-    bool hasGravity;
-
+    void copyTo(Engine::GameObjectProperty* dest);
+    void addColliderRadio();
+    void addMassField();
+    void addCustomSizeField();
     void onUpdate(float deltaTime);
-    void copyTo(GameObjectProperty* dest);
+    PhysicalProperty();
+};
+
+class ColliderProperty : public Engine::PhysicalProperty{
+public:
+    void onObjectDeleted(); //unregister in world
+    void addPropertyInterfaceToInspector();
+    void copyTo(Engine::GameObjectProperty* dest);
+    void onUpdate(float deltaTime);
+    Engine::TransformProperty* getTransformProperty();
+
+    bool isTrigger;
+
+    ColliderProperty();
+};
+
+class RigidbodyProperty : public Engine::PhysicalProperty{
+public:
+    ZSVECTOR3 gravity;
+    ZSVECTOR3 linearVel;
+    ZSVECTOR3 angularVel;
+
+    void addPropertyInterfaceToInspector();
+    void onUpdate(float deltaTime);
+    void copyTo(Engine::GameObjectProperty* dest);
+    void onValueChanged();
+
+    void setLinearVelocity(ZSVECTOR3 lvel);
 
     RigidbodyProperty();
 };

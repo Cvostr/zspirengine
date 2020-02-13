@@ -258,6 +258,13 @@ bool Engine::GameObject::hasMesh(){
     return false;
 }
 
+bool Engine::GameObject::isRigidbody(){
+    if(getPropertyPtrByType(GO_PROPERTY_TYPE_RIGIDBODY) != nullptr || getPropertyPtrByType(GO_PROPERTY_TYPE_COLLIDER) != nullptr)
+        return true;
+
+    return false;
+}
+
 Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(std::string label){
     //This function works recursively
     //Iterate over all children in current object

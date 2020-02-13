@@ -138,21 +138,21 @@ void Engine::TransformProperty::updateMat(){
 
     }
 
+    abs_translation = p_translation + this->translation;
+    abs_scale = p_scale * this->scale;
+    abs_rotation = this->rotation + p_rotation;
+
     //Calculate translation matrix
-    ZSMATRIX4x4 translation_mat = getTranslationMat(p_translation + this->translation);
+    ZSMATRIX4x4 translation_mat = getTranslationMat(abs_translation);
     //Calculate scale matrix
-    ZSMATRIX4x4 scale_mat = getScaleMat(p_scale + this->scale);
+    ZSMATRIX4x4 scale_mat = getScaleMat(abs_scale);
     //Calculate rotation matrix
     ZSMATRIX4x4 rotation_mat1 = getIdentity();
     getAbsoluteRotationMatrix(rotation_mat1);
-
-    abs_translation = p_translation + this->translation;
-    abs_scale = p_scale + this->scale;
-    abs_rotation = this->rotation + p_rotation;
-
-    ZSMATRIX4x4 rotation_mat = getRotationMat(this->rotation);
+    ZSMATRIX4x4 rotation_mat = getRotationMat(abs_rotation);
     //S * R * T
     this->transform_mat = scale_mat * rotation_mat * rotation_mat1 * translation_mat;
+
 }
 
 void Engine::TransformProperty::getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r){
@@ -409,17 +409,103 @@ void Engine::NodeProperty::copyTo(GameObjectProperty* dest){
     _dest->node_label = this->node_label;
 }
 
+
+void Engine::ColliderProperty::onObjectDeleted(){
+    if(created)
+        this->go_link.world_ptr->physical_world->removeRidigbodyFromWorld(this->rigidBody);
+} //unregister in world
+
+
+
+void Engine::ColliderProperty::onUpdate(float deltaTime){
+    if(!created)
+        init();
+}
+
+void Engine::ColliderProperty::copyTo(Engine::GameObjectProperty* dest){
+    if(dest->type != GO_PROPERTY_TYPE_COLLIDER) return;
+
+    PhysicalProperty::copyTo(dest);
+
+    ColliderProperty* coll_prop = static_cast<ColliderProperty*>(dest);
+    coll_prop->isTrigger = this->isTrigger;
+}
+
+Engine::TransformProperty* Engine::ColliderProperty::getTransformProperty(){
+    return this->go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
+}
+
 Engine::ColliderProperty::ColliderProperty(){
     type = GO_PROPERTY_TYPE_COLLIDER;
+
+    isTrigger = false;
+    coll_type = COLLIDER_TYPE_CUBE;
+    created = false;
+    mass = 0.0f; //collider is static
 }
-void Engine::ColliderProperty::onAddToObject(){
 
+
+void Engine::RigidbodyProperty::onUpdate(float deltaTime){
+    if(!created){
+        //if uninitialized
+        init();
+
+        this->rigidBody->setGravity(btVector3(gravity.X, gravity.Y, gravity.Z));
+        this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
+    }
+    else{
+        PhysicalProperty::onUpdate(deltaTime);
+
+        Engine::TransformProperty* transform = this->go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
+        btVector3 current_pos = rigidBody->getCenterOfMassPosition();
+        btQuaternion current_rot = rigidBody->getWorldTransform().getRotation();
+        //get current position
+        float curX = current_pos.getX();
+        float curY = current_pos.getY();
+        float curZ = current_pos.getZ();
+
+        float rotX = 0, rotY = 0, rotZ = 0;
+        //Convert quaternion to euler
+        current_rot.getEulerZYX(rotX, rotY, rotZ);
+        //Convert radians to degrees
+        rotX = rotX / ZS_PI * 180.0f;
+        rotY = rotY / ZS_PI * 180.0f;
+        rotZ = rotZ / ZS_PI * 180.0f;
+
+        if(transform->translation != ZSVECTOR3(curX, curY, curZ))
+            transform->translation = ZSVECTOR3(curX, curY, curZ);
+        if(transform->rotation != ZSVECTOR3(rotZ, rotY, rotX))
+            transform->rotation = ZSVECTOR3(rotZ, rotY, rotX);
+    }
 }
-void Engine::ColliderProperty::onObjectDeleted(){
 
-} //unregister in world
-void Engine::ColliderProperty::copyTo(GameObjectProperty* dest){
+void Engine::RigidbodyProperty::setLinearVelocity(ZSVECTOR3 lvel){
+    if(!created) return;
+    this->linearVel = lvel;
+    this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
+}
 
+void Engine::RigidbodyProperty::copyTo(Engine::GameObjectProperty* dest){
+    if(dest->type != GO_PROPERTY_TYPE_RIGIDBODY) return;
+
+    //Do base things
+    PhysicalProperty::copyTo(dest);
+
+    RigidbodyProperty* rigi_prop = static_cast<RigidbodyProperty*>(dest);
+    rigi_prop->gravity = this->gravity;
+    rigi_prop->linearVel = this->linearVel;
+    rigi_prop->angularVel = this->angularVel;
+}
+
+Engine::RigidbodyProperty::RigidbodyProperty(){
+
+    mass = 1.0f;
+    created = false;
+    type = GO_PROPERTY_TYPE_RIGIDBODY;
+    coll_type = COLLIDER_TYPE_CUBE;
+
+    gravity = ZSVECTOR3(0.f, -10.f, 0.f);
+    linearVel = ZSVECTOR3(0.f, 0.f, 0.f);
 }
 
 Engine::AnimationProperty::AnimationProperty(){
