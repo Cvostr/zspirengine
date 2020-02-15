@@ -45,6 +45,9 @@ void Engine::RenderPipeline::initShaders(){
 }
 
 Engine::RenderPipeline::RenderPipeline(){
+    this->current_state = PIPELINE_STATE_DEFAULT;
+    this->cullFaces = false;
+
     initShaders();
     //Allocate transform buffer
     this->transformBuffer = allocUniformBuffer();
@@ -98,7 +101,6 @@ Engine::RenderPipeline::~RenderPipeline(){
 }
 
 void Engine::RenderPipeline::init(){
-
 
     if(this->game_desc_ptr->game_perspective == PERSP_2D){
         glDisable(GL_DEPTH_TEST);
@@ -218,6 +220,11 @@ void Engine::RenderPipeline::render3D(){
     ZSGAME_DATA* game = static_cast<ZSGAME_DATA*>(engine_ptr->getGameDataPtr());
     World* world_ptr = game->world;
 
+    Engine::ShadowCasterProperty* shadowcast = static_cast<Engine::ShadowCasterProperty*>(this->render_settings.shadowcaster_ptr);
+    if(shadowcast != nullptr){ //we have shadowcaster
+        shadowcast->Draw(&world_ptr->world_camera, this); //draw shadowcaster
+    }
+
     if(engine_ptr->engine_info->graphicsApi == OGL32){
         gbuffer.bindFramebuffer();
         glClearColor(0,0,0,1);
@@ -244,13 +251,26 @@ void Engine::RenderPipeline::render3D(){
     }
 }
 
+void Engine::RenderPipeline::renderDepth(void* world_ptr){
+    World* _world_ptr = static_cast<World*>(world_ptr);
+    current_state = PIPELINE_STATE_SHADOWDEPTH;
+    //Iterate over all objects in the world
+    for(unsigned int obj_i = 0; obj_i < _world_ptr->objects.size(); obj_i ++){
+        GameObject* obj_ptr = (GameObject*)_world_ptr->objects[obj_i];
+        if(!obj_ptr->hasParent) //if it is a root object
+            obj_ptr->processObject(this); //Draw object
+    }
+    current_state = PIPELINE_STATE_DEFAULT;
+}
+
 void Engine::GameObject::processObject(RenderPipeline* pipeline){ //On render pipeline wish to work with object
     if(active == false || alive == false) return; //if object is inactive, not to render it
 
-    TransformProperty* transform_prop = static_cast<TransformProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+    TransformProperty* transform_prop = getTransformProperty();
 
-    //Call update on every property in objects
-    this->onUpdate(static_cast<int>(pipeline->deltaTime));
+    if(pipeline->current_state == PIPELINE_STATE_DEFAULT)
+        //Call update on every property in objects
+        this->onUpdate(static_cast<int>(pipeline->deltaTime));
 
     //Obtain camera viewport
     //ZSVIEWPORT cam_viewport = pipeline->cam->getViewport();
@@ -273,19 +293,154 @@ void Engine::GameObject::Draw(RenderPipeline* pipeline){    //On render pipeline
     //Call prerender on each property in object
     this->onPreRender(pipeline);
 
-    MeshProperty* mesh_prop = static_cast<MeshProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_MESH));
-    //Render all properties
-    this->onRender(pipeline);
+    if(pipeline->current_state == PIPELINE_STATE_DEFAULT) {
+        MeshProperty* mesh_prop = static_cast<MeshProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_MESH));
+        //Render all properties
+        this->onRender(pipeline);
 
-    if(mesh_prop != nullptr){
-        if(mesh_prop->mesh_ptr != nullptr){
-            mesh_prop->mesh_ptr->Draw();
+        if(mesh_prop != nullptr){
+            if(mesh_prop->mesh_ptr != nullptr){
+                mesh_prop->mesh_ptr->Draw();
+            }
+        }
+    }
+
+    if(pipeline->current_state == PIPELINE_STATE_SHADOWDEPTH) {
+        Engine::TransformProperty* transform_ptr = static_cast<Engine::TransformProperty*>(getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+        MeshProperty* mesh_prop = static_cast<MeshProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_MESH));
+        //set transform to camera buffer
+        pipeline->transformBuffer->bind();
+        pipeline->transformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2, sizeof (ZSMATRIX4x4), &transform_ptr->transform_mat);
+
+        //Get castShadows boolean from several properties
+        //bool castShadows = (hasTerrain()) ? getPropertyPtr<TerrainProperty>()->castShadows : mesh_prop->castShadows;
+
+        //if(castShadows)
+          //  DrawMesh(pipeline);
+        if(mesh_prop != nullptr){
+            if(mesh_prop->mesh_ptr != nullptr){
+                mesh_prop->mesh_ptr->Draw();
+            }
         }
     }
 }
 
-void Engine::MaterialProperty::onRender(RenderPipeline* pipeline){
-    this->material_ptr->material->applyMatToPipeline();
+void Engine::MaterialProperty::onRender(Engine::RenderPipeline* pipeline){
+    //Check for validity of pointer
+    if(material_ptr == nullptr) return;
+
+    MtShaderPropertiesGroup* group_ptr = material_ptr->group_ptr;
+    if( group_ptr == nullptr) return ; //if object hasn't property
+
+    //Get pointer to shadowcaster
+    Engine::ShadowCasterProperty* shadowcast = static_cast<Engine::ShadowCasterProperty*>(pipeline->getRenderSettings()->shadowcaster_ptr);
+    //Bind shadow uniform buffer
+    pipeline->shadowBuffer->bind();
+
+    int recShadows = 1;
+
+    if(shadowcast == nullptr){
+        //In GLSL we should use Integer instead of bool
+        recShadows = 0;
+    }else if(!receiveShadows || !shadowcast->isActive()){
+        recShadows = 0;
+    }else
+        shadowcast->setTexture();
+
+    pipeline->shadowBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 4, 4, &recShadows);
+
+    material_ptr->applyMatToPipeline();
+}
+
+void Engine::SkyboxProperty::onPreRender(Engine::RenderPipeline* pipeline){
+    pipeline->getRenderSettings()->skybox_ptr = static_cast<void*>(this);
+}
+
+void Engine::ShadowCasterProperty::onPreRender(Engine::RenderPipeline* pipeline){
+    pipeline->getRenderSettings()->shadowcaster_ptr = static_cast<void*>(this);
+}
+
+void Engine::SkyboxProperty::DrawSky(RenderPipeline* pipeline){
+    if(!this->isActive())
+        return;
+    if(this->go_link.updLinkPtr() == nullptr) return;
+    //Get pointer to Material property
+    MaterialProperty* mat = this->go_link.updLinkPtr()->getPropertyPtr<MaterialProperty>();
+    if(mat == nullptr) return;
+    //Apply material shader
+    mat->onRender(pipeline);
+    //Draw skybox cube
+    glDisable(GL_DEPTH_TEST);
+    Engine::getSkyboxMesh()->Draw();
+}
+
+void Engine::ShadowCasterProperty::init(){
+    glGenFramebuffers(1, &this->shadowBuffer);//Generate framebuffer for texture
+    glGenTextures(1, &this->shadowDepthTexture); //Generate texture
+
+    glBindTexture(GL_TEXTURE_2D, shadowDepthTexture);
+    //Configuring texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this->TextureWidth, this->TextureHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    //Binding framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer);
+    //Connecting depth texture to framebuffer
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->shadowDepthTexture, 0);
+    //We won't render color
+    glDrawBuffer(false);
+    glReadBuffer(false);
+    //Unbind framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    this->initialized = true;
+}
+
+void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pipeline){
+    if(!isRenderAvailable()){
+        glViewport(0, 0, TextureWidth, TextureHeight);
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer); //Bind framebuffer
+        glClear(GL_DEPTH_BUFFER_BIT);
+        return;
+    }
+
+    Engine::LightsourceProperty* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceProperty>();
+
+    //ZSVECTOR3 cam_pos = cam->getCameraPosition() + cam->getCameraFrontVec() * 20;
+    ZSVECTOR3 cam_pos = cam->getCameraPosition() - light->direction * 20;
+    this->LightProjectionMat = getOrthogonal(-projection_viewport, projection_viewport, -projection_viewport, projection_viewport, nearPlane, farPlane);
+    this->LightViewMat = matrixLookAt(cam_pos, cam_pos + light->direction * -1, ZSVECTOR3(0,1,0));
+    //Changing viewport to texture sizes
+    glViewport(0, 0, TextureWidth, TextureHeight);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer); //Bind framebuffer
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glFrontFace(GL_CW);
+    glDisable(GL_CULL_FACE);
+    //Bind shadow uniform buffer
+    pipeline->shadowBuffer->bind();
+    //Bind ortho shadow projection
+    pipeline->shadowBuffer->writeData(0, sizeof (ZSMATRIX4x4), &LightProjectionMat);
+    //Bind shadow view matrix
+    pipeline->shadowBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &LightViewMat);
+    //Send BIAS value
+    pipeline->shadowBuffer->writeData(sizeof (ZSMATRIX4x4) * 2, 4, &shadow_bias);
+    //Send Width of shadow texture
+    pipeline->shadowBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 8, 4, &this->TextureWidth);
+    //Send Height of shadow texture
+    pipeline->shadowBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 12, 4, &this->TextureHeight);
+    //Use shadowmap shader to draw objects
+    pipeline->getShadowmapShader()->Use();
+    //Render to depth all scene
+    pipeline->renderDepth(this->go_link.world_ptr);
+
+    glFrontFace(GL_CCW);
 }
 
 void Engine::TileProperty::onRender(RenderPipeline* pipeline){
@@ -293,7 +448,7 @@ void Engine::TileProperty::onRender(RenderPipeline* pipeline){
 
     //Receive pointer to tile information
     TileProperty* tile_ptr = static_cast<TileProperty*>(this->go_link.updLinkPtr()->getPropertyPtrByType(GO_PROPERTY_TYPE_TILE));
-    TransformProperty* transform_ptr = static_cast<TransformProperty*>(this->go_link.updLinkPtr()->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+    TransformProperty* transform_ptr = go_link.updLinkPtr()->getTransformProperty();
 
     if(tile_ptr == nullptr || transform_ptr == nullptr) return;
 
@@ -492,6 +647,10 @@ void Engine::RenderPipeline::renderGlyph(unsigned int texture_id, int X, int Y, 
 
 Engine::Shader* Engine::RenderPipeline::getTileShader(){
     return this->tile_shader;
+}
+
+Engine::Shader* Engine::RenderPipeline::getShadowmapShader(){
+    return this->shadowMap;
 }
 
 void Engine::RenderPipeline::addLight(void* light_ptr){

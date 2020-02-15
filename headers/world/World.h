@@ -140,7 +140,7 @@ public:
     GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
     Engine::GameObjectProperty* getPropertyPtrByTypeI(int property);
 
-    void addChildObject(GameObjectLink link);
+    void addChildObject(GameObjectLink link, bool updTransform = true);
     void removeChildObject(GameObjectLink link);
     //Remove property with type
     void removeProperty(int index);

@@ -13,6 +13,13 @@
 #include "../../headers/engine/resources.h"
 #include <vector>
 
+enum PIPELINE_STATE {
+    PIPELINE_STATE_DEFAULT,
+    PIPELINE_STATE_PICKING,
+    PIPELINE_STATE_MARKED,
+    PIPELINE_STATE_SHADOWDEPTH
+};
+
 namespace Engine{
 
 UniformBuffer* allocUniformBuffer();
@@ -65,6 +72,8 @@ private:
 
 
 public:
+    PIPELINE_STATE current_state;
+
     bool depthTest; //if enabled, GL will do depth testing
     bool cullFaces; //if enabled, GL will cull faces
 
@@ -89,6 +98,7 @@ public:
 
     RenderSettings* getRenderSettings();
     Engine::Shader* getTileShader();
+    Engine::Shader* getShadowmapShader();
 
     void addLight(void* light_ptr);
     void removeLights();
@@ -100,6 +110,7 @@ public:
     void render();
     void render2D();
     void render3D();
+    void renderDepth(void* world_ptr);
     void init();
     void updateWindowSize(int W, int H);
     void destroy();

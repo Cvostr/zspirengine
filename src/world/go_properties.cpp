@@ -61,18 +61,15 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             break;
         }
         case GO_PROPERTY_TYPE_MESH:{
-            MeshProperty* ptr = new MeshProperty;
-            _ptr = static_cast<GameObjectProperty*>(ptr);
+            _ptr = static_cast<GameObjectProperty*>(new MeshProperty);
             break;
         }
         case GO_PROPERTY_TYPE_NODE:{
-            NodeProperty* ptr = new NodeProperty;
-            _ptr = static_cast<GameObjectProperty*>(ptr);
+            _ptr = static_cast<GameObjectProperty*>(new NodeProperty);
             break;
         }
         case GO_PROPERTY_TYPE_LIGHTSOURCE:{
-            LightsourceProperty* ptr = new LightsourceProperty;
-            _ptr = static_cast<GameObjectProperty*>(ptr);
+            _ptr = static_cast<GameObjectProperty*>(new LightsourceProperty);
             break;
         }
 
@@ -83,8 +80,7 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
         }
 
         case GO_PROPERTY_TYPE_AUDSOURCE:{
-            AudioSourceProperty* ptr = new AudioSourceProperty;
-            _ptr = static_cast<GameObjectProperty*>(ptr);
+            _ptr = static_cast<GameObjectProperty*>(new AudioSourceProperty);
             break;
         }
 
@@ -111,8 +107,11 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             break;
         }
         case GO_PROPERTY_TYPE_ANIMATION:{
-            AnimationProperty* ptr = new AnimationProperty;
-            _ptr = static_cast<GameObjectProperty*>(ptr);
+            _ptr = static_cast<GameObjectProperty*>(new AnimationProperty);
+            break;
+        }
+        case GO_PROPERTY_TYPE_SKYBOX:{
+            _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::SkyboxProperty);
             break;
         }
     }
@@ -243,6 +242,10 @@ void Engine::MeshProperty::updateMeshPtr(){
 void Engine::MeshProperty::onRender(Engine::RenderPipeline* pipeline){
     if(this->skinning_root_node == nullptr)
         skinning_root_node = world_ptr->getGameObjectByLabel(this->rootNodeStr);
+}
+
+void Engine::MeshProperty::onValueChanged(){
+    updateMeshPtr();
 }
 
 Engine::ScriptGroupProperty::ScriptGroupProperty(){
@@ -416,15 +419,35 @@ void Engine::AudioSourceProperty::onObjectDeleted(){
 
 Engine::MaterialProperty::MaterialProperty(){
     type = GO_PROPERTY_TYPE_MATERIAL;
+
+    receiveShadows = true;
+    this->material_ptr = nullptr;
 }
 
-void Engine::MaterialProperty::copyTo(GameObjectProperty* dest){
+void Engine::MaterialProperty::copyTo(Engine::GameObjectProperty* dest){
+    //MaterialShaderProperty
+    if(dest->type != GO_PROPERTY_TYPE_MATERIAL) return;
 
+    //Do base things
+    GameObjectProperty::copyTo(dest);
+
+    MaterialProperty* mat_prop = static_cast<MaterialProperty*>(dest);
+    mat_prop->material_path = this->material_path;
+    mat_prop->material_ptr = this->material_ptr;
+    mat_prop->group_label = this->group_label;
 }
 
-void Engine::MaterialProperty::onValueChanged(){
-    this->material_ptr = game_data->resources->getMaterialByLabel(this->material_path);
+void Engine::MaterialProperty::setMaterial(Material* mat){
+    this->material_ptr = mat;
+    this->material_path = mat->file_path;
+    this->group_label = mat->group_ptr->groupCaption;
 }
+
+void Engine::MaterialProperty::setMaterial(std::string path){
+    Material* newmat_ptr = game_data->resources->getMaterialByLabel(path)->material;
+    setMaterial(newmat_ptr);
+}
+
 
 Engine::NodeProperty::NodeProperty(){
     type = GO_PROPERTY_TYPE_NODE;
@@ -521,6 +544,24 @@ void Engine::RigidbodyProperty::setLinearVelocity(ZSVECTOR3 lvel){
     this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
 }
 
+void Engine::RigidbodyProperty::onValueChanged(){
+    if(!created) return;
+    bool isDynamic = (mass != 0.f);
+
+    btVector3 localInertia(0, 0, 0);
+    if (isDynamic)
+        shape->calculateLocalInertia(mass, localInertia);
+    //SET mass to bullet rigidbody
+    this->rigidBody->setMassProps(mass, localInertia);
+    this->rigidBody->setGravity(btVector3(gravity.X, gravity.Y, gravity.Z));
+    this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
+
+    delete shape;
+    updateCollisionShape();
+    this->rigidBody->setCollisionShape(shape);
+}
+
+
 void Engine::RigidbodyProperty::copyTo(Engine::GameObjectProperty* dest){
     if(dest->type != GO_PROPERTY_TYPE_RIGIDBODY) return;
 
@@ -542,6 +583,88 @@ Engine::RigidbodyProperty::RigidbodyProperty(){
 
     gravity = ZSVECTOR3(0.f, -10.f, 0.f);
     linearVel = ZSVECTOR3(0.f, 0.f, 0.f);
+}
+
+Engine::CharacterControllerProperty::CharacterControllerProperty(){
+    type = GO_PROPERTY_TYPE_CHARACTER_CONTROLLER;
+    created = false;
+
+    gravity = ZSVECTOR3(0.f, -10.f, 0.f);
+    linearVel = ZSVECTOR3(0.f, -10.f, 0.f);
+
+    mass = 10;
+}
+
+void Engine::CharacterControllerProperty::setLinearVelocity(ZSVECTOR3 lvel){
+    if(!created) return;
+    this->linearVel = lvel;
+    this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
+    rigidBody->activate();
+}
+
+void Engine::CharacterControllerProperty::copyTo(Engine::GameObjectProperty* dest){
+    if(dest->type != GO_PROPERTY_TYPE_CHARACTER_CONTROLLER) return;
+
+    //Do base things
+    PhysicalProperty::copyTo(dest);
+
+    CharacterControllerProperty* chara = static_cast<CharacterControllerProperty*>(dest);
+
+}
+void Engine::CharacterControllerProperty::onUpdate(float deltaTime){
+    if(!created){
+        Engine::TransformProperty* transform = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
+
+        ZSVECTOR3 scale = transform->abs_scale;
+        ZSVECTOR3 pos = transform->abs_translation;
+        if(isCustomPhysicalSize){
+            scale = cust_size;
+        }
+
+        //if uninitialized
+        this->shape = new btCapsuleShape(scale.X, scale.Y);
+
+        btVector3 localInertia(0, 0, 0);
+
+        //shape->calculateLocalInertia(mass, localInertia);
+        //Declare start transform
+        btTransform startTransform;
+        startTransform.setIdentity();
+        //Set start transform
+        startTransform.setOrigin(btVector3( btScalar(pos.X),
+                                                    btScalar(pos.Y),
+                                                    btScalar(pos.Z)));
+
+        startTransform.setRotation(btQuaternion(transform->abs_rotation.X, transform->abs_rotation.Y, transform->abs_rotation.Z));
+
+         //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+         btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+
+         btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState, shape, localInertia);
+
+         rigidBody = new btRigidBody(cInfo);
+
+         rigidBody->setUserIndex(this->go_link.updLinkPtr()->array_index);
+         //add rigidbody to world
+         go_link.world_ptr->physical_world->addRidigbodyToWorld(rigidBody);
+        //Set zero values
+        this->rigidBody->setGravity(btVector3(gravity.X, gravity.Y, gravity.Z));
+        this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
+
+         created = true;
+    }else{
+        Engine::TransformProperty* transform = this->go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
+        btVector3 current_pos = rigidBody->getCenterOfMassPosition();
+
+        //get current position
+        float curX = current_pos.getX();
+        float curY = current_pos.getY();
+        float curZ = current_pos.getZ();
+
+        if(transform->translation != ZSVECTOR3(curX, curY, curZ))
+            transform->translation = ZSVECTOR3(curX, curY, curZ);
+
+    }
 }
 
 Engine::AnimationProperty::AnimationProperty(){
@@ -644,4 +767,78 @@ void Engine::AnimationProperty::setAnimation(std::string anim){
 
 void Engine::AnimationProperty::updateAnimationPtr(){
     anim_prop_ptr = game_data->resources->getAnimationByLabel(this->anim_label);
+}
+
+void Engine::AnimationProperty::onValueChanged(){
+    updateAnimationPtr();
+}
+
+Engine::SkyboxProperty::SkyboxProperty(){
+    type = GO_PROPERTY_TYPE_SKYBOX;
+}
+
+Engine::ShadowCasterProperty::ShadowCasterProperty(){
+    type = GO_PROPERTY_TYPE_SHADOWCASTER;
+
+    initialized = false;
+
+    TextureWidth = 2048;
+    TextureHeight = 2048;
+
+    shadow_bias = 0.005f;
+
+    nearPlane = 1.0f;
+    farPlane = 75.0f;
+
+    projection_viewport = 20;
+}
+
+bool Engine::ShadowCasterProperty::isRenderAvailable(){
+    if(!this->active)
+        return false;
+    if(!this->initialized)
+        init();
+    if(this->go_link.updLinkPtr() == nullptr)
+        return false;
+    //Get lightsource property of object
+    Engine::LightsourceProperty* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceProperty>();
+
+    if(light == nullptr)
+        return false;
+        //if light gameobject disabled
+    if(!light->isActive())
+            return false;
+    return true;
+}
+
+void Engine::ShadowCasterProperty::copyTo(Engine::GameObjectProperty* dest){
+    if(dest->type != this->type) return; //if it isn't script group
+
+    //Do base things
+    GameObjectProperty::copyTo(dest);
+
+    ShadowCasterProperty* _dest = static_cast<ShadowCasterProperty*>(dest);
+    _dest->farPlane = this->farPlane;
+    _dest->nearPlane = this->nearPlane;
+    _dest->shadow_bias = this->shadow_bias;
+    _dest->TextureWidth = this->TextureWidth;
+    _dest->TextureHeight = this->TextureHeight;
+    _dest->projection_viewport = this->projection_viewport;
+}
+
+void Engine::ShadowCasterProperty::setTextureSize(){
+    glDeleteTextures(1, &this->shadowDepthTexture);
+    glDeleteFramebuffers(1, &shadowBuffer);
+
+    init();
+}
+
+void Engine::ShadowCasterProperty::setTexture(){
+    glActiveTexture(GL_TEXTURE6);
+    glBindTexture(GL_TEXTURE_2D, this->shadowDepthTexture);
+}
+
+void Engine::ShadowCasterProperty::onValueChanged(){
+    //Update shadowmap texture
+    setTextureSize();
 }

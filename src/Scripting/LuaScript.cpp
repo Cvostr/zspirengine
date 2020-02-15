@@ -119,5 +119,27 @@ void Engine::ObjectScript::func(lua_State *L){
     if(lua_pcall(this->L, argsNum - 2, 0, 0) != 0){
         SCRIPT_LOG << "Error occured in script " << name << " function " << func_name << " : " << lua_tostring(this->L, -1) << std::endl;
     }
+}
 
+void Engine::ObjectScript::_func(std::string func_name, luabridge::LuaRef arg_table){
+    if(!arg_table.isTable()) return;
+
+    luabridge::LuaRef newtable = luabridge::newTable(L);
+
+    luabridge::LuaRef func = luabridge::getGlobal(L, func_name.c_str());
+
+    for(unsigned int table_entry = 0; table_entry < static_cast<unsigned int>(arg_table.length()); table_entry ++){
+        luabridge::LuaRef ref = arg_table[table_entry];
+
+        newtable[table_entry] = ref;
+    }
+
+    if (func.isFunction() == true) { //If function found
+        try {
+            func(arg_table);
+        }
+        catch (luabridge::LuaException e) {
+            SCRIPT_LOG << "Error occured in script " << name << " " << e.what() << std::endl;
+        }
+    }
 }

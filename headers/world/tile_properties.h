@@ -5,7 +5,6 @@
 
 namespace Engine {
 
-
 typedef struct TileGeometry{
     int tileWidth;
     int tileHeight;

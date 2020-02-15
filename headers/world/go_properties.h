@@ -60,8 +60,6 @@ public:
     float range; //Light's range
     float spot_angle;
 
-    //ZSLIGHTSOURCE_GL_ID id; //glsl uniform index
-
     void addPropertyInterfaceToInspector();
     void copyTo(Engine::GameObjectProperty* dest);
     void onPreRender(Engine::RenderPipeline* pipeline);
@@ -118,22 +116,62 @@ public:
     NodeProperty();
 };
 
-class MaterialProperty : public GameObjectProperty{
+class SkyboxProperty : public Engine::GameObjectProperty{
+public:
+    void onPreRender(Engine::RenderPipeline* pipeline);
+    void DrawSky(RenderPipeline* pipeline);
+    SkyboxProperty();
+};
+
+class ShadowCasterProperty : public Engine::GameObjectProperty{
+private:
+    bool initialized;
+    unsigned int shadowBuffer;
+    unsigned int shadowDepthTexture;
+
+    ZSMATRIX4x4 LightProjectionMat;
+    ZSMATRIX4x4 LightViewMat;
+public:
+    int TextureWidth;
+    int TextureHeight;
+    float shadow_bias;
+    float nearPlane;
+    float farPlane;
+    int projection_viewport;
+
+    void addPropertyInterfaceToInspector();
+    void onPreRender(Engine::RenderPipeline* pipeline);
+    void copyTo(Engine::GameObjectProperty* dest);
+    void onValueChanged();
+    void init();
+    void Draw(Engine::Camera* cam, RenderPipeline* pipeline);
+    void setTexture();
+    void setTextureSize();
+    bool isRenderAvailable();
+    ShadowCasterProperty();
+};
+
+class MaterialProperty : public Engine::GameObjectProperty{
+private:
+    std::string group_label;
 public:
     //Pointer to picked material
-    MaterialResource* material_ptr;
+    Material* material_ptr;
     //Path to material fil
     std::string material_path;
-
     //Draw shadows on object
     bool receiveShadows;
 
+    void setMaterial(Material* mat);
+    void setMaterial(std::string path);
+    void addPropertyInterfaceToInspector();
     void onValueChanged();
-    void copyTo(GameObjectProperty* dest);
-    void onRender(RenderPipeline* pipeline);
+    void copyTo(Engine::GameObjectProperty* dest);
+    void onRender(Engine::RenderPipeline* pipeline);
 
     MaterialProperty();
 };
+
 
 class PhysicalProperty : public Engine::GameObjectProperty{
 protected:
@@ -185,6 +223,22 @@ public:
 
     RigidbodyProperty();
 };
+
+class CharacterControllerProperty : public Engine::PhysicalProperty{
+public:
+    ZSVECTOR3 gravity;
+    ZSVECTOR3 linearVel;
+    ZSVECTOR3 angularVel;
+
+    void addPropertyInterfaceToInspector();
+    void copyTo(Engine::GameObjectProperty* dest);
+    void onUpdate(float deltaTime);
+
+    void setLinearVelocity(ZSVECTOR3 lvel);
+
+    CharacterControllerProperty();
+};
+
 
 class AnimationProperty : public Engine::GameObjectProperty {
 private:

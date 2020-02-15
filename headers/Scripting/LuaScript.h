@@ -28,10 +28,12 @@ public:
     void _callStart(GameObject* obj, World* world);
     void _callDraw(float deltaTime);
     void callDrawUI();
+    void onTrigger();
 
     unsigned int getArgCount(lua_State *_L);
 
     void func(lua_State *L);
+    void _func(std::string func_name, luabridge::LuaRef arg_table);
 
     ObjectScript();
 

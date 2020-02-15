@@ -82,7 +82,7 @@ void Engine::GameObject::removeProperty(int index){
 }
 
 
-void Engine::GameObject::addChildObject(GameObjectLink link){
+void Engine::GameObject::addChildObject(GameObjectLink link, bool updTransform){
     GameObjectLink _link = link;
     _link.updLinkPtr(); //Calculating object pointer
     _link.ptr->hasParent = true; //Object now has a parent (if it has't before)
@@ -95,7 +95,7 @@ void Engine::GameObject::addChildObject(GameObjectLink link){
     TransformProperty* Pobj_transform = static_cast<TransformProperty*>(getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
     TransformProperty* Cobj_transform = static_cast<TransformProperty*>(link.ptr->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
 
-    if(Pobj_transform != nullptr && Cobj_transform != nullptr){ //If both objects have mesh property
+    if(updTransform && Pobj_transform != nullptr && Cobj_transform != nullptr){ //If both objects have mesh property
 
         ZSVECTOR3 p_translation = ZSVECTOR3(0,0,0);
         ZSVECTOR3 p_scale = ZSVECTOR3(1,1,1);
@@ -111,6 +111,7 @@ void Engine::GameObject::addChildObject(GameObjectLink link){
 
     this->children.push_back(_link);
 }
+
 void Engine::GameObject::removeChildObject(GameObjectLink link){
     unsigned int children_am = static_cast<unsigned int>(children.size()); //get children amount
     for(unsigned int i = 0; i < children_am; i++){ //Iterate over all children in object
