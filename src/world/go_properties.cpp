@@ -85,25 +85,21 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
         }
 
         case GO_PROPERTY_TYPE_MATERIAL:{
-            MaterialProperty* ptr = new MaterialProperty;
-            _ptr = static_cast<GameObjectProperty*>(ptr);
+            _ptr = static_cast<GameObjectProperty*>(new MaterialProperty);
             break;
         }
 
         case GO_PROPERTY_TYPE_COLLIDER:{
-            ColliderProperty* ptr = new ColliderProperty;
-            _ptr = static_cast<GameObjectProperty*>(ptr);
+            _ptr = static_cast<GameObjectProperty*>(new ColliderProperty);
             break;
         }
 
         case GO_PROPERTY_TYPE_TILE_GROUP:{
-            TileGroupProperty* ptr = new TileGroupProperty;
-            _ptr = static_cast<GameObjectProperty*>(ptr);
+            _ptr = static_cast<GameObjectProperty*>(new TileGroupProperty);
             break;
         }
         case GO_PROPERTY_TYPE_TILE:{
-            TileProperty* ptr = new TileProperty;
-            _ptr = static_cast<GameObjectProperty*>(ptr);
+            _ptr = static_cast<GameObjectProperty*>(new TileProperty);
             break;
         }
         case GO_PROPERTY_TYPE_ANIMATION:{
@@ -112,6 +108,14 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
         }
         case GO_PROPERTY_TYPE_SKYBOX:{
             _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::SkyboxProperty);
+            break;
+        }
+        case GO_PROPERTY_TYPE_SHADOWCASTER:{
+            _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::ShadowCasterProperty);
+            break;
+        }
+        case GO_PROPERTY_TYPE_TERRAIN:{
+            _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::TerrainProperty);
             break;
         }
     }
@@ -643,6 +647,7 @@ void Engine::CharacterControllerProperty::onUpdate(float deltaTime){
          btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState, shape, localInertia);
 
          rigidBody = new btRigidBody(cInfo);
+
 
          rigidBody->setUserIndex(this->go_link.updLinkPtr()->array_index);
          //add rigidbody to world

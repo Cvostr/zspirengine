@@ -6,7 +6,6 @@ Engine::GameObjectLink::GameObjectLink(){
     world_ptr = nullptr;
 }
 
-
 Engine::GameObject* Engine::GameObjectLink::updLinkPtr(){
     if(world_ptr == nullptr) //If world not defined, exiting
         return nullptr;
@@ -259,11 +258,38 @@ bool Engine::GameObject::hasMesh(){
     return false;
 }
 
+bool Engine::GameObject::hasTerrain(){
+    Engine::TerrainProperty* terrain = getPropertyPtr<Engine::TerrainProperty>();
+    if(terrain != nullptr){
+        if(!terrain->active) return false;
+        return true;
+    }
+    return false;
+}
+
 bool Engine::GameObject::isRigidbody(){
     if(getPropertyPtrByType(GO_PROPERTY_TYPE_RIGIDBODY) != nullptr || getPropertyPtrByType(GO_PROPERTY_TYPE_COLLIDER) != nullptr)
         return true;
 
     return false;
+}
+
+void* Engine::GameObject::getPhysicalProperty(){
+    ColliderProperty* coll = getPropertyPtr<ColliderProperty>();
+    RigidbodyProperty* rigid = getPropertyPtr<RigidbodyProperty>();
+    CharacterControllerProperty* controller = getPropertyPtr<CharacterControllerProperty>();
+
+    PhysicalProperty* phys = nullptr;
+
+    if(coll == nullptr)
+        phys = rigid;
+    else if (coll != nullptr){
+        phys = coll;
+    }else{
+        phys = controller;
+    }
+
+    return phys;
 }
 
 Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(std::string label){

@@ -443,17 +443,11 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pip
     glFrontFace(GL_CCW);
 }
 
-void Engine::TileProperty::onRender(RenderPipeline* pipeline){
+void Engine::TileProperty::onRender(Engine::RenderPipeline* pipeline){
     Engine::Shader* tile_shader = pipeline->getTileShader();
 
-    //Receive pointer to tile information
-    TileProperty* tile_ptr = static_cast<TileProperty*>(this->go_link.updLinkPtr()->getPropertyPtrByType(GO_PROPERTY_TYPE_TILE));
-    TransformProperty* transform_ptr = go_link.updLinkPtr()->getTransformProperty();
-
-    if(tile_ptr == nullptr || transform_ptr == nullptr) return;
-
     tile_shader->Use();
-       //Bind tile material data
+
     pipeline->tileBuffer->bind();
 
     //Checking for diffuse texture

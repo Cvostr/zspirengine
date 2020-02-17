@@ -3,19 +3,48 @@
 extern ZSGAME_DATA* game_data;
 
 Engine::TileGroupProperty::TileGroupProperty(){
-    type = GO_PROPERTY_TYPE_TILE_GROUP;
-    isCreated = false;
+    type = GO_PROPERTY_TYPE_TILE_GROUP; //Set correct type
+    active = true; //And it is active
+
+    this->isCreated = false;
+    this->tiles_amount_X = 0;
+    this->tiles_amount_Y = 0;
+
+    this->mesh_string = "@plane";
+    this->diffuse_relpath = "@none";
+}
+
+void Engine::TileGroupProperty::copyTo(Engine::GameObjectProperty* dest){
+    if(dest->type != this->type) return; //if it isn't transform
+
+    //Do base things
+    Engine::GameObjectProperty::copyTo(dest);
+
+    TileGroupProperty* _dest = static_cast<TileGroupProperty*>(dest);
+    //Transfer all variables
+    _dest->geometry = geometry;
+    _dest->tiles_amount_X = tiles_amount_X;
+    _dest->tiles_amount_Y = tiles_amount_Y;
+    _dest->isCreated = isCreated;
 }
 
 Engine::TileProperty::TileProperty(){
     type = GO_PROPERTY_TYPE_TILE;
-    lastAnimState = false;
+    active = true;
+
+    this->texture_diffuse = nullptr;
+    this->diffuse_relpath = "@none";
+
+    this->texture_transparent = nullptr;
+    this->transparent_relpath = "@none";
+}
+void Engine::TileProperty::updTexturePtr(){
+    //Update color texture
+    this->texture_diffuse = game_data->resources->getTextureByLabel(diffuse_relpath);
+    //Update transparent layer texture
+    this->texture_transparent = game_data->resources->getTextureByLabel(transparent_relpath);
 }
 
-void Engine::TileProperty::updTexturePtr(){
-    this->texture_diffuse = game_data->resources->getTextureByLabel(this->diffuse_relpath);
-    this->texture_transparent = game_data->resources->getTextureByLabel(this->transparent_relpath);
-}
 void Engine::TileProperty::onUpdate(float deltaTime){
     if(this->anim_state.playing == true){ //if we playing anim
         anim_state.current_time += deltaTime;
@@ -35,15 +64,14 @@ void Engine::TileProperty::onUpdate(float deltaTime){
             anim_state.cur_frameX = 0;
             anim_state.cur_frameY = 0;
         }
-
     }
 }
 
-void Engine::TileProperty::copyTo(GameObjectProperty* dest){
+void Engine::TileProperty::copyTo(Engine::GameObjectProperty* dest){
     if(dest->type != this->type) return; //if it isn't transform
 
     //Do base things
-    GameObjectProperty::copyTo(dest);
+    Engine::GameObjectProperty::copyTo(dest);
 
     TileProperty* _dest = static_cast<TileProperty*>(dest);
     _dest->diffuse_relpath = diffuse_relpath;

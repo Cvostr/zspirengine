@@ -33,7 +33,9 @@ SOURCES += \
     src/render/zs-shader.cpp \
     src/render/zs-math.cpp \
     src/engine/resources.cpp \
+    src/world/GoProperty/TerrainComponent.cpp \
     src/world/PhysicalWorld.cpp \
+    src/world/Terrain.cpp \
     src/world/World.cpp \
     src/world/go_properties.cpp \
     src/world/GoProperty/tile_properties.cpp \
@@ -78,6 +80,7 @@ HEADERS += \
     headers/world/World.h \
     headers/world/go_properties.h \
     headers/game.h \
+    headers/world/terrain.h \
     headers/world/tile_properties.h \
     headers/engine/engine_window.h \
     headers/world/zs-camera.h \

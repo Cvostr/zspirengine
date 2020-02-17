@@ -180,8 +180,10 @@ public:
     void onTrigger(GameObject* obj);
     //true, if object has rigidbody component
     bool isRigidbody();
+    void* getPhysicalProperty();
 
     bool hasMesh(); //Check if gameobject has mesh property and mesh inside
+    bool hasTerrain(); //Check if gameobject has terrain inside
 
     GameObject();
 };

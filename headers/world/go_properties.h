@@ -5,6 +5,7 @@
 #include "../Scripting/LuaScript.h"
 #include "../misc/oal_manager.h"
 #include "../game.h"
+#include "terrain.h"
 
 namespace Engine {
 
@@ -264,6 +265,52 @@ public:
 
     AnimationProperty();
 };
+
+class TerrainProperty : public Engine::GameObjectProperty{
+
+private:
+    TerrainData data;
+    char edit_mode;
+
+    btRigidBody* rigidBody;
+public:
+    Engine::UniformBuffer* terrainUniformBuffer;
+    Engine::UniformBuffer* transformBuffer;
+
+    std::vector<HeightmapTexturePair> textures;
+    std::vector<HeightmapGrass> grass;
+
+    std::string file_label;
+    int Width; //Width of terrain mesh
+    int Length; //Height of terrain mesh
+    int MaxHeight;
+    float GrassDensity;
+    bool castShadows;
+    int textures_size;
+    int grassType_size;
+
+    int range; //Range of edit
+    float editHeight; //Modifying height
+    int textureid;
+    int vegetableid;
+
+    void addPropertyInterfaceToInspector();
+    void onRender(Engine::RenderPipeline* pipeline);
+
+    void DrawMesh(RenderPipeline* pipeline);
+    void onValueChanged();
+    void onAddToObject();
+    void copyTo(Engine::GameObjectProperty* dest);
+    void onUpdate(float deltaTime);
+    TerrainProperty();
+    void onMouseMotion(int posX, int posY, int screenY, bool isLeftButtonHold, bool isCtrlHold);
+    void getPickedVertexId(int posX, int posY, int screenY, unsigned char* data);
+
+    void modifyTerrainVertex(unsigned char* gl_data, bool isCtrlHold);
+
+    TerrainData* getTerrainData();
+};
+
 }
 
 #endif

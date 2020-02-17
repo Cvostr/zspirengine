@@ -48,41 +48,41 @@ typedef struct TileAnimationState{
     }
 }TileAnimationState;
 
-class TileGroupProperty : public GameObjectProperty{
+class TileGroupProperty : public Engine::GameObjectProperty{
 public:
     int tiles_amount_X; //Tiles to add
     int tiles_amount_Y;
 
     bool isCreated;
-    TileGeometry geometry; //Tile to add geometry
+    Engine::TileGeometry geometry; //Tile to add geometry
 
-    //QString diffuse_relpath; //Diffuse texture to generate
-    //QString mesh_string; //Mesh to generate
+    std::string diffuse_relpath; //Diffuse texture to generate
+    std::string mesh_string; //Mesh to generate
 
-    //void copyTo(GameObjectProperty* dest);
+    void copyTo(Engine::GameObjectProperty* dest);
 
     TileGroupProperty();
 };
 
-class TileProperty : public GameObjectProperty{
-private:
-    bool lastAnimState;
+class TileProperty : public Engine::GameObjectProperty{
 public:
-    TileGeometry geometry;
+    Engine::TileGeometry geometry;
     //Defines color texture
-    TextureResource* texture_diffuse;
+    Engine::TextureResource* texture_diffuse;
     std::string diffuse_relpath;
     //Defines texture, that will cover tile
-    TextureResource* texture_transparent;
+    Engine::TextureResource* texture_transparent;
     std::string transparent_relpath;
     //Defines animation
-    TileAnimation anim_property;
-    TileAnimationState anim_state;
+    Engine::TileAnimation anim_property;
+    Engine::TileAnimationState anim_state;
 
+    void addPropertyInterfaceToInspector();
+    void onValueChanged(); //Update texture pointer
     void updTexturePtr();
-    void copyTo(GameObjectProperty* dest);
+    void copyTo(Engine::GameObjectProperty* dest);
     void onUpdate(float deltaTime);
-    void onRender(RenderPipeline* pipeline);
+    void onRender(Engine::RenderPipeline* pipeline);
 
     void playAnim();
     void stopAnim();
@@ -90,7 +90,6 @@ public:
 
     TileProperty();
 };
-
 }
 
 #endif // TILE_PROPERTIES_H
