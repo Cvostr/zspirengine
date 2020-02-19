@@ -45,6 +45,8 @@ Engine::PhysicalProperty::PhysicalProperty(){
     isCustomPhysicalSize = false;
 
     rigidBody = nullptr;
+
+    transform_offset = ZSVECTOR3(0, 0, 0);
 }
 
 void Engine::PhysicalProperty::copyTo(Engine::GameObjectProperty* dest){
@@ -57,6 +59,7 @@ void Engine::PhysicalProperty::copyTo(Engine::GameObjectProperty* dest){
     rigi_prop->coll_type = this->coll_type;
     rigi_prop->isCustomPhysicalSize = this->isCustomPhysicalSize;
     rigi_prop->cust_size = this->cust_size;
+    rigi_prop->transform_offset = this->transform_offset;
 }
 
 void Engine::PhysicalProperty::init(){
@@ -73,9 +76,9 @@ void Engine::PhysicalProperty::init(){
     btTransform startTransform;
     startTransform.setIdentity();
     //Set start transform
-    startTransform.setOrigin(btVector3( btScalar(transform->abs_translation.X),
-                                                btScalar(transform->abs_translation.Y),
-                                                btScalar(transform->abs_translation.Z)));
+    startTransform.setOrigin(btVector3( btScalar(transform->abs_translation.X + transform_offset.X),
+                                                btScalar(transform->abs_translation.Y + transform_offset.Y),
+                                                btScalar(transform->abs_translation.Z + transform_offset.Z)));
 
     btQuaternion b;
     b.setEuler(transform->abs_rotation.Z, transform->abs_rotation.Y, transform->abs_rotation.X);

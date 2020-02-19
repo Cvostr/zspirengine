@@ -121,7 +121,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
                 //Writing name (file path)
                 ptr->scripts_attached[script_w_i].name = script_path;
                 ScriptResource* res = game_data->resources->getScriptByLabel(script_path);
-                ptr->scripts_attached[script_w_i].content = res->script_content;
+                ptr->scripts_attached[script_w_i].script_content = res->script_content;
             }
             break;
         }
@@ -150,6 +150,10 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
                 world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.X), sizeof(float));
                 world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.Y), sizeof(float));
                 world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.Z), sizeof(float));
+
+                world_stream->read(reinterpret_cast<char*>(&ptr->transform_offset.X), sizeof(float));
+                world_stream->read(reinterpret_cast<char*>(&ptr->transform_offset.Y), sizeof(float));
+                world_stream->read(reinterpret_cast<char*>(&ptr->transform_offset.Z), sizeof(float));
             }
 
             break;

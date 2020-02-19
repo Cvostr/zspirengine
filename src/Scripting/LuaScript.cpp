@@ -14,10 +14,12 @@ void Engine::ObjectScript::_InitScript() {
     luaL_openlibs(L);
 
     //Bind DSDK to script
-    EZSENSDK::bindSDK(L);
+    EZSENSDK::bindSDKBaseMath(L);
+    EZSENSDK::bindSDKProperties(L);
+    EZSENSDK::bindSDKClasses(L);
     EZSENSDK::bindKeyCodesSDK(L);
 
-    int start_result = luaL_dostring(L, this->content.c_str());
+    int start_result = luaL_dostring(L, this->script_content.c_str());
 
     created = true;
 
@@ -49,9 +51,7 @@ void Engine::ObjectScript::_callStart(GameObject* obj, World* world) {
     //Some error returned by script
     if(result == 1)
         SCRIPT_LOG << "Script (onStart) function exited with 1" << name << std::endl;
-
 }
-
 
 void Engine::ObjectScript::_callDraw(float deltaTime) {
 
@@ -65,6 +65,7 @@ void Engine::ObjectScript::_callDraw(float deltaTime) {
         }
     }
 }
+
 void Engine::ObjectScript::callDrawUI() {
 
     luabridge::LuaRef ui = luabridge::getGlobal(L, "onDrawUI");
@@ -83,6 +84,8 @@ unsigned int Engine::ObjectScript::getArgCount(lua_State *_L){
 }
 
 void Engine::ObjectScript::func(lua_State *L){
+    if(!this->created) return;
+
     unsigned int argsNum = getArgCount(L);
 
     std::string func_name = lua_tostring(L, 2);
@@ -91,7 +94,7 @@ void Engine::ObjectScript::func(lua_State *L){
     for(unsigned int i = 0; i <= argsNum; i ++){
         int arg_index = static_cast<int>(3 + i);
         if(lua_isinteger(L, arg_index)){
-            int in = lua_tointeger(L, arg_index);
+            long long in = lua_tointeger(L, arg_index);
             lua_pushinteger(this->L, in);
             continue;
         }
@@ -113,8 +116,6 @@ void Engine::ObjectScript::func(lua_State *L){
             lua_pushlightuserdata(this->L, in);
         }
     }
-
-      /* function to be called */
 
     if(lua_pcall(this->L, argsNum - 2, 0, 0) != 0){
         SCRIPT_LOG << "Error occured in script " << name << " function " << func_name << " : " << lua_tostring(this->L, -1) << std::endl;

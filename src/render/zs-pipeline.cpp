@@ -285,6 +285,7 @@ void Engine::GameObject::processObject(RenderPipeline* pipeline){ //On render pi
         if(!children[obj_i].isEmpty()){ //if link isn't broken
             children[obj_i].updLinkPtr();
             GameObject* child_ptr = this->children[obj_i].ptr;
+            if(child_ptr == nullptr) continue;
             child_ptr->processObject(pipeline);
         }
     }

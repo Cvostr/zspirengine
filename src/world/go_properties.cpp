@@ -72,13 +72,11 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             _ptr = static_cast<GameObjectProperty*>(new LightsourceProperty);
             break;
         }
-
         case GO_PROPERTY_TYPE_SCRIPTGROUP:{
             ScriptGroupProperty* ptr = new ScriptGroupProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
-
         case GO_PROPERTY_TYPE_AUDSOURCE:{
             _ptr = static_cast<GameObjectProperty*>(new AudioSourceProperty);
             break;
@@ -93,7 +91,14 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
             _ptr = static_cast<GameObjectProperty*>(new ColliderProperty);
             break;
         }
-
+        case GO_PROPERTY_TYPE_RIGIDBODY:{
+            _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::RigidbodyProperty);
+            break;
+        }
+        case GO_PROPERTY_TYPE_CHARACTER_CONTROLLER:{
+            _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::CharacterControllerProperty);
+            break;
+        }
         case GO_PROPERTY_TYPE_TILE_GROUP:{
             _ptr = static_cast<GameObjectProperty*>(new TileGroupProperty);
             break;
@@ -157,7 +162,33 @@ void Engine::TransformProperty::updateMat(){
     this->transform_mat = scale_mat * rotation_mat * rotation_mat1 * translation_mat;
 
 }
+void Engine::TransformProperty::onValueChanged(){
+    if((this->go_link.updLinkPtr()) == nullptr) return;
 
+    updateMat();
+
+    PhysicalProperty* phys = static_cast<PhysicalProperty*>(go_link.updLinkPtr()->getPhysicalProperty());
+
+    if(this->go_link.updLinkPtr()->isRigidbody()){
+        if(!phys->created) return;
+        btTransform startTransform;
+        startTransform.setIdentity();
+        startTransform.setOrigin(btVector3( btScalar(abs_translation.X + phys->transform_offset.X),
+                                                    btScalar(abs_translation.Y + phys->transform_offset.Y),
+                                                    btScalar(abs_translation.Z + phys->transform_offset.Z)));
+
+        startTransform.setRotation(btQuaternion(abs_rotation.X, abs_rotation.Y, abs_rotation.Z));
+
+
+        phys->rigidBody->setWorldTransform(startTransform);
+        phys->rigidBody->getMotionState()->setWorldTransform(startTransform);
+
+        phys->shape->setLocalScaling(btVector3(btScalar(abs_scale.X),
+                                               btScalar(abs_scale.Y),
+                                               btScalar(abs_scale.Z)));
+
+    }
+}
 void Engine::TransformProperty::getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r){
     GameObject* ptr = go_link.updLinkPtr(); //Pointer to object with this property
 
@@ -189,15 +220,15 @@ void Engine::TransformProperty::getAbsoluteRotationMatrix(ZSMATRIX4x4& m){
 
 void Engine::TransformProperty::setTranslation(ZSVECTOR3 new_translation){
     this->translation = new_translation;
-    this->updateMat();
+    this->onValueChanged();
 }
 void Engine::TransformProperty::setScale(ZSVECTOR3 new_scale){
     this->scale = new_scale;
-    this->updateMat();
+    this->onValueChanged();
 }
 void Engine::TransformProperty::setRotation(ZSVECTOR3 new_rotation){
     this->rotation = new_rotation;
-    this->updateMat();
+    this->onValueChanged();
 }
 
 void Engine::TransformProperty::copyTo(GameObjectProperty* dest){
@@ -244,8 +275,8 @@ void Engine::MeshProperty::updateMeshPtr(){
 }
 
 void Engine::MeshProperty::onRender(Engine::RenderPipeline* pipeline){
-    if(this->skinning_root_node == nullptr)
-        skinning_root_node = world_ptr->getGameObjectByLabel(this->rootNodeStr);
+    if(this->skinning_root_node == nullptr && mesh_ptr->mesh_ptr->hasBones())
+        skinning_root_node = go_link.world_ptr->getGameObjectByLabel(this->rootNodeStr);
 }
 
 void Engine::MeshProperty::onValueChanged(){
@@ -253,18 +284,49 @@ void Engine::MeshProperty::onValueChanged(){
 }
 
 Engine::ScriptGroupProperty::ScriptGroupProperty(){
-    this->type = GO_PROPERTY_TYPE_SCRIPTGROUP;
+    type = GO_PROPERTY_TYPE_SCRIPTGROUP;
+
     scr_num = 0;
+    this->scripts_attached.resize(static_cast<unsigned int>(this->scr_num));
 }
-void Engine::ScriptGroupProperty::onUpdate(float deltaTime){  //calls update in scripts
+
+void Engine::ScriptGroupProperty::onUpdate(float deltaTime){
     for(unsigned int script_i = 0; script_i < this->scripts_attached.size(); script_i ++){
-        ObjectScript* script_ptr = &this->scripts_attached[script_i]; //Obtain pointer to script
-        //if script isn't created, then create it!
+        Engine::ObjectScript* script_ptr = &this->scripts_attached[script_i]; //Obtain pointer to script
+        //if script isn't created, then create it.
         if(!script_ptr->created){
-            this->scripts_attached[script_i]._InitScript();
-            this->scripts_attached[script_i]._callStart(go_link.updLinkPtr(), go_link.world_ptr);
+            script_ptr->_InitScript();
+            script_ptr->_callStart(go_link.updLinkPtr(), go_link.world_ptr);
         }
+
         script_ptr->_callDraw(deltaTime); //Run onDraw() function in script
+    }
+}
+
+void Engine::ScriptGroupProperty::copyTo(Engine::GameObjectProperty* dest){
+    if(dest->type != this->type) return; //if it isn't script group
+
+    //Do base things
+    GameObjectProperty::copyTo(dest);
+
+    ScriptGroupProperty* _dest = static_cast<ScriptGroupProperty*>(dest);
+    _dest->scr_num = this->scr_num;
+
+    //resize data vectors
+    _dest->scripts_attached.resize(static_cast<unsigned int>(scr_num));
+    _dest->path_names.resize(static_cast<unsigned int>(scr_num));
+    //Copy data
+    for(unsigned int script_i = 0; script_i < static_cast<unsigned int>(scr_num); script_i ++){
+        _dest->scripts_attached[script_i] = this->scripts_attached[script_i];
+        _dest->path_names[script_i] = this->path_names[script_i];
+    }
+}
+
+
+void Engine::ScriptGroupProperty::shutdown(){
+    //Iterate over all scripts and call _DestroyScript() on each
+    for(unsigned int script_i = 0; script_i < static_cast<unsigned int>(scr_num); script_i ++){
+        this->scripts_attached[script_i]._DestroyScript();
     }
 }
 
@@ -478,8 +540,6 @@ void Engine::ColliderProperty::onObjectDeleted(){
         this->go_link.world_ptr->physical_world->removeRidigbodyFromWorld(this->rigidBody);
 } //unregister in world
 
-
-
 void Engine::ColliderProperty::onUpdate(float deltaTime){
     if(!created)
         init();
@@ -506,7 +566,6 @@ Engine::ColliderProperty::ColliderProperty(){
     created = false;
     mass = 0.0f; //collider is static
 }
-
 
 void Engine::RigidbodyProperty::onUpdate(float deltaTime){
     if(!created){
@@ -537,8 +596,8 @@ void Engine::RigidbodyProperty::onUpdate(float deltaTime){
 
         if(transform->translation != ZSVECTOR3(curX, curY, curZ))
             transform->translation = ZSVECTOR3(curX, curY, curZ);
-        if(transform->rotation != ZSVECTOR3(rotZ, rotY, rotX))
-            transform->rotation = ZSVECTOR3(rotZ, rotY, rotX);
+        if(transform->rotation != ZSVECTOR3(rotX, rotY, rotZ))
+            transform->rotation = ZSVECTOR3(rotX, rotY, rotZ);
     }
 }
 
@@ -751,7 +810,6 @@ void Engine::AnimationProperty::updateNodeTransform(GameObject* obj, ZSMATRIX4x4
     for(unsigned int i = 0; i < obj->children.size(); i ++){
         updateNodeTransform(obj->children[i].updLinkPtr(), prop->abs);
     }
-
 }
 
 void Engine::AnimationProperty::copyTo(GameObjectProperty *dest){

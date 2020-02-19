@@ -28,6 +28,7 @@ namespace Debug{
 namespace Math{
     ZSVECTOR3 vnormalize(ZSVECTOR3 vec);
     ZSVECTOR3 vadd(ZSVECTOR3 v1, ZSVECTOR3 v2);
+    ZSVECTOR3 vmul(ZSVECTOR3 v1, float m);
 }
 
 namespace Window {
@@ -35,8 +36,9 @@ namespace Window {
     void setWindowMode(unsigned int mode);
 }
 
-
-void bindSDK(lua_State* state);
+void bindSDKBaseMath(lua_State* state);
+void bindSDKProperties(lua_State* state);
+void bindSDKClasses(lua_State* state);
 void bindKeyCodesSDK(lua_State* state);
 
 }

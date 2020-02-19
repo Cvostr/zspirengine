@@ -32,12 +32,12 @@ void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, un
     indexBufferCreateInf.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     indexBufferCreateInf.pNext = nullptr;
     indexBufferCreateInf.flags = 0;
-    indexBufferCreateInf.size = vertices_num * sizeof (ZSVERTEX);
+    indexBufferCreateInf.size = indices_num * sizeof (unsigned int);
     indexBufferCreateInf.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
     indexBufferCreateInf.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     VkResult vertex_result = vkCreateBuffer(vulkan_ptr->getVkDevice(), &vertexBufferCreateInf, nullptr, &this->vertexBuffer);
-    VkResult fragment_result = vkCreateBuffer(vulkan_ptr->getVkDevice(), &vertexBufferCreateInf, nullptr, &this->vertexBuffer);
+    VkResult index_result = vkCreateBuffer(vulkan_ptr->getVkDevice(), &indexBufferCreateInf, nullptr, &this->indexBuffer);
 
     VkMemoryRequirements req;
     vkGetBufferMemoryRequirements(vulkan_ptr->getVkDevice(), vertexBuffer, &req);

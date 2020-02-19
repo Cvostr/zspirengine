@@ -5,7 +5,6 @@ Engine::World::World(){
     objects.reserve(MAX_OBJS);
     objects.resize(0);
 
-
     physical_world = new PhysicalWorld(&phys_settngs);
 }
 
@@ -24,7 +23,7 @@ Engine::GameObject* Engine::World::getGameObjectByLabel(std::string label){
     unsigned int objs_num = static_cast<unsigned int>(this->objects.size());
     for(unsigned int obj_it = 0; obj_it < objs_num; obj_it ++){ //Iterate over all objs in scene
         GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
-        if(obj_ptr->label_ptr->compare(label) == 0) //if labels are same
+        if(obj_ptr->getLabelProperty()->label.compare(label) == 0 && obj_ptr->active) //if labels are same
             return obj_ptr; //Return founded object
     }
     return nullptr; //if we haven't found one
@@ -76,6 +75,21 @@ void Engine::World::removeObject(GameObject* object){
             }
         }
         parent->trimChildrenArray(); //Remove cracked link from vector
+    }
+    //trimObjectsList();
+}
+
+void Engine::World::trimObjectsList(){
+    for (unsigned int i = 0; i < objects.size(); i ++) { //Iterating over all objects
+        if(objects[i]->alive == false){ //If object marked as deleted
+            delete objects[i];
+            for (unsigned int obj_i = i + 1; obj_i < objects.size(); obj_i ++) { //Iterate over all next chidren
+                objects[obj_i - 1] = objects[obj_i]; //Move it to previous place
+                objects[obj_i - 1]->array_index = obj_i - 1;
+
+            }
+            objects.resize(objects.size() - 1); //remove last position
+        }
     }
 }
 

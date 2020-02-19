@@ -54,20 +54,20 @@ bool ZsVulkan::init(bool validate, const char* app_name, int app_ver, SDL_Window
     VkApplicationInfo vk_app_info = {};
     vk_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     vk_app_info.pNext = nullptr;
-    vk_app_info.apiVersion = VK_API_VERSION_1_0;
+    vk_app_info.apiVersion = VK_API_VERSION_1_1;
     vk_app_info.pEngineName = "PERSH_ZSPIRE";
     vk_app_info.engineVersion = 0;
     vk_app_info.pApplicationName = app_name;
-    vk_app_info.applicationVersion = app_ver;
+    vk_app_info.applicationVersion = static_cast<unsigned int>(app_ver);
 
     VkInstanceCreateInfo vk_inst_create_info = {};
     vk_inst_create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     vk_inst_create_info.pNext = nullptr;
     vk_inst_create_info.pApplicationInfo = &vk_app_info;
-    vk_inst_create_info.enabledExtensionCount = extensions.size();
+    vk_inst_create_info.enabledExtensionCount = static_cast<unsigned int>(extensions.size());
     vk_inst_create_info.ppEnabledExtensionNames = extensions.data();
     if(validate){
-        vk_inst_create_info.enabledLayerCount = validationLayers.size();
+        vk_inst_create_info.enabledLayerCount = static_cast<unsigned int>(validationLayers.size());
         vk_inst_create_info.ppEnabledLayerNames = validationLayers.data();
     }
 
@@ -165,13 +165,13 @@ bool ZsVulkan::initDevice(bool validate){
     logical_gpu_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     logical_gpu_create_info.pNext = nullptr;
     logical_gpu_create_info.flags = 0;
-    logical_gpu_create_info.queueCreateInfoCount = queues_toCreate.size(); //size of queues vector
+    logical_gpu_create_info.queueCreateInfoCount = static_cast<unsigned int>(queues_toCreate.size()); //size of queues vector
     logical_gpu_create_info.pQueueCreateInfos = &queues_toCreate[0]; //pointer to start of queues vector
-    logical_gpu_create_info.enabledExtensionCount = deviceExtensions.size();
+    logical_gpu_create_info.enabledExtensionCount = static_cast<unsigned int>(deviceExtensions.size());
     logical_gpu_create_info.ppEnabledExtensionNames = &deviceExtensions[0];
 
     if(validate){
-        logical_gpu_create_info.enabledLayerCount = validationLayers.size();
+        logical_gpu_create_info.enabledLayerCount = static_cast<unsigned int>(validationLayers.size());
         logical_gpu_create_info.ppEnabledLayerNames = validationLayers.data();
     }
 
@@ -234,8 +234,8 @@ bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
     }
     //configure swap extend
     VkExtent2D swap_extend;
-    swap_extend.width = win_info->Width;
-    swap_extend.height = win_info->Height;
+    swap_extend.width = static_cast<unsigned int>(win_info->Width);
+    swap_extend.height = static_cast<unsigned int>(win_info->Height);
 
     //Now fill the strcucture
     VkSwapchainCreateInfoKHR swc_create_info;

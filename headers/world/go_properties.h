@@ -36,16 +36,24 @@ public:
     MeshProperty();
 };
 
-class ScriptGroupProperty : public GameObjectProperty {
+class ScriptGroupProperty : public Engine::GameObjectProperty {
 public:
-    int scr_num;
-    std::vector<ObjectScript> scripts_attached;
+    int scr_num; //to update amount via IntPropertyArea
 
+    std::vector<Engine::ObjectScript> scripts_attached;
+    std::vector<std::string> path_names;
+
+    void onValueChanged();
+    void addPropertyInterfaceToInspector();
+    void shutdown();
     void onUpdate(float deltaTime); //calls update in scripts
-    ObjectScript* getScriptByName(std::string name);
+    void copyTo(Engine::GameObjectProperty* dest);
+
+    Engine::ObjectScript* getScriptByName(std::string name);
 
     ScriptGroupProperty();
 };
+
 
 class LightsourceProperty : public Engine::GameObjectProperty{
 public:
@@ -182,6 +190,7 @@ protected:
 public:
     bool isCustomPhysicalSize;
     ZSVECTOR3 cust_size;
+    ZSVECTOR3 transform_offset;
 
     bool created;
     btRigidBody* rigidBody;

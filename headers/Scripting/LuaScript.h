@@ -20,10 +20,12 @@ private:
 public:
     bool created;
     std::string name;
-    std::string content;
+    std::string script_content;
 
     void _InitScript();
     void _DestroyScript();
+    //TEMPORARY, FOR EDITOR USE
+    void __InitScript();
 
     void _callStart(GameObject* obj, World* world);
     void _callDraw(float deltaTime);

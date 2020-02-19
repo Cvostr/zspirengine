@@ -1,5 +1,6 @@
 #include "../../headers/world/World.h"
 #include "../../headers/world/go_properties.h"
+#include "../../headers/misc/randomg.h"
 
 Engine::GameObjectLink::GameObjectLink(){
     ptr = nullptr;
@@ -35,6 +36,8 @@ Engine::GameObject::GameObject(){
 
     world_ptr = nullptr;
     label_ptr = nullptr;
+
+    genRandomString(&this->str_id, 15); //Generate random string ID
 
     for(int prop_i = 0; prop_i < OBJ_PROPS_SIZE; prop_i ++){ //iterate over all property pointers and clear them
         properties[prop_i] = nullptr;
@@ -91,8 +94,8 @@ void Engine::GameObject::addChildObject(GameObjectLink link, bool updTransform){
 
     //Updating child's transform
     //Now check, if it is possible
-    TransformProperty* Pobj_transform = static_cast<TransformProperty*>(getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
-    TransformProperty* Cobj_transform = static_cast<TransformProperty*>(link.ptr->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+    TransformProperty* Pobj_transform = getTransformProperty();
+    TransformProperty* Cobj_transform = link.ptr->getTransformProperty();
 
     if(updTransform && Pobj_transform != nullptr && Cobj_transform != nullptr){ //If both objects have mesh property
 
@@ -121,8 +124,8 @@ void Engine::GameObject::removeChildObject(GameObjectLink link){
 
             //Updating child's transform
             //Now check, if it is possible
-            TransformProperty* Pobj_transform = static_cast<TransformProperty*>(getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
-            TransformProperty* Cobj_transform = static_cast<TransformProperty*>(ptr->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+            TransformProperty* Pobj_transform = getTransformProperty();
+            TransformProperty* Cobj_transform = ptr->getTransformProperty();
 
             if(Pobj_transform != nullptr && Cobj_transform != nullptr){ //If both objects have mesh property
 
@@ -145,11 +148,11 @@ void Engine::GameObject::removeChildObject(GameObjectLink link){
 }
 
 std::string Engine::GameObject::getLabel(){
-    return *this->label_ptr;
+    return getLabelProperty()->label;
 }
 
 void Engine::GameObject::setLabel(std::string label){
-    this->getLabelProperty()->label = (label);
+    *this->label_ptr = label;
 }
 
 void Engine::GameObject::setActive(bool active){
@@ -157,7 +160,7 @@ void Engine::GameObject::setActive(bool active){
 }
 
 Engine::TransformProperty* Engine::GameObject::getTransformProperty(){
-    return static_cast<TransformProperty*>(getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+    return getPropertyPtr<TransformProperty>();
 }
 
 Engine::LabelProperty* Engine::GameObject::getLabelProperty(){
@@ -234,9 +237,7 @@ void Engine::GameObject::clearAll(){
     }
     this->props_num = 0; //Set property counter to zero
     children.clear();
-
 }
-
 
 void Engine::GameObject::trimChildrenArray(){
     for (unsigned int i = 0; i < children.size(); i ++) { //Iterating over all objects
@@ -250,7 +251,7 @@ void Engine::GameObject::trimChildrenArray(){
 }
 
 bool Engine::GameObject::hasMesh(){
-    Engine::MeshProperty* mesh_prop = static_cast<Engine::MeshProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_MESH));
+    Engine::MeshProperty* mesh_prop = getPropertyPtr<MeshProperty>();
     if(mesh_prop != nullptr){
         if(!mesh_prop->active) return false;
         if(mesh_prop->mesh_ptr != nullptr) return true;
@@ -268,7 +269,7 @@ bool Engine::GameObject::hasTerrain(){
 }
 
 bool Engine::GameObject::isRigidbody(){
-    if(getPropertyPtrByType(GO_PROPERTY_TYPE_RIGIDBODY) != nullptr || getPropertyPtrByType(GO_PROPERTY_TYPE_COLLIDER) != nullptr)
+    if(getPropertyPtr<RigidbodyProperty>() != nullptr || getPropertyPtr<ColliderProperty>() != nullptr)
         return true;
 
     return false;

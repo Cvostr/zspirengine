@@ -109,6 +109,8 @@ public:
     Engine::Camera* getCameraPtr();
     Engine::Camera world_camera;
 
+
+    void trimObjectsList();
     World();
 };
 
