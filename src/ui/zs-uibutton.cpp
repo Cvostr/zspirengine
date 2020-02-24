@@ -16,10 +16,6 @@ void ZSUI::Button::draw(){
         game_data->pipeline->renderSprite(hovered_sprite, this->pos.posX, this->pos.posY, size.WIDTH, size.HEIGHT);
 }
 
-bool ZSUI::Button::isClicked(){
-
-}
-
 void ZSUI::Button::resize(unsigned int Width, unsigned int Height){
     Widget::resize(Width, Height);
 }

@@ -185,6 +185,8 @@ bool ZsVulkan::initDevice(bool validate){
 
     q_f_indices.graphicsIndex = static_cast<uint32_t>(family_index);
     q_f_indices.presentIndex = static_cast<uint32_t>(present_family_index);
+
+    return true;
 }
 
 void ZsVulkan::initSurface(){
@@ -218,7 +220,6 @@ SwapChainSupportDetails ZsVulkan::getSwapChainDetails(){
 bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
     SwapChainSupportDetails swc_details = getSwapChainDetails();
     //Find best surface format
-    VkSurfaceFormatKHR chosen_sf_format;
     for(unsigned int i = 0; i < swc_details.formats.size(); i ++){
         VkSurfaceFormatKHR format = swc_details.formats[i];
         if(format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR && format.format == VK_FORMAT_B8G8R8A8_UNORM){
@@ -233,9 +234,9 @@ bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
             chosen_present_mode = pres_mode;
     }
     //configure swap extend
-    VkExtent2D swap_extend;
-    swap_extend.width = static_cast<unsigned int>(win_info->Width);
-    swap_extend.height = static_cast<unsigned int>(win_info->Height);
+
+    swapchain.swap_extend.width = static_cast<unsigned int>(win_info->Width);
+    swapchain.swap_extend.height = static_cast<unsigned int>(win_info->Height);
 
     //Now fill the strcucture
     VkSwapchainCreateInfoKHR swc_create_info;
@@ -244,7 +245,7 @@ bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
     swc_create_info.flags = 0;
     swc_create_info.surface = this->vk_surface;
     swc_create_info.minImageCount = swc_details.capabilities.minImageCount + 1;
-    swc_create_info.imageExtent = swap_extend;
+    swc_create_info.imageExtent = swapchain.swap_extend;
     //Configure image props
     swc_create_info.imageFormat = chosen_sf_format.format;
     swc_create_info.imageColorSpace = chosen_sf_format.colorSpace;
@@ -252,15 +253,21 @@ bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
     swc_create_info.imageArrayLayers = 1;
     swc_create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT; //we'll render directly to images
 
+    swc_create_info.queueFamilyIndexCount = 2;
+    uint32_t queueFamilyIndices[] = {q_f_indices.graphicsIndex, q_f_indices.presentIndex};
+    swc_create_info.pQueueFamilyIndices = queueFamilyIndices;
+
     if(q_f_indices.graphicsIndex != q_f_indices.presentIndex){ //if indices are not equal
         swc_create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         //TODO - implement
     }else{
         swc_create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        swc_create_info.queueFamilyIndexCount = 0; // Optional
+        swc_create_info.pQueueFamilyIndices = nullptr; // Optional
     }
     //No extra transformations
     swc_create_info.preTransform = swc_details.capabilities.currentTransform;
-    //No comosite alpha
+    //No composite alpha
     swc_create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
     swc_create_info.presentMode = chosen_present_mode;
@@ -269,23 +276,25 @@ bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
 
     std::cout << "Creating Vulkan Swapchain" << std::endl;
     //Creating swapchain
-    if(!vkCreateSwapchainKHR(this->logicalDevice, &swc_create_info, nullptr, &this->vk_swapchain)){
+    if(vkCreateSwapchainKHR(this->logicalDevice, &swc_create_info, nullptr, &this->swapchain.vk_swapchain) != VK_SUCCESS){
         return false;
     }
+    std::cout << "Vulkan: Swapchain creation successful" << std::endl;
     //array of swapchain images
     std::vector<VkImage> swapChainImages;
     uint32_t swc_images;
 
-    vkGetSwapchainImagesKHR(this->logicalDevice, this->vk_swapchain, &swc_images, nullptr);
+    vkGetSwapchainImagesKHR(this->logicalDevice, this->swapchain.vk_swapchain, &swc_images, nullptr);
     swapChainImages.resize(swc_images);
-    vkGetSwapchainImagesKHR(this->logicalDevice, this->vk_swapchain, &swc_images, swapChainImages.data());
+    vkGetSwapchainImagesKHR(this->logicalDevice, this->swapchain.vk_swapchain, &swc_images, swapChainImages.data());
 
-    this->swapChainImageViews.resize(swc_images);
+    this->swapchain.swapChainImageViews.resize(swc_images);
     //Iterate over all swapchain images and create image views
     for(unsigned int sw_i = 0; sw_i < swc_images; sw_i ++){
         VkImageViewCreateInfo img_view_create_info;
         img_view_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         img_view_create_info.pNext = nullptr;
+        img_view_create_info.flags = 0;
         img_view_create_info.image = swapChainImages[sw_i];
         img_view_create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
         img_view_create_info.format = chosen_sf_format.format;
@@ -301,12 +310,12 @@ bool ZsVulkan::initSwapChain(ZSWINDOW_CREATE_INFO* win_info){
         img_view_create_info.subresourceRange.baseArrayLayer = 0;
         img_view_create_info.subresourceRange.layerCount = 1;
 
-        vkCreateImageView(this->logicalDevice, &img_view_create_info, nullptr, &this->swapChainImageViews[sw_i]);
+        vkCreateImageView(this->logicalDevice, &img_view_create_info, nullptr, &this->swapchain.swapChainImageViews[sw_i]);
     }
     return true;
 }
 
-void ZsVkPipeline::create(void* shader, ZsVkPipelineConf conf, ZsVulkan* vulkan){
+bool ZsVkPipeline::create(void* shader, ZsVkPipelineConf conf, ZsVulkan* vulkan){
     Engine::_vk_Shader* shader_ptr = static_cast<Engine::_vk_Shader*>(shader);
     VkPipelineShaderStageCreateInfo vertexStageCreateInfo = {}, fragmentStageCreateInfo = {};
 
@@ -377,8 +386,121 @@ void ZsVkPipeline::create(void* shader, ZsVkPipelineConf conf, ZsVulkan* vulkan)
     pipeline_info.pushConstantRangeCount = 0;
     pipeline_info.pPushConstantRanges = nullptr;
     vkCreatePipelineLayout(vulkan->getVkDevice(), &pipeline_info, nullptr, &this->pipelineLayout);
+
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertexInputInfo.vertexBindingDescriptionCount = 0;
+    vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
+    vertexInputInfo.vertexAttributeDescriptionCount = 0;
+    vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+
+    //----------------NOW CREATING RENDER PASS VULKAN OBJECT--------------------
+    VkAttachmentDescription colorAttachment = {};
+    colorAttachment.format = vulkan->chosen_sf_format.format;
+    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+    //PIXEL SHADER OUTPUT
+    VkAttachmentReference colorAttachmentRef = {};
+    colorAttachmentRef.attachment = 0;
+    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    VkSubpassDescription subpass = {};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &colorAttachmentRef;
+
+    //RENDER PASS
+    VkRenderPassCreateInfo renderPassInfo = {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo.attachmentCount = 1;
+    renderPassInfo.pAttachments = &colorAttachment;
+    renderPassInfo.subpassCount = 1;
+    renderPassInfo.pSubpasses = &subpass;
+
+    if (vkCreateRenderPass(vulkan->getVkDevice(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
+        return false;
+    }
+
+
+    VkGraphicsPipelineCreateInfo pipeline_create_info = {};
+    pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipeline_create_info.pNext = nullptr;
+    pipeline_create_info.stageCount = 2; //Usually, we have two shader stages (vertex and fragment)
+    VkPipelineShaderStageCreateInfo stages[2] = {vertexStageCreateInfo, fragmentStageCreateInfo};
+    pipeline_create_info.pStages = stages; //Store shader stages
+    //Now bind all fucking structures, that created above
+    pipeline_create_info.pVertexInputState = &vertexInputInfo;
+    pipeline_create_info.pInputAssemblyState = &inputAssembly;
+    pipeline_create_info.pViewportState = &viewportState;
+    pipeline_create_info.pRasterizationState = &rasterizer;
+    pipeline_create_info.pMultisampleState = &multisampling;
+    pipeline_create_info.pDepthStencilState = nullptr;
+    pipeline_create_info.pColorBlendState = &colorBlending;
+    pipeline_create_info.pDynamicState = nullptr;
+    pipeline_create_info.layout = pipelineLayout;
+    //Bind render pass
+    pipeline_create_info.renderPass = renderPass;
+    pipeline_create_info.subpass = 0;
+    //For future recreation
+    pipeline_create_info.basePipelineHandle = VK_NULL_HANDLE; // Optional
+    pipeline_create_info.basePipelineIndex = -1; // Optional
+    //Try to create pipeline
+    if(vkCreateGraphicsPipelines(vulkan->getVkDevice(), VK_NULL_HANDLE, 1, &pipeline_create_info, nullptr, &this->pipeline) != VK_SUCCESS)
+        return false;
+
+    return true;
 }
+
 
 VkPipeline ZsVkPipeline::getPipeline(){
     return this->pipeline;
+}
+
+VkRenderPass ZsVkPipeline::getRenderPass(){
+    return this->renderPass;
+}
+
+ZsVkSwapchain* ZsVulkan::getSwapChain(){
+    return &this->swapchain;
+}
+
+ZsVkFamilyIndices* ZsVulkan::getFamilyIndices(){
+    return &this->q_f_indices;
+}
+
+VkQueue ZsVulkan::getGraphicsQueue(){
+    return graphicsQueue;
+}
+VkQueue ZsVulkan::getPresentQueue(){
+    return presentQueue;
+}
+
+VkFramebuffer ZsVkFrameBuffer::getFramebuffer(){
+    return this->framebuffer;
+}
+
+bool ZsVkFrameBuffer::create(ZsVkPipeline* pipeline){
+    VkImageView attachments[] = {
+            vulkan_ptr->getSwapChain()->swapChainImageViews[0]
+        };
+
+        VkFramebufferCreateInfo framebufferInfo = {};
+        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferInfo.renderPass = pipeline->getRenderPass();
+        framebufferInfo.attachmentCount = 1;
+        framebufferInfo.pAttachments = attachments;
+        framebufferInfo.width = 640;
+        framebufferInfo.height = 480;
+        framebufferInfo.layers = 1;
+
+        if (vkCreateFramebuffer(vulkan_ptr->getVkDevice(), &framebufferInfo, nullptr, &framebuffer) != VK_SUCCESS) {
+            return false;
+        }
+        return true;
 }

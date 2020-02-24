@@ -596,8 +596,8 @@ void Engine::RigidbodyProperty::onUpdate(float deltaTime){
 
         if(transform->translation != ZSVECTOR3(curX, curY, curZ))
             transform->translation = ZSVECTOR3(curX, curY, curZ);
-        if(transform->rotation != ZSVECTOR3(rotX, rotY, rotZ))
-            transform->rotation = ZSVECTOR3(rotX, rotY, rotZ);
+        if(transform->rotation != ZSVECTOR3(rotX, rotY, -rotZ))
+            transform->rotation = ZSVECTOR3(rotX, rotY, -rotZ);
     }
 }
 

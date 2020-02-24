@@ -55,6 +55,17 @@ bool Engine::_vk_Shader::compileFromFile(std::string VSpath, std::string FSpath)
     createFsInfo.codeSize = FS_size;
     createFsInfo.pCode = reinterpret_cast<const uint32_t*>(FScontent);
     vkCreateShaderModule(vk->getVkDevice(), &createFsInfo, nullptr, &fragmentShader);
+
+    this->pipeline = new ZsVkPipeline;
+
+    ZsVkPipelineConf conf;
+
+    if(!pipeline->create(this, conf, engine_ptr->getVulkanContext()))
+        return false;
+
+    std::cout << "Vulkan : Sheder compiling successful!" << std::endl;
+
+    return true;
 }
 void Engine::_vk_Shader::Use(){
 

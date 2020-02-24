@@ -143,6 +143,7 @@ void ZS3M::SceneFileExport::getNodesNum(unsigned int* nds_ptr, ZS3M::SceneNode* 
 void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size){
     char header[10];
     memcpy(&header, buffer, 9);
+    header[9] = '\0'; //Terminate string
 
     if(strcmp(header, "zs3mscene") == 1){
         //File's header is incorrect
@@ -333,8 +334,7 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
             }
 
             //Push mesh as output result
-            this->meshes_toWrite.push_back(newmesh);
-
+            this->meshes_toRead.push_back(newmesh);
         }
     }
 

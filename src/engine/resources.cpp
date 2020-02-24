@@ -295,8 +295,8 @@ void Engine::MeshResource::Draw(){
             ZS3M::ImportedSceneFile isf;
             isf.loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
 
-            for(unsigned int i = 0; i < isf.meshes_toWrite.size(); i ++){
-                Engine::Mesh* mMesh = isf.meshes_toWrite[i];
+            for(unsigned int i = 0; i < isf.meshes_toRead.size(); i ++){
+                Engine::Mesh* mMesh = isf.meshes_toRead[i];
                 if(mMesh->mesh_label.compare(resource_label) == false)
                     mesh_ptr = mMesh;
             }

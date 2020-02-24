@@ -25,6 +25,9 @@ bool ZSUI::Widget::isHoveredByMouse(){
 
     return false;
 }
+bool ZSUI::Widget::isClicked(){
+    return (Input::getMouseState().isLButtonDown && isHoveredByMouse());
+}
 void ZSUI::Widget::draw(){
 
 }

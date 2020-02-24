@@ -24,8 +24,6 @@ void _LDR_load(Engine::Loader::LoadRequest* req){
         req->size = static_cast<unsigned int>(stream.tellg());
         stream.seekg(0);
     }
-    //if(!stream.is_open())
-    //    requests.remove(req);
 
     req->data = new unsigned char[req->size];
     stream.read(reinterpret_cast<char*>(req->data), req->size);

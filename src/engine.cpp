@@ -178,6 +178,118 @@ void ZSpireEngine::loadGame(){
     destroyAllManagers();
     SDL_DestroyWindow(window); //Destroy SDL and opengl
     SDL_GL_DeleteContext(glcontext);
+/*
+    Engine::Shader* vert = Engine::allocShader();
+    vert->compileFromFile("Shaders/vk_demo/vert.spv", "Shaders/vk_demo/frag.spv");
+
+    ZsVkFrameBuffer fb;
+    fb.create(static_cast<Engine::_vk_Shader*>(vert)->pipeline);
+
+    VkCommandPool commandPool;
+
+    VkCommandPoolCreateInfo poolInfo = {};
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.queueFamilyIndex = getVulkanContext()->getFamilyIndices()->graphicsIndex;
+    poolInfo.flags = 0; // Optional
+
+    vkCreateCommandPool(getVulkanContext()->getVkDevice(), &poolInfo, nullptr, &commandPool);
+
+
+    VkCommandBuffer cmdbuf;
+
+    VkCommandBufferAllocateInfo allocInfo = {};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = commandPool;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = (uint32_t) 1;
+
+    vkAllocateCommandBuffers(getVulkanContext()->getVkDevice(), &allocInfo, &cmdbuf);
+
+
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = 0; // Optional
+    beginInfo.pInheritanceInfo = nullptr; // Optional
+
+    vkBeginCommandBuffer(cmdbuf, &beginInfo);
+
+
+    VkRenderPassBeginInfo renderPassInfo = {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = static_cast<Engine::_vk_Shader*>(vert)->pipeline->getRenderPass();
+    renderPassInfo.framebuffer = fb.getFramebuffer();
+
+    renderPassInfo.renderArea.offset = {0, 0};
+    renderPassInfo.renderArea.extent = getVulkanContext()->getSwapChain()->swap_extend;
+
+    VkClearValue clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearColor;
+
+    vkCmdBeginRenderPass(cmdbuf, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBindPipeline(cmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, static_cast<Engine::_vk_Shader*>(vert)->pipeline->getPipeline());
+    vkCmdDraw(cmdbuf, 3, 1, 0, 0);
+    vkCmdEndRenderPass(cmdbuf);
+    vkEndCommandBuffer(cmdbuf);
+
+
+    VkSemaphore imageAvailableSemaphore;
+    VkSemaphore renderFinishedSemaphore;
+
+    VkSemaphoreCreateInfo semaphoreInfo = {};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    vkCreateSemaphore(getVulkanContext()->getVkDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphore);
+    vkCreateSemaphore(getVulkanContext()->getVkDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphore);
+
+    while(gameRuns == true){
+
+        uint32_t _imageIndex;
+        vkAcquireNextImageKHR(getVulkanContext()->getVkDevice(), getVulkanContext()->getSwapChain()->vk_swapchain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &_imageIndex);
+
+
+
+
+        VkSubmitInfo submitInfo = {};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {imageAvailableSemaphore};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &cmdbuf;
+
+        VkSemaphore signalSemaphores[] = {renderFinishedSemaphore};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        vkQueueSubmit(getVulkanContext()->getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+
+
+        VkSubpassDependency dependency = {};
+        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+        dependency.dstSubpass = 0;
+        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.srcAccessMask = 0;
+        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+        VkPresentInfoKHR presentInfo = {};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {getVulkanContext()->getSwapChain()->vk_swapchain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+        uint32_t imageIndex = 0;
+        presentInfo.pImageIndices = &imageIndex;
+        presentInfo.pResults = nullptr; // Optional
+        vkQueuePresentKHR(getVulkanContext()->getPresentQueue(), &presentInfo);
+    }*/
 }
 
 void ZSpireEngine::destroyAllManagers(){

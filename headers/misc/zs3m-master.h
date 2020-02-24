@@ -57,7 +57,7 @@ class ImportedSceneFile{
 private:
     std::vector<ZS3M::SceneNode*> nodes_list;
 public:
-    std::vector<Engine::Mesh*> meshes_toWrite;
+    std::vector<Engine::Mesh*> meshes_toRead;
     ZS3M::SceneNode* rootNode;
 
     ZS3M::SceneNode* getSceneNodeWithName(std::string label);

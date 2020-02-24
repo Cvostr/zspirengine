@@ -200,8 +200,6 @@
     //Get vector with identity lenght
 	void vNormalize(ZSVECTOR3* v);
     void qNormalize(ZSQUATERNION* q);
-    ZSQUATERNION eulerToQuat(ZSVECTOR3 v);
-    ZSVECTOR3 quatToEuler(ZSQUATERNION q);
 	ZSVECTOR3 vCross(ZSVECTOR3 v1, ZSVECTOR3 v2);
 	float vDot(ZSVECTOR3 v1, ZSVECTOR3 v2);
     bool isDistanceFits(ZSVECTOR3 pos1, ZSVECTOR3 pos2, float max_dist);
@@ -209,6 +207,7 @@
     int sign(T value){
         if(typeid (value) == typeid (int) || typeid (value) == typeid (float))
             return (static_cast<float>(value) > 0) ? 1 : -1;
+        return 1;
     }
 
     ZSVECTOR3 lerp(ZSVECTOR3 v1, ZSVECTOR3 v2, float factor);

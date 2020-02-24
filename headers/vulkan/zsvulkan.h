@@ -34,18 +34,54 @@ typedef struct ZsVkPipelineConf{
         iaTopology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         polygonMode = VK_POLYGON_MODE_FILL;
         cullFace = VK_CULL_MODE_NONE;
+
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width =  640;
+        viewport.height = 480;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+
+        VkExtent2D swap_extend;
+        swap_extend.width = static_cast<unsigned int>(640);
+        swap_extend.height = static_cast<unsigned int>(480);
+
+        scissor.offset = {0, 0};
+        scissor.extent = swap_extend;
     }
 }ZsVkPipelineConf;
 
 class ZsVkPipeline{
 private:
-    VkPipeline pipeline;
+    VkPipeline pipeline; //Vulkan pipeline object
     VkPipelineLayout pipelineLayout;
+
+    VkRenderPass renderPass; //Render pass of this layout
 public:
     VkPipeline getPipeline();
+    VkRenderPass getRenderPass();
 
-    void create(void* shader, ZsVkPipelineConf conf, ZsVulkan* vulkan);
+    bool create(void* shader, ZsVkPipelineConf conf, ZsVulkan* vulkan);
 };
+
+typedef struct ZsVkSwapchain{
+    //Vulkan swapchain object
+    VkSwapchainKHR vk_swapchain;
+    //Array of swapchain image views
+    std::vector<VkImageView> swapChainImageViews;
+    VkExtent2D swap_extend;
+}ZsVkSwapchain;
+
+class ZsVkFrameBuffer{
+private:
+    VkFramebuffer framebuffer;
+public:
+    VkFramebuffer getFramebuffer();
+
+    bool create(ZsVkPipeline* pipeline);
+};
+
+
 
 class ZsVulkan{
 private:
@@ -67,9 +103,8 @@ private:
     VkQueue presentQueue; //queue to present
 
     VkSurfaceKHR vk_surface;
-    VkSwapchainKHR vk_swapchain;
+    ZsVkSwapchain swapchain;
 
-    std::vector<VkImageView> swapChainImageViews;
 public:
     bool init(bool validate, const char* app_name, int app_ver, SDL_Window* window, ZSWINDOW_CREATE_INFO* win_info);
     bool initDevice(bool validate);
@@ -78,8 +113,13 @@ public:
 
     VkDevice getVkDevice();
     VkPhysicalDevice getPhysicalDevice();
+    ZsVkFamilyIndices* getFamilyIndices();
+    VkQueue getGraphicsQueue();
+    VkQueue getPresentQueue();
 
     SwapChainSupportDetails getSwapChainDetails();
+    ZsVkSwapchain* getSwapChain();
+    VkSurfaceFormatKHR chosen_sf_format;
 
     ZsVulkan();
 };

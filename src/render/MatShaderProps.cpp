@@ -285,6 +285,7 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
     char test_header[13];
     //Read header
     memcpy(test_header, &buffer[position], 12);
+    test_header[12] = '\0'; //Terminate string
 
     if(strcmp(test_header, "ZSP_MATERIAL") == 1) //If it isn't zspire material
         return; //Go out, we have nothing to do
