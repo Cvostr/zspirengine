@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{0415ADB2-8D2F-45CF-B7E2-1BC392DD545F}</ProjectGuid>
+    <RootNamespace>engine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>..\LIBS;..\LIBS\BULLET;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>..\LIBS\BULLET;..\LIBS;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="code\src\engine.cpp" />
+    <ClCompile Include="code\src\engine\EngineManager.cpp" />
+    <ClCompile Include="code\src\engine\loader.cpp" />
+    <ClCompile Include="code\src\engine\resources.cpp" />
+    <ClCompile Include="code\src\input\zs-input.cpp" />
+    <ClCompile Include="code\src\misc\GlyphManager.cpp" />
+    <ClCompile Include="code\src\misc\oal_manager.cpp" />
+    <ClCompile Include="code\src\misc\randomg.cpp" />
+    <ClCompile Include="code\src\misc\zs3m-master.cpp" />
+    <ClCompile Include="code\src\ogl\ogl_mesh.cpp" />
+    <ClCompile Include="code\src\ogl\ogl_shader.cpp" />
+    <ClCompile Include="code\src\ogl\ogl_texture.cpp" />
+    <ClCompile Include="code\src\ogl\ogl_uniform_buf.cpp" />
+    <ClCompile Include="code\src\render\MatShaderProps.cpp" />
+    <ClCompile Include="code\src\render\terrain-render.cpp" />
+    <ClCompile Include="code\src\render\zs-animation.cpp" />
+    <ClCompile Include="code\src\render\zs-material-defines.cpp" />
+    <ClCompile Include="code\src\render\zs-math.cpp" />
+    <ClCompile Include="code\src\render\zs-mesh.cpp" />
+    <ClCompile Include="code\src\render\zs-pipeline.cpp" />
+    <ClCompile Include="code\src\render\zs-shader.cpp" />
+    <ClCompile Include="code\src\render\zs-texture.cpp" />
+    <ClCompile Include="code\src\render\zs-uniform-buffer.cpp" />
+    <ClCompile Include="code\src\Scripting\LuaScript.cpp" />
+    <ClCompile Include="code\src\Scripting\zsensdk.cpp" />
+    <ClCompile Include="code\src\Scripting\zsensdk_input.cpp" />
+    <ClCompile Include="code\src\ui\zs-uibutton.cpp" />
+    <ClCompile Include="code\src\ui\zs-uiwidget.cpp" />
+    <ClCompile Include="code\src\vulkan\vk_mesh.cpp" />
+    <ClCompile Include="code\src\vulkan\vk_shader.cpp" />
+    <ClCompile Include="code\src\vulkan\vk_texture.cpp" />
+    <ClCompile Include="code\src\vulkan\vk_uniform_buf.cpp" />
+    <ClCompile Include="code\src\vulkan\zsvk_mem.cpp" />
+    <ClCompile Include="code\src\vulkan\zsvulkan.cpp" />
+    <ClCompile Include="code\src\world\GameObject.cpp" />
+    <ClCompile Include="code\src\world\GoProperty\go_filestream.cpp" />
+    <ClCompile Include="code\src\world\GoProperty\go_properties.cpp" />
+    <ClCompile Include="code\src\world\GoProperty\TerrainComponent.cpp" />
+    <ClCompile Include="code\src\world\GoProperty\tile_properties.cpp" />
+    <ClCompile Include="code\src\world\PhysicalWorld.cpp" />
+    <ClCompile Include="code\src\world\Terrain.cpp" />
+    <ClCompile Include="code\src\world\World.cpp" />
+    <ClCompile Include="code\src\world\zs-camera.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="code\headers\engine.h" />
+    <ClInclude Include="code\headers\engine\EngineManager.h" />
+    <ClInclude Include="code\headers\engine\engine_window.h" />
+    <ClInclude Include="code\headers\engine\loader.h" />
+    <ClInclude Include="code\headers\engine\resources.h" />
+    <ClInclude Include="code\headers\input\zs-input.h" />
+    <ClInclude Include="code\headers\misc\GlyphManager.h" />
+    <ClInclude Include="code\headers\misc\oal_manager.h" />
+    <ClInclude Include="code\headers\misc\randomg.h" />
+    <ClInclude Include="code\headers\misc\zs3m-master.h" />
+    <ClInclude Include="code\headers\ogl\ogl.h" />
+    <ClInclude Include="code\headers\render\zs-animation.h" />
+    <ClInclude Include="code\headers\render\zs-materials.h" />
+    <ClInclude Include="code\headers\render\zs-math.h" />
+    <ClInclude Include="code\headers\render\zs-mesh.h" />
+    <ClInclude Include="code\headers\render\zs-pipeline.h" />
+    <ClInclude Include="code\headers\render\zs-shader.h" />
+    <ClInclude Include="code\headers\render\zs-texture.h" />
+    <ClInclude Include="code\headers\render\zs-uniform-buffer.h" />
+    <ClInclude Include="code\headers\Scripting\LuaScript.h" />
+    <ClInclude Include="code\headers\Scripting\zsensdk.h" />
+    <ClInclude Include="code\headers\ui\zs-uibutton.h" />
+    <ClInclude Include="code\headers\ui\zs-uiwidget.h" />
+    <ClInclude Include="code\headers\world\go_properties.h" />
+    <ClInclude Include="code\headers\world\Physics.h" />
+    <ClInclude Include="code\headers\world\terrain.h" />
+    <ClInclude Include="code\headers\world\tile_properties.h" />
+    <ClInclude Include="code\headers\world\World.h" />
+    <ClInclude Include="code\headers\world\zs-camera.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="code\Shaders\3d\3d.frag" />
+    <None Include="code\Shaders\3d\3d.vert" />
+    <None Include="code\Shaders\3d\3d_unskinned.vert" />
+    <None Include="code\Shaders\heightmap\grass.frag" />
+    <None Include="code\Shaders\heightmap\grass.vert" />
+    <None Include="code\Shaders\heightmap\heightmap.frag" />
+    <None Include="code\Shaders\heightmap\heightmap.vert" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
