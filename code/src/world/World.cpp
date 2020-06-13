@@ -53,8 +53,8 @@ Engine::GameObject* Engine::World::addObject(GameObject obj){
             free_index = static_cast<unsigned int>(obj_i);
         }
     }
-
-    if(free_index == objects.size()){ //all indeces are busy
+    //all indices are busy by objects
+    if(free_index == objects.size()){ 
         this->objects.push_back(newobj);
     }else{
         this->objects[free_index] = newobj;
@@ -89,7 +89,8 @@ void Engine::World::removeObj(Engine::GameObjectLink& link) {
                 parent->children[i].crack(); //Make link broken
             }
         }
-        parent->trimChildrenArray(); //Remove cracked link from vector
+        //Remove cracked link from vector
+        parent->trimChildrenArray(); 
     }
 }
 
@@ -146,16 +147,15 @@ Engine::GameObject* Engine::World::dublicateObject(GameObject* original, bool pa
     //Set new name for object
     LabelProperty* label_prop = new_obj->getLabelProperty(); //Obtain pointer to label property
     std::string to_paste;
-
+    //generate random string to add it after object label
     genRandomString(&to_paste, 3);
-
+    //Add generated string to end of label
     label_prop->label = label_prop->label + "_" + to_paste;
-
+    //Update pointer to LabelProperty
     new_obj->label_ptr = &label_prop->label;
     //Dublicate chilldren object
     unsigned int children_amount = static_cast<unsigned int>(original->children.size());
     //Iterate over all children
-
     for(unsigned int child_i = 0; child_i < children_amount; child_i ++){
         //Get pointer to original child object
         GameObjectLink link = original->children[child_i];
@@ -211,9 +211,9 @@ void Engine::World::loadGameObject(GameObject* object_ptr, std::ifstream* world_
                 link.obj_str_id = child_str_id; //Setting string ID
                 object_ptr->children.push_back(link); //Adding to object
             }
-
         }
         if(prefix.compare("G_PROPERTY") == 0){ //We found an property, zaeb*s'
+            //Call function to load that property
             object_ptr->loadProperty(world_stream);
         }
     }
@@ -239,7 +239,8 @@ void Engine::World::loadFromFile(std::string file, RenderSettings* settings_ptr)
 
     while(!stream.eof()){ //until file is over
         std::string prefix;
-        stream >> prefix; //define and read prefix
+        //read prefix
+        stream >> prefix; 
 
         if(prefix.compare("RENDER_SETTINGS_AMB_COLOR") == 0){ //if it is render setting of ambient light color
             stream.seekg(1, std::ofstream::cur);
@@ -250,9 +251,9 @@ void Engine::World::loadFromFile(std::string file, RenderSettings* settings_ptr)
 
         if(prefix.compare("G_OBJECT") == 0){ //if it is game object
             GameObject obj;
-
+            //Call function to load object
             loadGameObject(&obj, &stream);
-
+            //Add object to scene
             this->addObject(obj);
         }
     }
@@ -266,7 +267,7 @@ void Engine::World::loadFromFile(std::string file, RenderSettings* settings_ptr)
             child_go_ptr->hasParent = true;
         }
     }
-
+    //Close world file stream
     stream.close();
 }
 

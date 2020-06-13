@@ -18,7 +18,9 @@ PhysicalWorld::PhysicalWorld(PhysicalWorldSettings* settings){
     this->physic_world->setGravity(btVector3(settings->gravity.X,
                                                      settings->gravity.Y,
                                                      settings->gravity.Z));
-    physic_world->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
+    GhostCallback = new btGhostPairCallback();
+
+    physic_world->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(GhostCallback);
 }
 
 PhysicalWorld::~PhysicalWorld() {
@@ -28,6 +30,7 @@ PhysicalWorld::~PhysicalWorld() {
     delete broadphase;
     delete dispatcher;
     delete collisionConfiguraton;
+    delete GhostCallback;
 }
 
 void PhysicalWorld::addRidigbodyToWorld(btRigidBody* body){
@@ -48,6 +51,7 @@ void PhysicalWorld::removeCollisionObjFromWorld(btCollisionObject* body) {
 void PhysicalWorld::stepSimulation(float stepSimulation){
     if(stepSimulation > 200) return;
 
+    //Simulate physics
     this->physic_world->stepSimulation(stepSimulation);
     physic_world->performDiscreteCollisionDetection();
 }
@@ -65,8 +69,9 @@ Engine::PhysicalProperty::PhysicalProperty(){
 
     rigidBody = nullptr;
     shape = nullptr;
-
-    transform_offset = ZSVECTOR3(0, 0, 0);
+    //Set base values to custom transform vectors
+    transform_offset = ZSVECTOR3(0.f, 0.f, 0.f);
+    cust_size = ZSVECTOR3(1.f, 1.f, 1.f);
 
     coll_type = COLLIDER_TYPE::COLLIDER_TYPE_BOX;
     mass = 0;
@@ -110,8 +115,6 @@ void Engine::PhysicalProperty::init(){
     startTransform.setRotation(btQuaternion(transform->abs_rotation.X, transform->abs_rotation.Y, transform->abs_rotation.Z));
     //startTransform.setRotation(b);
 
-     
-
     //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
     btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
     btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState, shape, localInertia);
@@ -143,7 +146,7 @@ void Engine::TriggerProperty::initGhost() {
     startTransform.setOrigin(btVector3(btScalar(pos.X), btScalar(pos.Y), btScalar(pos.Z)));
     //Set start rotation
     startTransform.setRotation(btQuaternion(transform->abs_rotation.X, transform->abs_rotation.Y, transform->abs_rotation.Z));
-
+    //Create Ghost Object
     m_ghost = new btGhostObject();
     m_ghost->setCollisionShape(shape);
     m_ghost->setWorldTransform(startTransform);
@@ -158,6 +161,7 @@ void Engine::PhysicalProperty::updateCollisionShape(){
     Engine::Mesh* m = mesh->mesh_ptr->mesh_ptr;
 
     ZSVECTOR3 scale = transform->abs_scale;
+    //if size is overrided
     if(isCustomPhysicalSize){
         scale = cust_size;
     }
@@ -183,7 +187,6 @@ void Engine::PhysicalProperty::updateCollisionShape(){
             break;
         }
         case COLLIDER_TYPE::COLLIDER_TYPE_CONVEX_HULL:{
-
             shape = new btConvexHullShape(m->vertices_coord, m->vertices_num, sizeof (float) * 3);
             break;
         }

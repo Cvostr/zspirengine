@@ -254,6 +254,7 @@ class TriggerProperty : public Engine::PhysicalProperty {
 public:
     btGhostObject* m_ghost;
 
+    void addPropertyInterfaceToInspector();
     void onUpdate(float deltaTime);
     void copyTo(Engine::GameObjectProperty* dest);
     void initGhost();
@@ -300,7 +301,6 @@ public:
 
     std::vector<HeightmapTexturePair> textures;
     
-
     std::string file_label;
     int Width; //Width of terrain mesh
     int Length; //Height of terrain mesh
@@ -323,13 +323,16 @@ public:
     void onAddToObject();
     void copyTo(Engine::GameObjectProperty* dest);
     void onUpdate(float deltaTime);
-    TerrainProperty();
+    
     void onMouseMotion(int posX, int posY, int screenY, bool isLeftButtonHold, bool isCtrlHold);
     void getPickedVertexId(int posX, int posY, int screenY, unsigned char* data);
 
     void modifyTerrainVertex(unsigned char* gl_data, bool isCtrlHold);
 
     TerrainData* getTerrainData();
+
+    TerrainProperty();
+    ~TerrainProperty();
 };
 
 }

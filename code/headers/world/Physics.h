@@ -36,6 +36,7 @@ private:
     btBroadphaseInterface* broadphase;
     btSequentialImpulseConstraintSolver* solver;
     btDiscreteDynamicsWorld* physic_world;
+    btGhostPairCallback* GhostCallback;
 
 public:
     unsigned int getManifolsNum();

@@ -91,45 +91,57 @@ typedef struct TerrainPainting{
     }
 }TerrainPainting;
 
+struct TerrainMeshGL {
+    unsigned int VAO;
+    unsigned int VBO;
+    unsigned int EBO;
+
+    void generate();
+    void destroy();
+};
+
 class TerrainData{
 private:
     bool created;
     //Stores IDs for paintings and memory
     TerrainPainting painting;
-
+    //Stores Opengl mesh variables
+    TerrainMeshGL meshGL;
+    //Array for vertex data to GL
     HeightmapVertex* vertices;
+    //Array for indices
     unsigned int* indices;
 
 public:
+    //terrain sizes
     int W, H;
 
     bool hasHeightmapChanged;
     bool hasPaintingChanged;
     bool hasGrassChanged;
     bool hasPhysicShapeChanged;
-
+    //Pointer to object of bullet physics shape
     btBvhTriangleMeshShape* shape;
-
-    unsigned int VAO;
-    unsigned int VBO;
-    unsigned int EBO;
-
+    //Data for each vertex of heightmap
     HeightmapTexel* data;
-
+    //Stores all grass types
     std::vector<HeightmapGrass> grass;
     float GrassDensity;
-
+    //Allocate arrays
     void alloc(int W, int H);
-    void flatTerrain(int height);
-
+    //Make terrain absolutely flat with specified height
+    void flatTerrain(float height);
+    //Init opengl varibles
     void initGL();
     void initPhysics();
+    //Destroy GL variables
     void destroyGL();
     void Draw(bool picking = false);
     void generateGLMesh();
     void processNormalsTangentSpace(HeightmapVertex* vert_array, unsigned int* indices_array, int indices_num);
     void saveToFile(const char* file_path);
     bool loadFromFile(const char* file_path);
+    bool loadFromMemory(const char* bytes);
 
     void modifyHeight(int originX, int originY, float originHeight, int range, int multiplyer);
     void modifyTexture(int originX, int originY, int range, unsigned char texture);

@@ -4,7 +4,7 @@
 extern ZSGAME_DATA* game_data;
 
 Engine::GameObjectProperty::GameObjectProperty(){
-    type = GO_PROPERTY_TYPE_NONE;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_NONE;
     active = true;
     world_ptr = nullptr;
 }
@@ -48,82 +48,83 @@ Engine::GameObjectProperty::~GameObjectProperty(){
 
 }
 
-Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
+Engine::GameObjectProperty* Engine::GameObject::allocProperty(PROPERTY_TYPE type){
     GameObjectProperty* _ptr = nullptr;
-    switch (type) {
-        case GO_PROPERTY_TYPE_TRANSFORM:{ //If type is transfrom
+    PROPERTY_TYPE _type = static_cast<PROPERTY_TYPE>(type);
+    switch (_type) {
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM:{ //If type is transfrom
             _ptr = static_cast<GameObjectProperty*>(new TransformProperty); //Allocation of transform in heap
             break;
         }
-        case GO_PROPERTY_TYPE_LABEL:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL:{
             LabelProperty* ptr = new LabelProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
-        case GO_PROPERTY_TYPE_MESH:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH:{
             _ptr = static_cast<GameObjectProperty*>(new MeshProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_NODE:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_NODE:{
             _ptr = static_cast<GameObjectProperty*>(new NodeProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_LIGHTSOURCE:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_LIGHTSOURCE:{
             _ptr = static_cast<GameObjectProperty*>(new LightsourceProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_SCRIPTGROUP:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_SCRIPTGROUP:{
             ScriptGroupProperty* ptr = new ScriptGroupProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
-        case GO_PROPERTY_TYPE_AUDSOURCE:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_AUDSOURCE:{
             _ptr = static_cast<GameObjectProperty*>(new AudioSourceProperty);
             break;
         }
 
-        case GO_PROPERTY_TYPE_MATERIAL:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_MATERIAL:{
             _ptr = static_cast<GameObjectProperty*>(new MaterialProperty);
             break;
         }
 
-        case GO_PROPERTY_TYPE_COLLIDER:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_COLLIDER:{
             _ptr = static_cast<GameObjectProperty*>(new ColliderProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_RIGIDBODY:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_RIGIDBODY:{
             _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::RigidbodyProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_CHARACTER_CONTROLLER:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_CHARACTER_CONTROLLER:{
             _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::CharacterControllerProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_TILE_GROUP:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_TILE_GROUP:{
             _ptr = static_cast<GameObjectProperty*>(new TileGroupProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_TILE:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_TILE:{
             _ptr = static_cast<GameObjectProperty*>(new TileProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_ANIMATION:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_ANIMATION:{
             _ptr = static_cast<GameObjectProperty*>(new AnimationProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_SKYBOX:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_SKYBOX:{
             _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::SkyboxProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_SHADOWCASTER:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_SHADOWCASTER:{
             _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::ShadowCasterProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_TERRAIN:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_TERRAIN:{
             _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::TerrainProperty);
             break;
         }
-        case GO_PROPERTY_TYPE_TRIGGER: {
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_TRIGGER: {
             _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::TriggerProperty);
             break;
         }
@@ -132,10 +133,11 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(int type){
 }
 
 Engine::TransformProperty::TransformProperty(){
-    this->type = GO_PROPERTY_TYPE_TRANSFORM;
+    this->type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM;
+    this->scale = ZSVECTOR3(1.f, 1.f, 1.f);
 }
 
-void Engine::TransformProperty::updateMat(){
+void Engine::TransformProperty::updateMatrix(){
     //Variables to store
     ZSVECTOR3 p_translation = ZSVECTOR3(0,0,0);
     ZSVECTOR3 p_scale = ZSVECTOR3(1,1,1);
@@ -144,7 +146,7 @@ void Engine::TransformProperty::updateMat(){
     GameObject* ptr = go_link.updLinkPtr(); //Pointer to object with this property
     if(ptr != nullptr && ptr->hasParent){ //if object exist and dependent
         //Get parent's transform property
-        TransformProperty* property = static_cast<TransformProperty*>(ptr->parent.updLinkPtr()->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+        TransformProperty* property = static_cast<TransformProperty*>(ptr->parent.updLinkPtr()->getTransformProperty());
         //Calculate parent transform offset
         property->getAbsoluteParentTransform(p_translation, p_scale, p_rotation);
 
@@ -168,9 +170,9 @@ void Engine::TransformProperty::updateMat(){
 }
 void Engine::TransformProperty::onValueChanged(){
     if((this->go_link.updLinkPtr()) == nullptr) return;
-
-    updateMat();
-
+    //Update transform matrices
+    updateMatrix();
+    //Get pointer to Base physics component
     PhysicalProperty* phys = static_cast<PhysicalProperty*>(go_link.updLinkPtr()->getPhysicalProperty());
 
     if(this->go_link.updLinkPtr()->isRigidbody()){
@@ -202,7 +204,7 @@ void Engine::TransformProperty::getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTO
 
     if(ptr->hasParent){
         GameObject* parent_p = ptr->parent.ptr;
-        TransformProperty* property = static_cast<TransformProperty*>(parent_p->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+        TransformProperty* property = static_cast<TransformProperty*>(parent_p->getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM));
         property->getAbsoluteParentTransform(t, s, r);
     }
 }
@@ -214,7 +216,7 @@ void Engine::TransformProperty::getAbsoluteRotationMatrix(ZSMATRIX4x4& m){
 
     if(ptr->hasParent == true){
         GameObject* parent_p = ptr->parent.ptr;
-        TransformProperty* property = static_cast<TransformProperty*>(parent_p->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+        TransformProperty* property = static_cast<TransformProperty*>(parent_p->getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM));
 
         ZSMATRIX4x4 rotation_mat1 = getRotationMat(property->rotation, ptr->getTransformProperty()->translation);
         m = rotation_mat1 * m;
@@ -246,18 +248,18 @@ void Engine::TransformProperty::copyTo(GameObjectProperty* dest){
 }
 
 void Engine::TransformProperty::onPreRender(RenderPipeline* pipeline){
-    this->updateMat();
+    this->updateMatrix();
     //Send transform matrix to transform buffer
     pipeline->transformBuffer->bind();
     pipeline->transformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2, sizeof (ZSMATRIX4x4), &transform_mat);
 }
 
 Engine::LabelProperty::LabelProperty(){
-    this->type = GO_PROPERTY_TYPE_LABEL;
+    this->type = PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL;
 }
 
 Engine::MeshProperty::MeshProperty(){
-    this->type = GO_PROPERTY_TYPE_MESH;
+    this->type = PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH;
     mesh_ptr = nullptr;
 
     castShadows = true;
@@ -293,7 +295,7 @@ void Engine::MeshProperty::onValueChanged(){
 }
 
 Engine::ScriptGroupProperty::ScriptGroupProperty(){
-    type = GO_PROPERTY_TYPE_SCRIPTGROUP;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_SCRIPTGROUP;
 
     scr_num = 0;
     this->scripts_attached.resize(static_cast<unsigned int>(this->scr_num));
@@ -379,7 +381,7 @@ void Engine::LightsourceProperty::onPreRender(Engine::RenderPipeline* pipeline){
 }
 
 Engine::LightsourceProperty::LightsourceProperty(){
-    type = GO_PROPERTY_TYPE_LIGHTSOURCE;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_LIGHTSOURCE;
     active = true;
     light_type = LIGHTSOURCE_TYPE::LIGHTSOURCE_TYPE_DIRECTIONAL; //base type is directional
 
@@ -389,7 +391,7 @@ Engine::LightsourceProperty::LightsourceProperty(){
 }
 
 Engine::AudioSourceProperty::AudioSourceProperty(){
-    type = GO_PROPERTY_TYPE_AUDSOURCE;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_AUDSOURCE;
 
     buffer_ptr = nullptr;
     this->resource_relpath = "@none";
@@ -508,7 +510,7 @@ void Engine::AudioSourceProperty::onObjectDeleted(){
 }
 
 Engine::MaterialProperty::MaterialProperty(){
-    type = GO_PROPERTY_TYPE_MATERIAL;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_MATERIAL;
 
     receiveShadows = true;
     this->material_ptr = nullptr;
@@ -516,7 +518,7 @@ Engine::MaterialProperty::MaterialProperty(){
 
 void Engine::MaterialProperty::copyTo(Engine::GameObjectProperty* dest){
     //MaterialShaderProperty
-    if(dest->type != GO_PROPERTY_TYPE_MATERIAL) return;
+    if(dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_MATERIAL) return;
 
     //Do base things
     GameObjectProperty::copyTo(dest);
@@ -543,7 +545,7 @@ void Engine::MaterialProperty::_setMaterial(MaterialResource* mat) {
 }
 
 Engine::NodeProperty::NodeProperty(){
-    type = GO_PROPERTY_TYPE_NODE;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_NODE;
 
     scale = ZSVECTOR3(1.f, 1.f, 1.f);
     translation = ZSVECTOR3(0.f, 0.f, 0.f);
@@ -573,7 +575,7 @@ void Engine::ColliderProperty::onUpdate(float deltaTime){
 }
 
 void Engine::ColliderProperty::copyTo(Engine::GameObjectProperty* dest){
-    if(dest->type != GO_PROPERTY_TYPE_COLLIDER) return;
+    if(dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_COLLIDER) return;
 
     PhysicalProperty::copyTo(dest);
 
@@ -585,7 +587,7 @@ Engine::TransformProperty* Engine::ColliderProperty::getTransformProperty(){
 }
 
 Engine::ColliderProperty::ColliderProperty(){
-    type = GO_PROPERTY_TYPE_COLLIDER;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_COLLIDER;
 
     coll_type = COLLIDER_TYPE::COLLIDER_TYPE_CUBE;
     created = false;
@@ -651,7 +653,7 @@ void Engine::RigidbodyProperty::onValueChanged(){
 
 
 void Engine::RigidbodyProperty::copyTo(Engine::GameObjectProperty* dest){
-    if(dest->type != GO_PROPERTY_TYPE_RIGIDBODY) return;
+    if(dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_RIGIDBODY) return;
 
     //Do base things
     PhysicalProperty::copyTo(dest);
@@ -666,7 +668,7 @@ Engine::RigidbodyProperty::RigidbodyProperty(){
 
     mass = 1.0f;
     created = false;
-    type = GO_PROPERTY_TYPE_RIGIDBODY;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_RIGIDBODY;
     coll_type = COLLIDER_TYPE::COLLIDER_TYPE_CUBE;
 
     gravity = ZSVECTOR3(0.f, -10.f, 0.f);
@@ -674,13 +676,20 @@ Engine::RigidbodyProperty::RigidbodyProperty(){
 }
 
 Engine::CharacterControllerProperty::CharacterControllerProperty(){
-    type = GO_PROPERTY_TYPE_CHARACTER_CONTROLLER;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_CHARACTER_CONTROLLER;
     created = false;
 
     gravity = ZSVECTOR3(0.f, -10.f, 0.f);
     linearVel = ZSVECTOR3(0.f, -10.f, 0.f);
 
     mass = 10;
+}
+
+Engine::TriggerProperty::TriggerProperty() {
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TRIGGER;
+    coll_type = COLLIDER_TYPE::COLLIDER_TYPE_CUBE;
+    created = false;
+    m_ghost = nullptr;
 }
 
 void Engine::CharacterControllerProperty::setLinearVelocity(ZSVECTOR3 lvel){
@@ -691,7 +700,7 @@ void Engine::CharacterControllerProperty::setLinearVelocity(ZSVECTOR3 lvel){
 }
 
 void Engine::CharacterControllerProperty::copyTo(Engine::GameObjectProperty* dest){
-    if(dest->type != GO_PROPERTY_TYPE_CHARACTER_CONTROLLER) return;
+    if(dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_CHARACTER_CONTROLLER) return;
 
     //Do base things
     PhysicalProperty::copyTo(dest);
@@ -773,7 +782,7 @@ void Engine::TriggerProperty::onUpdate(float deltaTime) {
     }
 }
 void Engine::TriggerProperty::copyTo(Engine::GameObjectProperty* dest) {
-    if (dest->type != GO_PROPERTY_TYPE_TRIGGER) return;
+    if (dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_TRIGGER) return;
 
     //Do base things
     PhysicalProperty::copyTo(dest);
@@ -781,14 +790,8 @@ void Engine::TriggerProperty::copyTo(Engine::GameObjectProperty* dest) {
     TriggerProperty* trigger = static_cast<TriggerProperty*>(dest);
 }
 
-Engine::TriggerProperty::TriggerProperty() {
-    type = GO_PROPERTY_TYPE_TRIGGER;
-    created = false;
-    m_ghost = nullptr;
-}
-
 Engine::AnimationProperty::AnimationProperty(){
-    type = GO_PROPERTY_TYPE_ANIMATION;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_ANIMATION;
     this->anim_label = "@none";
     anim_prop_ptr = nullptr;
     Playing = false;
@@ -899,11 +902,11 @@ void Engine::AnimationProperty::onValueChanged(){
 }
 
 Engine::SkyboxProperty::SkyboxProperty(){
-    type = GO_PROPERTY_TYPE_SKYBOX;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_SKYBOX;
 }
 
 Engine::ShadowCasterProperty::ShadowCasterProperty(){
-    type = GO_PROPERTY_TYPE_SHADOWCASTER;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_SHADOWCASTER;
 
     initialized = false;
 

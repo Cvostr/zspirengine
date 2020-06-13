@@ -17,10 +17,14 @@ void _LDR_load(Engine::Loader::LoadRequest* req){
     std::ifstream stream;
     //Get absolute path to blob file
     std::string file_path = blob_root_directory + req->file_path;
+    //Check, if size explicitly specified
     if(req->size > 0){
+        //if size explicitly specified
         stream.open(file_path, std::ofstream::binary);
         stream.seekg(static_cast<long>(req->offset));
     }else{
+        //if size explicitly specified, then try to load file
+        //and get file size
         stream.open(file_path, std::ofstream::binary | std::ofstream::ate);
         req->size = static_cast<unsigned int>(stream.tellg());
         stream.seekg(0);
@@ -38,11 +42,14 @@ void _LDR_load(Engine::Loader::LoadRequest* req){
 
 void loop(){
     while(loader_thread_working){
+        //If there are some queues in pool
         if(queue_length > 0){
             std::cout << "Loading ";
+            //Obtain pointer to LoadRequest
             Engine::Loader::LoadRequest* req = requests[LOADER_QUEUE_SIZE - queue_length];
-            
+            //Reduce requests pool amount
             queue_length--;
+            //Load resource by request
             _LDR_load(req);
         }
     }

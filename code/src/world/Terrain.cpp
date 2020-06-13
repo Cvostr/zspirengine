@@ -24,13 +24,13 @@ bool TerrainData::isCreated() {
 TerrainData::~TerrainData(){
     if(created)
         delete[] data;
-
+    //Free shape
     if(shape)
         delete shape;
-
+    //Free Dynamic Arrays
     delete[] vertices;
     delete[] indices;
-
+    //Free memory for texture buffers
     painting.freeMem();
 }
 
@@ -46,7 +46,7 @@ void TerrainData::alloc(int W, int H){
     flatTerrain(0);
 }
 
-void TerrainData::flatTerrain(int height){
+void TerrainData::flatTerrain(float height){
     for(int i = 0; i < W * H; i ++){
         data[i].height = height;
         this->data[i].texture_factors[0] = 255;
@@ -115,12 +115,11 @@ void TerrainData::updateGeometryBuffers(bool full_rebuild){
                 indices[inds + 3] = static_cast<unsigned int>(x * H + y);
                 indices[inds + 5] = static_cast<unsigned int>(x * H + H + y + 1);
                 indices[inds + 4] = static_cast<unsigned int>(x * H + y + 1);
-
+                //Add inds 6
                 inds += 6;
             }
         }
     }
-
     //generate normals, tangent, bitangent
     processNormalsTangentSpace(vertices, indices, (W - 1) * (H - 1) * 2 * 3);
 }
@@ -154,59 +153,56 @@ bool TerrainData::loadFromFile(const char* file_path){
             world_stream.read(reinterpret_cast<char*>(&data[i].texture_factors[tex_factor]), sizeof(unsigned char));
         world_stream.read(reinterpret_cast<char*>(&data[i].grass), sizeof(int));
     }
-
+    //Close stream
     world_stream.close();
     return true;
 }
 
+bool TerrainData::loadFromMemory(const char* bytes) {
+    memcpy(&this->W, bytes, sizeof(int));
+    memcpy(&this->W, bytes + 0x4, sizeof(int));
+
+    if (W < 1 || H < 1) {
+        return false;
+    }
+    //allocate memory
+    alloc(W, H);
+    //read all terrain points
+    int offset = 0x8;
+    for (int i = 0; i < W * H; i++) {
+        //Read height
+        memcpy(&data[i].height, bytes + offset, sizeof(float));
+        offset += 0x4;
+        //Iterate over all textures
+        for (int tex_factor = 0; tex_factor < TERRAIN_TEXTURES_AMOUNT; tex_factor++) {
+            memcpy(&data[i].texture_factors[tex_factor], bytes + offset, sizeof(unsigned char));
+        }
+        memcpy(&data[i].grass, bytes + offset, sizeof(int));
+    }
+}
+
 void TerrainData::initPhysics(){
-
-    ZSVECTOR3* vertex_pos = new ZSVECTOR3[static_cast<unsigned int>(W * H)];
-    int* phys_indices = new int[static_cast<unsigned int>((W - 1) * (H - 1) * 2 * 3)];
-
-    //Iterate over all vertices and fill their vectors
-    for(int y = 0; y < H; y ++){
-        for(int x = 0; x < W; x ++){
-            //Set vertex height
-            vertex_pos[x * H + y] = ZSVECTOR3(x, data[x * H + y].height, y);
-        }
-    }
-    //Declare indices iterator
-    unsigned int inds = 0;
-    //Iterate over all vertices
-    for(int y = 0; y < H - 1; y ++){
-        for(int x = 0; x < W - 1; x ++){
-            phys_indices[inds] = (x * H + y);
-            phys_indices[inds + 2] = (x * H + H + y);
-            phys_indices[inds + 1] = (x * H + H + y + 1);
-
-            phys_indices[inds + 3] = (x * H + y);
-            phys_indices[inds + 5] = (x * H + H + y + 1);
-            phys_indices[inds + 4] = (x * H + y + 1);
-
-            inds += 6;
-        }
-    }
+    ZSVECTOR3* vertex_pos = &vertices[0].pos;
 
     int numFaces = (W - 1) * (H - 1) * 2;
-    int vertStride = sizeof(ZSVECTOR3);
+    int vertStride = sizeof(HeightmapVertex);
     int indexStride = 3 * sizeof(unsigned int);
-    btTriangleIndexVertexArray* va = new btTriangleIndexVertexArray(numFaces, phys_indices, indexStride,  W * H, reinterpret_cast<btScalar*>(vertex_pos), vertStride);
+    //Generate VertexArray with geometry
+    btTriangleIndexVertexArray* va = new btTriangleIndexVertexArray(numFaces, (int*)indices, indexStride,  W * H, reinterpret_cast<btScalar*>(vertex_pos), vertStride);
     if(shape != nullptr)
         delete shape;
-
+    //Allocate Shape with geometry
     this->shape = new btBvhTriangleMeshShape(va, false,  true);
-
-    delete[] vertex_pos;
-    delete[] phys_indices;
 }
 
 void TerrainData::updateGrassBuffers() {
+    //Calculate grass density
     float delta = 1.0f / GrassDensity;
+    //Iterate over all grass blocks and clear their transform matrices
     for (unsigned int grass_i = 0; grass_i < grass.size(); grass_i++) {
         grass[grass_i].inst_transform.clear();
     }
-
+    //iterate over all points in terrain
     for (float texelZ = 0; texelZ < W; texelZ += delta) {
         for (float texelX = 0; texelX < H; texelX += delta) {
 
@@ -226,22 +222,27 @@ void TerrainData::updateGrassBuffers() {
 
 void TerrainData::processNormalsTangentSpace(HeightmapVertex* vert_array, unsigned int* indices_array, int indices_num){
     for(int ind_i = 0; ind_i < indices_num ; ind_i += 3){
+        //Get pointer to next terrain vertex
         HeightmapVertex* v1 = &vert_array[indices_array[ind_i]];
+        //Normal calculation os so expensive
         if (!data[indices_array[ind_i]].modified && !data[indices_array[ind_i + 1]].modified && !data[indices_array[ind_i + 2]].modified)
-            return;
+            //if vertex was not modified, then avoid normal recalculation
+            continue;
         else {
+            //Remove "modified" flag
             data[indices_array[ind_i]].modified = false;
         }
+        //Get pointers to other vertices of triangle
         HeightmapVertex* v2 = &vert_array[indices_array[ind_i + 1]];
         HeightmapVertex* v3 = &vert_array[indices_array[ind_i + 2]];
-
+        //Poses of other vertices of triangle
         ZSVECTOR3 v12 = v1->pos - v2->pos;
         ZSVECTOR3 v13 = v1->pos - v3->pos;
         //Calculate normal
         v1->normal = vCross(v12, v13);
         //Normalize vector
         vNormalize(&v1->normal);
-
+        //--------------Calculate Tangent 
         ZSVECTOR3 edge1 = v2->pos - v1->pos;
         ZSVECTOR3 edge2 = v3->pos - v1->pos;
         ZSVECTOR2 deltaUV1 = v2->uv - v1->uv;
@@ -267,8 +268,15 @@ void TerrainData::processNormalsTangentSpace(HeightmapVertex* vert_array, unsign
 }
 
 void TerrainData::copyTo(TerrainData* dest) {
+    //Allocate terrain
     dest->alloc(W, H);
-    memcpy(dest->data, data, static_cast<unsigned int>(W * H) * sizeof(HeightmapTexel));
+    memcpy(dest->data, data, (static_cast<uint64_t>(W) * H) * sizeof(HeightmapTexel));
+
+    for (unsigned int v = 0; v < W * H; v ++) {
+        dest->data[v].modified = true;
+    }
+
+    //Generate mesh
     dest->generateGLMesh();
 
     dest->GrassDensity = GrassDensity;

@@ -53,7 +53,7 @@ Engine::GameObjectLink Engine::GameObject::getLinkToThisObject(){
     return link;
 }
 
-bool Engine::GameObject::addProperty(int property){
+bool Engine::GameObject::addProperty(PROPERTY_TYPE property){
     unsigned int props = static_cast<unsigned int>(this->props_num);
     for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
         GameObjectProperty* property_ptr = this->properties[prop_i];
@@ -107,7 +107,7 @@ void Engine::GameObject::addChildObject(GameObjectLink link, bool updTransform){
         Cobj_transform->scale = Cobj_transform->scale / p_scale;
         Cobj_transform->rotation = Cobj_transform->rotation - p_rotation;
 
-        Cobj_transform->updateMat(); //Update transform matrix
+        Cobj_transform->updateMatrix(); //Update transform matrix
     }
 
     this->children.push_back(_link);
@@ -125,21 +125,20 @@ void Engine::GameObject::removeChildObject(GameObjectLink link){
             //Now check, if it is possible
             TransformProperty* Pobj_transform = getTransformProperty();
             TransformProperty* Cobj_transform = ptr->getTransformProperty();
-
-            if(Pobj_transform != nullptr && Cobj_transform != nullptr){ //If both objects have mesh property
-
+            //Check, If both objects have mesh property
+            if(Pobj_transform != nullptr && Cobj_transform != nullptr){ 
+                //if so, then add parent transform to child
                 ZSVECTOR3 p_translation = ZSVECTOR3(0,0,0);
                 ZSVECTOR3 p_scale = ZSVECTOR3(1,1,1);
                 ZSVECTOR3 p_rotation = ZSVECTOR3(0,0,0);
+                //get absolute transform of parent
                 Pobj_transform->getAbsoluteParentTransform(p_translation, p_scale, p_rotation);
-
+                //Add parent transform to child
                 Cobj_transform->translation = Cobj_transform->translation + p_translation;
-
                 Cobj_transform->scale = Cobj_transform->scale * p_scale;
-
                 Cobj_transform->rotation = Cobj_transform->rotation + Pobj_transform->rotation;
-
-                Cobj_transform->updateMat(); //Update transform matrix
+                //Update transform matrix
+                Cobj_transform->updateMatrix(); 
             }
         }
     }
@@ -163,7 +162,7 @@ Engine::TransformProperty* Engine::GameObject::getTransformProperty(){
 }
 
 Engine::LabelProperty* Engine::GameObject::getLabelProperty(){
-    return static_cast<LabelProperty*>(getPropertyPtrByType(GO_PROPERTY_TYPE_LABEL));
+    return static_cast<LabelProperty*>(getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL));
 }
 
 Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByType(PROPERTY_TYPE type){
@@ -177,7 +176,7 @@ Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByType(PROPERTY_TY
     return nullptr;
 }
 
-Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByTypeI(int property){
+Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByTypeI(PROPERTY_TYPE property){
     unsigned int props = static_cast<unsigned int>(this->props_num);
     for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
         Engine::GameObjectProperty* property_ptr = this->properties[prop_i];
@@ -279,7 +278,7 @@ bool Engine::GameObject::hasTerrain(){
 }
 
 void Engine::GameObject::DrawMesh(RenderPipeline* pipeline) {
-    Engine::MeshProperty* mesh_prop = static_cast<Engine::MeshProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_MESH));
+    Engine::MeshProperty* mesh_prop = static_cast<Engine::MeshProperty*>(this->getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH));
     Engine::TerrainProperty* terrain_prop = getPropertyPtr<Engine::TerrainProperty>();
     //Draw default mesh
     if (mesh_prop != nullptr) mesh_prop->mesh_ptr->Draw();
@@ -287,7 +286,7 @@ void Engine::GameObject::DrawMesh(RenderPipeline* pipeline) {
 }
 
 void Engine::GameObject::DrawMeshInstanced(RenderPipeline* pipeline, unsigned int inst_num) {
-    Engine::MeshProperty* mesh_prop = static_cast<Engine::MeshProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_MESH));
+    Engine::MeshProperty* mesh_prop = static_cast<Engine::MeshProperty*>(this->getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH));
     Engine::TerrainProperty* terrain_prop = getPropertyPtr<Engine::TerrainProperty>();
     //Draw default mesh
     if (mesh_prop != nullptr) mesh_prop->mesh_ptr->DrawInstanced(inst_num);
@@ -305,15 +304,18 @@ void* Engine::GameObject::getPhysicalProperty(){
     ColliderProperty* coll = getPropertyPtr<ColliderProperty>();
     RigidbodyProperty* rigid = getPropertyPtr<RigidbodyProperty>();
     CharacterControllerProperty* controller = getPropertyPtr<CharacterControllerProperty>();
+    TriggerProperty* trigger = getPropertyPtr<TriggerProperty>();
     //Variable to store result
     PhysicalProperty* phys = nullptr;
 
-    if(coll == nullptr)
+    if(rigid != nullptr)
         phys = rigid;
     else if (coll != nullptr){
         phys = coll;
-    }else{
+    }else if(controller != nullptr){
         phys = controller;
+    }else {
+        phys = trigger;
     }
 
     return phys;

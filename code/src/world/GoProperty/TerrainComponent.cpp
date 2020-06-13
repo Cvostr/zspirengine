@@ -1,7 +1,7 @@
 #include "../../../headers/world/go_properties.h"
 
 Engine::TerrainProperty::TerrainProperty(){
-    type = GO_PROPERTY_TYPE_TERRAIN;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TERRAIN;
 
     this->Width = 500;
     this->Length = 500;
@@ -19,6 +19,10 @@ Engine::TerrainProperty::TerrainProperty(){
     edit_mode = 1;
 
     rigidBody = nullptr;
+}
+
+Engine::TerrainProperty::~TerrainProperty() {
+
 }
 
 TerrainData* Engine::TerrainProperty::getTerrainData(){
@@ -47,27 +51,31 @@ void Engine::TerrainProperty::copyTo(Engine::GameObjectProperty* dest){
 }
 
 void Engine::TerrainProperty::onUpdate(float deltaTime) {
+    //Check, if physics stuff created
     if (data.shape == nullptr || data.hasPhysicShapeChanged && data.isCreated()) {
+        //Init Physic configuration
         data.initPhysics();
-        Engine::TransformProperty* transform = this->go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
-
+        
         //Declare start transform
+        Engine::TransformProperty* transform = this->go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
         btTransform startTransform;
         startTransform.setIdentity();
         //Set start transform
         startTransform.setOrigin(btVector3(btScalar(transform->abs_translation.X), btScalar(transform->abs_translation.Y),
             btScalar(transform->abs_translation.Z)));
 
-
         //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
         btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
 
         btRigidBody::btRigidBodyConstructionInfo cInfo(0, myMotionState, data.shape, btVector3(0, 0, 0));
-
+        //if regidbody is already created
         if (rigidBody != nullptr) {
+            //Remove RigidBody from world
             world_ptr->physical_world->removeRidigbodyFromWorld(rigidBody);
+            //Remove rigidBody
             delete rigidBody;
         }
+        //Allocate rigidbody
         rigidBody = new btRigidBody(cInfo);
 
         rigidBody->setUserIndex(this->go_link.updLinkPtr()->array_index);

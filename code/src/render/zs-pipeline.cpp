@@ -150,7 +150,9 @@ void Engine::RenderPipeline::destroy(){
 }
 
 void Engine::RenderPipeline::setLightsToBuffer(){
+    //Bind Lighting buffer to work with it
     this->lightsBuffer->bind();
+    //Iterate over all lights
     for(unsigned int light_i = 0; light_i < this->lights_ptr.size(); light_i ++){
         LightsourceProperty* _light_ptr = static_cast<LightsourceProperty*>(lights_ptr[light_i]);
 
@@ -270,7 +272,7 @@ void Engine::GameObject::processObject(RenderPipeline* pipeline) {
     if (alive == false || active == false) return;
 
 
-    Engine::TransformProperty* transform_prop = static_cast<Engine::TransformProperty*>(this->getPropertyPtrByType(GO_PROPERTY_TYPE_TRANSFORM));
+    Engine::TransformProperty* transform_prop = this->getTransformProperty();
     //Call update on every property in objects
     if (pipeline->allowOnUpdate && pipeline->current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
         this->onUpdate(static_cast<int>(pipeline->deltaTime));

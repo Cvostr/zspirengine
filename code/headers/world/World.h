@@ -14,7 +14,7 @@
 #define OBJ_PROPS_SIZE 11
 #define MAX_OBJS 15000
 
-enum PROPERTY_TYPE{
+enum class PROPERTY_TYPE{
     GO_PROPERTY_TYPE_NONE,
     GO_PROPERTY_TYPE_TRANSFORM,
     GO_PROPERTY_TYPE_LABEL,
@@ -140,11 +140,11 @@ public:
 
     void loadProperty(std::ifstream* world_stream); //Loads one property from stream
 
-    GameObjectProperty* allocProperty(int type);
-    bool addProperty(int property); //Adds property with property ID
+    GameObjectProperty* allocProperty(PROPERTY_TYPE type);
+    bool addProperty(PROPERTY_TYPE property); //Adds property with property ID
     //returns pointer to property by property type
     GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
-    Engine::GameObjectProperty* getPropertyPtrByTypeI(int property);
+    Engine::GameObjectProperty* getPropertyPtrByTypeI(PROPERTY_TYPE property);
 
     void addChildObject(GameObjectLink link, bool updTransform = true);
     void removeChildObject(GameObjectLink link);
@@ -220,7 +220,7 @@ public:
     ZSVECTOR3 abs_scale;
     ZSVECTOR3 abs_rotation;
 
-    void updateMat();
+    void updateMatrix();
     void getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r);
     void copyTo(GameObjectProperty* dest);
     void onPreRender(RenderPipeline* pipeline);

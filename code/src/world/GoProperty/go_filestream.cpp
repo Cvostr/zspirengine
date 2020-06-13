@@ -14,7 +14,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
     world_stream->read(reinterpret_cast<char*>(&prop_ptr->active), sizeof(bool));
     //since more than 1 properties same type can't be on one gameobject
     switch(type){
-        case GO_PROPERTY_TYPE_LABEL :{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL :{
             std::string label;
             *world_stream >> label;
             LabelProperty* lptr = static_cast<LabelProperty*>(prop_ptr);
@@ -22,7 +22,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             lptr->label = label; //Write loaded string
             break;
         }
-        case GO_PROPERTY_TYPE_TRANSFORM :{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM :{
             world_stream->seekg(1, std::ofstream::cur); //Skip space
             TransformProperty* t_ptr = static_cast<TransformProperty*>(prop_ptr);
             world_stream->read(reinterpret_cast<char*>(&t_ptr->translation.X), sizeof(float));
@@ -37,10 +37,10 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             world_stream->read(reinterpret_cast<char*>(&t_ptr->rotation.Y), sizeof(float));
             world_stream->read(reinterpret_cast<char*>(&t_ptr->rotation.Z), sizeof(float));
 
-            t_ptr->updateMat(); //After everything is loaded, update matrices
+            t_ptr->updateMatrix(); //After everything is loaded, update matrices
             break;
         }
-        case GO_PROPERTY_TYPE_MESH :{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH :{
             std::string rel_path;
             *world_stream >> rel_path;
             MeshProperty* lptr = static_cast<MeshProperty*>(prop_ptr);
@@ -51,7 +51,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             world_stream->read(reinterpret_cast<char*>(&lptr->castShadows), sizeof(bool));
             break;
         }
-        case GO_PROPERTY_TYPE_LIGHTSOURCE:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_LIGHTSOURCE:{
             LightsourceProperty* ptr = static_cast<LightsourceProperty*>(prop_ptr);
             world_stream->seekg(1, std::ofstream::cur);
 
@@ -71,7 +71,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
 
             break;
         }
-        case GO_PROPERTY_TYPE_TILE:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_TILE:{
             TileProperty* lptr = static_cast<TileProperty*>(prop_ptr);
             //read textures relative pathes
             *world_stream >> lptr->diffuse_relpath;
@@ -89,7 +89,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             break;
         }
 
-        case GO_PROPERTY_TYPE_AUDSOURCE:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_AUDSOURCE:{
             std::string rel_path;
 
             AudioSourceProperty* lptr = static_cast<AudioSourceProperty*>(prop_ptr);
@@ -106,7 +106,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
 
             break;
         }
-        case GO_PROPERTY_TYPE_SCRIPTGROUP:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_SCRIPTGROUP:{
             ScriptGroupProperty* ptr = static_cast<ScriptGroupProperty*>(prop_ptr);
             world_stream->seekg(1, std::ofstream::cur);
             //Read scripts number
@@ -124,7 +124,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             }
             break;
         }
-        case GO_PROPERTY_TYPE_SHADOWCASTER:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_SHADOWCASTER:{
             Engine::ShadowCasterProperty* ptr = static_cast<Engine::ShadowCasterProperty*>(prop_ptr);
             world_stream->seekg(1, std::ofstream::cur);
             //write collider type
@@ -136,7 +136,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             world_stream->read(reinterpret_cast<char*>(&ptr->projection_viewport), sizeof(float));
             break;
         }
-        case GO_PROPERTY_TYPE_COLLIDER:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_COLLIDER:{
             Engine::ColliderProperty* ptr = static_cast<Engine::ColliderProperty*>(prop_ptr);
             world_stream->seekg(1, std::ofstream::cur);
             //read collider type
@@ -156,7 +156,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
 
             break;
         }
-        case GO_PROPERTY_TYPE_RIGIDBODY:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_RIGIDBODY:{
             Engine::RigidbodyProperty* ptr = static_cast<Engine::RigidbodyProperty*>(prop_ptr);
             world_stream->seekg(1, std::ofstream::cur);
             //read collider type
@@ -172,7 +172,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
 
             break;
         }
-        case GO_PROPERTY_TYPE_MATERIAL:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_MATERIAL:{
             MaterialProperty* ptr = static_cast<MaterialProperty*>(prop_ptr);
             //reading path
             *world_stream >> ptr->material_path;
@@ -184,7 +184,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
 
             break;
         }
-        case GO_PROPERTY_TYPE_CHARACTER_CONTROLLER:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_CHARACTER_CONTROLLER:{
             Engine::CharacterControllerProperty* ptr = static_cast<Engine::CharacterControllerProperty*>(prop_ptr);
             world_stream->seekg(1, std::ofstream::cur); //Skip space
             world_stream->read(reinterpret_cast<char*>(&ptr->isCustomPhysicalSize), sizeof(bool));
@@ -195,7 +195,7 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             }
             break;
         }
-        case GO_PROPERTY_TYPE_TERRAIN: {
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_TERRAIN: {
             Engine::TerrainProperty* ptr = static_cast<Engine::TerrainProperty*>(prop_ptr);
             *world_stream >> ptr->file_label; //Write material relpath
             world_stream->seekg(1, std::ofstream::cur);

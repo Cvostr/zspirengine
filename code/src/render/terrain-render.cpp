@@ -3,10 +3,19 @@
 #include "../../headers/world/go_properties.h"
 #include <GL/glew.h>
 
-void TerrainData::initGL() {
+void TerrainMeshGL::generate() {
     glGenVertexArrays(1, &this->VAO);
     glGenBuffers(1, &this->VBO);
     glGenBuffers(1, &this->EBO);
+}
+void TerrainMeshGL::destroy() {
+    glDeleteVertexArrays(1, &this->VAO);
+    glDeleteBuffers(1, &this->VBO);
+    glDeleteBuffers(1, &this->EBO);
+}
+
+void TerrainData::initGL() {
+    meshGL.generate();
 
     glGenTextures(1, &this->painting.texture_mask1);
     glBindTexture(GL_TEXTURE_2D, this->painting.texture_mask1);
@@ -34,9 +43,7 @@ void TerrainData::initGL() {
 }
 
 void TerrainData::destroyGL() {
-    glDeleteVertexArrays(1, &this->VAO);
-    glDeleteBuffers(1, &this->VBO);
-    glDeleteBuffers(1, &this->EBO);
+    meshGL.destroy();
 }
 
 void TerrainData::Draw(bool picking) {
@@ -51,9 +58,9 @@ void TerrainData::Draw(bool picking) {
         glActiveTexture(GL_TEXTURE26);
         glBindTexture(GL_TEXTURE_2D, painting.texture_mask3);
     }
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-    glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+    glBindVertexArray(meshGL.VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshGL.EBO);
+    glBindBuffer(GL_ARRAY_BUFFER, meshGL.VBO);
     glDrawElements(GL_TRIANGLES, (W - 1) * (H - 1) * 2 * 3, GL_UNSIGNED_INT, nullptr);
 }
 
@@ -99,11 +106,11 @@ void TerrainData::updateTextureBuffersGL() {
 }
 
 void TerrainData::updateGeometryBuffersGL() {
-    glBindVertexArray(this->VAO); //Bind vertex array
-    glBindBuffer(GL_ARRAY_BUFFER, this->VBO); //Bind vertex buffer
+    glBindVertexArray(meshGL.VAO); //Bind vertex array
+    glBindBuffer(GL_ARRAY_BUFFER, meshGL.VBO); //Bind vertex buffer
     glBufferData(GL_ARRAY_BUFFER, static_cast<int>(W * H)* static_cast<int>(sizeof(HeightmapVertex)), vertices, GL_STATIC_DRAW); //send vertices to buffer
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO); //Bind index buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshGL.EBO); //Bind index buffer
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<unsigned int>((W - 1) * (H - 1) * 2 * 3) * sizeof(unsigned int), indices, GL_STATIC_DRAW); //Send indices to buffer
 
     //Vertex pos 3 floats

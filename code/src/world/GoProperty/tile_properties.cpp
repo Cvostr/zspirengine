@@ -3,7 +3,7 @@
 extern ZSGAME_DATA* game_data;
 
 Engine::TileGroupProperty::TileGroupProperty(){
-    type = GO_PROPERTY_TYPE_TILE_GROUP; //Set correct type
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TILE_GROUP; //Set correct type
     active = true; //And it is active
 
     this->isCreated = false;
@@ -29,7 +29,7 @@ void Engine::TileGroupProperty::copyTo(Engine::GameObjectProperty* dest){
 }
 
 Engine::TileProperty::TileProperty(){
-    type = GO_PROPERTY_TYPE_TILE;
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TILE;
     active = true;
 
     this->texture_diffuse = nullptr;
