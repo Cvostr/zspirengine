@@ -311,8 +311,9 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
         if(strcmp(prefix, "_GROUP") == 0){ //if it is game object
             position += 7;
             char group_name[100];
+            //Read shader group name
             strcpy(group_name, &buffer[position]);
-            position += strlen(group_name) + 2;
+            position += static_cast<unsigned int>(strlen(group_name)) + 2;
 
             setPropertyGroup(MtShProps::getMtShaderPropertyGroup(std::string(group_name)));
         }
@@ -339,7 +340,7 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                             char texture_relpath[64];
 
                             strcpy(texture_relpath, &buffer[position]);
-                            position += strlen(texture_relpath);
+                            position += static_cast<unsigned int>(strlen(texture_relpath));
                             texture_conf->path = std::string(texture_relpath);
 
                             position += 2;

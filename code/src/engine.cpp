@@ -42,13 +42,13 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
         SDL_WIN_MODE = SDL_WINDOW_OPENGL; //Set window mode to OpenGL
 
-            std::cout << "OpenGL version : 4.2 core" << std::endl;
+        std::cout << "OpenGL version : 4.2 core" << std::endl;
        
         SDL_DisplayMode current;
         SDL_GetCurrentDisplayMode(0, &current);
 
-        this->window = SDL_CreateWindow(win->title, 0, 0, win->Width, win->Height, SDL_WIN_MODE); //Create window
-        if(info->graphicsApi == OGL32){
+        this->window = SDL_CreateWindow(win->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, win->Width, win->Height, SDL_WIN_MODE); //Create window
+
             this->glcontext = SDL_GL_CreateContext(window);
             glViewport(0, 0, win->Width, win->Height);
 
@@ -56,10 +56,8 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
             if(glewInit() != GLEW_OK) std::cout << "GLEW initialize failed" << std::endl; else {
                 std::cout << "GLEW initialize sucessful" << std::endl;
             }
-        }
-        if(info->graphicsApi == VULKAN){
-            this->vkcontext.init(true, desc->app_label.c_str(), desc->app_version, this->window, win);
-        }
+
+        
         //initialize OpenAL sound system
         Engine::SFX::initAL();
 

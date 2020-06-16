@@ -73,12 +73,15 @@ bool Engine::GameObject::addProperty(PROPERTY_TYPE property){
 
 void Engine::GameObject::removeProperty(int index){
     GameObjectProperty* prop_ptr = static_cast<GameObjectProperty*>(this->properties[index]);
+    //Call onObjectDeleted() on removing property
     prop_ptr->onObjectDeleted();
-    this->properties[index] = nullptr; //set as deleted
-
+    //set as deleted
+    this->properties[index] = nullptr;
+    //Trim properties pointers vector
     for(unsigned int i = static_cast<unsigned int>(index); i < props_num - 1; i ++){
         properties[i] = properties[i + 1];
     }
+    //Reduce variable props_num
     props_num -= 1;
 }
 
@@ -95,21 +98,22 @@ void Engine::GameObject::addChildObject(GameObjectLink link, bool updTransform){
     //Now check, if it is possible
     TransformProperty* Pobj_transform = getTransformProperty();
     TransformProperty* Cobj_transform = link.ptr->getTransformProperty();
-
+    //Check, If both objects have Transform property
     if(updTransform && Pobj_transform != nullptr && Cobj_transform != nullptr){ //If both objects have mesh property
-
+        //if so, then add parent transform to child
         ZSVECTOR3 p_translation = ZSVECTOR3(0,0,0);
         ZSVECTOR3 p_scale = ZSVECTOR3(1,1,1);
         ZSVECTOR3 p_rotation = ZSVECTOR3(0,0,0);
+        //get absolute transform of parent
         Pobj_transform->getAbsoluteParentTransform(p_translation, p_scale, p_rotation); //Collecting transforms
-
+        //Add parent transform to child
         Cobj_transform->translation = Cobj_transform->translation - p_translation;
         Cobj_transform->scale = Cobj_transform->scale / p_scale;
         Cobj_transform->rotation = Cobj_transform->rotation - p_rotation;
-
+        //Update transform matrix
         Cobj_transform->updateMatrix(); //Update transform matrix
     }
-
+    //Add child to children vector
     this->children.push_back(_link);
 }
 
@@ -125,7 +129,7 @@ void Engine::GameObject::removeChildObject(GameObjectLink link){
             //Now check, if it is possible
             TransformProperty* Pobj_transform = getTransformProperty();
             TransformProperty* Cobj_transform = ptr->getTransformProperty();
-            //Check, If both objects have mesh property
+            //Check, If both objects have Transform property
             if(Pobj_transform != nullptr && Cobj_transform != nullptr){ 
                 //if so, then add parent transform to child
                 ZSVECTOR3 p_translation = ZSVECTOR3(0,0,0);
@@ -142,7 +146,8 @@ void Engine::GameObject::removeChildObject(GameObjectLink link){
             }
         }
     }
-    trimChildrenArray(); //Remove broken link from vector
+    //Remove broken link from vector
+    trimChildrenArray(); 
 }
 
 std::string Engine::GameObject::getLabel(){
@@ -232,6 +237,7 @@ void Engine::GameObject::clearAll(){
         removeProperty(prop_i);
     }
     this->props_num = 0; //Set property counter to zero
+    //Clear vector of children
     children.clear();
     hasParent = false;
     alive = false;

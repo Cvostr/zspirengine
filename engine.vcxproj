@@ -164,6 +164,12 @@
     <ClCompile Include="code\src\render\zs-shader.cpp" />
     <ClCompile Include="code\src\render\zs-texture.cpp" />
     <ClCompile Include="code\src\render\zs-uniform-buffer.cpp" />
+    <ClCompile Include="code\src\resources\AnimationResource.cpp" />
+    <ClCompile Include="code\src\resources\AudioResource.cpp" />
+    <ClCompile Include="code\src\resources\GlyphResource.cpp" />
+    <ClCompile Include="code\src\resources\MaterialResource.cpp" />
+    <ClCompile Include="code\src\resources\MeshResource.cpp" />
+    <ClCompile Include="code\src\resources\TextureResource.cpp" />
     <ClCompile Include="code\src\Scripting\LuaScript.cpp" />
     <ClCompile Include="code\src\Scripting\zsensdk.cpp" />
     <ClCompile Include="code\src\Scripting\zsensdk_input.cpp" />
@@ -176,6 +182,7 @@
     <ClCompile Include="code\src\vulkan\zsvk_mem.cpp" />
     <ClCompile Include="code\src\vulkan\zsvulkan.cpp" />
     <ClCompile Include="code\src\world\GameObject.cpp" />
+    <ClCompile Include="code\src\world\GoProperty\AnimationComponent.cpp" />
     <ClCompile Include="code\src\world\GoProperty\go_filestream.cpp" />
     <ClCompile Include="code\src\world\GoProperty\go_properties.cpp" />
     <ClCompile Include="code\src\world\GoProperty\TerrainComponent.cpp" />

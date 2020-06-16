@@ -114,9 +114,18 @@ void Engine::RenderPipeline::init(){
         glEnable(GL_CULL_FACE);
     }
     //if we use opengl, then create GBUFFER in GL commands
-    if(engine_ptr->engine_info->graphicsApi == OGL32 && this->game_desc_ptr->game_perspective == PERSP_3D){
-        this->gbuffer.create(this->WIDTH, this->HEIGHT);
+    if(this->game_desc_ptr->game_perspective == PERSP_3D){
+        create_G_Buffer(this->WIDTH, this->HEIGHT);
     }
+}
+
+void Engine::RenderPipeline::create_G_Buffer(unsigned int width, unsigned int height) {
+    gbuffer = new GLframebuffer(width, height, true);
+    gbuffer->addTexture(GL_RGBA8, GL_RGBA);
+    gbuffer->addTexture(GL_RGB16F, GL_RGB); //Normal frame
+    gbuffer->addTexture(GL_RGB16F, GL_RGB); //Position frame
+    gbuffer->addTexture(GL_RGBA, GL_RGBA); //Position frame
+    gbuffer->addTexture(GL_RGBA, GL_RGBA); //Position frame
 }
 
 void Engine::RenderPipeline::destroy(){
@@ -143,7 +152,7 @@ void Engine::RenderPipeline::destroy(){
         grass_shader->Destroy();
         shadowMap->Destroy();
 
-        gbuffer.Destroy();
+        delete gbuffer;
     }
 
     freeDefaultMeshes();
@@ -231,9 +240,11 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
     }
 
     //Bind Geometry Buffer to make Deferred Shading
-    gbuffer.bindFramebuffer();
+    gbuffer->bind();
     glClearColor(0,0,0,1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    setBlendingState(false);
+    setFullscreenViewport(this->WIDTH, this->HEIGHT);
 
     //Iterate over all objects in the world
     for(unsigned int obj_i = 0; obj_i < world_ptr->objects.size(); obj_i ++){
@@ -242,14 +253,14 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
         obj_ptr->processObject(this); //Draw object
     }
     //Disable depth rendering to draw plane correctly
-    glDisable(GL_DEPTH_TEST);
+    setDepthState(false);
 
     if(cullFaces == true) //if GL face cull is enabled
         glDisable(GL_CULL_FACE);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
     glClear(GL_COLOR_BUFFER_BIT); //Clear screen
-    gbuffer.bindTextures(); //Bind gBuffer textures
+    gbuffer->bindTextures(10); //Bind gBuffer textures
     deffered_light->Use(); //use deffered shader
 
     Engine::getPlaneMesh2D()->Draw(); //Draw screen
@@ -532,95 +543,6 @@ void Engine::TileProperty::onRender(Engine::RenderPipeline* pipeline){
     }
 }
 
-
-Engine::G_BUFFER_GL::G_BUFFER_GL(){
-    created = false;
-}
-
-void Engine::G_BUFFER_GL::create(int width, int height){
-    glGenFramebuffers(1, &gBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-
-    glGenTextures(1, &tDiffuse);
-    glBindTexture(GL_TEXTURE_2D, tDiffuse);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tDiffuse, 0);
-
-    glGenTextures(1, &tNormal);
-    glBindTexture(GL_TEXTURE_2D, tNormal);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, tNormal, 0);
-
-    glGenTextures(1, &tPos);
-    glBindTexture(GL_TEXTURE_2D, tPos);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, tPos, 0);
-
-    glGenTextures(1, &tTransparent);
-    glBindTexture(GL_TEXTURE_2D, tTransparent);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, tTransparent, 0);
-
-    glGenTextures(1, &tMasks);
-    glBindTexture(GL_TEXTURE_2D, tMasks);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, tMasks, 0);
-
-    unsigned int attachments[5] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4};
-    glDrawBuffers(5, attachments);
-
-    glGenRenderbuffers(1, &depthBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0); //return back to default
-
-    created = true;
-}
-void Engine::G_BUFFER_GL::bindFramebuffer(){
-    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-}
-void Engine::G_BUFFER_GL::bindTextures(){
-    glActiveTexture(GL_TEXTURE10);
-    glBindTexture(GL_TEXTURE_2D, tDiffuse);
-
-    glActiveTexture(GL_TEXTURE11);
-    glBindTexture(GL_TEXTURE_2D, tNormal);
-
-    glActiveTexture(GL_TEXTURE12);
-    glBindTexture(GL_TEXTURE_2D, tPos);
-
-    glActiveTexture(GL_TEXTURE13);
-    glBindTexture(GL_TEXTURE_2D, tTransparent);
-
-    glActiveTexture(GL_TEXTURE14);
-    glBindTexture(GL_TEXTURE_2D, tMasks);
-}
-
-void Engine::G_BUFFER_GL::Destroy(){
-    //Remove textures
-    glDeleteTextures(1, &tDiffuse);
-    glDeleteTextures(1, &tNormal);
-    glDeleteTextures(1, &tPos);
-    glDeleteTextures(1, &tTransparent);
-    glDeleteTextures(1, &tMasks);
-
-    //delete framebuffer & renderbuffer
-    glDeleteRenderbuffers(1, &this->depthBuffer);
-    glDeleteFramebuffers(1, &this->gBuffer);
-}
-
 void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
     transformBuffer->bind();
     ZSMATRIX4x4 proj = cam_ptr->getProjMatrix();
@@ -651,8 +573,8 @@ void Engine::RenderPipeline::renderSprite(Engine::Texture* texture_sprite, int X
     //Use texture at 0 slot
     texture_sprite->Use(0);
 
-    ZSMATRIX4x4 translation = getTranslationMat(X, Y, 0.0f);
-    ZSMATRIX4x4 scale = getScaleMat(scaleX, scaleY, 0.0f);
+    ZSMATRIX4x4 translation = getTranslationMat(static_cast<float>(X), static_cast<float>(Y), 0.0f);
+    ZSMATRIX4x4 scale = getScaleMat(static_cast<float>(scaleX), static_cast<float>(scaleY), 0.0f);
     ZSMATRIX4x4 transform = scale * translation;
 
     //Push glyph transform
@@ -676,13 +598,12 @@ void Engine::RenderPipeline::renderGlyph(unsigned int texture_id, int X, int Y, 
     uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 16, 4, &color.gl_r);
     uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 4 + 16, 4, &color.gl_g);
     uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 8 + 16, 4, &color.gl_b);
-
     //Use texture at 0 slot
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    ZSMATRIX4x4 translation = getTranslationMat(X, Y, 0.0f);
-    ZSMATRIX4x4 scale = getScaleMat(scaleX, scaleY, 0.0f);
+    ZSMATRIX4x4 translation = getTranslationMat(static_cast<float>(X), static_cast<float>(Y), 0.0f);
+    ZSMATRIX4x4 scale = getScaleMat(static_cast<float>(scaleX), static_cast<float>(scaleY), 0.0f);
     ZSMATRIX4x4 transform = scale * translation;
 
     //Push glyph transform
@@ -714,14 +635,93 @@ void Engine::RenderPipeline::removeLights(){
 }
 
 void Engine::RenderPipeline::updateWindowSize(int W, int H){
-     glViewport(0, 0, W, H);
-    //Recreate gBuffer with new resolution
-    if(gbuffer.created){
-        this->gbuffer.Destroy();
-        this->gbuffer.create(W, H);
-    }
+     setFullscreenViewport(W, H);
+     delete gbuffer;
+     create_G_Buffer(W, H);
 }
 
 Engine::RenderSettings* Engine::RenderPipeline::getRenderSettings(){
     return &this->render_settings;
+}
+
+void Engine::RenderPipeline::setBlendingState(bool blend) {
+    if(blend)
+        glEnable(GL_BLEND);
+    else
+        glDisable(GL_BLEND);
+}
+void Engine::RenderPipeline::setDepthState(bool depth) {
+    if (depth)
+        glEnable(GL_DEPTH_TEST);
+    else
+        glDisable(GL_DEPTH_TEST);
+}
+void Engine::RenderPipeline::setFullscreenViewport(unsigned int Width, unsigned int Height) {
+    glViewport(0, 0, Width, Height);
+}
+
+void Engine::GLframebuffer::bind() {
+    glBindFramebuffer(GL_FRAMEBUFFER, fbuffer);
+    glViewport(0, 0, Width, Height);
+}
+
+void Engine::GLframebuffer::bindTextures(unsigned int m) {
+    for (unsigned int t = 0; t < texture_size; t++) {
+        glActiveTexture(GL_TEXTURE0 + m + t);
+        glBindTexture(GL_TEXTURE_2D, textures[t]);
+    }
+}
+
+void Engine::GLframebuffer::addTexture(GLint intFormat, GLint format) {
+    if (texture_size == MAX_RENDERER_ATTACHMENT_COUNT) return;
+    bind();
+    //Create texture
+    glGenTextures(1, &textures[texture_size]);
+    glBindTexture(GL_TEXTURE_2D, textures[texture_size]);
+    glTexImage2D(GL_TEXTURE_2D, 0, intFormat, Width, Height, 0, format, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + texture_size, GL_TEXTURE_2D, textures[texture_size], 0);
+    texture_size++; //Add texture
+
+    unsigned int attachments[MAX_RENDERER_ATTACHMENT_COUNT] =
+    { GL_COLOR_ATTACHMENT0,
+    GL_COLOR_ATTACHMENT1,
+    GL_COLOR_ATTACHMENT2,
+    GL_COLOR_ATTACHMENT3,
+    GL_COLOR_ATTACHMENT4,
+    GL_COLOR_ATTACHMENT5,
+    GL_COLOR_ATTACHMENT6 };
+
+    glDrawBuffers(texture_size, attachments);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+Engine::GLframebuffer::~GLframebuffer() {
+    if (Depth)
+        glDeleteRenderbuffers(1, &this->depthBuffer);
+    glDeleteFramebuffers(1, &this->fbuffer);
+
+    for (unsigned int t = 0; t < texture_size; t++) {
+        glDeleteTextures(1, &textures[t]);
+    }
+}
+Engine::GLframebuffer::GLframebuffer(unsigned int width, unsigned int height, bool depth) {
+    textures[0] = 0;
+    this->Width = width;
+    this->Height = height;
+
+    this->Depth = depth;
+    texture_size = 0;
+
+    glGenFramebuffers(1, &fbuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbuffer);
+    if (depth) {
+        glGenRenderbuffers(1, &depthBuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); //return back to default
 }

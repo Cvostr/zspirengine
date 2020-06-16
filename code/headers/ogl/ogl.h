@@ -81,7 +81,6 @@ public:
     void GLcheckCompileErrors(unsigned int shader, const char* type, const char* filepath = nullptr);
     bool readShaderFile(const char* path, char* result);
     bool compileFromFile(std::string VSpath, std::string FSpath);
-    bool compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath);
     bool compileFromStr(const char* _VS, const char* _FS);
     void setUniformBufferBinding(const char* UB_NAME, unsigned int binding);
     void Use();

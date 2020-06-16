@@ -141,10 +141,28 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             world_stream->seekg(1, std::ofstream::cur);
             //read collider type
             world_stream->read(reinterpret_cast<char*>(&ptr->coll_type), sizeof(COLLIDER_TYPE));
-            //read isTrigger boolean
-
+            //read isCustomPhysicalSize boolean
             world_stream->read(reinterpret_cast<char*>(&ptr->isCustomPhysicalSize), sizeof(bool));
             if(ptr->isCustomPhysicalSize){
+                world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.X), sizeof(float));
+                world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.Y), sizeof(float));
+                world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.Z), sizeof(float));
+
+                world_stream->read(reinterpret_cast<char*>(&ptr->transform_offset.X), sizeof(float));
+                world_stream->read(reinterpret_cast<char*>(&ptr->transform_offset.Y), sizeof(float));
+                world_stream->read(reinterpret_cast<char*>(&ptr->transform_offset.Z), sizeof(float));
+            }
+
+            break;
+        }
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_TRIGGER: {
+            Engine::TriggerProperty* ptr = static_cast<Engine::TriggerProperty*>(prop_ptr);
+            world_stream->seekg(1, std::ofstream::cur);
+            //read collider type
+            world_stream->read(reinterpret_cast<char*>(&ptr->coll_type), sizeof(COLLIDER_TYPE));
+            //read isCustomPhysicalSize boolean
+            world_stream->read(reinterpret_cast<char*>(&ptr->isCustomPhysicalSize), sizeof(bool));
+            if (ptr->isCustomPhysicalSize) {
                 world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.X), sizeof(float));
                 world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.Y), sizeof(float));
                 world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.Z), sizeof(float));
@@ -207,11 +225,19 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             world_stream->read(reinterpret_cast<char*>(&ptr->textures_size), sizeof(int));
             world_stream->read(reinterpret_cast<char*>(&ptr->grassType_size), sizeof(int));
 
-           /* std::string fpath = ptr->file_label;
-            bool result = ptr->getTerrainData()->loadFromFile(fpath.c_str());
-            if (result) //if loading sucessstd::cout << "Terrain : Probably, missing terrain file" << file_path;
-                ptr->getTerrainData()->generateGLMesh();
-
+            ZsResource* terrain_res = game_data->resources->getResource<Engine::ZsResource>(ptr->file_label);
+            //check, if terrain resource found
+            if (terrain_res) {
+                terrain_res->request = new Engine::Loader::LoadRequest;
+                terrain_res->request->offset = terrain_res->offset;
+                terrain_res->request->size = terrain_res->size;
+                terrain_res->request->file_path = terrain_res->blob_path;
+                loadImmideately(terrain_res->request);
+                //Load terrain from readed binary data
+                bool result = ptr->getTerrainData()->loadFromMemory((const char*)terrain_res->request->data);
+                if (result) //if loading sucessstd::cout << "Terrain : Probably, missing terrain file" << file_path;
+                    ptr->getTerrainData()->generateGLMesh();
+            }
             world_stream->seekg(1, std::ofstream::cur);
 
             //Read textures relative pathes
@@ -232,10 +258,12 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
                 world_stream->read(reinterpret_cast<char*>(&grass.scale.X), sizeof(float));
                 world_stream->read(reinterpret_cast<char*>(&grass.scale.Y), sizeof(float));
 
-                ptr->grass.push_back(grass);
+                ptr->getTerrainData()->grass.push_back(grass);
             }
-
-            ptr->onValueChanged();*/
+            //Fill grass buffers with transforms
+            ptr->getTerrainData()->updateGrassBuffers();
+            
+            ptr->onValueChanged();
 
             break;
         }

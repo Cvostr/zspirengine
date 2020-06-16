@@ -64,52 +64,6 @@ bool Engine::_ogl_Shader::readShaderFile(const char* path, char* result){
     return true;
 }
 
-bool Engine::_ogl_Shader::compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath) {
-    std::cout << "OGL: Compiling shader " << VSpath << " " << FSpath << std::endl;
-
-    GLchar vs_data[SHADER_STR_LEN];
-    GLchar fs_data[SHADER_STR_LEN];
-    GLchar gs_data[SHADER_STR_LEN];
-
-    const GLchar* vs = &vs_data[0];
-    const GLchar* fs = &fs_data[0];
-    const GLchar* gs = &gs_data[0];
-    //read shader files
-    readShaderFile(VSpath.c_str(), &vs_data[0]);
-    readShaderFile(FSpath.c_str(), &fs_data[0]);
-    readShaderFile(GSpath.c_str(), &gs_data[0]);
-    //init opengl shaders
-    this->shader_id = glCreateProgram();
-
-    unsigned int VS = glCreateShader(GL_VERTEX_SHADER);
-    unsigned int FS = glCreateShader(GL_FRAGMENT_SHADER);
-    unsigned int GS = glCreateShader(GL_GEOMETRY_SHADER);
-
-    glShaderSource(VS, 1, &vs, nullptr); //Setting shader code text on vs
-    glShaderSource(FS, 1, &fs, nullptr); //Setting shader code text on fs
-    glShaderSource(GS, 1, &gs, nullptr); //Setting shader code text on gs
-
-    glCompileShader(VS); //Compile VS shader code
-    GLcheckCompileErrors(VS, "VERTEX", VSpath.c_str()); //Check vertex errors
-    glCompileShader(FS); //Compile FS shader code
-    GLcheckCompileErrors(FS, "FRAGMENT", FSpath.c_str()); //Check fragment compile errors
-    glCompileShader(GS); //Compile FS shader code
-    GLcheckCompileErrors(GS, "GEOMETRY", GSpath.c_str()); //Check fragment compile errors
-
-    glAttachShader(this->shader_id, VS);
-    glAttachShader(this->shader_id, FS);
-    glAttachShader(this->shader_id, GS);
-
-    glLinkProgram(this->shader_id);
-    GLcheckCompileErrors(shader_id, "PROGRAM");
-    //Clear shaders, we don't need them anymore
-    glDeleteShader(VS);
-    glDeleteShader(FS);
-    glDeleteShader(GS);
-
-    return true;
-}
-
 bool Engine::_ogl_Shader::compileFromFile(std::string VSpath, std::string FSpath){
     std::cout << "OGL: Compiling shader " << VSpath << " " << FSpath << std::endl;
 

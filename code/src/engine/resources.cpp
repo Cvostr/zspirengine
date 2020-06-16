@@ -10,7 +10,7 @@ extern ZSGAME_DATA* game_data;
 
 Engine::ZsResource::ZsResource(){
     this->resource_type = RESOURCE_TYPE_NONE;
-    this->resource_state = STATE_NOT_LOADED;
+    this->resource_state = RESOURCE_STATE::STATE_NOT_LOADED;
     size = 0;
     offset = 0;
     loadInstantly = false;
@@ -21,7 +21,7 @@ Engine::ZsResource::~ZsResource(){
 }
 
 void Engine::ZsResource::Release(){
-    this->resource_state = STATE_NOT_LOADED;
+    this->resource_state = RESOURCE_STATE::STATE_NOT_LOADED;
 }
 
 void Engine::ZsResource::load(){
@@ -30,28 +30,28 @@ void Engine::ZsResource::load(){
 
 Engine::ResourceManager::ResourceManager(){
     MeshResource* plane_resource = new MeshResource;
-    plane_resource->resource_state = STATE_LOADED;
+    plane_resource->resource_state = RESOURCE_STATE::STATE_LOADED;
     plane_resource->rel_path = "@plane";
     plane_resource->resource_label = plane_resource->rel_path;
     plane_resource->mesh_ptr = Engine::getPlaneMesh2D();
     this->resources.push_back(plane_resource);
 
     MeshResource* isotile_resource = new MeshResource;
-    isotile_resource->resource_state = STATE_LOADED;
+    isotile_resource->resource_state = RESOURCE_STATE::STATE_LOADED;
     isotile_resource->rel_path = "@isotile";
     isotile_resource->resource_label = isotile_resource->rel_path;
     isotile_resource->mesh_ptr = Engine::getIsoTileMesh2D();
     this->resources.push_back(isotile_resource);
 
     MeshResource* cube_resource = new MeshResource;
-    cube_resource->resource_state = STATE_LOADED;
+    cube_resource->resource_state = RESOURCE_STATE::STATE_LOADED;
     cube_resource->rel_path = "@cube";
     cube_resource->resource_label = cube_resource->rel_path;
     cube_resource->mesh_ptr = Engine::getCubeMesh3D();
     this->resources.push_back(cube_resource);
 
     MeshResource* sphere_resource = new MeshResource;
-    sphere_resource->resource_state = STATE_LOADED;
+    sphere_resource->resource_state = RESOURCE_STATE::STATE_LOADED;
     sphere_resource->rel_path = "@sphere";
     sphere_resource->resource_label = sphere_resource->rel_path;
     sphere_resource->mesh_ptr = Engine::getSphereMesh();
@@ -60,14 +60,14 @@ Engine::ResourceManager::ResourceManager(){
     //This material should be created only in 3D projects
     if(engine_ptr->desc->game_perspective == PERSP_3D){
         MaterialResource* material3d_resource = new MaterialResource;
-        material3d_resource->resource_state = STATE_LOADED;
+        material3d_resource->resource_state = RESOURCE_STATE::STATE_LOADED;
         material3d_resource->rel_path = "@default";
         material3d_resource->resource_label = material3d_resource->rel_path;
         material3d_resource->material = default3dmat;
         this->resources.push_back(material3d_resource);
 
         MaterialResource* materialTerrain_resource = new MaterialResource;
-        materialTerrain_resource->resource_state = STATE_LOADED;
+        materialTerrain_resource->resource_state = RESOURCE_STATE::STATE_LOADED;
         materialTerrain_resource->rel_path = "@defaultHeightmap";
         materialTerrain_resource->resource_label = materialTerrain_resource->rel_path;
         materialTerrain_resource->material = defaultTerrainMat;
@@ -166,6 +166,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
 
             switch(resource.resource_type){
                 case RESOURCE_TYPE_NONE:{
+                    resource_ptr = new ZsResource;
                     break;
                 }
                 case RESOURCE_TYPE_FILE:{
@@ -217,10 +218,11 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
 
             if(resource_ptr->loadInstantly)
                 (resource_ptr)->load();
-
+            //Add resource to vector
             this->resources.push_back(resource_ptr);
         }
     }
+    //close resource map stream
     file_stream.close();
 }
 
@@ -231,186 +233,20 @@ Engine::ZsResource* Engine::ResourceManager::getResourceByIndex(unsigned int ind
 unsigned int Engine::ResourceManager::getResourcesSize(){
     return static_cast<unsigned int>(resources.size());
 }
-Engine::TextureResource::TextureResource(){
-    this->resource_type = RESOURCE_TYPE_TEXTURE;
-    texture_ptr = nullptr;
-}
-
-void Engine::TextureResource::Use(int slot){
-    //Check, if texture already loaded
-    if(this->resource_state == STATE_LOADED)
-        //If loaded, just use it in slot
-        this->texture_ptr->Use(slot);
-    //Otherwise perform texture loading
-    if(this->resource_state == STATE_NOT_LOADED){
-        //Create loading request
-        request = new Engine::Loader::LoadRequest;
-        //Set offset of resource in blob
-        request->offset = this->offset;
-        //Set size of resource in blob
-        request->size = this->size;
-        request->file_path = this->blob_path;
-        //Send request to queue
-        Engine::Loader::queryLoadingRequest(request);
-        this->resource_state = STATE_LOADING_PROCESS;
-    }
-    //Check, if texture reading process finished
-    if(this->resource_state == STATE_LOADING_PROCESS){
-        if(this->request->done == true){
-            this->texture_ptr->LoadDDSTextureFromBuffer(request->data);
-            //Delete read data
-            delete[] request->data;
-            //Delete request
-            delete this->request;
-            //Set state to "Loaded"
-            this->resource_state = STATE_LOADED;
-        }
-    }
-}
-
-void Engine::TextureResource::Release(){
-    if(this->resource_state == STATE_LOADED){
-        this->texture_ptr->Destroy();
-        this->resource_state = STATE_NOT_LOADED;
-    }
-}
-
-Engine::MeshResource::MeshResource(){
-    this->resource_type = RESOURCE_TYPE_MESH;
-    mesh_ptr = nullptr;
-}
-
-void Engine::MeshResource::DrawInstanced(unsigned int inst_num) {
-    //Check, if texture already loaded
-    if (this->resource_state == STATE_LOADED)
-        //If loaded, just use it in slot
-        this->mesh_ptr->DrawInstanced(inst_num);
-    //Otherwise perform texture loading
-    if (this->resource_state == STATE_NOT_LOADED) {
-        request = new Engine::Loader::LoadRequest;
-        request->offset = this->offset;
-        request->size = this->size;
-        request->file_path = this->blob_path;
-        Engine::Loader::queryLoadingRequest(request);
-        this->resource_state = STATE_LOADING_PROCESS;
-    }
-    if (this->resource_state == STATE_LOADING_PROCESS) {
-        if (this->request->done) {
-            ZS3M::ImportedSceneFile isf;
-            isf.loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
-
-            for (unsigned int i = 0; i < isf.meshes_toRead.size(); i++) {
-                Engine::Mesh* mMesh = isf.meshes_toRead[i];
-                if (mMesh->mesh_label.compare(resource_label) == false)
-                    mesh_ptr = mMesh;
-                else {
-                    mMesh->Destroy();
-                    delete mMesh;
-                }
-            }
-
-            delete[] request->data;
-            delete this->request;
-            this->resource_state = STATE_LOADED;
-        }
-    }
-}
-
-void Engine::MeshResource::Draw(){
-    DrawInstanced(1);
-}
-void Engine::MeshResource::Release(){
-    if(this->resource_state == STATE_LOADED){
-        this->mesh_ptr->Destroy();
-        this->resource_state = STATE_NOT_LOADED;
-    }
-}
-
-Engine::AudioResource::AudioResource(){
-    this->resource_type = RESOURCE_TYPE_AUDIO;
-    buffer = new SoundBuffer;
-}
-
-void Engine::AudioResource::load(){
-    if(this->resource_state == STATE_NOT_LOADED){
-        request = new Engine::Loader::LoadRequest;
-        request->offset = this->offset;
-        request->size = this->size;
-        request->file_path = this->blob_path;
-        Engine::Loader::queryLoadingRequest(request);
-        this->resource_state = STATE_LOADING_PROCESS;
-    }
-    if(this->resource_state == STATE_LOADING_PROCESS){
-        if(this->request->done){
-            this->buffer->loadBufferWAV(request->data);
-            delete[] request->data;
-            delete this->request;
-            this->resource_state = STATE_LOADED;
-        }
-    }
-}
-
-void Engine::AudioResource::Release(){
-    if(this->resource_state == STATE_LOADED){
-        this->buffer->Destroy();
-        this->resource_state = STATE_NOT_LOADED;
-    }
-}
 
 Engine::ScriptResource::ScriptResource(){
     this->resource_type = RESOURCE_TYPE_SCRIPT;
     loadInstantly = true;
 }
 
-Engine::MaterialResource::MaterialResource(){
-    this->resource_type = RESOURCE_TYPE_MATERIAL;
-    material = nullptr;
-    loadInstantly = true;
-}
-
-Engine::AnimationResource::AnimationResource(){
-    this->resource_type = RESOURCE_TYPE_ANIMATION;
-    animation_ptr = nullptr;
-}
-
-Engine::GlyphResource::GlyphResource(){
-    this->resource_type = RESOURCE_TYPE_FONT;
-    font_ptr = nullptr;
-    this->loadInstantly = true;
-}
-
-void Engine::AnimationResource::load(){
-    if(this->resource_state == STATE_NOT_LOADED){
-        request = new Engine::Loader::LoadRequest;
-        request->offset = this->offset;
-        request->size = this->size;
-        request->file_path = this->blob_path;
-        Engine::Loader::queryLoadingRequest(request);
-        this->resource_state = STATE_LOADING_PROCESS;
-    }
-    if(this->resource_state == STATE_LOADING_PROCESS){
-        if(this->request->done){
-            ZS3M::ImportedAnimationFile iaf;
-            iaf.loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
-            this->animation_ptr = iaf.anim_ptr;
-
-            delete[] request->data;
-            delete this->request;
-            this->resource_state = STATE_LOADED;
-            this->resource_label = iaf.anim_ptr->name;
-        }
-    }
-
-}
-
 void Engine::ScriptResource::load(){
-    if(this->resource_state == STATE_NOT_LOADED){
+    if(this->resource_state == RESOURCE_STATE::STATE_NOT_LOADED){
         request = new Engine::Loader::LoadRequest;
         request->offset = this->offset;
         request->size = this->size;
         request->file_path = this->blob_path;
         loadImmideately(request);
-        this->resource_state = STATE_LOADED;
+        this->resource_state = RESOURCE_STATE::STATE_LOADED;
         //Write string
         //Clear string data, first
         script_content.clear();
@@ -433,96 +269,11 @@ void Engine::ResourceManager::reloadScripts() {
     }
 }
 
-void Engine::MaterialResource::load(){
-    if(this->resource_state == STATE_NOT_LOADED){
-        request = new Engine::Loader::LoadRequest;
-        request->offset = this->offset;
-        request->size = this->size;
-        request->file_path = this->blob_path;
-
-        std::string absolute = "";
-        loadImmideately(request, &absolute);
-        this->resource_state = STATE_LOADED;
-        this->material->loadFromBuffer(reinterpret_cast<char*>(request->data), request->size);
-        this->material->file_path = absolute;
-        delete [] request->data;
-        delete request;
-    }
-}
-
-void Engine::GlyphResource::load(){
-    if(this->resource_state == STATE_NOT_LOADED){
-        request = new Engine::Loader::LoadRequest;
-        request->offset = this->offset;
-        request->size = this->size;
-        request->file_path = this->blob_path;
-
-        loadImmideately(request);
-        this->resource_state = STATE_LOADED;
-
-        font_ptr = new GlyphFontContainer(request->data, request->size, 48, game_data->glyph_manager);
-        font_ptr->loadGlyphs();
-
-        delete[] request->data;
-        delete this->request;
-    }
-}
-
-Engine::TextureResource* Engine::ResourceManager::getTextureByLabel(std::string label){
-    for(unsigned int res = 0; res < this->resources.size(); res ++){
-        ZsResource* resource_ptr = this->resources[res];
-        if(resource_ptr->resource_type == RESOURCE_TYPE_TEXTURE && resource_ptr->rel_path.compare(label) == 0)
-            return static_cast<TextureResource*>(resource_ptr);
-    }
-    return nullptr;
-}
-
-Engine::MeshResource* Engine::ResourceManager::getMeshByLabel(std::string label){
-    for(unsigned int res = 0; res < this->resources.size(); res ++){
-        ZsResource* resource_ptr = this->resources[res];
-        if(resource_ptr->resource_type == RESOURCE_TYPE_MESH && resource_ptr->resource_label.compare(label) == 0)
-            return static_cast<MeshResource*>(resource_ptr);
-    }
-    return nullptr;
-}
-Engine::AudioResource* Engine::ResourceManager::getAudioByLabel(std::string label){
-    for(unsigned int res = 0; res < this->resources.size(); res ++){
-        ZsResource* resource_ptr = this->resources[res];
-        if(resource_ptr->resource_type == RESOURCE_TYPE_AUDIO && resource_ptr->resource_label.compare(label) == 0)
-            return static_cast<AudioResource*>(resource_ptr);
-    }
-    return nullptr;
-}
 Engine::ScriptResource* Engine::ResourceManager::getScriptByLabel(std::string label){
     for(unsigned int res = 0; res < this->resources.size(); res ++){
         ZsResource* resource_ptr = this->resources[res];
         if(resource_ptr->resource_type == RESOURCE_TYPE_SCRIPT && resource_ptr->resource_label.compare(label) == 0)
             return static_cast<ScriptResource*>(resource_ptr);
-    }
-    return nullptr;
-}
-Engine::MaterialResource* Engine::ResourceManager::getMaterialByLabel(std::string label){
-    for(unsigned int res = 0; res < this->resources.size(); res ++){
-        ZsResource* resource_ptr = this->resources[res];
-        if(resource_ptr->resource_type == RESOURCE_TYPE_MATERIAL && resource_ptr->resource_label.compare(label) == 0)
-            return static_cast<MaterialResource*>(resource_ptr);
-    }
-    return nullptr;
-}
-Engine::AnimationResource* Engine::ResourceManager::getAnimationByLabel(std::string label){
-    for(unsigned int res = 0; res < this->resources.size(); res ++){
-        ZsResource* resource_ptr = this->resources[res];
-        if(resource_ptr->resource_type == RESOURCE_TYPE_ANIMATION && resource_ptr->resource_label.compare(label) == 0)
-            return static_cast<AnimationResource*>(resource_ptr);
-    }
-    return nullptr;
-}
-
-Engine::GlyphResource* Engine::ResourceManager::getFontByLabel(std::string label){
-    for(unsigned int res = 0; res < this->resources.size(); res ++){
-        ZsResource* resource_ptr = this->resources[res];
-        if(resource_ptr->resource_type == RESOURCE_TYPE_FONT && resource_ptr->resource_label.compare(label) == 0)
-            return static_cast<GlyphResource*>(resource_ptr);
     }
     return nullptr;
 }

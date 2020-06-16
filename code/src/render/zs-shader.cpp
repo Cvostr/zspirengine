@@ -25,7 +25,7 @@ bool Engine::Shader::compileFromFile(std::string VSpath, std::string FSpath, std
     bool result = false;
     switch (engine_ptr->engine_info->graphicsApi) {
     case OGL32: {
-        result = static_cast<_ogl_Shader*>(this)->compileFromFile(VSpath, FSpath, GSpath);
+        result = static_cast<_ogl_Shader*>(this)->compileFromFile(VSpath, FSpath);
         break;
     }
     case VULKAN: {
@@ -46,10 +46,7 @@ bool Engine::Shader::compileFromFile(std::string VSpath, std::string FSpath){
             result = static_cast<_ogl_Shader*>(this)->compileFromFile(VSpath, FSpath);
             break;
         }
-        case VULKAN : {
-            result = static_cast<_vk_Shader*>(this)->compileFromFile(VSpath, FSpath);
-            break;
-        }
+       
     }
     if(result)
         this->isCreated = true;

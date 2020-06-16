@@ -13,6 +13,8 @@
 #include "../../headers/engine/resources.h"
 #include <vector>
 
+#define MAX_RENDERER_ATTACHMENT_COUNT 7
+
 enum class PIPELINE_STATE {
     PIPELINE_STATE_DEFAULT,
     PIPELINE_STATE_PICKING,
@@ -38,23 +40,30 @@ struct RenderSettings {
     }
 };
 
-class G_BUFFER_GL{
-protected:
+class GLframebuffer {
+private:
+    GLuint fbuffer;
+    GLuint depthBuffer;
 
-    unsigned int depthBuffer;
-    unsigned int gBuffer; //framebuffer
-    unsigned int tDiffuse; //To store RGB diffuse Color A - shininess
-    unsigned int tNormal; //To store normal coordinate
-    unsigned int tPos; //To store position coordinate
-    unsigned int tTransparent; //To store color with alpha
-    unsigned int tMasks;
+    unsigned int texture_size;
+
+    unsigned int Width;
+    unsigned int Height;
+
+    bool Depth;
+
 public:
-    bool created;
-    G_BUFFER_GL();
-    void create(int width, int height);
-    void bindFramebuffer();
-    void bindTextures();
-    void Destroy();
+
+    GLuint textures[MAX_RENDERER_ATTACHMENT_COUNT];
+
+    void bind();
+
+    void bindTextures(unsigned int m);
+
+    void addTexture(GLint intFormat = GL_RGBA8, GLint format = GL_RGBA);
+
+    ~GLframebuffer();
+    GLframebuffer(unsigned int width, unsigned int height, bool depth);
 };
 
 class RenderPipeline : public EngineComponentManager{
@@ -62,10 +71,16 @@ protected:
     //Vector to store lights
     std::vector<void*> lights_ptr;
     RenderSettings render_settings;
-    G_BUFFER_GL gbuffer;
+    GLframebuffer* gbuffer;
 
     void setLightsToBuffer();
     void updateShadersCameraInfo(Engine::Camera* cam_ptr);
+
+    void setBlendingState(bool blend);
+    void setDepthState(bool depth);
+    void setFullscreenViewport(unsigned int Width, unsigned int Height);
+
+    void create_G_Buffer(unsigned int width, unsigned int height);
 private:
 
     void initShaders();

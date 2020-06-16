@@ -94,7 +94,7 @@ void TerrainData::updateGeometryBuffers(bool full_rebuild){
     for(int y = 0; y < H; y ++){
         for(int x = 0; x < W; x ++){
             //Set vertex height
-            vertices[x * H + y].pos = ZSVECTOR3(x, data[x * H + y].height, y);
+            vertices[x * H + y].pos = ZSVECTOR3(static_cast<float>(x), data[x * H + y].height, static_cast<float>(y));
             //Calculate vertex texture UV
             vertices[x * H + y].uv = ZSVECTOR2(static_cast<float>(x) / W, static_cast<float>(y) / H);
         }
@@ -160,7 +160,7 @@ bool TerrainData::loadFromFile(const char* file_path){
 
 bool TerrainData::loadFromMemory(const char* bytes) {
     memcpy(&this->W, bytes, sizeof(int));
-    memcpy(&this->W, bytes + 0x4, sizeof(int));
+    memcpy(&this->H, bytes + 0x4, sizeof(int));
 
     if (W < 1 || H < 1) {
         return false;
@@ -172,18 +172,23 @@ bool TerrainData::loadFromMemory(const char* bytes) {
     for (int i = 0; i < W * H; i++) {
         //Read height
         memcpy(&data[i].height, bytes + offset, sizeof(float));
-        offset += 0x4;
+        offset += sizeof(float);
         //Iterate over all textures
         for (int tex_factor = 0; tex_factor < TERRAIN_TEXTURES_AMOUNT; tex_factor++) {
+            //Read texture factor
             memcpy(&data[i].texture_factors[tex_factor], bytes + offset, sizeof(unsigned char));
+            offset += sizeof(unsigned char);
         }
+        //Read grass ID
         memcpy(&data[i].grass, bytes + offset, sizeof(int));
+        offset += sizeof(int);
     }
+    return true;
 }
 
 void TerrainData::initPhysics(){
     ZSVECTOR3* vertex_pos = &vertices[0].pos;
-
+    //Calculate amount of indices
     int numFaces = (W - 1) * (H - 1) * 2;
     int vertStride = sizeof(HeightmapVertex);
     int indexStride = 3 * sizeof(unsigned int);
@@ -205,10 +210,12 @@ void TerrainData::updateGrassBuffers() {
     //iterate over all points in terrain
     for (float texelZ = 0; texelZ < W; texelZ += delta) {
         for (float texelX = 0; texelX < H; texelX += delta) {
-
-            int texelXi = floor(texelX);
-            int texelZi = floor(texelZ);
+            //Calculate position offset of grass
+            int texelXi = static_cast<int>(floor(texelX));
+            int texelZi = static_cast<int>(floor(texelZ));
+            //Get vertex, connected to this position
             HeightmapTexel* texel_ptr = &data[texelZi * W + texelXi];
+            //if grass exist there
             if (texel_ptr->grass > 0) {
                 HeightmapGrass* grass = &this->grass[static_cast<unsigned int>(texel_ptr->grass - 1)];
                 ZSVECTOR3 pos = ZSVECTOR3(texelZ, texel_ptr->height, texelX);
@@ -272,7 +279,7 @@ void TerrainData::copyTo(TerrainData* dest) {
     dest->alloc(W, H);
     memcpy(dest->data, data, (static_cast<uint64_t>(W) * H) * sizeof(HeightmapTexel));
 
-    for (unsigned int v = 0; v < W * H; v ++) {
+    for (unsigned int v = 0; v < static_cast<unsigned int>(W * H); v ++) {
         dest->data[v].modified = true;
     }
 

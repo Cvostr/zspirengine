@@ -22,7 +22,7 @@ Engine::TerrainProperty::TerrainProperty(){
 }
 
 Engine::TerrainProperty::~TerrainProperty() {
-
+    textures.clear();
 }
 
 TerrainData* Engine::TerrainProperty::getTerrainData(){
@@ -81,7 +81,7 @@ void Engine::TerrainProperty::onUpdate(float deltaTime) {
         rigidBody->setUserIndex(this->go_link.updLinkPtr()->array_index);
         //add rigidbody to world
         go_link.world_ptr->physical_world->addRidigbodyToWorld(rigidBody);
-
+        //Physics objects are created, no need to recreate them in further
         data.hasPhysicShapeChanged = false;
     }
 }
