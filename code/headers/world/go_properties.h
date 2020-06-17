@@ -188,8 +188,8 @@ public:
 class PhysicalProperty : public Engine::GameObjectProperty{
 protected:
 
-    void init();
-    void updateCollisionShape();
+    bool init();
+    bool updateCollisionShape();
 public:
     bool isCustomPhysicalSize;
     ZSVECTOR3 cust_size;

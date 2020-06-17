@@ -103,13 +103,12 @@ Engine::RenderPipeline::~RenderPipeline(){
 }
 
 void Engine::RenderPipeline::init(){
+    setDepthState(true);
 
     if(this->game_desc_ptr->game_perspective == PERSP_2D){
-        glEnable(GL_DEPTH_TEST);
         cullFaces = false;
         glDisable(GL_CULL_FACE);
     }else{
-        glEnable(GL_DEPTH_TEST);
         cullFaces = true;
         glEnable(GL_CULL_FACE);
     }
@@ -121,11 +120,11 @@ void Engine::RenderPipeline::init(){
 
 void Engine::RenderPipeline::create_G_Buffer(unsigned int width, unsigned int height) {
     gbuffer = new GLframebuffer(width, height, true);
-    gbuffer->addTexture(GL_RGBA8, GL_RGBA);
-    gbuffer->addTexture(GL_RGB16F, GL_RGB); //Normal frame
-    gbuffer->addTexture(GL_RGB16F, GL_RGB); //Position frame
+    gbuffer->addTexture(GL_RGBA8, GL_RGBA); //Diffuse map
+    gbuffer->addTexture(GL_RGB16F, GL_RGB); //Normal map
+    gbuffer->addTexture(GL_RGB16F, GL_RGB); //Position map
     gbuffer->addTexture(GL_RGBA, GL_RGBA); //Position frame
-    gbuffer->addTexture(GL_RGBA, GL_RGBA); //Position frame
+    gbuffer->addTexture(GL_RGBA, GL_RGBA); //Masks map
 }
 
 void Engine::RenderPipeline::destroy(){
@@ -217,7 +216,7 @@ void Engine::RenderPipeline::render2D(){
 
     if(engine_ptr->engine_info->graphicsApi == OGL32){
         glClearColor(0,0,0,1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ClearFBufferGL(true, true);
 
         //Iterate over all objects in the world
         for(unsigned int obj_i = 0; obj_i < world_ptr->objects.size(); obj_i ++){
@@ -242,7 +241,7 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
     //Bind Geometry Buffer to make Deferred Shading
     gbuffer->bind();
     glClearColor(0,0,0,1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    ClearFBufferGL(true, true);
     setBlendingState(false);
     setFullscreenViewport(this->WIDTH, this->HEIGHT);
 
@@ -259,7 +258,7 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
         glDisable(GL_CULL_FACE);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
-    glClear(GL_COLOR_BUFFER_BIT); //Clear screen
+    ClearFBufferGL(true, false); //Clear screen
     gbuffer->bindTextures(10); //Bind gBuffer textures
     deffered_light->Use(); //use deffered shader
 
@@ -281,7 +280,6 @@ void Engine::RenderPipeline::renderDepth(void* world_ptr){
 
 void Engine::GameObject::processObject(RenderPipeline* pipeline) {
     if (alive == false || active == false) return;
-
 
     Engine::TransformProperty* transform_prop = this->getTransformProperty();
     //Call update on every property in objects
@@ -658,6 +656,16 @@ void Engine::RenderPipeline::setDepthState(bool depth) {
 }
 void Engine::RenderPipeline::setFullscreenViewport(unsigned int Width, unsigned int Height) {
     glViewport(0, 0, Width, Height);
+}
+
+void Engine::RenderPipeline::ClearFBufferGL(bool clearColor, bool clearDepth) {
+    GLbitfield clearMask = 0;
+    if (clearColor)
+        clearMask |= GL_COLOR_BUFFER_BIT;
+    if (clearDepth)
+        clearMask |= GL_DEPTH_BUFFER_BIT;
+
+    glClear(clearMask);
 }
 
 void Engine::GLframebuffer::bind() {

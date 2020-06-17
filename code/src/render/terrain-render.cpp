@@ -149,48 +149,49 @@ void TerrainData::generateGLMesh() {
 void Engine::TerrainProperty::DrawMesh(RenderPipeline* pipeline) {
     //Draw terrain mesh
     data.Draw(false);
-    //Use grass shader
-    pipeline->grass_shader->Use();
-    //Bind instanced buffer
-    pipeline->instancedTransformBuffer->bind();
+    if (pipeline->current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT) {
+        //Use grass shader
+        pipeline->grass_shader->Use();
+        //Bind instanced buffer
+        pipeline->instancedTransformBuffer->bind();
 
-    Engine::TransformProperty* t_ptr = (this->go_link.updLinkPtr())->getPropertyPtr<Engine::TransformProperty>();
-    //Iterate over all grass types
-    for (unsigned int grass_i = 0; grass_i < data.grass.size(); grass_i++) {
-        //Get a pointer to grass type
-        HeightmapGrass* grass = &data.grass[grass_i];
-        //if texture is specified
-        if(grass->diffuse)
-            //then bind it to slot 0
-            grass->diffuse->Use(0);
-        //Calc amount of steps 
-        unsigned int steps = grass->inst_transform.size() / INSTANCED_RENDER_BUFFER_SIZE;
-        //Amount of steps, that hadn't processed
-        unsigned int left_steps = grass->inst_transform.size();
-        //if no steps left, then exit function
-        if (left_steps < 1)
-            return;
-        //Iterate over all steps
-        for (unsigned int step_i = 0; step_i < steps + 1; step_i++) {
-            //Amount of steps, that will processed by this operation
-            unsigned int entries = (left_steps >= INSTANCED_RENDER_BUFFER_SIZE) ? INSTANCED_RENDER_BUFFER_SIZE : left_steps;
-            //offset of array grass->inst_transform[] to be processed by this step
-            unsigned int offset = step_i * INSTANCED_RENDER_BUFFER_SIZE;
-            //Reduce amount of steps
-            left_steps -= entries;
-            //if grass has changed, but arrays weren't prepared for rendering
-            if (data.hasGrassChanged == true)
-                //Avoid grass rendering
+        Engine::TransformProperty* t_ptr = (this->go_link.updLinkPtr())->getPropertyPtr<Engine::TransformProperty>();
+        //Iterate over all grass types
+        for (unsigned int grass_i = 0; grass_i < data.grass.size(); grass_i++) {
+            //Get a pointer to grass type
+            HeightmapGrass* grass = &data.grass[grass_i];
+            //if texture is specified
+            if (grass->diffuse)
+                //then bind it to slot 0
+                grass->diffuse->Use(0);
+            //Calc amount of steps 
+            unsigned int steps = static_cast<unsigned int>(grass->inst_transform.size()) / INSTANCED_RENDER_BUFFER_SIZE;
+            //Amount of steps, that hadn't processed
+            unsigned int left_steps = static_cast<unsigned int>(grass->inst_transform.size());
+            //if no steps left, then exit function
+            if (left_steps < 1)
                 return;
-            //Send matrices to instanced buffer
-            pipeline->instancedTransformBuffer->writeData(0, entries * sizeof(ZSMATRIX4x4),
-                &grass->inst_transform[offset]);
-            //Draw grass instanced
-            Engine::getGrassMesh()->DrawInstanced(entries);
-        }
+            //Iterate over all steps
+            for (unsigned int step_i = 0; step_i < steps + 1; step_i++) {
+                //Amount of steps, that will processed by this operation
+                unsigned int entries = (left_steps >= INSTANCED_RENDER_BUFFER_SIZE) ? INSTANCED_RENDER_BUFFER_SIZE : left_steps;
+                //offset of array grass->inst_transform[] to be processed by this step
+                unsigned int offset = step_i * INSTANCED_RENDER_BUFFER_SIZE;
+                //Reduce amount of steps
+                left_steps -= entries;
+                //if grass has changed, but arrays weren't prepared for rendering
+                if (data.hasGrassChanged == true)
+                    //Avoid grass rendering
+                    return;
+                //Send matrices to instanced buffer
+                pipeline->instancedTransformBuffer->writeData(0, entries * sizeof(ZSMATRIX4x4),
+                    &grass->inst_transform[offset]);
+                //Draw grass instanced
+                Engine::getGrassMesh()->DrawInstanced(entries);
+            }
 
+        }
     }
-   
 }
 
 void Engine::TerrainProperty::onRender(Engine::RenderPipeline* pipeline) {

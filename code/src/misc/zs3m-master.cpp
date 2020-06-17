@@ -253,9 +253,12 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
             int vertexNum = 0;
             int indexNum = 0;
             unsigned int bonesNum = 0;
-
+            //Read mesh info
+            //Read vertex amount
             memcpy(reinterpret_cast<char*>(&vertexNum), &buffer[cur_pos], sizeof (unsigned int));
+            //Read indices amount
             memcpy(reinterpret_cast<char*>(&indexNum), &buffer[cur_pos + 4], sizeof (unsigned int));
+            //Read bones amount
             memcpy(reinterpret_cast<char*>(&bonesNum), &buffer[cur_pos + 8], sizeof (unsigned int));
             cur_pos += 13;
 
@@ -471,7 +474,7 @@ void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size
     unsigned int byte_offset = 0;
 
     strcpy(&prefix[0], &buffer[byte_offset]);
-    byte_offset += strlen(prefix) + 1;
+    byte_offset += static_cast<unsigned int>(strlen(prefix)) + 1;
     if(strcmp(prefix, "zs3manim") == 1){
         //File's header is incorrect
         return;
@@ -504,7 +507,7 @@ void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size
             byte_offset += 6;
             //Read node, channel will work with
             strcpy(&prefix[0], &buffer[byte_offset]);
-            byte_offset += strlen(prefix) + 1;
+            byte_offset += static_cast<unsigned int>(strlen(prefix)) + 1;
             //Allocate animation channel
             Engine::AnimationChannel* chan = &anim_ptr->channels[ch_i];
             chan->bone_name = std::string(prefix);

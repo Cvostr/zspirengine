@@ -185,6 +185,7 @@
     <ClCompile Include="code\src\world\GoProperty\AnimationComponent.cpp" />
     <ClCompile Include="code\src\world\GoProperty\go_filestream.cpp" />
     <ClCompile Include="code\src\world\GoProperty\go_properties.cpp" />
+    <ClCompile Include="code\src\world\GoProperty\RigidbodyProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\TerrainComponent.cpp" />
     <ClCompile Include="code\src\world\GoProperty\tile_properties.cpp" />
     <ClCompile Include="code\src\world\PhysicalWorld.cpp" />

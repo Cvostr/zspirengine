@@ -91,10 +91,11 @@ void Engine::PhysicalProperty::copyTo(Engine::GameObjectProperty* dest){
     rigi_prop->transform_offset = this->transform_offset;
 }
 
-void Engine::PhysicalProperty::init(){
+bool Engine::PhysicalProperty::init(){
     Engine::TransformProperty* transform = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
     //Set collision shape
-    updateCollisionShape();
+    if (!updateCollisionShape())
+        return false;
 
     bool isDynamic = (mass != 0.f);
 
@@ -125,6 +126,7 @@ void Engine::PhysicalProperty::init(){
     go_link.world_ptr->physical_world->addRidigbodyToWorld(rigidBody);
     
     created = true;
+    return true;
 }
 
 void Engine::TriggerProperty::initGhost() {
@@ -155,8 +157,9 @@ void Engine::TriggerProperty::initGhost() {
     created = true;
 }
 
-void Engine::PhysicalProperty::updateCollisionShape(){
+bool Engine::PhysicalProperty::updateCollisionShape(){
     Engine::TransformProperty* transform = this->go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
+    transform->updateMatrix();
     Engine::MeshProperty* mesh = this->go_link.updLinkPtr()->getPropertyPtr<Engine::MeshProperty>();
     Engine::Mesh* m = mesh->mesh_ptr->mesh_ptr;
 
@@ -165,6 +168,8 @@ void Engine::PhysicalProperty::updateCollisionShape(){
     if(isCustomPhysicalSize){
         scale = cust_size;
     }
+
+    bool result = true;
 
     switch(coll_type){
         case COLLIDER_TYPE::COLLIDER_TYPE_NONE: {
@@ -187,10 +192,19 @@ void Engine::PhysicalProperty::updateCollisionShape(){
             break;
         }
         case COLLIDER_TYPE::COLLIDER_TYPE_CONVEX_HULL:{
+            if (m->vertices_coord == nullptr) {
+                result = false;
+                break;
+            }
             shape = new btConvexHullShape(m->vertices_coord, m->vertices_num, sizeof (float) * 3);
             break;
         }
         case COLLIDER_TYPE::COLLIDER_TYPE_MESH:{
+
+            if (m->vertices_coord == nullptr) {
+                result = false;
+                break;
+            }
 
             float* vertices = m->vertices_coord;
             int* indices = reinterpret_cast<int*>(m->indices_arr);
@@ -205,6 +219,7 @@ void Engine::PhysicalProperty::updateCollisionShape(){
             break;
         }
     }
+    return result;
 }
 
 void Engine::PhysicalProperty::onUpdate(float deltaTime){

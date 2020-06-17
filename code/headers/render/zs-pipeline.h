@@ -79,13 +79,11 @@ protected:
     void setBlendingState(bool blend);
     void setDepthState(bool depth);
     void setFullscreenViewport(unsigned int Width, unsigned int Height);
+    void ClearFBufferGL(bool clearColor, bool clearDepth);
 
     void create_G_Buffer(unsigned int width, unsigned int height);
 private:
-
     void initShaders();
-
-
 public:
     PIPELINE_STATE current_state;
 

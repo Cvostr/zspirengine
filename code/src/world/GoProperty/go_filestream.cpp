@@ -41,13 +41,17 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH :{
-            std::string rel_path;
-            *world_stream >> rel_path;
+
             MeshProperty* lptr = static_cast<MeshProperty*>(prop_ptr);
-            lptr->resource_relpath = rel_path; //Write loaded mesh relative path
-            lptr->updateMeshPtr(); //Pointer will now point to mesh resource
+            //Read mesh resource label
+            *world_stream >> lptr->resource_relpath;
+            //Read Root Node label
+            *world_stream >> lptr->rootNodeStr;
+            //Pointer will now point to mesh resource
+            lptr->updateMeshPtr(); 
 
             world_stream->seekg(1, std::ofstream::cur);
+            //Read castShadows bool
             world_stream->read(reinterpret_cast<char*>(&lptr->castShadows), sizeof(bool));
             break;
         }
@@ -88,7 +92,28 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
 
             break;
         }
-
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_ANIMATION: {
+            Engine::AnimationProperty* ptr = static_cast<Engine::AnimationProperty*>(prop_ptr);
+            //Read animation clip name
+            *world_stream >> ptr->anim_label;
+            ptr->updateAnimationPtr();
+            break;
+        }
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_NODE: {
+            Engine::NodeProperty* ptr = static_cast<Engine::NodeProperty*>(prop_ptr);
+            //Read node name
+            *world_stream >> ptr->node_label;
+            //Skip 1 byte
+            world_stream->seekg(1, std::ofstream::cur);
+            //Now read node matrix
+            for (unsigned int m_i = 0; m_i < 4; m_i++) {
+                for (unsigned int m_j = 0; m_j < 4; m_j++) {
+                    float* m_v = &ptr->transform_mat.m[m_i][m_j];
+                    world_stream->read(reinterpret_cast<char*>(m_v), sizeof(float));
+                }
+            }
+            break;
+        }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_AUDSOURCE:{
             std::string rel_path;
 

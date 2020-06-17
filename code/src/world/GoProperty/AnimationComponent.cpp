@@ -47,11 +47,14 @@ void Engine::AnimationProperty::onPreRender(RenderPipeline* pipeline) {
         for (unsigned int channels_i = 0; channels_i < anim_prop_ptr->NumChannels; channels_i++) {
             Engine::AnimationChannel* ch = &anim_prop_ptr->channels[channels_i];
             GameObject* node = obj->getChildObjectWithNodeLabel(ch->bone_name);
-            NodeProperty* prop = node->getPropertyPtr<NodeProperty>();
-
-            prop->translation = ch->getPostitionInterpolated(animTime);
-            prop->scale = ch->getScaleInterpolated(animTime);
-            prop->rotation = ch->getRotationInterpolated(animTime);
+            //Check, if that gameobject exists
+            if (node) {
+                //if exists
+                NodeProperty* prop = node->getPropertyPtr<NodeProperty>();
+                prop->translation = ch->getPostitionInterpolated(animTime);
+                prop->scale = ch->getScaleInterpolated(animTime);
+                prop->rotation = ch->getRotationInterpolated(animTime);
+            }
         }
     }
     ZSMATRIX4x4 identity_matrix = getIdentity();
