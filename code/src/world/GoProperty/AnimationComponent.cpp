@@ -117,3 +117,14 @@ void Engine::AnimationProperty::updateAnimationPtr() {
 void Engine::AnimationProperty::onValueChanged() {
     updateAnimationPtr();
 }
+
+void Engine::AnimationProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
+    unsigned int offset = 1;
+    //Read animation clip name
+    anim_label.clear();
+    while (data[offset] != ' ' && data[offset] != '\n') {
+        anim_label += data[offset];
+        offset++;
+    }
+    updateAnimationPtr();
+}

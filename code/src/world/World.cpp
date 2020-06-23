@@ -196,8 +196,7 @@ void Engine::World::loadGameObject(GameObject* object_ptr, std::ifstream* world_
             break; //Then end this infinity loop
         }
         if(prefix.compare("G_CHI") == 0) { //Ops, it is chidren header
-            unsigned int amount;
-
+            unsigned int amount = 0;
             world_stream->seekg(1, std::ofstream::cur);
             //Read amount of children of object
             world_stream->read(reinterpret_cast<char*>(&amount), sizeof(int));
@@ -271,6 +270,144 @@ void Engine::World::loadFromFile(std::string file, RenderSettings* settings_ptr)
     stream.close();
 }
 
+void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char* bytes, unsigned int left_bytes) {
+    std::string prefix;
+    unsigned int iter = 1;
+    object_ptr->world_ptr = this; //Assign pointer to world
+    object_ptr->str_id.clear(); //Clear old string id
+    while (bytes[iter] != ' ') {
+        object_ptr->str_id += bytes[iter];
+        iter++;
+    }
+
+    iter++;
+    //Read ACTIVE and STATIC flags
+    memcpy(&object_ptr->active, bytes + iter, sizeof(bool));
+    iter += sizeof(bool);
+    memcpy(&object_ptr->IsStatic, bytes + iter, sizeof(bool));
+    iter += sizeof(bool);
+    //Then do the same sh*t, iterate until "G_END" came up
+    while (true) {
+        prefix.clear();
+        //Read prefix
+        while (bytes[iter] == ' ' || bytes[iter] == '\n') {
+            iter++;
+        }
+        while (bytes[iter] != ' ' && bytes[iter] != '\n' && iter < left_bytes) {
+            if(bytes[iter] != '\0')
+                prefix += bytes[iter];
+            iter++;
+        }
+
+        if (prefix.compare("G_END") == 0) { //If end reached
+            break; //Then end this infinity loop
+        }
+        if (prefix.compare("G_CHI") == 0) { //Ops, it is chidren header
+            unsigned int amount = 0;
+            iter++;
+            //Read amount of children of object
+            memcpy(&amount, bytes + iter, sizeof(int));
+            iter += sizeof(int);
+            //Iterate over these children
+            for (unsigned int ch_i = 0; ch_i < amount; ch_i++) { //Iterate over all written children to file
+                std::string child_str_id;
+                //Reading child string id
+                while (bytes[iter] == ' ' || bytes[iter] == '\n') {
+                    iter++;
+                }
+                while (bytes[iter] != ' ' && bytes[iter] != '\n') {
+                    child_str_id += bytes[iter];
+                    iter++;
+                }
+
+                GameObjectLink link;
+                link.world_ptr = this; //Setting world pointer
+                link.obj_str_id = child_str_id; //Setting string ID
+                object_ptr->children.push_back(link); //Adding to object
+            }
+        }
+        if (prefix.compare("G_PROPERTY") == 0) { //We found an property, zaeb*s'
+            //Call function to load that property
+            PROPERTY_TYPE type;
+            iter++; //Skip space
+            memcpy(&type, bytes + iter, sizeof(int));
+            iter += sizeof(int);
+            //Spawn new property with readed type
+            object_ptr->addProperty(type);
+            auto prop_ptr = object_ptr->getPropertyPtrByType(type); //get created property
+            //Read ACTIVE flag
+            memcpy(&prop_ptr->active, bytes + iter, sizeof(bool));
+            iter += sizeof(bool);
+            //Load property
+            prop_ptr->loadPropertyFromMemory(bytes + iter, object_ptr);
+        }
+    }
+}
+
+void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderSettings* settings_ptr) {
+    unsigned int iter = 0;
+    std::string test_header;
+    //Read header
+    while (bytes[iter] != ' ') {
+        test_header += bytes[iter];
+        iter++;
+    }
+
+    if (test_header.compare("ZSP_SCENE") != 0) //If it isn't zspire scene
+        return; //Go out, we have nothing to do
+    iter++;
+    int version = 0; //define version on world file
+    int objs_num = 0; //define number of objects
+    memcpy(&version, bytes + iter, sizeof(int));
+    iter += 4;
+    memcpy(&objs_num, bytes + iter, sizeof(int));
+    iter += 5;
+
+    while (iter < size) { //until file is over
+        std::string prefix;
+        //read prefix
+        while (bytes[iter] == ' ' || bytes[iter] == '\n') {
+            iter++;
+        }
+        while (bytes[iter] != ' ' && bytes[iter] != '\n') {
+            prefix += bytes[iter];
+            iter++;
+        }
+
+        if (prefix.compare("RENDER_SETTINGS_AMB_COLOR") == 0) { //if it is render setting of ambient light color
+            iter++;
+            memcpy(&settings_ptr->ambient_light_color.r, bytes + iter, sizeof(int));
+            iter += 4;
+            memcpy(&settings_ptr->ambient_light_color.g, bytes + iter, sizeof(int));
+            iter += 4;
+            memcpy(&settings_ptr->ambient_light_color.b, bytes + iter, sizeof(int));
+            iter += 4;
+        }
+
+        if (prefix.compare("G_OBJECT") == 0) { //if it is game object
+            GameObject obj;
+            //Call function to load object
+
+            if (this->objects.size() == 100) {
+                int ui = 0;
+            }
+
+            loadGameObjectFromMemory(&obj, bytes + iter, size - iter);
+            //Add object to scene
+            this->addObject(obj);
+        }
+    }
+    //Now iterate over all objects and set depencies
+    for (unsigned int obj_i = 0; obj_i < this->objects.size(); obj_i++) {
+        GameObject* obj_ptr = this->objects[obj_i];
+        for (unsigned int chi_i = 0; chi_i < obj_ptr->children.size(); chi_i++) { //Now iterate over all children
+            GameObjectLink* child_ptr = &obj_ptr->children[chi_i];
+            GameObject* child_go_ptr = child_ptr->updLinkPtr();
+            child_go_ptr->parent = obj_ptr->getLinkToThisObject();
+            child_go_ptr->hasParent = true;
+        }
+    }
+}
 
 Engine::Camera* Engine::World::getCameraPtr(){
     return &this->world_camera;

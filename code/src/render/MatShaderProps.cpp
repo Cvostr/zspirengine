@@ -323,7 +323,7 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
             char _prop_identifier[100];
             strcpy(_prop_identifier, &buffer[position]);
             std::string prop_identifier = std::string(_prop_identifier);
-            position += prop_identifier.size() + 1;
+            position += static_cast<unsigned int>(prop_identifier.size()) + 1;
 
             for(unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i ++){
                 MaterialShaderProperty* prop_ptr = group_ptr->properties[prop_i];
@@ -427,7 +427,7 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                                 char texture_relpath[64];
                                 strcpy(texture_relpath, &buffer[position]);
                                 texture3_conf->texture_str[i] = std::string(texture_relpath);
-                                position += strlen(texture_relpath) + 1;
+                                position += static_cast<unsigned int>(strlen(texture_relpath)) + 1;
                             }
 
                             break;

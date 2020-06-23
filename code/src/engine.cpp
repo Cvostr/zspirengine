@@ -135,8 +135,24 @@ void ZSpireEngine::loadGame(){
     Engine::Loader::start();
     Engine::Loader::setBlobRootDirectory(this->desc->blob_root_path);
 
+    
+
     game_data->resources->loadResourcesTable(this->desc->resource_map_file_path);
-    game_data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene, game_data->pipeline->getRenderSettings());
+
+
+    Engine::ZsResource* terrain_res = game_data->resources->getResource<Engine::ZsResource>(desc->startup_scene);
+    //check, if terrain resource found
+    if (terrain_res) {
+        terrain_res->request = new Engine::Loader::LoadRequest;
+        terrain_res->request->offset = terrain_res->offset;
+        terrain_res->request->size = terrain_res->size;
+        terrain_res->request->file_path = terrain_res->blob_path;
+        loadImmideately(terrain_res->request);
+
+        game_data->world->loadFromMemory((const char*)terrain_res->request->data, terrain_res->request->size, game_data->pipeline->getRenderSettings());
+    }
+
+    //game_data->world->loadFromFile(desc->game_dir + "/" + desc->startup_scene, game_data->pipeline->getRenderSettings());
 
     static uint64_t NOW = SDL_GetPerformanceCounter();
     static uint64_t last = 0;

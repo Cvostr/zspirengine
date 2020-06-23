@@ -68,18 +68,21 @@ public:
     PROPERTY_TYPE type; //type of property
     GameObjectLink go_link; //link to object, that holds this property
     bool active; //Is property working
-
+    //Pointer to World class
     World* world_ptr;
-
+    //Func to change active state
     void setActive(bool active);
+    //Check, if Property is Active
     bool isActive();
-
+    //Virtual func to copy all property's values
     virtual void copyTo(GameObjectProperty* dest);
+    //Virtual func to define property behaviour each frame
     virtual void onUpdate(float deltaTime);
     virtual void onPreRender(RenderPipeline* pipeline = nullptr);
     virtual void onRender(RenderPipeline* pipeline = nullptr);
     virtual void onAddToObject();
     virtual void onObjectDeleted();
+    virtual void loadPropertyFromMemory(const char* data, GameObject* obj);
     virtual void onTrigger(Engine::GameObject* obj);
     //Editor specific functions
     virtual void addPropertyInterfaceToInspector();
@@ -96,8 +99,10 @@ public:
     PhysicalWorld* physical_world;
 
     std::vector<GameObject*> objects; //Vector, containing all gameobjects
+    void loadFromMemory(const char* bytes, unsigned int size, RenderSettings* settings_ptr);
     void loadFromFile(std::string file, RenderSettings* settings_ptr);
     void loadGameObject(GameObject* object_ptr, std::ifstream* world_stream);
+    void loadGameObjectFromMemory(GameObject* object_ptr, const char* bytes, unsigned int left_bytes);
 
     GameObject* getGameObjectByStrId(std::string id);
     GameObject* getGameObjectByLabel(std::string label);
@@ -204,6 +209,7 @@ class LabelProperty : public GameObjectProperty {
 public:
     std::string label; //Label of gameobject
 
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     LabelProperty();
 };
@@ -232,6 +238,8 @@ public:
     //Editor stuff
     void onValueChanged();
     void addPropertyInterfaceToInspector();
+
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     TransformProperty();
 };

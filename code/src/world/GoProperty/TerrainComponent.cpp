@@ -1,5 +1,7 @@
 #include "../../../headers/world/go_properties.h"
 
+extern ZSGAME_DATA* game_data;
+
 Engine::TerrainProperty::TerrainProperty(){
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TERRAIN;
 
@@ -84,4 +86,87 @@ void Engine::TerrainProperty::onUpdate(float deltaTime) {
         //Physics objects are created, no need to recreate them in further
         data.hasPhysicShapeChanged = false;
     }
+}
+
+void Engine::TerrainProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
+    unsigned int offset = 1;
+
+    while (data[offset] != ' ' && data[offset] != '\n') {
+        file_label += data[offset];
+        offset++;
+    }
+
+    offset++;
+    //read dimensions
+    memcpy(&Width, data + offset, sizeof(float));
+    offset += sizeof(float);
+    memcpy(&Length, data + offset, sizeof(float));
+    offset += sizeof(float);
+    memcpy(&MaxHeight, data + offset, sizeof(float));
+    offset += sizeof(float);
+
+    memcpy(&castShadows, data + offset, sizeof(bool));
+    offset += sizeof(bool);
+    memcpy(&textures_size, data + offset, sizeof(int));
+    offset += sizeof(int);
+    memcpy(&grassType_size, data + offset, sizeof(int));
+    offset += sizeof(int);
+
+    ZsResource* terrain_res = game_data->resources->getResource<Engine::ZsResource>(file_label);
+    //check, if terrain resource found
+    if (terrain_res) {
+        terrain_res->request = new Engine::Loader::LoadRequest;
+        terrain_res->request->offset = terrain_res->offset;
+        terrain_res->request->size = terrain_res->size;
+        terrain_res->request->file_path = terrain_res->blob_path;
+        loadImmideately(terrain_res->request);
+        //Load terrain from readed binary data
+        bool result = getTerrainData()->loadFromMemory((const char*)terrain_res->request->data);
+        if (result) //if loading sucessstd::cout << "Terrain : Probably, missing terrain file" << file_path;
+            getTerrainData()->generateGLMesh();
+    }
+    offset++;
+
+    //Read textures relative pathes
+    for (int texture_i = 0; texture_i < textures_size; texture_i++) {
+        HeightmapTexturePair texture_pair;
+        //Read texture pair
+        texture_pair.diffuse_relpath.clear();
+        while (data[offset] != ' ' && data[offset] != '\n') {
+            texture_pair.diffuse_relpath += data[offset];
+            offset++;
+        }
+        offset++;
+        //Read normal pair
+        texture_pair.normal_relpath.clear();    
+        while (data[offset] != ' ' && data[offset] != '\n') {
+            texture_pair.normal_relpath += data[offset];
+            offset++;
+        }
+        offset++;
+        //Push texture to array
+        textures.push_back(texture_pair);
+    }
+
+    for (int grass_i = 0; grass_i < grassType_size; grass_i++) {
+        HeightmapGrass grass;
+        //Read grass diffuse texture
+        grass.diffuse_relpath.clear();
+        while (data[offset] != ' ' && data[offset] != '\n') {
+            grass.diffuse_relpath += data[offset];
+            offset++;
+        }
+        //Write grass size
+        offset++;
+        memcpy(&grass.scale.X, data + offset, sizeof(float));
+        offset += sizeof(float);
+        memcpy(&grass.scale.Y, data + offset, sizeof(float));
+        offset += sizeof(float);
+        //Push Grass to array
+        getTerrainData()->grass.push_back(grass);
+    }
+    //Fill grass buffers with transforms
+    getTerrainData()->updateGrassBuffers();
+
+    onValueChanged();
 }

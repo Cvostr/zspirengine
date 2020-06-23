@@ -188,6 +188,10 @@ bool TerrainData::loadFromMemory(const char* bytes) {
 
 void TerrainData::initPhysics(){
     ZSVECTOR3* vertex_pos = &vertices[0].pos;
+    //Check vertices array
+    if (vertex_pos == nullptr)
+        //if no vertices, then exit function
+        return;
     //Calculate amount of indices
     int numFaces = (W - 1) * (H - 1) * 2;
     int vertStride = sizeof(HeightmapVertex);

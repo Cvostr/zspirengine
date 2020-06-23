@@ -195,7 +195,7 @@ Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByTypeI(PROPERTY_T
 void Engine::GameObject::onUpdate(int deltaTime){   //calls onUpdate on all properties
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
         if(!properties[i]->active) continue; //if property is inactive, then skip it
-        properties[i]->onUpdate(deltaTime); //and call onUpdate on each property
+        properties[i]->onUpdate(static_cast<float>(deltaTime)); //and call onUpdate on each property
     }
 }
 

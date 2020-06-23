@@ -33,6 +33,7 @@ public:
     //EDITOR STUFF
     void addPropertyInterfaceToInspector();
     void onValueChanged(); //Update mesh    pointer
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     MeshProperty();
 };
@@ -51,6 +52,8 @@ public:
     void copyTo(Engine::GameObjectProperty* dest);
 
     Engine::ObjectScript* getScriptByName(std::string name);
+
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     ScriptGroupProperty();
 };
@@ -73,6 +76,7 @@ public:
     void addPropertyInterfaceToInspector();
     void copyTo(Engine::GameObjectProperty* dest);
     void onPreRender(Engine::RenderPipeline* pipeline);
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     LightsourceProperty();
 };
@@ -105,6 +109,8 @@ public:
     void setGain(float gain);
     void setPitch(float pitch);
 
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
+
     AudioSourceProperty();
 };
 
@@ -123,6 +129,7 @@ public:
 
     void copyTo(GameObjectProperty* dest);
    // void addPropertyInterfaceToInspector();
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     NodeProperty();
 };
@@ -159,6 +166,9 @@ public:
     void setTexture();
     void setTextureSize();
     bool isRenderAvailable();
+    //function to read shadowcaster property from memory
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
+
     ShadowCasterProperty();
 };
 
@@ -180,6 +190,8 @@ public:
     void onValueChanged();
     void copyTo(Engine::GameObjectProperty* dest);
     void onRender(Engine::RenderPipeline* pipeline);
+
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     MaterialProperty();
 };
@@ -216,6 +228,8 @@ public:
     void onUpdate(float deltaTime);
     Engine::TransformProperty* getTransformProperty();
 
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
+
     ColliderProperty();
 };
 
@@ -232,11 +246,18 @@ public:
 
     void setLinearVelocity(ZSVECTOR3 lvel);
 
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
+
     RigidbodyProperty();
 };
 
 class CharacterControllerProperty : public Engine::PhysicalProperty{
+private:
+    bool _isOnGround;
 public:
+    float width;
+    float height;
+
     ZSVECTOR3 gravity;
     ZSVECTOR3 linearVel;
     ZSVECTOR3 angularVel;
@@ -246,6 +267,10 @@ public:
     void onUpdate(float deltaTime);
 
     void setLinearVelocity(ZSVECTOR3 lvel);
+
+    bool isOnGround();
+
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     CharacterControllerProperty();
 };
@@ -284,6 +309,7 @@ public:
     void updateAnimationPtr();
     void updateNodeTransform(GameObject* obj, ZSMATRIX4x4 parent);
 
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     AnimationProperty();
 };
@@ -330,6 +356,8 @@ public:
     void modifyTerrainVertex(unsigned char* gl_data, bool isCtrlHold);
 
     TerrainData* getTerrainData();
+
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     TerrainProperty();
     ~TerrainProperty();

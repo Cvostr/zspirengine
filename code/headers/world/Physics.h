@@ -47,8 +47,29 @@ public:
     void removeRidigbodyFromWorld(btRigidBody* body);
     void addCollisionObjToWorld(btCollisionObject* body);
     void removeCollisionObjFromWorld(btCollisionObject* body);
+    void rayTest(ZSVECTOR3 pos, ZSVECTOR3 dir, btCollisionWorld::RayResultCallback& callback);
     PhysicalWorld(PhysicalWorldSettings* settings);
     ~PhysicalWorld();
+};
+
+class ClosestNotMe : public btCollisionWorld::ClosestRayResultCallback
+{
+public:
+    ClosestNotMe(btRigidBody* me) : btCollisionWorld::ClosestRayResultCallback(btVector3(0.0, 0.0, 0.0), btVector3(0.0, 0.0, 0.0))
+    {
+        m_me = me;
+    }
+
+    virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult, bool normalInWorldSpace)
+    {
+        if (rayResult.m_collisionObject == m_me)
+            return 1.0;
+
+        return ClosestRayResultCallback::addSingleResult(rayResult, normalInWorldSpace
+        );
+    }
+protected:
+    btRigidBody* m_me;
 };
 
 #endif // PHYSICS_H

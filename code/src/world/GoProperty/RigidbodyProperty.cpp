@@ -15,7 +15,8 @@ void Engine::RigidbodyProperty::onUpdate(float deltaTime) {
     if (!created) {
         //if uninitialized
         if (init()) {
-
+            //if initialization suucessful
+            //then apply some settings
             this->rigidBody->setGravity(btVector3(gravity.X, gravity.Y, gravity.Z));
             this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
         }
@@ -80,4 +81,28 @@ void Engine::RigidbodyProperty::copyTo(Engine::GameObjectProperty* dest) {
     rigi_prop->gravity = this->gravity;
     rigi_prop->linearVel = this->linearVel;
     rigi_prop->angularVel = this->angularVel;
+}
+
+void Engine::RigidbodyProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
+    unsigned int offset = 1;
+    //read collider type
+    memcpy(&coll_type, data + offset, sizeof(COLLIDER_TYPE));
+    offset += sizeof(COLLIDER_TYPE);
+    //Read mass of rigidbody
+    memcpy(&mass, data + offset, sizeof(float));
+    offset += sizeof(float);
+    //Read Gravity vector
+    memcpy(&gravity.X, data + offset, sizeof(float));
+    offset += sizeof(float);
+    memcpy(&gravity.Y, data + offset, sizeof(float));
+    offset += sizeof(float);
+    memcpy(&gravity.Z, data + offset, sizeof(float));
+    offset += sizeof(float);
+    //read linear velocity
+    memcpy(&linearVel.Z, data + offset, sizeof(float));
+    offset += sizeof(float);
+    memcpy(&linearVel.Z, data + offset, sizeof(float));
+    offset += sizeof(float);
+    memcpy(&linearVel.Z, data + offset, sizeof(float));
+    offset += sizeof(float);
 }

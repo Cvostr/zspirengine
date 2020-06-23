@@ -5,7 +5,7 @@ extern ZSpireEngine* engine_ptr;
 extern ZSGAME_DATA* game_data;
 
 void Engine::GameObject::loadProperty(std::ifstream* world_stream){
-    PROPERTY_TYPE type;
+  /*  PROPERTY_TYPE type;
     world_stream->seekg(1, std::ofstream::cur); //Skip space
     world_stream->read(reinterpret_cast<char*>(&type), sizeof(int));
     //Spawn new property with readed type
@@ -115,12 +115,10 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_AUDSOURCE:{
-            std::string rel_path;
-
             AudioSourceProperty* lptr = static_cast<AudioSourceProperty*>(prop_ptr);
 
             *world_stream >> lptr->resource_relpath;
-            if(rel_path.compare("@none") != 0){
+            if(lptr->resource_relpath.compare("@none") != 0){
                 lptr->updateAudioPtr(); //Pointer will now point to mesh resource
             }
             world_stream->seekg(1, std::ofstream::cur);
@@ -230,12 +228,12 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_CHARACTER_CONTROLLER:{
             Engine::CharacterControllerProperty* ptr = static_cast<Engine::CharacterControllerProperty*>(prop_ptr);
             world_stream->seekg(1, std::ofstream::cur); //Skip space
-            world_stream->read(reinterpret_cast<char*>(&ptr->isCustomPhysicalSize), sizeof(bool));
-            if(ptr->isCustomPhysicalSize){
-                world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.X), sizeof(float));
-                world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.Y), sizeof(float));
-                world_stream->read(reinterpret_cast<char*>(&ptr->cust_size.Z), sizeof(float));
-            }
+            world_stream->read(reinterpret_cast<char*>(&ptr->width), sizeof(float));
+            world_stream->read(reinterpret_cast<char*>(&ptr->height), sizeof(float));
+
+            world_stream->read(reinterpret_cast<char*>(&ptr->transform_offset.X), sizeof(float));
+            world_stream->read(reinterpret_cast<char*>(&ptr->transform_offset.Y), sizeof(float));
+            world_stream->read(reinterpret_cast<char*>(&ptr->transform_offset.Z), sizeof(float));
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_TERRAIN: {
@@ -292,5 +290,5 @@ void Engine::GameObject::loadProperty(std::ifstream* world_stream){
 
             break;
         }
-    }
+    }*/
 }

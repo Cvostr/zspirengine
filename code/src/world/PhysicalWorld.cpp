@@ -48,6 +48,12 @@ void PhysicalWorld::removeCollisionObjFromWorld(btCollisionObject* body) {
     this->physic_world->removeCollisionObject(body);
 }
 
+void PhysicalWorld::rayTest(ZSVECTOR3 pos, ZSVECTOR3 dir, btCollisionWorld::RayResultCallback& callback) {
+    btVector3 bvpos = btVector3(pos.X, pos.Y, pos.Z);
+    btVector3 bvdir = btVector3(dir.X, dir.Y, dir.Z);
+    physic_world->rayTest(bvpos, bvdir, callback);
+}
+
 void PhysicalWorld::stepSimulation(float stepSimulation){
     if(stepSimulation > 200) return;
 
