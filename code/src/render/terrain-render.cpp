@@ -149,6 +149,11 @@ void TerrainData::generateGLMesh() {
 void Engine::TerrainProperty::DrawMesh(RenderPipeline* pipeline) {
     //Draw terrain mesh
     data.Draw(false);
+    //Draw Grass
+    DrawGrass(pipeline);
+}
+
+void Engine::TerrainProperty::DrawGrass(RenderPipeline* pipeline) {
     if (pipeline->current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT) {
         //Use grass shader
         pipeline->grass_shader->Use();

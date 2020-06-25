@@ -48,6 +48,7 @@ public:
     void addCollisionObjToWorld(btCollisionObject* body);
     void removeCollisionObjFromWorld(btCollisionObject* body);
     void rayTest(ZSVECTOR3 pos, ZSVECTOR3 dir, btCollisionWorld::RayResultCallback& callback);
+
     PhysicalWorld(PhysicalWorldSettings* settings);
     ~PhysicalWorld();
 };

@@ -550,7 +550,7 @@ void Material::applyMatToPipeline(){
                 Float3MtShPropConf* fvec3_conf = static_cast<Float3MtShPropConf*>(conf_ptr);
 
                 offset = fvec3_p->start_offset;
-                //Write color to buffer
+                //Write vec3 to buffer
                 group_ptr->setUB_Data(offset, 4, &fvec3_conf->value.X);
                 group_ptr->setUB_Data(offset + 4, 4, &fvec3_conf->value.Y);
                 group_ptr->setUB_Data(offset + 8, 4, &fvec3_conf->value.Z);
@@ -563,7 +563,7 @@ void Material::applyMatToPipeline(){
                 Float2MtShPropConf* fvec2_conf = static_cast<Float2MtShPropConf*>(conf_ptr);
 
                 offset = fvec2_p->start_offset;
-                //Write color to buffer
+                //Write vec2 to buffer
                 group_ptr->setUB_Data(offset, 4, &fvec2_conf->value.X);
                 group_ptr->setUB_Data(offset + 4, 4, &fvec2_conf->value.Y);
                 break;
@@ -574,7 +574,7 @@ void Material::applyMatToPipeline(){
                 Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
 
                 offset = ivec2_p->start_offset;
-                //Write color to buffer
+                //Write vec2 to buffer
                 group_ptr->setUB_Data(offset, 4, &ivec2_conf->value[0]);
                 group_ptr->setUB_Data(offset + 4, 4, &ivec2_conf->value[1]);
                 break;
@@ -583,16 +583,19 @@ void Material::applyMatToPipeline(){
                 //Cast pointer
                 Texture3MaterialShaderProperty* texture_p = static_cast<Texture3MaterialShaderProperty*>(prop_ptr);
                 Texture3MtShPropConf* texture_conf = static_cast<Texture3MtShPropConf*>(conf_ptr);
-
+                //Check, is texture already created
                 if(!texture_conf->texture3D->created){
+                    //If not created, create OpenGL instance
                     texture_conf->texture3D->Init();
 
                     for(int i = 0; i < 6; i ++){
                         texture_conf->texture3D->pushTexture(i, texture_conf->texture_str[i]);
                     }
+                    //Change Flag state
                     texture_conf->texture3D->created = true;
                     texture_conf->texture3D->Use(texture_p->slotToBind);
                 }else{
+                    //3D texture already created, Use it
                     texture_conf->texture3D->Use(texture_p->slotToBind);
                 }
                 break;

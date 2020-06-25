@@ -243,6 +243,7 @@ public:
     void onUpdate(float deltaTime);
     void copyTo(Engine::GameObjectProperty* dest);
     void onValueChanged();
+    void onObjectDeleted(); //unregister in world
 
     void setLinearVelocity(ZSVECTOR3 lvel);
 
@@ -283,6 +284,7 @@ public:
     void onUpdate(float deltaTime);
     void copyTo(Engine::GameObjectProperty* dest);
     void initGhost();
+    void onObjectDeleted(); //unregister in world
 
     TriggerProperty();
 };
@@ -345,6 +347,7 @@ public:
     void onRender(Engine::RenderPipeline* pipeline);
 
     void DrawMesh(RenderPipeline* pipeline);
+    void DrawGrass(RenderPipeline* pipeline);
     void onValueChanged();
     void onAddToObject();
     void copyTo(Engine::GameObjectProperty* dest);

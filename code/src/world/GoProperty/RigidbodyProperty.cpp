@@ -64,9 +64,11 @@ void Engine::RigidbodyProperty::onValueChanged() {
     this->rigidBody->setMassProps(mass, localInertia);
     this->rigidBody->setGravity(btVector3(gravity.X, gravity.Y, gravity.Z));
     this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
-
+    //Delete Bullet Shape Object
     delete shape;
+    //Update Shape
     updateCollisionShape();
+    //Assign new shape to rigid body
     this->rigidBody->setCollisionShape(shape);
 }
 
@@ -81,6 +83,11 @@ void Engine::RigidbodyProperty::copyTo(Engine::GameObjectProperty* dest) {
     rigi_prop->gravity = this->gravity;
     rigi_prop->linearVel = this->linearVel;
     rigi_prop->angularVel = this->angularVel;
+}
+
+void Engine::RigidbodyProperty::onObjectDeleted() { //unregister in world
+    if (created)
+        this->go_link.world_ptr->physical_world->removeRidigbodyFromWorld(this->rigidBody);
 }
 
 void Engine::RigidbodyProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {

@@ -78,6 +78,7 @@ protected:
 
     void setBlendingState(bool blend);
     void setDepthState(bool depth);
+    void setFaceCullState(bool face_cull);
     void setFullscreenViewport(unsigned int Width, unsigned int Height);
     void ClearFBufferGL(bool clearColor, bool clearDepth);
 
@@ -116,6 +117,9 @@ public:
 
     void addLight(void* light_ptr);
     void removeLights();
+
+    void TryRenderShadows(Engine::Camera* cam);
+    void TryRenderSkybox();
 
     void renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY);
     void renderSprite(Engine::TextureResource* texture_sprite, int X, int Y, int scaleX, int scaleY);

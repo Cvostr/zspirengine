@@ -230,13 +230,7 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
     ZSGAME_DATA* game = static_cast<ZSGAME_DATA*>(engine_ptr->getGameDataPtr());
     World* world_ptr = game->world;
     //Render shadows, first
-    if (this->render_settings.shadowcaster_obj_ptr != nullptr) {
-        Engine::ShadowCasterProperty* shadowcast =
-            static_cast<Engine::GameObject*>(this->render_settings.shadowcaster_obj_ptr)->getPropertyPtr<Engine::ShadowCasterProperty>();
-        if (shadowcast != nullptr) { //we have shadowcaster
-            shadowcast->Draw(cam, this); //draw shadowcaster
-        }
-    }
+    TryRenderShadows(cam);
 
     //Bind Geometry Buffer to make Deferred Shading
     gbuffer->bind();
@@ -245,6 +239,10 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
     setBlendingState(false);
     setFullscreenViewport(this->WIDTH, this->HEIGHT);
 
+    TryRenderSkybox();
+    
+    setDepthState(true);
+    setFaceCullState(true);
     //Iterate over all objects in the world
     for(unsigned int obj_i = 0; obj_i < world_ptr->objects.size(); obj_i ++){
         GameObject* obj_ptr = world_ptr->objects[obj_i];
@@ -253,9 +251,7 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
     }
     //Disable depth rendering to draw plane correctly
     setDepthState(false);
-
-    if(cullFaces == true) //if GL face cull is enabled
-        glDisable(GL_CULL_FACE);
+    setFaceCullState(false);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
     ClearFBufferGL(true, false); //Clear screen
@@ -409,9 +405,7 @@ void Engine::SkyboxProperty::onPreRender(Engine::RenderPipeline* pipeline){
     pipeline->getRenderSettings()->skybox_obj_ptr = static_cast<void*>(this->go_link.updLinkPtr());
 }
 
-void Engine::ShadowCasterProperty::onPreRender(Engine::RenderPipeline* pipeline){
-    pipeline->getRenderSettings()->shadowcaster_obj_ptr = static_cast<void*>(this->go_link.updLinkPtr());
-}
+
 
 void Engine::SkyboxProperty::DrawSky(RenderPipeline* pipeline){
     if(!this->isActive())
@@ -427,84 +421,7 @@ void Engine::SkyboxProperty::DrawSky(RenderPipeline* pipeline){
     Engine::getSkyboxMesh()->Draw();
 }
 
-void Engine::ShadowCasterProperty::init(){
-    glGenFramebuffers(1, &this->shadowBuffer);//Generate framebuffer for texture
-    glGenTextures(1, &this->shadowDepthTexture); //Generate texture
 
-    glBindTexture(GL_TEXTURE_2D, shadowDepthTexture);
-    //Configuring texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this->TextureWidth * 3, this->TextureHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-    //Binding framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer);
-    //Connecting depth texture to framebuffer
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->shadowDepthTexture, 0);
-    //We won't render color
-    glDrawBuffer(false);
-    glReadBuffer(false);
-    //Unbind framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    this->initialized = true;
-}
-
-void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pipeline){
-    if(!isRenderAvailable()){
-        glViewport(0, 0, TextureWidth, TextureHeight);
-        glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer); //Bind framebuffer
-        glClear(GL_DEPTH_BUFFER_BIT);
-        return;
-    }
-
-    Engine::LightsourceProperty* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceProperty>();
-    //Change Framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer); //Bind framebuffer
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    glFrontFace(GL_CW);
-    glDisable(GL_CULL_FACE);
-    //Bind shadow uniform buffer
-    pipeline->shadowBuffer->bind();
-    //Send BIAS value
-    pipeline->shadowBuffer->writeData(sizeof (ZSMATRIX4x4) * 4, 4, &shadow_bias);
-    //Send Width of shadow texture
-    pipeline->shadowBuffer->writeData(sizeof (ZSMATRIX4x4) * 4 + 8, 4, &this->TextureWidth);
-    //Send Height of shadow texture
-    pipeline->shadowBuffer->writeData(sizeof (ZSMATRIX4x4) * 4 + 12, 4, &this->TextureHeight);
-    //Use shadowmap shader to draw objects
-    pipeline->getShadowmapShader()->Use();
-
-    int dists[] = {0, 20, 70, 100};
-    //iterate over all cascades
-    for (unsigned int i = 0; i < 3; i++) {
-        ZSVECTOR3 cam_pos = cam->getCameraPosition() + cam->getCameraFrontVec() + 15 * (1 + i);
-        ZSMATRIX4x4 matview = matrixLookAt(cam_pos, cam_pos + light->direction * -1, ZSVECTOR3(0, 1, 0));
-
-
-        float w = projection_viewport * (1 + i);
-        this->LightProjectionMat = getOrthogonal(-w, w, -w, w, nearPlane, farPlane);
-
-        ZSMATRIX4x4 mat = matview * LightProjectionMat;
-
-        pipeline->shadowBuffer->bind();
-        pipeline->shadowBuffer->writeData(0, sizeof(ZSMATRIX4x4), &mat);
-        uint64_t offset = (1 + uint64_t(i));
-        pipeline->shadowBuffer->writeData(sizeof(ZSMATRIX4x4) * offset, sizeof(ZSMATRIX4x4), &mat);
-
-
-        glViewport(TextureWidth * i, 0, TextureWidth, TextureHeight);
-        //Render to depth all scene
-        pipeline->renderDepth(this->go_link.world_ptr);
-    }
-
-    glFrontFace(GL_CCW);
-}
 
 void Engine::TileProperty::onRender(Engine::RenderPipeline* pipeline){
     Engine::Shader* tile_shader = pipeline->getTileShader();
@@ -654,6 +571,12 @@ void Engine::RenderPipeline::setDepthState(bool depth) {
     else
         glDisable(GL_DEPTH_TEST);
 }
+void Engine::RenderPipeline::setFaceCullState(bool face_cull) {
+    if (face_cull)
+        glEnable(GL_CULL_FACE);
+    else
+        glDisable(GL_CULL_FACE);
+}
 void Engine::RenderPipeline::setFullscreenViewport(unsigned int Width, unsigned int Height) {
     glViewport(0, 0, Width, Height);
 }
@@ -666,6 +589,24 @@ void Engine::RenderPipeline::ClearFBufferGL(bool clearColor, bool clearDepth) {
         clearMask |= GL_DEPTH_BUFFER_BIT;
 
     glClear(clearMask);
+}
+
+void Engine::RenderPipeline::TryRenderShadows(Engine::Camera* cam) {
+    if (this->render_settings.shadowcaster_obj_ptr != nullptr) {
+        Engine::ShadowCasterProperty* shadowcast =
+            static_cast<Engine::GameObject*>(this->render_settings.shadowcaster_obj_ptr)->getPropertyPtr<Engine::ShadowCasterProperty>();
+        if (shadowcast != nullptr) { //we have shadowcaster
+            shadowcast->Draw(cam, this); //draw shadowcaster
+        }
+    }
+}
+void Engine::RenderPipeline::TryRenderSkybox() {
+    if (this->render_settings.skybox_obj_ptr != nullptr) {
+        Engine::SkyboxProperty* skybox
+            = static_cast<Engine::GameObject*>(this->render_settings.skybox_obj_ptr)->getPropertyPtr<Engine::SkyboxProperty>();
+        if (skybox != nullptr)
+            skybox->DrawSky(this);
+    }
 }
 
 void Engine::GLframebuffer::bind() {

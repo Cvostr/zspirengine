@@ -457,6 +457,7 @@ void Engine::TriggerProperty::onUpdate(float deltaTime) {
     else {
        //Get number of objects, that currently collide
         unsigned int overlaping = m_ghost->getNumOverlappingObjects();
+        //Iterate over all overlapping objects
         for (int i = 0; i < overlaping; i++) {
             btCollisionObject* coll_obj = m_ghost->getOverlappingObject(i);
             if (coll_obj == nullptr) continue;
@@ -476,6 +477,12 @@ void Engine::TriggerProperty::copyTo(Engine::GameObjectProperty* dest) {
 
     TriggerProperty* trigger = static_cast<TriggerProperty*>(dest);
 }
+
+void Engine::TriggerProperty::onObjectDeleted() { //unregister in world
+    if (created)
+        this->go_link.world_ptr->physical_world->removeCollisionObjFromWorld(this->m_ghost);
+}
+   
 
 Engine::SkyboxProperty::SkyboxProperty(){
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_SKYBOX;

@@ -5,6 +5,8 @@
 #include "../../headers/vulkan/vk_data.h"
 
 extern ZSpireEngine* engine_ptr;
+//Hack to support resources
+extern ZSGAME_DATA* game_data;
 
 Engine::Texture* Engine::allocTexture(){
     Engine::Texture* result = nullptr;
@@ -169,14 +171,26 @@ bool Engine::Texture3D::pushTexture(int index, std::string path){
 
     this->units[index].path = path;
     this->units[index].req = new Engine::Loader::LoadRequest;
-    this->units[index].req->size = 0;
-    this->units[index].req->file_path = path;
-    this->units[index].req->offset = 0;
-
+    //Check, if we use engine from Editor
+    if (!game_data->isEditor) {
+        //We are not in editor
+        TextureResource* texture = game_data->resources->getTextureByLabel(path);
+        this->units[index].req->offset = texture->offset;
+        //Set size of resource in blob
+        this->units[index].req->size = texture->size;
+        this->units[index].req->file_path = texture->blob_path;
+    }
+    else {
+        //We are in editor
+        this->units[index].req->size = 0;
+        this->units[index].req->file_path = path;
+        this->units[index].req->offset = 0;
+    }
+    //Load binary file multithreaded
     Engine::Loader::loadImmideately(this->units[index].req);
     if (!pushTextureBuffer(index, this->units[index].req->data))
         return false;
-
+    //Free bytes
     delete[] this->units[index].req->data;
     delete this->units[index].req;
 

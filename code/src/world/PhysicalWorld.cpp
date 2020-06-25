@@ -55,8 +55,8 @@ void PhysicalWorld::rayTest(ZSVECTOR3 pos, ZSVECTOR3 dir, btCollisionWorld::RayR
 }
 
 void PhysicalWorld::stepSimulation(float stepSimulation){
-    if(stepSimulation > 200) return;
-
+    if(stepSimulation > 200) 
+        return;
     //Simulate physics
     this->physic_world->stepSimulation(stepSimulation);
     physic_world->performDiscreteCollisionDetection();
@@ -120,7 +120,6 @@ bool Engine::PhysicalProperty::init(){
     b.setEuler(transform->abs_rotation.Z, transform->abs_rotation.Y, transform->abs_rotation.X);
     //Set start rotation
     startTransform.setRotation(btQuaternion(transform->abs_rotation.X, transform->abs_rotation.Y, transform->abs_rotation.Z));
-    //startTransform.setRotation(b);
 
     //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
     btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
@@ -130,7 +129,7 @@ bool Engine::PhysicalProperty::init(){
     rigidBody->setUserIndex(this->go_link.updLinkPtr()->array_index);
     //add rigidbody to world
     go_link.world_ptr->physical_world->addRidigbodyToWorld(rigidBody);
-    
+    //Set CREATED flag
     created = true;
     return true;
 }
@@ -143,8 +142,7 @@ void Engine::TriggerProperty::initGhost() {
     //if Custom Physical Size is checked
     if (isCustomPhysicalSize) {
         scale = cust_size;
-    }
-
+    }   
     //if uninitialized
     this->shape = new btCapsuleShape(scale.X, scale.Y);
     //Declare start transform
@@ -232,3 +230,4 @@ void Engine::PhysicalProperty::onUpdate(float deltaTime){
     if(!rigidBody->isActive())
         rigidBody->activate();
 }
+

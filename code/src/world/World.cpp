@@ -234,7 +234,7 @@ void Engine::World::loadFromFile(std::string file, RenderSettings* settings_ptr)
     int version = 0; //define version on world file
     int objs_num = 0; //define number of objects
     stream.read(reinterpret_cast<char*>(&version), sizeof(int)); //reading version
-    stream.read(reinterpret_cast<char*>(&objs_num),     sizeof(int)); //reading objects count
+    stream.read(reinterpret_cast<char*>(&objs_num), sizeof(int)); //reading objects count
 
     while(!stream.eof()){ //until file is over
         std::string prefix;
@@ -387,11 +387,6 @@ void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderS
         if (prefix.compare("G_OBJECT") == 0) { //if it is game object
             GameObject obj;
             //Call function to load object
-
-            if (this->objects.size() == 100) {
-                int ui = 0;
-            }
-
             loadGameObjectFromMemory(&obj, bytes + iter, size - iter);
             //Add object to scene
             this->addObject(obj);
