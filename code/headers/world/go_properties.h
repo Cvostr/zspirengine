@@ -270,6 +270,8 @@ public:
     void setLinearVelocity(ZSVECTOR3 lvel);
 
     bool isOnGround();
+    void jump(float height);
+    void walk(float x, float z);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
 

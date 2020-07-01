@@ -34,6 +34,7 @@ namespace ZSUI {
 
         virtual void draw();
 
+        Widget(unsigned int Width, unsigned int Height);
         Widget();
         virtual ~Widget();
     };

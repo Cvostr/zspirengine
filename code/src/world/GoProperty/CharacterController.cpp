@@ -36,6 +36,20 @@ bool Engine::CharacterControllerProperty::isOnGround() {
     return _isOnGround;
 }
 
+void Engine::CharacterControllerProperty::jump(float height) {
+    if (isOnGround()) {
+        btVector3 d = rigidBody->getWorldTransform().getBasis()[1];
+        btScalar magnitude = (btScalar(1.0) / rigidBody->getInvMass()) * height;
+        rigidBody->activate(true);
+        rigidBody->applyCentralImpulse(d * magnitude);
+    }
+}
+
+void Engine::CharacterControllerProperty::walk(float x, float z) {
+    btVector3 current_vel_l = rigidBody->getLinearVelocity();
+    rigidBody->setLinearVelocity(btVector3(x, current_vel_l.y(), z));
+}
+
 void Engine::CharacterControllerProperty::onUpdate(float deltaTime) {
     if (!created) {
         Engine::TransformProperty* transform = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();

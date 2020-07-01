@@ -164,7 +164,8 @@ void EZSENSDK::bindSDKProperties(lua_State* state){
         .deriveClass <Engine::CharacterControllerProperty, Engine::PhysicalProperty>("CharacterController")
             .addData("gravity", &Engine::CharacterControllerProperty::gravity, false)
             .addData("linearVelocity", &Engine::CharacterControllerProperty::linearVel, false)
-            .addFunction("setLinearVelocity", &Engine::CharacterControllerProperty::setLinearVelocity)
+            .addFunction("Jump", &Engine::CharacterControllerProperty::jump)
+            .addFunction("Walk", &Engine::CharacterControllerProperty::walk)
         .endClass()
 
         .deriveClass <Engine::TileProperty, Engine::GameObjectProperty>("Tile2D")
@@ -220,12 +221,13 @@ void EZSENSDK::bindSDKResources(lua_State* state) {
                 .endClass()
             .endNamespace()
         .endNamespace();
-
+    //Fill LUA namespace with resources
     for (unsigned int i = 0; i < game_data->resources->getResourcesSize(); i++) {
+        //Obtain next resource
         auto res = game_data->resources->getResourceByIndex(i);
-
+        //get resource label
         std::string res_name = res->resource_label;
-        
+        //Replace / . @  by _
         for (unsigned int str_i = 0; str_i < res_name.size(); str_i++) {
             if (res_name[str_i] == '/' || res_name[str_i] == '.' || res_name[str_i] == '@') res_name[str_i] = '_';
         }

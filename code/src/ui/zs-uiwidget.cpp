@@ -4,6 +4,9 @@
 ZSUI::Widget::Widget(){
 
 }
+ZSUI::Widget::Widget(unsigned int Width, unsigned int Height) {
+    resize(Width, Height);
+}
 ZSUI::Widget::~Widget(){
 
 }

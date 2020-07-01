@@ -12,9 +12,10 @@ namespace ZSUI {
 
         void resize(unsigned int Width, unsigned int Height);
         void move(unsigned int x, unsigned int y);
-
+        bool isClicked();
         void draw();
 
+        Button(unsigned int Width, unsigned int Height);
         Button();
         ~Button();
     };

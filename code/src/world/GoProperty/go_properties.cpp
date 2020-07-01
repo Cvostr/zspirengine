@@ -330,11 +330,13 @@ Engine::LightsourceProperty::LightsourceProperty(){
 
 void Engine::LightsourceProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
-
+    //Read Type of Light Source
     memcpy(&light_type, data + offset, sizeof(LIGHTSOURCE_TYPE));
     offset += sizeof(LIGHTSOURCE_TYPE);
+    //Read Intensity of source
     memcpy(&intensity, data + offset, sizeof(float));
     offset += sizeof(float);
+    //Read Range of source
     memcpy(&range, data + offset, sizeof(float));
     offset += sizeof(float);
     memcpy(&spot_angle, data + offset, sizeof(float));
@@ -343,7 +345,7 @@ void Engine::LightsourceProperty::loadPropertyFromMemory(const char* data, GameO
     float cl_r;
     float cl_g;
     float cl_b;
-
+    //Read light color
     memcpy(&cl_r, data + offset, sizeof(float));
     offset += sizeof(float);
     memcpy(&cl_g, data + offset, sizeof(float));
@@ -392,17 +394,17 @@ void Engine::MaterialProperty::_setMaterial(MaterialResource* mat) {
 }
 
 void Engine::MaterialProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
-
     unsigned int offset = 1;
-
+    //Read material path
     while (data[offset] != ' ' && data[offset] != '\n') {
         material_path += data[offset];
         offset++;
     }
-
+    //get material by label
     material_ptr = game_data->resources->getMaterialByLabel(material_path)->material; //find it and process
 
     offset++;
+    //Read receiveShadows boolean
     memcpy(&receiveShadows, data + offset, sizeof(bool));
 }
 
