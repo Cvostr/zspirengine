@@ -169,7 +169,6 @@ public:
     GlyphResource();
 };
 
-
 }
 
 #endif

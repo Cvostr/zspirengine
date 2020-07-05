@@ -179,7 +179,7 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
             //Read NODE label string
             strcpy(&node_label[0], &buffer[cur_pos]);
             node->node_label = std::string(node_label);
-            cur_pos += strlen(node_label) + 1;
+            cur_pos += static_cast<unsigned int>(strlen(node_label) + 1);
 
             unsigned int meshesNum = 0;
             unsigned int childrenNum = 0;
@@ -194,7 +194,7 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
                 char mesh_label[64];
                 //Read NODE label string
                 strcpy(&mesh_label[0], &buffer[cur_pos]);
-                cur_pos += strlen(mesh_label) + 1;
+                cur_pos += static_cast<unsigned int>(strlen(mesh_label) + 1);
                 //Put mesh name
                 node->mesh_names.push_back(mesh_label);
             }
@@ -203,7 +203,7 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
                 //Read child name
                 char child_node_label[64];
                 strcpy(&child_node_label[0], &buffer[cur_pos]);
-                cur_pos += strlen(child_node_label) + 1;
+                cur_pos += static_cast<unsigned int>(strlen(child_node_label) + 1);
                 //Put child name
                 node->child_node_labels.push_back(std::string(child_node_label));
             }
@@ -215,18 +215,21 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
                     cur_pos += 4;
                 }
             }
+            //Read node Translation
             memcpy(reinterpret_cast<char*>(&node->node_translation.X), &buffer[cur_pos], sizeof(float));
             cur_pos += sizeof(float);
             memcpy(reinterpret_cast<char*>(&node->node_translation.Y), &buffer[cur_pos], sizeof(float));
             cur_pos += sizeof(float);
             memcpy(reinterpret_cast<char*>(&node->node_translation.Z), &buffer[cur_pos], sizeof(float));
             cur_pos += sizeof(float);
+            //Read node Scale
             memcpy(reinterpret_cast<char*>(&node->node_scaling.X), &buffer[cur_pos], sizeof(float));
             cur_pos += sizeof(float);
             memcpy(reinterpret_cast<char*>(&node->node_scaling.Y), &buffer[cur_pos], sizeof(float));
             cur_pos += sizeof(float);
             memcpy(reinterpret_cast<char*>(&node->node_scaling.Z), &buffer[cur_pos], sizeof(float));
             cur_pos += sizeof(float);
+            //Read node Rotation Quaternion
             memcpy(reinterpret_cast<char*>(&node->node_rotation.X), &buffer[cur_pos], sizeof(float));
             cur_pos += sizeof(float);
             memcpy(reinterpret_cast<char*>(&node->node_rotation.Y), &buffer[cur_pos], sizeof(float));
@@ -235,7 +238,6 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
             cur_pos += sizeof(float);
             memcpy(reinterpret_cast<char*>(&node->node_rotation.W), &buffer[cur_pos], sizeof(float));
             cur_pos += sizeof(float);
-
 
             //Add node to list
             nodes_list.push_back(node);
@@ -248,7 +250,7 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
             char mesh_label[64];
             //Read mesh label string
             strcpy(&mesh_label[0], &buffer[cur_pos]);
-            cur_pos += strlen(mesh_label) + 1;
+            cur_pos += static_cast<unsigned int>(strlen(mesh_label) + 1);
 
             int vertexNum = 0;
             int indexNum = 0;
@@ -325,7 +327,7 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
                 char bone_label[64];
                 //Read mesh label string
                 strcpy(&bone_label[0], &buffer[cur_pos]);
-                cur_pos += strlen(bone_label) + 1;
+                cur_pos += static_cast<unsigned int>(strlen(bone_label) + 1);
 
                 std::string bone_label_strstd = std::string(bone_label);
                 Engine::Bone bone(bone_label_strstd);

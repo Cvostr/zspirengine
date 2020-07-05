@@ -144,6 +144,7 @@
     <ClCompile Include="code\src\engine.cpp" />
     <ClCompile Include="code\src\engine\EngineManager.cpp" />
     <ClCompile Include="code\src\engine\loader.cpp" />
+    <ClCompile Include="code\src\engine\LocaleStringsFile.cpp" />
     <ClCompile Include="code\src\engine\resources.cpp" />
     <ClCompile Include="code\src\input\zs-input.cpp" />
     <ClCompile Include="code\src\misc\GlyphManager.cpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="code\headers\engine\EngineManager.h" />
     <ClInclude Include="code\headers\engine\engine_window.h" />
     <ClInclude Include="code\headers\engine\loader.h" />
+    <ClInclude Include="code\headers\engine\LocaleStringsFile.h" />
     <ClInclude Include="code\headers\engine\resources.h" />
     <ClInclude Include="code\headers\input\zs-input.h" />
     <ClInclude Include="code\headers\misc\GlyphManager.h" />

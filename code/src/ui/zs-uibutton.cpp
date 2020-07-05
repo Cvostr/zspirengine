@@ -14,6 +14,13 @@ ZSUI::Button::Button(unsigned int Width, unsigned int Height) {
     resize(Width, Height);
 }
 
+ZSUI::Button::Button(ButtonStyle* style) {
+    common_sprite = style->default_sprite;
+    hovered_sprite = style->hovered_sprite;
+
+    resize(style->size.WIDTH, style->size.HEIGHT);
+}
+
 ZSUI::Button::~Button(){
 
 }
