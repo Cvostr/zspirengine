@@ -5,6 +5,10 @@ Engine::MeshResource::MeshResource() {
     mesh_ptr = nullptr;
 }
 
+Engine::MeshResource::~MeshResource() {
+    delete mesh_ptr;
+}
+
 void Engine::MeshResource::DrawInstanced(unsigned int inst_num) {
     //Check, if texture already loaded
     if (this->resource_state == RESOURCE_STATE::STATE_LOADED)

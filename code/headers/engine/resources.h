@@ -110,6 +110,7 @@ public:
     void Release();
 
     TextureResource();
+    ~TextureResource();
 };
 
 class MeshResource : public ZsResource{
@@ -121,6 +122,7 @@ public:
     void Release();
 
     MeshResource();
+    ~MeshResource();
 };
 
 class AudioResource : public ZsResource{
@@ -131,6 +133,7 @@ public:
     void Release();
 
     AudioResource();
+    ~AudioResource();
 };
 
 class ScriptResource : public ZsResource{
@@ -158,6 +161,7 @@ public:
     void load();
 
     AnimationResource();
+    ~AnimationResource();
 };
 
 class GlyphResource : public ZsResource{
@@ -167,6 +171,7 @@ public:
     void load();
 
     GlyphResource();
+    ~GlyphResource();
 };
 
 }

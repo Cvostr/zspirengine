@@ -48,7 +48,7 @@ void ZS3M::SceneFileExport::write(std::string output_file){
         stream.write(reinterpret_cast<char*>(&bonesNum), sizeof (unsigned int));
         stream << "\n"; //Write divider
         //Write all vertices
-        for (unsigned int v_i = 0; v_i < vertexNum; v_i ++) {
+        for (unsigned int v_i = 0; v_i < static_cast<unsigned int>(vertexNum); v_i ++) {
             ZSVERTEX* v_ptr = &mesh_ptr->vertices_arr[v_i];
             //Write vertex vectors
             stream.write(reinterpret_cast<char*>(&v_ptr->pos), sizeof(float) * 3);

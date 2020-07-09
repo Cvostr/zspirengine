@@ -141,6 +141,10 @@ Engine::LabelProperty::LabelProperty(){
     this->type = PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL;
 }
 
+Engine::LabelProperty::~LabelProperty() {
+
+}
+
 void Engine::LabelProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
     std::string label;

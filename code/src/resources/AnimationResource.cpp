@@ -5,6 +5,9 @@ Engine::AnimationResource::AnimationResource() {
     animation_ptr = nullptr;
 }
 
+Engine::AnimationResource::~AnimationResource() {
+    delete animation_ptr;
+}
 
 void Engine::AnimationResource::load() {
     if (this->resource_state == RESOURCE_STATE::STATE_NOT_LOADED) {

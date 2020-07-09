@@ -5,6 +5,10 @@ Engine::AudioResource::AudioResource() {
     buffer = new SoundBuffer;
 }
 
+Engine::AudioResource::~AudioResource() {
+    delete buffer;
+}
+
 void Engine::AudioResource::load() {
     //if resource isn't loaded
     if (this->resource_state == RESOURCE_STATE::STATE_NOT_LOADED) {

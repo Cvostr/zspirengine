@@ -212,6 +212,7 @@ public:
     void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     LabelProperty();
+    ~LabelProperty();
 };
 
 class TransformProperty : public GameObjectProperty {

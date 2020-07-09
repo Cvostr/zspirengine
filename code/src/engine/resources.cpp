@@ -78,7 +78,9 @@ Engine::ResourceManager::ResourceManager(){
 
 void Engine::ResourceManager::clear(){
     for(unsigned int i = 0; i < this->resources.size(); i ++){
-        this->resources[i]->Release();
+        auto res_ptr = this->resources[i];
+        res_ptr->Release();
+        delete res_ptr;
     }
     this->resources.clear();
 }

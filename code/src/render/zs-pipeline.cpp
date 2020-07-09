@@ -154,7 +154,7 @@ void Engine::RenderPipeline::destroy(){
         delete gbuffer;
     }
 
-    freeDefaultMeshes();
+    //freeDefaultMeshes();
 }
 
 void Engine::RenderPipeline::setLightsToBuffer(){

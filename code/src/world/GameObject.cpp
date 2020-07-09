@@ -72,9 +72,10 @@ bool Engine::GameObject::addProperty(PROPERTY_TYPE property){
 }
 
 void Engine::GameObject::removeProperty(int index){
-    GameObjectProperty* prop_ptr = static_cast<GameObjectProperty*>(this->properties[index]);
+    auto prop_ptr = this->properties[index];
     //Call onObjectDeleted() on removing property
     prop_ptr->onObjectDeleted();
+    delete this->properties[index];
     //set as deleted
     this->properties[index] = nullptr;
     //Trim properties pointers vector
@@ -234,7 +235,7 @@ void Engine::GameObject::clearAll(){
 
     for(unsigned int prop_i = 0; prop_i < props_num; prop_i ++){ //Walk through all children an remove them
         //Obtain pointer to property
-        removeProperty(prop_i);
+        removeProperty(0);
     }
     this->props_num = 0; //Set property counter to zero
     //Clear vector of children

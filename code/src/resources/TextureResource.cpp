@@ -5,6 +5,10 @@ Engine::TextureResource::TextureResource() {
     texture_ptr = nullptr;
 }
 
+Engine::TextureResource::~TextureResource() {
+    delete texture_ptr;
+}
+
 void Engine::TextureResource::Use(int slot) {
     //Check, if texture already loaded
     if (this->resource_state == RESOURCE_STATE::STATE_LOADED)

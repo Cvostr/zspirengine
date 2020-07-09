@@ -9,6 +9,10 @@ Engine::GlyphResource::GlyphResource() {
     this->loadInstantly = true;
 }
 
+Engine::GlyphResource::~GlyphResource() {
+    delete font_ptr;
+}
+
 void Engine::GlyphResource::load() {
     if (this->resource_state == RESOURCE_STATE::STATE_NOT_LOADED) {
         request = new Engine::Loader::LoadRequest;

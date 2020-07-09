@@ -30,6 +30,16 @@ GlyphFontContainer::GlyphFontContainer(unsigned char* data, unsigned int bsize, 
     FT_Set_Pixel_Sizes(this->font, 0, size);
 }
 
+GlyphFontContainer::~GlyphFontContainer() {
+    FT_Done_Face(this->font);
+
+    std::for_each(characters.begin(), characters.end(),
+        [](std::pair<unsigned int, CharacterGlyph*> element) {
+            // Accessing VALUE from element.
+            delete element.second;
+        });
+}
+
 void GlyphFontContainer::loadGlyphs(){
     //Common ASCII symbols
     for(unsigned int i = 0; i < 255; i ++){

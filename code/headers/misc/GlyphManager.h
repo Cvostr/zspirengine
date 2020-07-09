@@ -34,6 +34,8 @@ private:
     GlyphManager* manager_ptr;
 public:
     GlyphFontContainer(unsigned char* data, unsigned int bsize, unsigned int size, GlyphManager* manager);
+    ~GlyphFontContainer();
+
     void loadGlyphs();
     void loadGlyph(unsigned int index);
 

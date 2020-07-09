@@ -177,9 +177,12 @@ void ZSpireEngine::loadGame(){
         SDL_GL_SwapWindow(window); //Send rendered frame
 
     }
+    game_data->world->clear(); //clear world
     Engine::Loader::stop();
     Engine::SFX::destroyAL();
+    //Destroys all created managers
     destroyAllManagers();
+    delete game_data;
     SDL_DestroyWindow(window); //Destroy SDL and opengl
     SDL_GL_DeleteContext(glcontext);
 
