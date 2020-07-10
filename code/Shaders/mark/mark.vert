@@ -20,7 +20,7 @@ layout (std140, binding = 0) uniform CamMatrices{
 };
 
 layout (std140, binding = 4) uniform BonesData{
-    uniform mat4 bone_transform[150];
+    uniform mat4 bone_transform[200];
 };
 
 mat4 getBoneTransform(){
@@ -54,11 +54,11 @@ mat4 getBoneTransform(){
     _weights[11] = Weights2.w;
     
     mat4 result = mat4(0.0);
-    
-    for(int i = 0; i < 12; i++){
+    //Summarize bone transforms
+    for(int i = 0; i < bones; i++){
         result += bone_transform[_ids[i]] * _weights[i];
     }
-	
+	//Return resulting transform
     return result;
 }
 

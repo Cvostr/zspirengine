@@ -223,6 +223,11 @@ Engine::ScriptGroupProperty::ScriptGroupProperty(){
     this->scripts_attached.resize(static_cast<unsigned int>(this->scr_num));
 }
 
+Engine::ScriptGroupProperty::~ScriptGroupProperty() {
+    scripts_attached.clear();
+    path_names.clear();
+}
+
 void Engine::ScriptGroupProperty::onUpdate(float deltaTime){
     for(unsigned int script_i = 0; script_i < this->scripts_attached.size(); script_i ++){
         Engine::ObjectScript* script_ptr = &this->scripts_attached[script_i]; //Obtain pointer to script
@@ -488,7 +493,33 @@ void Engine::TriggerProperty::onObjectDeleted() { //unregister in world
     if (created)
         this->go_link.world_ptr->physical_world->removeCollisionObjFromWorld(this->m_ghost);
 }
-   
+
+void Engine::TriggerProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
+    unsigned int offset = 0;
+    offset += 1; //Skip space
+    //read collider type
+    memcpy(&coll_type, data + offset, sizeof(COLLIDER_TYPE));
+    offset += sizeof(COLLIDER_TYPE);
+    //read isCustomPhysicalSize boolean
+    memcpy(&isCustomPhysicalSize, data + offset, sizeof(bool));
+    offset += sizeof(bool);
+    //Check, if trigger has custom size specified
+    if (isCustomPhysicalSize) {
+        memcpy(&cust_size.X, data + offset, sizeof(float));
+        offset += sizeof(float);
+        memcpy(&cust_size.Y, data + offset, sizeof(float));
+        offset += sizeof(float);
+        memcpy(&cust_size.Z, data + offset, sizeof(float));
+        offset += sizeof(float);
+
+        memcpy(&transform_offset.Z, data + offset, sizeof(float));
+        offset += sizeof(float);
+        memcpy(&transform_offset.Z, data + offset, sizeof(float));
+        offset += sizeof(float);
+        memcpy(&transform_offset.Z, data + offset, sizeof(float));
+        offset += sizeof(float);
+    }
+}
 
 Engine::SkyboxProperty::SkyboxProperty(){
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_SKYBOX;

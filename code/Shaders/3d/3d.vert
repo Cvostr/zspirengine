@@ -64,7 +64,7 @@ mat4 getBoneTransform(){
     
     mat4 result = mat4(0.0);
     
-    for(int i = 0; i < 12; i++){
+    for(int i = 0; i < bones; i++){
         result += bone_transform[_ids[i]] * _weights[i];
    }
 	

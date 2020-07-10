@@ -65,6 +65,8 @@ public:
 
     void copyTo(Engine::GameObjectProperty* dest);
 
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
+
     TileGroupProperty();
 };
 
@@ -91,6 +93,8 @@ public:
     void playAnim();
     void stopAnim();
     void setDiffuseTexture(std::string texture);
+
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     TileProperty();
 };

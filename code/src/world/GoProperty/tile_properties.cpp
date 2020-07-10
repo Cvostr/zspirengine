@@ -28,6 +28,10 @@ void Engine::TileGroupProperty::copyTo(Engine::GameObjectProperty* dest){
     _dest->isCreated = isCreated;
 }
 
+void Engine::TileGroupProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
+
+}
+
 Engine::TileProperty::TileProperty(){
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TILE;
     active = true;
@@ -90,4 +94,35 @@ void Engine::TileProperty::setDiffuseTexture(std::string texture){
     diffuse_relpath = texture;
         //Update texture pointer
     updTexturePtr();
+}
+
+void Engine::TileProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
+    unsigned int offset = 0;
+    offset += 1; //Skip space
+    //read textures relative pathes
+    diffuse_relpath.clear();
+    while (data[offset] != ' ' && data[offset] != '\n') {
+        diffuse_relpath += data[offset];
+        offset++;
+    }
+    offset++;
+    transparent_relpath.clear();
+    while (data[offset] != ' ' && data[offset] != '\n') {
+        transparent_relpath += data[offset];
+        offset++;
+    }
+
+    //set pointers to textures
+    updTexturePtr();
+
+    offset++;
+    memcpy(&anim_property.isAnimated, data + offset, sizeof(bool));
+    offset += sizeof(bool);
+
+    if (anim_property.isAnimated) { //if animated, then write animation properties
+        memcpy(&anim_property.framesX, data + offset, sizeof(int));
+        offset += sizeof(int);
+        memcpy(&anim_property.framesY, data + offset, sizeof(int));
+        offset += sizeof(int);
+    }
 }

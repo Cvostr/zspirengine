@@ -120,7 +120,9 @@ public:
     void clear();
 
     void trimObjectsList();
+
     World();
+    ~World();
 };
 
 class GameObject{

@@ -8,6 +8,9 @@ Engine::World::World(){
     physical_world = new PhysicalWorld(&phys_settngs);
 }
 
+Engine::World::~World() {
+    delete physical_world;
+}
 
 Engine::GameObject* Engine::World::getGameObjectByStrId(std::string id){
     unsigned int objs_num = static_cast<unsigned int>(this->objects.size());

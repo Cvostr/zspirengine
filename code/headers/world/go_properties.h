@@ -56,6 +56,7 @@ public:
     void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     ScriptGroupProperty();
+    ~ScriptGroupProperty();
 };
 
 
@@ -287,6 +288,8 @@ public:
     void copyTo(Engine::GameObjectProperty* dest);
     void initGhost();
     void onObjectDeleted(); //unregister in world
+
+    void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     TriggerProperty();
 };

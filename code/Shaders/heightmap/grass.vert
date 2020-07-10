@@ -19,7 +19,7 @@ layout (std140, binding = 0) uniform CamMatrices{
 };
 
 layout (std140, binding = 9) uniform InstMatrices{
-    uniform mat4 inst_transform[10000];
+    uniform mat4 inst_transform[1000];
 };
 
 void main(){
