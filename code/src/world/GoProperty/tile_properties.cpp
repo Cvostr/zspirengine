@@ -29,7 +29,39 @@ void Engine::TileGroupProperty::copyTo(Engine::GameObjectProperty* dest){
 }
 
 void Engine::TileGroupProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
+    unsigned int offset = 1; //Skip space
+    int isCreated = 0;
 
+    memcpy(&isCreated, data + offset, sizeof(int));
+    offset += sizeof(int);
+
+    memcpy(&geometry.tileWidth, data + offset, sizeof(int));
+    offset += sizeof(int);
+    memcpy(&geometry.tileHeight, data + offset, sizeof(int));
+    offset += sizeof(int);
+
+    memcpy(&tiles_amount_X, data + offset, sizeof(int));
+    offset += sizeof(int);
+    memcpy(&tiles_amount_Y, data + offset, sizeof(int));
+    offset += sizeof(int);
+
+    this->isCreated = static_cast<bool>(isCreated);
+
+    offset ++; //Skip space
+    //Read diffuse and mesh
+    //*world_stream >> t_ptr->diffuse_relpath >> t_ptr->mesh_string;
+
+    diffuse_relpath.clear();
+    while (data[offset] != ' ' && data[offset] != '\n') {
+        diffuse_relpath += data[offset];
+        offset++;
+    }
+    offset++;
+    mesh_string.clear();
+    while (data[offset] != ' ' && data[offset] != '\n') {
+        mesh_string += data[offset];
+        offset++;
+    }
 }
 
 Engine::TileProperty::TileProperty(){

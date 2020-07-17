@@ -2,6 +2,7 @@
 #define ZSUIBUTTON_H
 
 #include "../../headers/game.h"
+#include "../engine/LocaleStringsFile.h"
 #include "zs-uiwidget.h"
 
 namespace ZSUI {
@@ -26,6 +27,8 @@ namespace ZSUI {
     }ButtonStyle;
 
     class Button : public Widget{
+    private:
+        ZSPIRE::LocString* btn_text_string;
     public:
         Engine::TextureResource* common_sprite;
         Engine::TextureResource* hovered_sprite;
@@ -34,6 +37,8 @@ namespace ZSUI {
         void move(unsigned int x, unsigned int y);
         bool isClicked();
         void draw();
+
+        void setText(ZSPIRE::LocString* btn_text_string);
 
         Button(ButtonStyle* style);
         Button(unsigned int Width, unsigned int Height);

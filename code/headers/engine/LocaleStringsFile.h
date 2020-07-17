@@ -18,8 +18,8 @@ namespace ZSPIRE {
 
 	class LocString {
 	public:
-		unsigned int ID;
-		std::string str_ID;
+		unsigned int ID; //Integer ID for string
+		std::string str_ID; //String ID for string
 
 		std::u32string STR[LANGS_COUNT];
 	

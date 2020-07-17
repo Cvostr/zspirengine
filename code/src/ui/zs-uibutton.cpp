@@ -6,18 +6,21 @@ extern ZSGAME_DATA* game_data;
 ZSUI::Button::Button(){
     this->common_sprite = nullptr;
     this->hovered_sprite = nullptr;
+
+    btn_text_string = nullptr;
 }
 
 ZSUI::Button::Button(unsigned int Width, unsigned int Height) {
     this->common_sprite = nullptr;
     this->hovered_sprite = nullptr;
+    //Call resize function
     resize(Width, Height);
 }
 
 ZSUI::Button::Button(ButtonStyle* style) {
     common_sprite = style->default_sprite;
     hovered_sprite = style->hovered_sprite;
-
+    //Call resize function
     resize(style->size.WIDTH, style->size.HEIGHT);
 }
 
@@ -44,4 +47,8 @@ void ZSUI::Button::resize(unsigned int Width, unsigned int Height){
 }
 void ZSUI::Button::move(unsigned int x, unsigned int y){
     Widget::move(x, y);
+}
+
+void ZSUI::Button::setText(ZSPIRE::LocString* btn_text_string) {
+    this->btn_text_string = btn_text_string;
 }

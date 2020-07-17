@@ -315,12 +315,12 @@ void* Engine::GameObject::getPhysicalProperty(){
     //Variable to store result
     PhysicalProperty* phys = nullptr;
 
-    if(rigid != nullptr)
-        phys = rigid;
-    else if (coll != nullptr){
-        phys = coll;
-    }else if(controller != nullptr){
-        phys = controller;
+    if(rigid != nullptr) //if rigidbody component exists
+        phys = rigid; //then return rigidbody
+    else if (coll != nullptr){ //else, if collider component exists
+        phys = coll; //return collider 
+    }else if(controller != nullptr){ //else, if char controller component exists
+        phys = controller; //return character controller
     }else {
         phys = trigger;
     }

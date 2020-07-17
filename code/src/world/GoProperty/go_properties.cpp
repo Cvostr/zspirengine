@@ -511,7 +511,7 @@ void Engine::TriggerProperty::loadPropertyFromMemory(const char* data, GameObjec
         offset += sizeof(float);
         memcpy(&cust_size.Z, data + offset, sizeof(float));
         offset += sizeof(float);
-
+        //Load Transform offset vector
         memcpy(&transform_offset.Z, data + offset, sizeof(float));
         offset += sizeof(float);
         memcpy(&transform_offset.Z, data + offset, sizeof(float));
