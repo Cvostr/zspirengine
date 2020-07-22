@@ -126,42 +126,26 @@ void TerrainData::updateGeometryBuffers(bool full_rebuild){
 
 bool TerrainData::loadFromFile(const char* file_path){
     std::ifstream world_stream;
-    world_stream.open(file_path, std::ifstream::binary);
+    world_stream.open(file_path, std::ifstream::binary | std::ifstream::ate);
 
-    if(world_stream.fail()){ //Probably, no file
-        std::cout << "Terrain : Probably, missing terrain file" << file_path << std::endl;
-        return false;
-    }
-
-    //read dimensions
-    world_stream.read(reinterpret_cast<char*>(&this->W), sizeof(int));
-    world_stream.read(reinterpret_cast<char*>(&this->H), sizeof(int));
-
-    if(W < 1 || H < 1){
-        std::cout << "Terrain : Can't load terrain dimensions from file " << file_path << ", it's probably corrupted!" << std::endl;
-        return false;
-    }
-
-    //allocate memory
-    alloc(W, H);
-    //read all terrain points
-    for(int i = 0; i < W * H; i ++){
-        //Read height
-        world_stream.read(reinterpret_cast<char*>(&data[i].height), sizeof(float));
-        //Iterate over all textures
-        for(int tex_factor = 0; tex_factor < TERRAIN_TEXTURES_AMOUNT; tex_factor ++)
-            world_stream.read(reinterpret_cast<char*>(&data[i].texture_factors[tex_factor]), sizeof(unsigned char));
-        world_stream.read(reinterpret_cast<char*>(&data[i].grass), sizeof(int));
-    }
+    unsigned int size = world_stream.tellg();
+    char* data = new char[size];
+    world_stream.seekg(0);
+    world_stream.read(data, size);
+    //Load terrain from bytes
+    loadFromMemory(data);
+    delete[] data;
+    
     //Close stream
     world_stream.close();
     return true;
 }
 
 bool TerrainData::loadFromMemory(const char* bytes) {
+    //Read sizes
     memcpy(&this->W, bytes, sizeof(int));
     memcpy(&this->H, bytes + 0x4, sizeof(int));
-
+    //Check, if sizes are correct
     if (W < 1 || H < 1) {
         return false;
     }

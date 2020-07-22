@@ -187,7 +187,6 @@
     <ClCompile Include="code\src\world\GoProperty\AudioSourceProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\CharacterController.cpp" />
     <ClCompile Include="code\src\world\GoProperty\ColliderProperty.cpp" />
-    <ClCompile Include="code\src\world\GoProperty\go_filestream.cpp" />
     <ClCompile Include="code\src\world\GoProperty\go_properties.cpp" />
     <ClCompile Include="code\src\world\GoProperty\RigidbodyProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\ShadowCasterProperty.cpp" />

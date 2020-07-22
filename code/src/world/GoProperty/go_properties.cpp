@@ -285,17 +285,17 @@ void Engine::ScriptGroupProperty::loadPropertyFromMemory(const char* data, GameO
     offset += sizeof(int) + 1;
     //resize arrays
     scripts_attached.resize(static_cast<unsigned int>(scr_num));
+    path_names.resize(static_cast<unsigned int>(scr_num));
     //iterate over all scripts and read their path
     for (unsigned int script_w_i = 0; script_w_i < static_cast<unsigned int>(scr_num); script_w_i++) {
-        std::string script_path;
         //Read script path
         while (data[offset] != ' ' && data[offset] != '\n') {
-            script_path += data[offset];
+            path_names[script_w_i] += data[offset];
             offset++;
         }
         //Writing name (file path)
-        scripts_attached[script_w_i].name = script_path;
-        ScriptResource* res = game_data->resources->getScriptByLabel(script_path);
+        scripts_attached[script_w_i].name = path_names[script_w_i];
+        ScriptResource* res = game_data->resources->getScriptByLabel(path_names[script_w_i]);
     }
 }
 
@@ -469,7 +469,7 @@ void Engine::TriggerProperty::onUpdate(float deltaTime) {
        //Get number of objects, that currently collide
         unsigned int overlaping = m_ghost->getNumOverlappingObjects();
         //Iterate over all overlapping objects
-        for (int i = 0; i < overlaping; i++) {
+        for (int i = 0; i < (int)overlaping; i++) {
             btCollisionObject* coll_obj = m_ghost->getOverlappingObject(i);
             if (coll_obj == nullptr) continue;
             btRigidBody* pRigidBody = static_cast<btRigidBody*>(coll_obj);

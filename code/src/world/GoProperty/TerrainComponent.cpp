@@ -1,6 +1,7 @@
 #include "../../../headers/world/go_properties.h"
 
 extern ZSGAME_DATA* game_data;
+extern ZSpireEngine* engine_ptr;
 
 Engine::TerrainProperty::TerrainProperty(){
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TERRAIN;
@@ -112,16 +113,24 @@ void Engine::TerrainProperty::loadPropertyFromMemory(const char* data, GameObjec
     memcpy(&grassType_size, data + offset, sizeof(int));
     offset += sizeof(int);
 
-    ZsResource* terrain_res = game_data->resources->getResource<Engine::ZsResource>(file_label);
-    //check, if terrain resource found
-    if (terrain_res) {
-        terrain_res->request = new Engine::Loader::LoadRequest;
-        terrain_res->request->offset = terrain_res->offset;
-        terrain_res->request->size = terrain_res->size;
-        terrain_res->request->file_path = terrain_res->blob_path;
-        loadImmideately(terrain_res->request);
-        //Load terrain from readed binary data
-        bool result = getTerrainData()->loadFromMemory((const char*)terrain_res->request->data);
+    if (!game_data->isEditor) {
+        ZsResource* terrain_res = game_data->resources->getResource<Engine::ZsResource>(file_label);
+        //check, if terrain resource found
+        if (terrain_res) {
+            terrain_res->request = new Engine::Loader::LoadRequest;
+            terrain_res->request->offset = terrain_res->offset;
+            terrain_res->request->size = terrain_res->size;
+            terrain_res->request->file_path = terrain_res->blob_path;
+            loadImmideately(terrain_res->request);
+            //Load terrain from readed binary data
+            bool result = getTerrainData()->loadFromMemory((const char*)terrain_res->request->data);
+            if (result) //if loading sucessstd::cout << "Terrain : Probably, missing terrain file" << file_path;
+                getTerrainData()->generateGLMesh();
+        }
+    }
+    else {
+        std::string fpath = engine_ptr->desc->game_dir + "/" + file_label;
+        bool result = getTerrainData()->loadFromFile(fpath.c_str());
         if (result) //if loading sucessstd::cout << "Terrain : Probably, missing terrain file" << file_path;
             getTerrainData()->generateGLMesh();
     }

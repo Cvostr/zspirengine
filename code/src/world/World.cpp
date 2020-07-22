@@ -183,92 +183,22 @@ void Engine::World::clear() {
     objects.clear();
 }
 
-void Engine::World::loadGameObject(GameObject* object_ptr, std::ifstream* world_stream){
-    std::string prefix;
-    object_ptr->world_ptr = this; //Assign pointer to world
-    *world_stream >> object_ptr->str_id;
-
-    world_stream->seekg(1, std::ofstream::cur);
-    //Read ACTIVE and STATIC flags
-    world_stream->read(reinterpret_cast<char*>(&object_ptr->active), sizeof(bool));
-    world_stream->read(reinterpret_cast<char*>(&object_ptr->IsStatic), sizeof(bool));
-    //Then do the same sh*t, iterate until "G_END" came up
-    while(true){
-        *world_stream >> prefix; //Read prefix
-        if(prefix.compare("G_END") == 0){ //If end reached
-            break; //Then end this infinity loop
-        }
-        if(prefix.compare("G_CHI") == 0) { //Ops, it is chidren header
-            unsigned int amount = 0;
-            world_stream->seekg(1, std::ofstream::cur);
-            //Read amount of children of object
-            world_stream->read(reinterpret_cast<char*>(&amount), sizeof(int));
-            //Iterate over these children
-            for(unsigned int ch_i = 0; ch_i < amount; ch_i ++){ //Iterate over all written children to file
-                std::string child_str_id;
-                *world_stream >> child_str_id; //Reading child string id
-
-                GameObjectLink link;
-                link.world_ptr = this; //Setting world pointer
-                link.obj_str_id = child_str_id; //Setting string ID
-                object_ptr->children.push_back(link); //Adding to object
-            }
-        }
-        if(prefix.compare("G_PROPERTY") == 0){ //We found an property, zaeb*s'
-            //Call function to load that property
-            object_ptr->loadProperty(world_stream);
-        }
-    }
-}
-
 void Engine::World::addObjectsFromPrefab(std::string file){
 
 }
 
 void Engine::World::loadFromFile(std::string file, RenderSettings* settings_ptr){
     std::ifstream stream;
-    stream.open(file, std::ifstream::binary); //open world file in binary mode
-
-    std::string test_header;
-    stream >> test_header; //Read header
-    if(test_header.compare("ZSP_SCENE") != 0) //If it isn't zspire scene
-        return; //Go out, we have nothing to do
-    stream.seekg(1, std::ofstream::cur);
-    int version = 0; //define version on world file
-    int objs_num = 0; //define number of objects
-    stream.read(reinterpret_cast<char*>(&version), sizeof(int)); //reading version
-    stream.read(reinterpret_cast<char*>(&objs_num), sizeof(int)); //reading objects count
-
-    while(!stream.eof()){ //until file is over
-        std::string prefix;
-        //read prefix
-        stream >> prefix; 
-
-        if(prefix.compare("RENDER_SETTINGS_AMB_COLOR") == 0){ //if it is render setting of ambient light color
-            stream.seekg(1, std::ofstream::cur);
-            stream.read(reinterpret_cast<char*>(&settings_ptr->ambient_light_color.r), sizeof(int)); //Writing R component of amb color
-            stream.read(reinterpret_cast<char*>(&settings_ptr->ambient_light_color.g), sizeof(int)); //Writing G component of amb color
-            stream.read(reinterpret_cast<char*>(&settings_ptr->ambient_light_color.b), sizeof(int)); //Writing B component of amb color
-        }
-
-        if(prefix.compare("G_OBJECT") == 0){ //if it is game object
-            GameObject obj;
-            //Call function to load object
-            loadGameObject(&obj, &stream);
-            //Add object to scene
-            this->addObject(obj);
-        }
-    }
-    //Now iterate over all objects and set depencies
-    for(unsigned int obj_i = 0; obj_i < this->objects.size(); obj_i ++){
-        GameObject* obj_ptr = this->objects[obj_i];
-        for(unsigned int chi_i = 0; chi_i < obj_ptr->children.size(); chi_i ++){ //Now iterate over all children
-            GameObjectLink* child_ptr = &obj_ptr->children[chi_i];
-            GameObject* child_go_ptr = child_ptr->updLinkPtr();
-            child_go_ptr->parent = obj_ptr->getLinkToThisObject();
-            child_go_ptr->hasParent = true;
-        }
-    }
+    stream.open(file, std::ifstream::binary | std::ifstream::ate); //open world file in binary mode
+    unsigned int size = static_cast<unsigned int>(stream.tellg());
+    
+    stream.seekg(0);
+    char* data = new char[size];
+    stream.read(data, size);
+    //Process World
+    loadFromMemory(data, size, settings_ptr);
+    //Free allocated data
+    delete[] data;
     //Close world file stream
     stream.close();
 }
@@ -282,7 +212,6 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
         object_ptr->str_id += bytes[iter];
         iter++;
     }
-
     iter++;
     //Read ACTIVE and STATIC flags
     memcpy(&object_ptr->active, bytes + iter, sizeof(bool));
@@ -322,7 +251,7 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
                     child_str_id += bytes[iter];
                     iter++;
                 }
-
+                //Create link for object
                 GameObjectLink link;
                 link.world_ptr = this; //Setting world pointer
                 link.obj_str_id = child_str_id; //Setting string ID
@@ -361,8 +290,10 @@ void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderS
     iter++;
     int version = 0; //define version on world file
     int objs_num = 0; //define number of objects
+    //Parse Version Integer
     memcpy(&version, bytes + iter, sizeof(int));
     iter += 4;
+    //Read amount of objects
     memcpy(&objs_num, bytes + iter, sizeof(int));
     iter += 5;
 

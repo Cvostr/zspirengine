@@ -101,7 +101,6 @@ public:
     std::vector<GameObject*> objects; //Vector, containing all gameobjects
     void loadFromMemory(const char* bytes, unsigned int size, RenderSettings* settings_ptr);
     void loadFromFile(std::string file, RenderSettings* settings_ptr);
-    void loadGameObject(GameObject* object_ptr, std::ifstream* world_stream);
     void loadGameObjectFromMemory(GameObject* object_ptr, const char* bytes, unsigned int left_bytes);
 
     GameObject* getGameObjectByStrId(std::string id);
@@ -144,8 +143,6 @@ public:
 
     std::vector<GameObjectLink> children; //Vector to store links to children of object
     GameObjectProperty* properties[OBJ_PROPS_SIZE];
-
-    void loadProperty(std::ifstream* world_stream); //Loads one property from stream
 
     GameObjectProperty* allocProperty(PROPERTY_TYPE type);
     bool addProperty(PROPERTY_TYPE property); //Adds property with property ID

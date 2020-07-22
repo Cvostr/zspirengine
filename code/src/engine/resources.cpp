@@ -1,5 +1,6 @@
 #include "../../headers/engine/resources.h"
 #include <fstream>
+#include <iostream>
 #include "../../headers/engine.h"
 #include "../../headers/game.h"
 
@@ -140,6 +141,10 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
     std::ifstream file_stream;
     file_stream.open(resmap_path, std::ifstream::binary); //open resources map file
 
+    if (!file_stream.is_open()) {
+        std::cout << "Error opening Resource Table File " << resmap_path << std::endl; 
+    }
+
     std::string prefix;
 
     while(!file_stream.eof()){
@@ -167,7 +172,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
             ZsResource* resource_ptr = nullptr;
 
             switch(resource.resource_type){
-                case RESOURCE_TYPE_NONE:{
+                default:{
                     resource_ptr = new ZsResource;
                     break;
                 }

@@ -8,16 +8,25 @@ using namespace std;
 LocaleStringsFile::LocaleStringsFile(char* data) {
 	StringsCount = 0;
 	langsCount = 0;
+	selected_lang_code = LANG_ALL;
+	//Read from buffer
+	readFileHeader(data);
+}
+LocaleStringsFile::LocaleStringsFile(char* data, unsigned int lang_code) {
+	StringsCount = 0;
+	langsCount = 0;
+	this->selected_lang_code = lang_code;
 	//Read from buffer
 	readFileHeader(data);
 }
 LocaleStringsFile::LocaleStringsFile(std::string file_path) {
 	StringsCount = 0;
 	langsCount = 0;
+	selected_lang_code = LANG_ALL;
 
 	ifstream stream;
 	stream.open(file_path, std::ifstream::binary | std::ifstream::ate);
-	unsigned int size = stream.tellg();
+	unsigned int size = static_cast<unsigned int>(stream.tellg());
 	stream.seekg(0);
 
 	char* data = new char[size];
@@ -60,6 +69,7 @@ bool LocaleStringsFile::readFileHeader(char* data) {
 		offset += sizeof(unsigned int);
 		//Read string in all languages
 		for (unsigned int lang_i = 0; lang_i < langsCount; lang_i++) {
+			//Read ID of language
 			unsigned int lang_code = 0;
 			memcpy(&lang_code, data + offset, sizeof(unsigned int));
 			offset += sizeof(unsigned int);
@@ -67,14 +77,20 @@ bool LocaleStringsFile::readFileHeader(char* data) {
 			unsigned int str_size = 0;
 			memcpy(&str_size, data + offset, sizeof(unsigned int));
 			offset += sizeof(unsigned int);
-			//Read localized string
-			for (unsigned int c_i = 0; c_i < str_size; c_i ++) {
-				char32_t _char = 0;
-				memcpy(&_char, data + offset, sizeof(char32_t));
-				offset += sizeof(char32_t);
-				str.STR[lang_code].push_back(_char);
+			if (this->selected_lang_code == LANG_ALL || lang_code == this->selected_lang_code) {
+				//Read localized string
+				for (unsigned int c_i = 0; c_i < str_size; c_i++) {
+					char32_t _char = 0;
+					memcpy(&_char, data + offset, sizeof(char32_t));
+					offset += sizeof(char32_t);
+					str.STR[lang_code].push_back(_char);
+				}
+			}
+			else {
+				offset += str_size * sizeof(char32_t);
 			}
 		}
+		//Add new string to strings array
 		strings.push_back(str);
 	}
 	return true;
