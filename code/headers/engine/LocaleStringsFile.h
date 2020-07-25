@@ -43,6 +43,7 @@ namespace ZSPIRE {
 		LocString* getString(std::string str_ID);
 		LocString* getStringById(unsigned int id);
 
+		void removeString(LocString* str);
 		void pushString(LocString str);
 		unsigned int getLang(unsigned int i);
 		unsigned int getLanguagesCount();

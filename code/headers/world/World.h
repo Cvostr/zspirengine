@@ -11,6 +11,7 @@
 #include "Physics.h"
 #include "../render/zs-pipeline.h"
 
+
 #define OBJ_PROPS_SIZE 11
 #define MAX_OBJS 15000
 
@@ -83,6 +84,7 @@ public:
     virtual void onAddToObject();
     virtual void onObjectDeleted();
     virtual void loadPropertyFromMemory(const char* data, GameObject* obj);
+    virtual void bindScriptingToLua();
     virtual void onTrigger(Engine::GameObject* obj);
     //Editor specific functions
     virtual void addPropertyInterfaceToInspector();

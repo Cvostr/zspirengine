@@ -114,6 +114,19 @@ LocString* LocaleStringsFile::getStringById(unsigned int id) {
 	}
 	return nullptr;
 }
+void LocaleStringsFile::removeString(LocString* str) {
+	for (unsigned int i = 0; i < StringsCount; i++) { //Iterating over all objects
+		LocString* ls = &strings[i];
+		if (ls->ID == str->ID){
+			for (unsigned int obj_i = i + 1; obj_i < StringsCount; obj_i++) { //Iterate over all next chidren
+				strings[obj_i - 1] = strings[obj_i]; //Move it to previous place
+			}
+			strings.resize(StringsCount - 1); //Reduce vector length
+			StringsCount -= 1;
+		}
+	}
+
+}
 void LocaleStringsFile::pushString(LocString str) {
 	strings.push_back(str);
 	StringsCount += 1;
