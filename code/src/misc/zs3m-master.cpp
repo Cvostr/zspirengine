@@ -65,7 +65,7 @@ void ZS3M::SceneFileExport::write(std::string output_file){
                 stream.write(reinterpret_cast<char*>(&b_weight), sizeof(float));
             }
         }
-        for(unsigned int ind_i = 0; ind_i < indexNum; ind_i ++){
+        for(unsigned int ind_i = 0; ind_i < static_cast<unsigned int>(indexNum); ind_i ++){
             stream.write(reinterpret_cast<char*>(&mesh_ptr->indices_arr[ind_i]), sizeof(unsigned int));
         }
         stream << "\n"; //Write divider
@@ -485,7 +485,7 @@ void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size
     anim_ptr = new Engine::Animation; //allocate animation
     //Read animation name
     strcpy(&prefix[0], &buffer[byte_offset]);
-    byte_offset += strlen(prefix) + 1;
+    byte_offset += static_cast<unsigned int>(strlen(prefix) + 1);
     //Set animation name
     anim_ptr->name = std::string(prefix);
     //Read Tick Per Second property

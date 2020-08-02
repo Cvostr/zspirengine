@@ -11,6 +11,7 @@
 #include "Physics.h"
 #include "../render/zs-pipeline.h"
 
+#include "../Scripting/AngelScriptMgr.h"
 
 #define OBJ_PROPS_SIZE 11
 #define MAX_OBJS 15000
@@ -77,6 +78,8 @@ public:
     bool isActive();
     //Virtual func to copy all property's values
     virtual void copyTo(GameObjectProperty* dest);
+    //Virtual func to define property behaviour on scene start
+    virtual void onStart();
     //Virtual func to define property behaviour each frame
     virtual void onUpdate(float deltaTime);
     virtual void onPreRender(RenderPipeline* pipeline = nullptr);
@@ -84,7 +87,7 @@ public:
     virtual void onAddToObject();
     virtual void onObjectDeleted();
     virtual void loadPropertyFromMemory(const char* data, GameObject* obj);
-    virtual void bindScriptingToLua();
+    virtual void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
     virtual void onTrigger(Engine::GameObject* obj);
     //Editor specific functions
     virtual void addPropertyInterfaceToInspector();
@@ -114,6 +117,8 @@ public:
     GameObject* dublicateObject(GameObject* original, bool parent = true);
     GameObject* Instantiate(GameObject* original);
     void addObjectsFromPrefab(std::string file);
+
+    void call_onStart();
 
     Engine::Camera* getCameraPtr();
     Engine::Camera world_camera;
@@ -187,6 +192,7 @@ public:
     void copyTo(GameObject* dest);
     void processObject(RenderPipeline* pipeline); //On render pipeline wish to work with object
     void Draw(RenderPipeline* pipeline); //On render pipeline wish to draw the object
+    void onStart(); //calls onStart() on all properties
     void onUpdate(int deltaTime); //calls onUpdate on all properties
     void onPreRender(RenderPipeline* pipeline); //calls onPreRender on all properties
     void onRender(RenderPipeline* pipeline); //calls onRender on all properties
@@ -234,12 +240,13 @@ public:
     void onPreRender(RenderPipeline* pipeline);
     void getAbsoluteRotationMatrix(ZSMATRIX4x4& m);
 
-    void setTranslation(ZSVECTOR3 new_translation);
-    void setScale(ZSVECTOR3 new_scale);
-    void setRotation(ZSVECTOR3 new_rotation);
+    void setTranslation(ZSVECTOR3& new_translation);
+    void setScale(ZSVECTOR3& new_scale);
+    void setRotation(ZSVECTOR3& new_rotation);
     //Editor stuff
     void onValueChanged();
     void addPropertyInterfaceToInspector();
+    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
 

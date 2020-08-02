@@ -4,7 +4,7 @@
 #include <GL/glew.h>
 #include <iostream>
 #include "../headers/misc/oal_manager.h"
-#include "../headers/Scripting/zsensdk.h"
+#include "../headers/input/zs-input.h"
 
 ZSpireEngine* engine_ptr;
 ZSGAME_DATA* game_data;
@@ -109,9 +109,11 @@ void ZSpireEngine::loadGame(){
     game_data->resources = new Engine::ResourceManager;
     //Start it as manager
     startManager(game_data->resources);
-
+    //Allocate Glyph manager
     game_data->glyph_manager = new GlyphManager;
     startManager(game_data->glyph_manager);
+    //Allocate script manager
+    game_data->script_manager = new Engine::AGScriptMgr;
 
     game_data->world = new Engine::World();
 

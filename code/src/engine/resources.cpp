@@ -254,12 +254,12 @@ void Engine::ScriptResource::load(){
         request->file_path = this->blob_path;
         loadImmideately(request);
         this->resource_state = RESOURCE_STATE::STATE_LOADED;
-        //Write string
         //Clear string data, first
         script_content.clear();
         for(unsigned int i = 0; i < this->request->size; i ++){
             this->script_content.push_back(static_cast<char>(request->data[i]));
         }
+        size = request->size;
 
         delete[] request->data;
         delete this->request;

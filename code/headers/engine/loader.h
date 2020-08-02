@@ -9,7 +9,7 @@ namespace Engine {
         typedef struct LoadRequest{
             unsigned char* data;
             std::string file_path;
-            unsigned long offset;
+            uint64_t offset;
             unsigned int size;
             bool done;
             LoadRequest(){

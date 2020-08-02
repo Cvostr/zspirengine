@@ -52,15 +52,15 @@ void Engine::LightsourceProperty::loadPropertyFromMemory(const char* data, GameO
     memcpy(&spot_angle, data + offset, sizeof(float));
     offset += sizeof(float);
 
-    float cl_r;
-    float cl_g;
-    float cl_b;
+    int cl_r;
+    int cl_g;
+    int cl_b;
     //Read light color
-    memcpy(&cl_r, data + offset, sizeof(float));
+    memcpy(&cl_r, data + offset, sizeof(int));
     offset += sizeof(float);
-    memcpy(&cl_g, data + offset, sizeof(float));
+    memcpy(&cl_g, data + offset, sizeof(int));
     offset += sizeof(float);
-    memcpy(&cl_b, data + offset, sizeof(float));
+    memcpy(&cl_b, data + offset, sizeof(int));
     offset += sizeof(float);
 
     color = ZSRGBCOLOR(cl_r, cl_g, cl_b);

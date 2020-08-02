@@ -2,13 +2,13 @@
 #define go_properties
 
 #include "World.h"
-#include "../Scripting/LuaScript.h"
 #include "../misc/oal_manager.h"
 #include "../game.h"
 #include "terrain.h"
+#include "../Scripting/AngelScript.hpp"
 
 namespace Engine {
-
+    void bindOPropertyScriptingToAngel(AGScriptMgr* mgr);
 enum class LIGHTSOURCE_TYPE {
     LIGHTSOURCE_TYPE_NONE,
     LIGHTSOURCE_TYPE_DIRECTIONAL,
@@ -38,25 +38,22 @@ public:
     MeshProperty();
 };
 
-class ScriptGroupProperty : public Engine::GameObjectProperty {
+class ZPScriptProperty : public Engine::GameObjectProperty {
+private:
+    Engine::AGScript* script;
+    std::string script_path;
 public:
-    int scr_num; //to update amount via IntPropertyArea
-
-    std::vector<Engine::ObjectScript> scripts_attached;
-    std::vector<std::string> path_names;
-
+    ScriptResource* script_res;
     void onValueChanged();
     void addPropertyInterfaceToInspector();
-    void shutdown();
+    void onStart();
     void onUpdate(float deltaTime); //calls update in scripts
     void copyTo(Engine::GameObjectProperty* dest);
 
-    Engine::ObjectScript* getScriptByName(std::string name);
-
     void loadPropertyFromMemory(const char* data, GameObject* obj);
 
-    ScriptGroupProperty();
-    ~ScriptGroupProperty();
+    ZPScriptProperty();
+    ~ZPScriptProperty();
 };
 
 

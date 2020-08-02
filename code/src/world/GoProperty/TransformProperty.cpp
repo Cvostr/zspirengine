@@ -92,15 +92,15 @@ void Engine::TransformProperty::getAbsoluteRotationMatrix(ZSMATRIX4x4& m) {
     }
 }
 
-void Engine::TransformProperty::setTranslation(ZSVECTOR3 new_translation) {
+void Engine::TransformProperty::setTranslation(ZSVECTOR3& new_translation) {
     this->translation = new_translation;
     this->onValueChanged();
 }
-void Engine::TransformProperty::setScale(ZSVECTOR3 new_scale) {
+void Engine::TransformProperty::setScale(ZSVECTOR3& new_scale) {
     this->scale = new_scale;
     this->onValueChanged();
 }
-void Engine::TransformProperty::setRotation(ZSVECTOR3 new_rotation) {
+void Engine::TransformProperty::setRotation(ZSVECTOR3& new_rotation) {
     this->rotation = new_rotation;
     this->onValueChanged();
 }
@@ -120,6 +120,21 @@ void Engine::TransformProperty::onPreRender(RenderPipeline* pipeline) {
     //Send transform matrix to transform buffer
     pipeline->transformBuffer->bind();
     pipeline->transformBuffer->writeData(sizeof(ZSMATRIX4x4) * 2, sizeof(ZSMATRIX4x4), &transform_mat);
+}
+
+void Engine::TransformProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    int result = 0;
+    result = mgr->RegisterObjectType("TransformProperty", 0, asOBJ_REF | asOBJ_NOCOUNT);
+    assert(result >= 0);
+
+    result = mgr->RegisterObjectProperty("TransformProperty", "Vec3 translation", offsetof(TransformProperty, translation));
+    result = mgr->RegisterObjectProperty("TransformProperty", "Vec3 scale", offsetof(TransformProperty, scale));
+    result = mgr->RegisterObjectProperty("TransformProperty", "Vec3 rotation", offsetof(TransformProperty, rotation));
+
+    result = mgr->RegisterObjectMethod("TransformProperty", "void setTranslation(Vec3@)", asMETHOD(TransformProperty, setTranslation), asCALL_THISCALL);
+    result = mgr->RegisterObjectMethod("TransformProperty", "void setScale(Vec3@)", asMETHOD(TransformProperty, setScale), asCALL_THISCALL);
+    result = mgr->RegisterObjectMethod("TransformProperty", "void setRotation(Vec3@)", asMETHOD(TransformProperty, setRotation), asCALL_THISCALL);
+    assert(result >=0 );
 }
 
 void Engine::TransformProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {

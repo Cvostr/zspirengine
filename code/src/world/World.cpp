@@ -341,3 +341,10 @@ void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderS
 Engine::Camera* Engine::World::getCameraPtr(){
     return &this->world_camera;
 }
+
+void Engine::World::call_onStart() {
+    for (unsigned int object_i = 0; object_i < objects.size(); object_i++) {
+        Engine::GameObject* object_ptr = objects[object_i];
+        object_ptr->onStart();
+    }
+}

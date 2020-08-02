@@ -22,10 +22,28 @@
 
 	}ZSVECTOR2;
 
-	typedef struct ZSVECTOR3 {
+	class ZSVECTOR3 {
+	public:
 		float X;
 		float Y;
 		float Z;
+
+		void Normalize() {
+			float sqr = X * X + Y * Y + Z * Z;
+			if (REAL_NUM_EQ(sqr, 1) || REAL_NUM_EQ(sqr, 0))
+				return;
+
+			float invrt = (1.0f / static_cast<float>(sqrt(sqr)));
+			X *= invrt;
+			Y *= invrt;
+			Z *= invrt;
+		}
+
+		void operator+=(ZSVECTOR3& r) {
+			X += r.X;
+			Y += r.Y;
+			Z += r.Z;
+		}
 
         ZSVECTOR3(){
             X = 0;
@@ -45,9 +63,10 @@
 			Z = v;
 		}
 
-	}ZSVECTOR3;
+	};
 
-    typedef struct ZSQUATERNION{
+    class ZSQUATERNION{
+	public:
         float X;
         float Y;
         float Z;
@@ -66,7 +85,7 @@
             this->Z = z;
             this->W = w;
         }
-    }ZSQUATERNION;
+    };
 
 	typedef struct ZSVECTOR4 {
 

@@ -18,6 +18,9 @@ void Engine::GameObjectProperty::copyTo(GameObjectProperty* dest){
     dest->active = this->active;
     dest->world_ptr = this->world_ptr;
 }
+void Engine::GameObjectProperty::onStart() {
+
+}
 void Engine::GameObjectProperty::onUpdate(float deltaTime){
 
 }
@@ -36,7 +39,7 @@ void Engine::GameObjectProperty::onObjectDeleted(){
 void Engine::GameObjectProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
 
 }
-void Engine::GameObjectProperty::bindScriptingToLua() {
+void Engine::GameObjectProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
 
 }
 void Engine::GameObjectProperty::onTrigger(Engine::GameObject* obj){
@@ -80,7 +83,7 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(PROPERTY_TYPE type
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_SCRIPTGROUP:{
-            ScriptGroupProperty* ptr = new ScriptGroupProperty;
+            ZPScriptProperty* ptr = new ZPScriptProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;
         }
@@ -138,7 +141,10 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(PROPERTY_TYPE type
     return _ptr;
 }
 
+void Engine::bindOPropertyScriptingToAngel(AGScriptMgr* mgr) {
 
+    
+}
 
 Engine::LabelProperty::LabelProperty(){
     this->type = PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL;
@@ -157,89 +163,6 @@ void Engine::LabelProperty::loadPropertyFromMemory(const char* data, GameObject*
     }
     obj->label_ptr = &this->label; //Making GameObjects's pointer to string in label property
     this->label = label; //Write loaded string
-}
-
-Engine::ScriptGroupProperty::ScriptGroupProperty(){
-    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_SCRIPTGROUP;
-
-    scr_num = 0;
-    this->scripts_attached.resize(static_cast<unsigned int>(this->scr_num));
-}
-
-Engine::ScriptGroupProperty::~ScriptGroupProperty() {
-    scripts_attached.clear();
-    path_names.clear();
-}
-
-void Engine::ScriptGroupProperty::onUpdate(float deltaTime){
-    for(unsigned int script_i = 0; script_i < this->scripts_attached.size(); script_i ++){
-        Engine::ObjectScript* script_ptr = &this->scripts_attached[script_i]; //Obtain pointer to script
-        //if script isn't created, then create it.
-        if(!script_ptr->created){
-            script_ptr->script_content.clear();
-            script_ptr->script_content = game_data->resources->getScriptByLabel(script_ptr->name)->script_content;
-            script_ptr->_InitScript();
-            script_ptr->_callStart(go_link.updLinkPtr(), go_link.world_ptr);
-        }
-
-        script_ptr->_callDraw(deltaTime); //Run onDraw() function in script
-    }
-}
-
-void Engine::ScriptGroupProperty::copyTo(Engine::GameObjectProperty* dest){
-    if(dest->type != this->type) return; //if it isn't script group
-
-    //Do base things
-    GameObjectProperty::copyTo(dest);
-
-    ScriptGroupProperty* _dest = static_cast<ScriptGroupProperty*>(dest);
-    _dest->scr_num = this->scr_num;
-
-    //resize data vectors
-    _dest->scripts_attached.resize(static_cast<unsigned int>(scr_num));
-    _dest->path_names.resize(static_cast<unsigned int>(scr_num));
-    //Copy data
-    for(unsigned int script_i = 0; script_i < static_cast<unsigned int>(scr_num); script_i ++){
-        _dest->scripts_attached[script_i] = this->scripts_attached[script_i];
-        _dest->path_names[script_i] = this->path_names[script_i];
-    }
-}
-
-
-void Engine::ScriptGroupProperty::shutdown(){
-    //Iterate over all scripts and call _DestroyScript() on each
-    for(unsigned int script_i = 0; script_i < static_cast<unsigned int>(scr_num); script_i ++){
-        this->scripts_attached[script_i]._DestroyScript();
-    }
-}
-
-Engine::ObjectScript* Engine::ScriptGroupProperty::getScriptByName(std::string name){
-    for(unsigned int script_i = 0; script_i < static_cast<unsigned int>(scr_num); script_i ++){
-        if(!name.compare(scripts_attached[script_i].name))
-            return &scripts_attached[script_i];
-    }
-    return nullptr;
-}
-
-void Engine::ScriptGroupProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
-    unsigned int offset = 1;
-    //Read scripts number
-    memcpy(&scr_num, data + offset, sizeof(int));
-    offset += sizeof(int) + 1;
-    //resize arrays
-    scripts_attached.resize(static_cast<unsigned int>(scr_num));
-    path_names.resize(static_cast<unsigned int>(scr_num));
-    //iterate over all scripts and read their path
-    for (unsigned int script_w_i = 0; script_w_i < static_cast<unsigned int>(scr_num); script_w_i++) {
-        //Read script path
-        while (data[offset] != ' ' && data[offset] != '\n') {
-            path_names[script_w_i] += data[offset];
-            offset++;
-        }
-        //Writing name (file path)
-        scripts_attached[script_w_i].name = path_names[script_w_i];
-        ScriptResource* res = game_data->resources->getScriptByLabel(path_names[script_w_i]);
-    }
 }
 
 Engine::MaterialProperty::MaterialProperty(){

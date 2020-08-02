@@ -149,6 +149,7 @@
     <ClCompile Include="code\src\input\zs-input.cpp" />
     <ClCompile Include="code\src\misc\GlyphManager.cpp" />
     <ClCompile Include="code\src\misc\oal_manager.cpp" />
+    <ClCompile Include="code\src\misc\output.cpp" />
     <ClCompile Include="code\src\misc\randomg.cpp" />
     <ClCompile Include="code\src\misc\zs3m-master.cpp" />
     <ClCompile Include="code\src\ogl\ogl_mesh.cpp" />
@@ -171,9 +172,9 @@
     <ClCompile Include="code\src\resources\MaterialResource.cpp" />
     <ClCompile Include="code\src\resources\MeshResource.cpp" />
     <ClCompile Include="code\src\resources\TextureResource.cpp" />
-    <ClCompile Include="code\src\Scripting\LuaScript.cpp" />
-    <ClCompile Include="code\src\Scripting\zsensdk.cpp" />
-    <ClCompile Include="code\src\Scripting\zsensdk_input.cpp" />
+    <ClCompile Include="code\src\Scripting\AngelScript.cpp" />
+    <ClCompile Include="code\src\Scripting\AngelScriptMgr.cpp" />
+    <ClCompile Include="code\src\Scripting\GameObjectAG.cpp" />
     <ClCompile Include="code\src\ui\zs-uibutton.cpp" />
     <ClCompile Include="code\src\ui\zs-uiwidget.cpp" />
     <ClCompile Include="code\src\vulkan\vk_mesh.cpp" />
@@ -195,6 +196,7 @@
     <ClCompile Include="code\src\world\GoProperty\TerrainComponent.cpp" />
     <ClCompile Include="code\src\world\GoProperty\tile_properties.cpp" />
     <ClCompile Include="code\src\world\GoProperty\TransformProperty.cpp" />
+    <ClCompile Include="code\src\world\GoProperty\ZPScriptProperty.cpp" />
     <ClCompile Include="code\src\world\PhysicalWorld.cpp" />
     <ClCompile Include="code\src\world\Terrain.cpp" />
     <ClCompile Include="code\src\world\World.cpp" />
@@ -207,10 +209,13 @@
     <ClInclude Include="code\headers\engine\loader.h" />
     <ClInclude Include="code\headers\engine\LocaleStringsFile.h" />
     <ClInclude Include="code\headers\engine\resources.h" />
+    <ClInclude Include="code\headers\game.h" />
     <ClInclude Include="code\headers\input\zs-input.h" />
     <ClInclude Include="code\headers\misc\GlyphManager.h" />
     <ClInclude Include="code\headers\misc\oal_manager.h" />
+    <ClInclude Include="code\headers\misc\output.hpp" />
     <ClInclude Include="code\headers\misc\randomg.h" />
+    <ClInclude Include="code\headers\misc\RefCounter.hpp" />
     <ClInclude Include="code\headers\misc\zs3m-master.h" />
     <ClInclude Include="code\headers\ogl\ogl.h" />
     <ClInclude Include="code\headers\render\zs-animation.h" />
@@ -221,8 +226,8 @@
     <ClInclude Include="code\headers\render\zs-shader.h" />
     <ClInclude Include="code\headers\render\zs-texture.h" />
     <ClInclude Include="code\headers\render\zs-uniform-buffer.h" />
-    <ClInclude Include="code\headers\Scripting\LuaScript.h" />
-    <ClInclude Include="code\headers\Scripting\zsensdk.h" />
+    <ClInclude Include="code\headers\Scripting\AngelScript.hpp" />
+    <ClInclude Include="code\headers\Scripting\AngelScriptMgr.h" />
     <ClInclude Include="code\headers\ui\zs-uibutton.h" />
     <ClInclude Include="code\headers\ui\zs-uiwidget.h" />
     <ClInclude Include="code\headers\world\go_properties.h" />

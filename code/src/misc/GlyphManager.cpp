@@ -113,7 +113,7 @@ void GlyphFontContainer::DrawString(int* string, unsigned int len, ZSVECTOR2 pos
     unsigned int xpos_offset = static_cast<unsigned int>(pos.X);
     for(unsigned int i = 0; i < len; i ++){
         unsigned int char_len = 0;
-        DrawChar(string[i], ZSVECTOR2(xpos_offset, pos.Y), &char_len, color);
+        DrawChar(string[i], ZSVECTOR2(static_cast<float>(xpos_offset), pos.Y), &char_len, color);
         xpos_offset += char_len;
     }
 }
