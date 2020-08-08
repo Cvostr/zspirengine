@@ -28,16 +28,21 @@ void MessageCallback(const asSMessageInfo* msg, void* param)
 	{
 		case asMSGTYPE_WARNING:
 			se_type = ScriptErrorType::SE_TYPE_WARNING;
+			break;
 		case asMSGTYPE_ERROR:
 			se_type = ScriptErrorType::SE_TYPE_ERROR;
+			break;
 	default:
 		break;
 	}
-
-	std::string _msg = "(" + std::to_string(*msg->section) + ") " + "(" + std::to_string(msg->row)
+	//format string
+	std::string _msg = "(" + std::string(msg->section) + ") " + "(" + std::to_string(msg->row)
 		+ ":" + std::to_string(msg->col) + ") " + msg->message;
-
+	//send message string
 	game_data->out_manager->addConsoleLog(le_type, _msg, se_type);
+
+	if (msg->type == asMSGTYPE_ERROR)
+		game_data->out_manager->spawnRuntimeError(RuntimeErrorType::RE_TYPE_SCRIPT_ERROR);
 }
 
 AGScriptMgr::AGScriptMgr() {
@@ -51,7 +56,8 @@ AGScriptMgr::AGScriptMgr() {
 
 	bindGameObjectSDK(this);
 	bindMathSDK(this);
-	bindGameObjectPropertySDK<TransformProperty>(this, "TransformProperty");
+	bindGameObjectPropertySDK<TransformProperty>(this, TRANSFORM_PROP_TYPE_NAME);
+	bindGameObjectPropertySDK<LightsourceProperty>(this, LIGHTSOURCE_PROP_TYPE_NAME);
 
 	bindGameObjectPropertiesSDK(this);
 

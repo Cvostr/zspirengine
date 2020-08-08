@@ -124,16 +124,16 @@ void Engine::TransformProperty::onPreRender(RenderPipeline* pipeline) {
 
 void Engine::TransformProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
     int result = 0;
-    result = mgr->RegisterObjectType("TransformProperty", 0, asOBJ_REF | asOBJ_NOCOUNT);
+    result = mgr->RegisterObjectType(TRANSFORM_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
     assert(result >= 0);
 
-    result = mgr->RegisterObjectProperty("TransformProperty", "Vec3 translation", offsetof(TransformProperty, translation));
-    result = mgr->RegisterObjectProperty("TransformProperty", "Vec3 scale", offsetof(TransformProperty, scale));
-    result = mgr->RegisterObjectProperty("TransformProperty", "Vec3 rotation", offsetof(TransformProperty, rotation));
+    result = mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 translation", offsetof(TransformProperty, translation));
+    result = mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 scale", offsetof(TransformProperty, scale));
+    result = mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 rotation", offsetof(TransformProperty, rotation));
 
-    result = mgr->RegisterObjectMethod("TransformProperty", "void setTranslation(Vec3@)", asMETHOD(TransformProperty, setTranslation), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod("TransformProperty", "void setScale(Vec3@)", asMETHOD(TransformProperty, setScale), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod("TransformProperty", "void setRotation(Vec3@)", asMETHOD(TransformProperty, setRotation), asCALL_THISCALL);
+    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setTranslation(Vec3@)", asMETHOD(TransformProperty, setTranslation), asCALL_THISCALL);
+    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setScale(Vec3@)", asMETHOD(TransformProperty, setScale), asCALL_THISCALL);
+    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setRotation(Vec3@)", asMETHOD(TransformProperty, setRotation), asCALL_THISCALL);
     assert(result >=0 );
 }
 

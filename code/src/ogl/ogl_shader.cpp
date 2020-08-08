@@ -57,8 +57,9 @@ bool Engine::_ogl_Shader::readShaderFile(const char* path, char* result){
         res_data = css.str();
         strcpy(result, res_data.c_str());
     }
-    catch (std::ifstream::failure e)
+    catch (std::ifstream::failure& e)
     {
+        std::cout << e.what() << std::endl;
         return false;
     }
     return true;
@@ -67,8 +68,8 @@ bool Engine::_ogl_Shader::readShaderFile(const char* path, char* result){
 bool Engine::_ogl_Shader::compileFromFile(std::string VSpath, std::string FSpath){
     std::cout << "OGL: Compiling shader " << VSpath << " " << FSpath << std::endl;
 
-    GLchar vs_data[SHADER_STR_LEN];
-    GLchar fs_data[SHADER_STR_LEN];
+    GLchar* vs_data = new GLchar[SHADER_STR_LEN];
+    GLchar* fs_data = new GLchar[SHADER_STR_LEN];
 
     const GLchar* vs = &vs_data[0];
     const GLchar* fs = &fs_data[0];
@@ -97,6 +98,9 @@ bool Engine::_ogl_Shader::compileFromFile(std::string VSpath, std::string FSpath
     //Clear shaders, we don't need them anymore
     glDeleteShader(VS);
     glDeleteShader(FS);
+    //Free temporary memory
+    delete[] vs_data;
+    delete[] fs_data;
 
     return true;
 }

@@ -65,3 +65,14 @@ void Engine::LightsourceProperty::loadPropertyFromMemory(const char* data, GameO
 
     color = ZSRGBCOLOR(cl_r, cl_g, cl_b);
 }
+
+void Engine::LightsourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    int result = 0;
+    result = mgr->RegisterObjectType(LIGHTSOURCE_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+    assert(result >= 0);
+
+    result = mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float intensity", offsetof(LightsourceProperty, intensity));
+    result = mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float range", offsetof(LightsourceProperty, range));
+    result = mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float spot_angle", offsetof(LightsourceProperty, spot_angle));
+    result = mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "rgbColor color", offsetof(LightsourceProperty, color));
+}

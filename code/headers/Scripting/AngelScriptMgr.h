@@ -5,6 +5,14 @@
 #include <angelscript/scripthandle.h>
 #include <string>
 
+#define GAME_OBJECT_TYPE_NAME "GameObject"
+#define GAME_OBJECT_PROP_TYPE_NAME "GameObjectProperty"
+#define VEC3_TYPE_NAME "Vec3"
+#define RGBCOLOR_TYPE_NAME "rgbColor"
+
+#define TRANSFORM_PROP_TYPE_NAME "Transform"
+#define LIGHTSOURCE_PROP_TYPE_NAME "Lightsource"
+
 namespace Engine {
     class AGScriptMgr {
     private:

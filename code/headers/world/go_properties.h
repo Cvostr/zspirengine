@@ -75,6 +75,7 @@ public:
     void copyTo(Engine::GameObjectProperty* dest);
     void onPreRender(Engine::RenderPipeline* pipeline);
     void loadPropertyFromMemory(const char* data, GameObject* obj);
+    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     LightsourceProperty();
 };
