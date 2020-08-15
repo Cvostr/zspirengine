@@ -28,7 +28,9 @@ void Engine::GameObjectLink::crack(){
 }
 
 Engine::GameObject::GameObject(){
+    array_index = 0;
     props_num = 0; //No props by default
+    scripts_num = 0; //No scripts by default
     alive = true; //Object exist by default
     hasParent = false; //No parent by default
     active = true;
@@ -38,10 +40,8 @@ Engine::GameObject::GameObject(){
     label_ptr = nullptr;
 
     genRandomString(&this->str_id, 15); //Generate random string ID
-
-    for(int prop_i = 0; prop_i < OBJ_PROPS_SIZE; prop_i ++){ //iterate over all property pointers and clear them
-        properties[prop_i] = nullptr;
-    }
+    properties[0] = nullptr;
+    scripts[0] = nullptr;
 }
 
 Engine::GameObjectLink Engine::GameObject::getLinkToThisObject(){
@@ -55,6 +55,10 @@ Engine::GameObjectLink Engine::GameObject::getLinkToThisObject(){
 
 bool Engine::GameObject::addProperty(PROPERTY_TYPE property){
     unsigned int props = static_cast<unsigned int>(this->props_num);
+
+    if (props == OBJ_PROPS_SIZE)
+        return false;
+
     for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
         GameObjectProperty* property_ptr = this->properties[prop_i];
         if(property_ptr->type == property){ //If object already has one
@@ -68,6 +72,17 @@ bool Engine::GameObject::addProperty(PROPERTY_TYPE property){
     _ptr->world_ptr = this->world_ptr; //Assign pointer to world
     this->properties[props_num] = _ptr; //Store property in gameobject
     this->props_num += 1;
+    return true;
+}
+
+bool Engine::GameObject::addScript() {
+    ZPScriptProperty* _ptr = static_cast<ZPScriptProperty*>(allocProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT));
+
+    _ptr->go_link = this->getLinkToThisObject();
+    _ptr->go_link.updLinkPtr();
+    _ptr->world_ptr = this->world_ptr; //Assign pointer to world
+    this->scripts[scripts_num] = _ptr; //Store property in gameobject
+    this->scripts_num += 1;
     return true;
 }
 
@@ -182,11 +197,11 @@ Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByType(PROPERTY_TY
     return nullptr;
 }
 
-Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByTypeI(PROPERTY_TYPE property){
+Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByTypeI(int property){
     unsigned int props = static_cast<unsigned int>(this->props_num);
     for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
         Engine::GameObjectProperty* property_ptr = this->properties[prop_i];
-        if(property_ptr->type == property){ //If object already has one
+        if((int)property_ptr->type == property){ //If object already has one
             return property_ptr; //return it
         }
     }
@@ -198,12 +213,34 @@ void Engine::GameObject::onStart() {
         if (!properties[i]->active) continue; //if property is inactive, then skip it
         properties[i]->onStart(); //and call onStart on each property
     }
+    //Work with scripts
+    for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
+        if (!scripts[i]->active) continue; //if script is inactive, then skip it
+        scripts[i]->onStart(); //and call onStart on each script
+    }
+}
+
+void Engine::GameObject::onStop() {
+    for (unsigned int i = 0; i < props_num; i++) { //iterate over all properties
+        if (!properties[i]->active) continue; //if property is inactive, then skip it
+        properties[i]->onStop(); //and call onStart on each property
+    }
+    //Work with scripts
+    for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
+        if (!scripts[i]->active) continue; //if script is inactive, then skip it
+        scripts[i]->onStop(); //and call onStart on each script
+    }
 }
 
 void Engine::GameObject::onUpdate(int deltaTime){   //calls onUpdate on all properties
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
         if(!properties[i]->active) continue; //if property is inactive, then skip it
         properties[i]->onUpdate(static_cast<float>(deltaTime)); //and call onUpdate on each property
+    }
+    //Work with scripts
+    for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
+        if (!scripts[i]->active) continue; //if script is inactive, then skip it
+        scripts[i]->onUpdate(static_cast<float>(deltaTime)); //and call onUpdate on each script
     }
 }
 

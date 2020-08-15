@@ -21,6 +21,9 @@ void Engine::GameObjectProperty::copyTo(GameObjectProperty* dest){
 void Engine::GameObjectProperty::onStart() {
 
 }
+void Engine::GameObjectProperty::onStop() {
+
+}
 void Engine::GameObjectProperty::onUpdate(float deltaTime){
 
 }
@@ -82,7 +85,7 @@ Engine::GameObjectProperty* Engine::GameObject::allocProperty(PROPERTY_TYPE type
             _ptr = static_cast<GameObjectProperty*>(new LightsourceProperty);
             break;
         }
-        case PROPERTY_TYPE::GO_PROPERTY_TYPE_SCRIPTGROUP:{
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT:{
             ZPScriptProperty* ptr = new ZPScriptProperty;
             _ptr = static_cast<GameObjectProperty*>(ptr);
             break;

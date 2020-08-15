@@ -42,6 +42,7 @@ class ZPScriptProperty : public Engine::GameObjectProperty {
 private:
     Engine::AGScript* script;
     std::string script_path;
+    std::vector<GlobVarHandle*> vars;
 public:
     ScriptResource* script_res;
     void onValueChanged();
@@ -49,6 +50,7 @@ public:
     void onStart();
     void onUpdate(float deltaTime); //calls update in scripts
     void copyTo(Engine::GameObjectProperty* dest);
+    void makeGlobalVarsList();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
 
@@ -109,6 +111,7 @@ public:
     void setPitch(float pitch);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
+    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     AudioSourceProperty();
 };

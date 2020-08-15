@@ -143,3 +143,7 @@ void Engine::AudioSourceProperty::loadPropertyFromMemory(const char* data, GameO
 
     source.apply_settings(); //Apply settings to openal
 }
+
+void Engine::AudioSourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+
+}

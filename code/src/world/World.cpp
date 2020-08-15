@@ -348,3 +348,10 @@ void Engine::World::call_onStart() {
         object_ptr->onStart();
     }
 }
+
+void Engine::World::call_onStop() {
+    for (unsigned int object_i = 0; object_i < objects.size(); object_i++) {
+        Engine::GameObject* object_ptr = objects[object_i];
+        object_ptr->onStop();
+    }
+}

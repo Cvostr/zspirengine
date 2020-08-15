@@ -13,7 +13,8 @@
 
 #include "../Scripting/AngelScriptMgr.h"
 
-#define OBJ_PROPS_SIZE 11
+#define OBJ_PROPS_SIZE 10
+#define OBJ_SCRIPT_PROPS_SIZE 5
 #define MAX_OBJS 15000
 
 enum class PROPERTY_TYPE{
@@ -24,7 +25,7 @@ enum class PROPERTY_TYPE{
     GO_PROPERTY_TYPE_LIGHTSOURCE,
     GO_PROPERTY_TYPE_AUDSOURCE,
     GO_PROPERTY_TYPE_MATERIAL,
-    GO_PROPERTY_TYPE_SCRIPTGROUP,
+    GO_PROPERTY_TYPE_AGSCRIPT,
     GO_PROPERTY_TYPE_COLLIDER,
     GO_PROPERTY_TYPE_RIGIDBODY,
     GO_PROPERTY_TYPE_SKYBOX,
@@ -80,6 +81,8 @@ public:
     virtual void copyTo(GameObjectProperty* dest);
     //Virtual func to define property behaviour on scene start
     virtual void onStart();
+    //Virtual func to define property behaviour on scene stop
+    virtual void onStop();
     //Virtual func to define property behaviour each frame
     virtual void onUpdate(float deltaTime);
     virtual void onPreRender(RenderPipeline* pipeline = nullptr);
@@ -119,6 +122,7 @@ public:
     void addObjectsFromPrefab(std::string file);
 
     void call_onStart();
+    void call_onStop();
 
     Engine::Camera* getCameraPtr();
     Engine::Camera world_camera;
@@ -139,25 +143,31 @@ public:
     std::string* label_ptr;
 
     bool active; //if true, object will be active in scene
-    bool alive;
+    bool alive; //false, if object was remove
     bool hasParent;
     bool IsStatic;
 
     unsigned int props_num; //amount of properties
+    unsigned int scripts_num;
+
     World* world_ptr; //pointer to world, when object placed
 
     GameObjectLink parent;
 
     std::vector<GameObjectLink> children; //Vector to store links to children of object
+    //Pointers to properties and scripts
     GameObjectProperty* properties[OBJ_PROPS_SIZE];
-
+    GameObjectProperty* scripts[OBJ_SCRIPT_PROPS_SIZE];
+    //Allocate property in this object
     GameObjectProperty* allocProperty(PROPERTY_TYPE type);
+    bool addScript();
     bool addProperty(PROPERTY_TYPE property); //Adds property with property ID
     //returns pointer to property by property type
-    GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
-    Engine::GameObjectProperty* getPropertyPtrByTypeI(PROPERTY_TYPE property);
-
+    Engine::GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
+    Engine::GameObjectProperty* getPropertyPtrByTypeI(int property);
+    //Add object link as child
     void addChildObject(GameObjectLink link, bool updTransform = true);
+    //unparent object from this
     void removeChildObject(GameObjectLink link);
     int getAliveChildrenAmount(); //Gets current amount of children objects (exclude removed chidren)
     //Remove property with type
@@ -193,6 +203,7 @@ public:
     void processObject(RenderPipeline* pipeline); //On render pipeline wish to work with object
     void Draw(RenderPipeline* pipeline); //On render pipeline wish to draw the object
     void onStart(); //calls onStart() on all properties
+    void onStop(); //calls onStop() on all properties
     void onUpdate(int deltaTime); //calls onUpdate on all properties
     void onPreRender(RenderPipeline* pipeline); //calls onPreRender on all properties
     void onRender(RenderPipeline* pipeline); //calls onRender on all properties

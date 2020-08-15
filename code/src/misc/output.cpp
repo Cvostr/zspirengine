@@ -39,3 +39,6 @@ void OutputManager::clearMessagesWithType(LogEntryType log_type) {
 void OutputManager::spawnRuntimeError(RuntimeErrorType re_type) {
 	RE_TYPE = re_type;
 }
+void OutputManager::unsetRuntimeError() {
+	RE_TYPE = RuntimeErrorType::RE_TYPE_NONE;
+}

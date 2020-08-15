@@ -30,7 +30,7 @@ namespace Engine {
         int RegisterObjectProperty(const char* obj, const char* declaration, int byteOffset, int compositeOffset = 0, bool isCompositeIndirect = false);
 
         int RegisterObjectBehaviour(const char* obj, asEBehaviours behaviour, const char* declaration, const asSFuncPtr& funcPointer, asDWORD callConv, void* auxiliary = 0, int compositeOffset = 0, bool isCompositeIndirect = false);
-        bool registerGlobalFunc(std::string func_name, 
+        bool RegisterGlobalFunction(std::string func_name,
                                 const asSFuncPtr& funcPointer,
                                 asDWORD 	callConv,
                                 void* auxiliary = 0);

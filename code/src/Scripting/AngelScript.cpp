@@ -6,22 +6,34 @@ using namespace Engine;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
 
-void AGScript::compileFromResource(Engine::ScriptResource* res) {
+void GVH_VEC3::getValue() {
+
+	void* moved = address;
+	uint64_t* vc = (uint64_t*)(*((uint64_t*)address));
+	memcpy(&value, vc, sizeof(ZSVECTOR3));
+}
+
+
+bool AGScript::compileFromResource(Engine::ScriptResource* res) {
 	int result = 0;
 	
 	result = builder.AddSectionFromMemory(res->rel_path.c_str(), res->script_content.c_str(), res->size);
 
 	result = builder.BuildModule();
-	if (result < 0)
+	if (result < 0) {
 		hasErrors = true;
+		return false;
+	}
+	return true;
 }
 
 void AGScript::onStart() {
 
 	if (hasErrors == true)
 		return;
-
+	//fill pointer with main class
 	obtainScriptMainClass();
+	
 
 	//Obtain Start() function
 	asIScriptFunction* func = main_class->GetMethodByDecl("void Start()");
@@ -45,8 +57,28 @@ void AGScript::onUpdate() {
 	assert(r >= 0);
 }
 
-void AGScript::obtainScriptMainClass() {
+unsigned int AGScript::getGlobalVarsCount() {
+	return module->GetGlobalVarCount();
+}
+
+void* AGScript::getGlobalVariableAddr(unsigned int index) {
+	return module->GetAddressOfGlobalVar(index);
+}
+
+void AGScript::getGlobalVariable(unsigned int index, const char** name, const char** _namespace, int* typeID) {
+	unsigned int max = module->GetGlobalVarCount();
+	if (index > max - 1) 
+		return;
+	module->GetGlobalVar(index, name, _namespace, typeID);
+}
+
+void AGScript::obtainScriptModule() {
 	asIScriptModule* mod = engine->GetModule(ModuleName, asGM_ONLY_IF_EXISTS);
+	this->module = mod;
+}
+
+void AGScript::obtainScriptMainClass() {
+	obtainScriptModule();
 	//Obtain class with interface ZPScript
 	main_class = getClassWithInterface("ZPScript");
 	ClassName = main_class->GetName();
@@ -95,5 +127,5 @@ AGScript::AGScript(AGScriptMgr* engine, Engine::GameObject* obj, std::string Cla
 	hasErrors = false;
 }
 AGScript::~AGScript() {
-
+	module->Discard();
 }

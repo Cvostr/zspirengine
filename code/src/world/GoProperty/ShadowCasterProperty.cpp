@@ -157,7 +157,6 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pip
         uint64_t offset = (1 + uint64_t(i));
         pipeline->shadowBuffer->writeData(sizeof(ZSMATRIX4x4) * offset, sizeof(ZSMATRIX4x4), &mat);
 
-
         glViewport(TextureWidth * i, 0, TextureWidth, TextureHeight);
         //Render to depth all scene
         pipeline->renderDepth(this->go_link.world_ptr);

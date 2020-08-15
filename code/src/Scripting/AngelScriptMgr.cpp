@@ -6,9 +6,31 @@ extern ZSGAME_DATA* game_data;
 
 using namespace Engine;
 
-void print(std::string& msg)
+void printToConsole(asIScriptGeneric* gen)
 {
-	printf("%s", msg.c_str());
+	unsigned int args = gen->GetArgCount();
+	std::string out = "";
+
+	for (unsigned int arg_i = 0; arg_i < args; arg_i++) {
+		void* ref = gen->GetArgAddress(arg_i);
+		int typeId = gen->GetArgTypeId(arg_i);
+
+		switch (typeId) {
+		case asTYPEID_INT32: {
+			int v = 0;
+			memcpy(&v, ref, sizeof(int));
+			out += std::to_string(v) + " ";
+			break;
+		}
+		case asTYPEID_FLOAT: {
+			float f = 0;
+			memcpy(&f, ref, sizeof(float));
+			out += std::to_string(f) + " ";
+			break;
+		}
+		}
+	}
+	game_data->out_manager->addConsoleLog(LogEntryType::LE_TYPE_SCRIPT_MESSAGE, out);
 }
 
 asIScriptEngine* AGScriptMgr::getAgScriptEngine() {
@@ -61,7 +83,7 @@ AGScriptMgr::AGScriptMgr() {
 
 	bindGameObjectPropertiesSDK(this);
 
-	r = ag_engine->RegisterGlobalFunction("void print(const string &in)", asFUNCTION(print), asCALL_CDECL);
+	r = RegisterGlobalFunction("void print(?&in, ?&in)", asFUNCTION(printToConsole), asCALL_GENERIC);
 
 	assert(r >= 0);
 
@@ -98,12 +120,12 @@ int AGScriptMgr::RegisterObjectProperty(const char* obj, const char* declaration
 	return ag_engine->RegisterObjectProperty(obj, declaration, byteOffset, compositeOffset, isCompositeIndirect);
 }
 
-bool AGScriptMgr::registerGlobalFunc(std::string func_name,
+bool AGScriptMgr::RegisterGlobalFunction(std::string func_name,
 	const asSFuncPtr& funcPointer,
 	asDWORD 	callConv,
 	void* auxiliary) {
 
-	int result = ag_engine->RegisterGlobalFunction(func_name.c_str(), funcPointer, asCALL_CDECL);
+	int result = ag_engine->RegisterGlobalFunction(func_name.c_str(), funcPointer, callConv, auxiliary);
 
 	return (result >= 0);
 }

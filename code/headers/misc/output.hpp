@@ -22,7 +22,7 @@ enum class RuntimeErrorType {
 	RE_TYPE_GL_CREATION_ERROR,
 	RE_TYPE_SHADER_ERROR,
 	RE_TYPE_SCRIPT_ERROR,
-	RE_TYPE_SCENE_OPEN_ERROR,
+	RE_TYPE_SCENE_OPEN_ERROR
 };
 
 typedef struct LogEntry {
@@ -50,6 +50,7 @@ namespace Engine {
 		void addConsoleLog(LogEntryType log_type, std::string message, ScriptErrorType err_type = ScriptErrorType::SE_TYPE_NONE);
 		void addConsoleLog(LogEntry entry);
 		void spawnRuntimeError(RuntimeErrorType re_type);
+		void unsetRuntimeError();
 		void clearMessagesWithType(LogEntryType log_type);
 
 		OutputManager();

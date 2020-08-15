@@ -101,6 +101,7 @@ void Engine::TransformProperty::setScale(ZSVECTOR3& new_scale) {
     this->onValueChanged();
 }
 void Engine::TransformProperty::setRotation(ZSVECTOR3& new_rotation) {
+    float* ptr = &new_rotation.X;
     this->rotation = new_rotation;
     this->onValueChanged();
 }
