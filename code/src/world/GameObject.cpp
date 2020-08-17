@@ -171,7 +171,9 @@ std::string Engine::GameObject::getLabel(){
 }
 
 void Engine::GameObject::setLabel(std::string label){
-    *this->label_ptr = label;
+    LabelProperty* label_prop = getLabelProperty(); //Obtain pointer to label property
+    label_prop->label = label; //set new name
+    label_ptr = &label_prop->label; //update pointer
 }
 
 void Engine::GameObject::setActive(bool active){

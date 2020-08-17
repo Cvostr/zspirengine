@@ -18,116 +18,73 @@ namespace Engine{
 
     class GlobVarHandle {
     protected:
-        unsigned int size;
+        
         bool isRef;
     public:
         unsigned int index;
         std::string name;
         std::string _namespace;
         void* address;
+        void* value_ptr;
         int typeID;
+        unsigned int size;
 
-        virtual void applyValue() {
-            //memcpy(address, &value, size);
+        void applyValue() {
+            if (!isRef) {
+                memcpy(address, value_ptr, size);
+            }
+            else {
+                void* moved = address;
+                uint64_t* vc = (uint64_t*)(*((uint64_t*)address));
+                memcpy(vc, value_ptr, sizeof(ZSVECTOR3));
+            }
         }
-        virtual void getValue() {
-            //memcpy(&value, address, size);
+        void updValue() {
+            if (!isRef) {
+                memcpy(value_ptr, address, size);
+            }
+            else {
+                void* moved = address;
+                uint64_t* vc = (uint64_t*)(*((uint64_t*)address));
+                memcpy(value_ptr, vc, sizeof(ZSVECTOR3));
+            }
         }
 
-        GlobVarHandle() {
-            size = 0;
-            isRef = false;
+        template <typename T>
+        T* getValue() {
+            return static_cast<T*>(value_ptr);
+        }
+
+        GlobVarHandle(int typeID) {
             index = 0;
             name = "";
             address = nullptr;
-            typeID = 0;
-        }
-    };
-
-    class GVH_INT32 : public GlobVarHandle {
-    public:
-        int32_t value;
-
-        void applyValue() {
-            memcpy(address, &value, size);
-        }
-        void getValue() {
-            memcpy(&value, address, size);
-        }
-
-        GVH_INT32() {
-            size = sizeof(int);
+            this->typeID = typeID;
             isRef = false;
-            value = 0;
-        }
-    };
 
-    class GVH_FLOAT : public GlobVarHandle {
-    public:
-        float value;
-
-        void applyValue() {
-            memcpy(address, &value, size);
-        }
-        void getValue() {
-            memcpy(&value, address, size);
-        }
-
-        GVH_FLOAT() {
-            size = sizeof(float);
-            isRef = false;
-            value = 0.f;
-        }
-    };
-
-    class GVH_BOOL : public GlobVarHandle {
-    public:
-        bool value;
-
-        void applyValue() {
-            memcpy(address, &value, size);
-        }
-        void getValue() {
-            memcpy(&value, address, size);
-        }
-
-        GVH_BOOL() {
-            size = sizeof(bool);
-            isRef = false;
-            value = false;
-        }
-    };
-
-    class GVH_VEC3 : public GlobVarHandle {
-    public:
-        ZSVECTOR3 value;
-
-        void applyValue() {
-            
-        }
-        void getValue();
-
-        GVH_VEC3() {
-            size = sizeof(ZSVECTOR3);
-            isRef = true;
-            value = ZSVECTOR3(0, 0, 0);
-        }
-    };
-    class GVH_STR : public GlobVarHandle {
-    public:
-        std::string value;
-
-        void applyValue() {
-            memcpy(address, &value, size);
-        }
-        void getValue() {
-            memcpy(&value, address, size);
-        }
-
-        GVH_STR() {
-            size = sizeof(std::string);
-            isRef = false;
-            value = "";
+            switch (typeID) {
+            case asTYPEID_INT32:
+                size = sizeof(int);
+                value_ptr = malloc(size);
+                break;
+            case asTYPEID_FLOAT:
+                size = sizeof(float);
+                value_ptr = malloc(size);
+                break;
+            case asTYPEID_BOOL:
+                size = sizeof(bool);
+                value_ptr = malloc(size);
+                break;
+            case AG_VECTOR3:
+                size = sizeof(ZSVECTOR3);
+                value_ptr = new ZSVECTOR3;
+                isRef = true;
+                break;
+            case AG_STRING:
+                size = sizeof(std::string);
+                value_ptr = new std::string;
+                break;
+            }
         }
     };
 

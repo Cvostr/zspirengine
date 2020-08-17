@@ -41,9 +41,9 @@ public:
 class ZPScriptProperty : public Engine::GameObjectProperty {
 private:
     Engine::AGScript* script;
-    std::string script_path;
-    std::vector<GlobVarHandle*> vars;
 public:
+    std::vector<GlobVarHandle*> vars;
+    std::string script_path;
     ScriptResource* script_res;
     void onValueChanged();
     void addPropertyInterfaceToInspector();

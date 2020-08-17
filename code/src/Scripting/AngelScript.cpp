@@ -6,14 +6,6 @@ using namespace Engine;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
 
-void GVH_VEC3::getValue() {
-
-	void* moved = address;
-	uint64_t* vc = (uint64_t*)(*((uint64_t*)address));
-	memcpy(&value, vc, sizeof(ZSVECTOR3));
-}
-
-
 bool AGScript::compileFromResource(Engine::ScriptResource* res) {
 	int result = 0;
 	
@@ -34,7 +26,6 @@ void AGScript::onStart() {
 	//fill pointer with main class
 	obtainScriptMainClass();
 	
-
 	//Obtain Start() function
 	asIScriptFunction* func = main_class->GetMethodByDecl("void Start()");
 	//Execute function

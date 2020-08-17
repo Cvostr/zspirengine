@@ -55,8 +55,6 @@ void PhysicalWorld::rayTest(ZSVECTOR3 pos, ZSVECTOR3 dir, btCollisionWorld::RayR
 }
 
 void PhysicalWorld::stepSimulation(float stepSimulation){
-    if(stepSimulation > 200) 
-        return;
     //Simulate physics
     this->physic_world->stepSimulation(stepSimulation);
     physic_world->performDiscreteCollisionDetection();

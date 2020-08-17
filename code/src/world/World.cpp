@@ -153,9 +153,7 @@ Engine::GameObject* Engine::World::dublicateObject(GameObject* original, bool pa
     //generate random string to add it after object label
     genRandomString(&to_paste, 3);
     //Add generated string to end of label
-    label_prop->label = label_prop->label + "_" + to_paste;
-    //Update pointer to LabelProperty
-    new_obj->label_ptr = &label_prop->label;
+    new_obj->setLabel(label_prop->label + "_" + to_paste);
     //Dublicate chilldren object
     unsigned int children_amount = static_cast<unsigned int>(original->children.size());
     //Iterate over all children
