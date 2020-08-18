@@ -190,6 +190,7 @@
     <ClCompile Include="code\src\world\GoProperty\ColliderProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\go_properties.cpp" />
     <ClCompile Include="code\src\world\GoProperty\LightsourceProperty.cpp" />
+    <ClCompile Include="code\src\world\GoProperty\MaterialProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\MeshProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\RigidbodyProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\ShadowCasterProperty.cpp" />

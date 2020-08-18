@@ -159,7 +159,7 @@ public:
     GameObjectProperty* properties[OBJ_PROPS_SIZE];
     GameObjectProperty* scripts[OBJ_SCRIPT_PROPS_SIZE];
     //Allocate property in this object
-    GameObjectProperty* allocProperty(PROPERTY_TYPE type);
+    
     bool addScript();
     bool addProperty(PROPERTY_TYPE property); //Adds property with property ID
     //returns pointer to property by property type
@@ -227,7 +227,11 @@ class LabelProperty : public GameObjectProperty {
 public:
     std::string label; //Label of gameobject
 
-    void loadPropertyFromMemory(const char* data, GameObject* obj);
+    void addPropertyInterfaceToInspector();
+    void onValueChanged();
+    void onObjectDeleted();
+    void copyTo(Engine::GameObjectProperty* dest);
+    void loadPropertyFromMemory(const char* data, Engine::GameObject* obj);
 
     LabelProperty();
     ~LabelProperty();
@@ -263,7 +267,7 @@ public:
 
     TransformProperty();
 };
-
+GameObjectProperty* allocProperty(PROPERTY_TYPE type);
 }
 
 #endif
