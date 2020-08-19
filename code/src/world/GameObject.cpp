@@ -44,6 +44,10 @@ Engine::GameObject::GameObject(){
     scripts[0] = nullptr;
 }
 
+Engine::GameObject::~GameObject() {
+
+}
+
 Engine::GameObjectLink Engine::GameObject::getLinkToThisObject(){
     GameObjectLink link; //Definition of result link
     link.obj_str_id = this->str_id; //Placing string id
@@ -394,3 +398,71 @@ Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(std::string 
     return nullptr;
 }
 
+
+void Engine::GameObject::putToSnapshot(GameObjectSnapshot* snapshot) {
+    snapshot->props_num = 0;
+    snapshot->scripts_num = 0;
+
+    snapshot->parent_link = this->parent;
+    snapshot->obj_array_ind = this->array_index;
+
+    this->copyTo(&snapshot->reserved_obj);
+    //Copy all properties
+    for (unsigned int i = 0; i < this->props_num; i++) {
+        Engine::GameObjectProperty* prop_ptr = this->properties[i];
+        Engine::GameObjectProperty* new_prop_ptr = Engine::allocProperty(prop_ptr->type);
+        prop_ptr->copyTo(new_prop_ptr);
+        snapshot->properties[snapshot->props_num] = new_prop_ptr;
+        snapshot->props_num += 1;
+    }
+    for (unsigned int i = 0; i < this->scripts_num; i++) {
+        Engine::ZPScriptProperty* script_ptr = static_cast<Engine::ZPScriptProperty*>(this->scripts[i]);
+        Engine::ZPScriptProperty* new_script_ptr = static_cast<Engine::ZPScriptProperty*>(
+            Engine::allocProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT));
+        script_ptr->copyTo(new_script_ptr);
+        snapshot->scripts[snapshot->scripts_num] = new_script_ptr;
+        snapshot->scripts_num += 1;
+    }
+    snapshot->children_snapshots.resize(this->children.size());
+    //Copy all children links
+    for (unsigned int i = 0; i < this->children.size(); i++) {
+        snapshot->children.push_back(this->children[i]);
+        //Call putToSnapshot() on object
+        static_cast<GameObject*>(children[i].ptr)->putToSnapshot(&snapshot->children_snapshots[i]);
+    }
+}
+
+void Engine::GameObject::setMeshSkinningRootNodeRecursively(GameObject* rootNode) {
+    Engine::MeshProperty* mesh = getPropertyPtr<Engine::MeshProperty>();
+    if (mesh)
+        mesh->skinning_root_node = rootNode;
+
+    for (unsigned int ch_i = 0; ch_i < children.size(); ch_i++) {
+        GameObject* obj_ptr = (GameObject*)children[ch_i].updLinkPtr();
+        obj_ptr->setMeshSkinningRootNodeRecursively(rootNode);
+    }
+}
+
+void Engine::GameObjectSnapshot::clear() {
+    //free array of children
+    this->children.clear();
+
+    for (unsigned int prop = 0; prop < static_cast<unsigned int>(this->props_num); prop++) {
+        auto prop_ptr = this->properties[prop];
+        delete prop_ptr;
+        prop_ptr = nullptr;
+    }
+    props_num = 0;
+
+    for (unsigned int child = 0; child < this->children.size(); child++) {
+        children_snapshots[child].clear();
+    }
+    children_snapshots.clear(); //Free snapshot vector
+    this->children.clear(); //Free link vector
+}
+
+Engine::GameObjectSnapshot::GameObjectSnapshot() {
+    props_num = 0;
+    scripts_num = 0;
+    obj_array_ind = 0;
+}

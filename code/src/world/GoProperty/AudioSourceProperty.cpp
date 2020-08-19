@@ -145,5 +145,13 @@ void Engine::AudioSourceProperty::loadPropertyFromMemory(const char* data, GameO
 }
 
 void Engine::AudioSourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    int result = 0;
+    result = mgr->RegisterObjectType(AUDSOURCE_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+    assert(result >= 0);
+
+    //result = mgr->RegisterObjectProperty(AUDSOURCE_PROP_TYPE_NAME, "float intensity", offsetof(LightsourceProperty, intensity));
+    //result = mgr->RegisterObjectProperty(AUDSOURCE_PROP_TYPE_NAME, "float range", offsetof(LightsourceProperty, range));
+    //result = mgr->RegisterObjectProperty(AUDSOURCE_PROP_TYPE_NAME, "float spot_angle", offsetof(LightsourceProperty, spot_angle));
+   // result = mgr->RegisterObjectProperty(AUDSOURCE_PROP_TYPE_NAME, "rgbColor color", offsetof(LightsourceProperty, color));
 
 }

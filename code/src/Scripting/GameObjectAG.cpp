@@ -41,7 +41,9 @@ void Engine::bindGameObjectPropertiesSDK(AGScriptMgr* mgr) {
 
 	result = mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "Transform@ transform()", asMETHOD(Engine::GameObject, getPropertyPtr<TransformProperty>), asCALL_THISCALL);
 	assert(result >= 0);
-	result = mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "Lightsource@ light()", asMETHOD(Engine::GameObject, getPropertyPtr<LightsourceProperty>), asCALL_THISCALL);
+	result = mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "LightSource@ light()", asMETHOD(Engine::GameObject, getPropertyPtr<LightsourceProperty>), asCALL_THISCALL);
+	assert(result >= 0);
+	result = mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "AudioSource@ audio()", asMETHOD(Engine::GameObject, getPropertyPtr<AudioSourceProperty>), asCALL_THISCALL);
 	assert(result >= 0);
 }
 

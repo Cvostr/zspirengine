@@ -271,6 +271,18 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
             //Load property
             prop_ptr->loadPropertyFromMemory(bytes + iter, object_ptr);
         }
+        if (prefix.compare("G_SCRIPT") == 0) { //We found an property, zaeb*s'
+            //Call function to load that property
+            iter++; //Skip space
+            //Spawn new property with readed type
+            object_ptr->addScript();
+            auto script_ptr = object_ptr->scripts[object_ptr->scripts_num]; //get created property
+            //Read ACTIVE flag
+            memcpy(&script_ptr->active, bytes + iter, sizeof(bool));
+            iter += sizeof(bool);
+            //Load property
+            script_ptr->loadPropertyFromMemory(bytes + iter, object_ptr);
+        }
     }
 }
 
@@ -351,5 +363,52 @@ void Engine::World::call_onStop() {
     for (unsigned int object_i = 0; object_i < objects.size(); object_i++) {
         Engine::GameObject* object_ptr = objects[object_i];
         object_ptr->onStop();
+    }
+}
+
+bool Engine::World::isObjectLabelUnique(std::string label) {
+    unsigned int objs_num = static_cast<unsigned int>(this->objects.size());
+    int ret_amount = 0;
+    for (unsigned int obj_it = 0; obj_it < objs_num; obj_it++) { //Iterate over all objs in scene
+        Engine::GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
+        //if object was destroyed
+        if (!obj_ptr->alive) continue;
+        if (obj_ptr->label_ptr->compare(label) == 0) {
+            ret_amount += 1;
+            if (ret_amount > 1) return false;
+        }
+    }
+    return true;
+}
+
+void Engine::World::getAvailableNumObjLabel(std::string label, int* result) {
+    unsigned int objs_num = static_cast<unsigned int>(this->objects.size());
+    std::string tocheck_str = label + std::to_string(*result); //Calculating compare string
+    bool hasEqualName = false; //true if we already have this obj
+    for (unsigned int obj_it = 0; obj_it < objs_num; obj_it++) { //Iterate over all objs in scene
+        Engine::GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
+        if (obj_ptr->label_ptr == nullptr || !obj_ptr->alive) continue;
+        if (obj_ptr->label_ptr->compare(tocheck_str) == 0) //If label on object is same
+            hasEqualName = true; //Then we founded equal name
+    }
+    if (hasEqualName == true) {
+        *result += 1;
+        getAvailableNumObjLabel(label, result);
+    }
+}
+int Engine::World::getFreeObjectSpaceIndex() {
+    unsigned int index_to_push = static_cast<unsigned int>(objects.size()); //Set free index to objects amount
+    unsigned int objects_num = static_cast<unsigned int>(this->objects.size());
+    for (unsigned int objs_i = 0; objs_i < objects_num; objs_i++) {
+        if (objects[objs_i]->alive == false) { //if object deleted
+            index_to_push = objs_i; //set free index to index of deleted object
+        }
+    }
+
+    if (index_to_push == objects.size()) { //if all indeces are busy
+        return static_cast<int>(objects.size());
+    }
+    else { //if vector has an empty space
+        return static_cast<int>(index_to_push);
     }
 }

@@ -80,7 +80,7 @@ AGScriptMgr::AGScriptMgr() {
 	bindMathSDK(this);
 	bindGameObjectPropertySDK<TransformProperty>(this, TRANSFORM_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<LightsourceProperty>(this, LIGHTSOURCE_PROP_TYPE_NAME);
-
+	bindGameObjectPropertySDK<AudioSourceProperty>(this, AUDSOURCE_PROP_TYPE_NAME);
 	bindGameObjectPropertiesSDK(this);
 
 	r = RegisterGlobalFunction("void print(?&in, ?&in)", asFUNCTION(printToConsole), asCALL_GENERIC);

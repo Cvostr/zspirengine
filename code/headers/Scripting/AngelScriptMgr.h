@@ -11,7 +11,8 @@
 #define RGBCOLOR_TYPE_NAME "rgbColor"
 
 #define TRANSFORM_PROP_TYPE_NAME "Transform"
-#define LIGHTSOURCE_PROP_TYPE_NAME "Lightsource"
+#define LIGHTSOURCE_PROP_TYPE_NAME "LightSource"
+#define AUDSOURCE_PROP_TYPE_NAME "AudioSource"
 
 namespace Engine {
     class AGScriptMgr {

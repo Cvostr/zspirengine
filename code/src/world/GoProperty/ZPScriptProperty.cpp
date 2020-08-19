@@ -88,14 +88,40 @@ void Engine::ZPScriptProperty::copyTo(Engine::GameObjectProperty* dest) {
 		new_handle->name = old_handle->name;
 		new_handle->_namespace = old_handle->_namespace;
 		memcpy(new_handle->value_ptr, old_handle->value_ptr, old_handle->size);
+		_dest->vars.push_back(new_handle);
 	}
 }
 
 void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
 	unsigned int offset = 1;
+	unsigned int vars = 0;
 
 	while (data[offset] != ' ' && data[offset] != '\n') {
 		script_path += data[offset];
 		offset++;
+	}
+	offset++;
+
+	script_res = game_data->resources->getScriptByLabel(script_path);
+	//makeGlobalVarsList();
+
+	memcpy(&vars, data + offset, sizeof(unsigned int));
+	offset += sizeof(unsigned int);
+	//read all variables data
+	for (unsigned int v_i = 0; v_i < vars; v_i++) {
+		int typeID = 0;
+		unsigned int index = 0;
+
+		memcpy(&index, data + offset, sizeof(unsigned int));
+		offset += sizeof(unsigned int);
+		memcpy(&typeID, data + offset, sizeof(int));
+		offset += sizeof(int);
+
+		Engine::GlobVarHandle* var = new Engine::GlobVarHandle(typeID);
+		var->index = index;
+		memcpy(var->value_ptr, data + offset, var->size);
+		offset += var->size;
+		
+		this->vars.push_back(var);
 	}
 }

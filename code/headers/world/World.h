@@ -48,6 +48,7 @@ enum class COLLIDER_TYPE {COLLIDER_TYPE_NONE,
 
 namespace Engine {
 class GameObject;
+class GameObjectSnapshot;
 class World;
 
 class TransformProperty;
@@ -103,6 +104,8 @@ public:
 class World{
 private:
 public:
+    std::vector<int> picked_objs_ids;
+
     PhysicalWorldSettings phys_settngs;
     PhysicalWorld* physical_world;
 
@@ -130,6 +133,9 @@ public:
     void clear();
 
     void trimObjectsList();
+    int getFreeObjectSpaceIndex();
+    bool isObjectLabelUnique(std::string label); //Get amount of objects with this label
+    void getAvailableNumObjLabel(std::string label, int* result);
 
     World();
     ~World();
@@ -174,6 +180,7 @@ public:
     void removeProperty(int index);
 
     GameObject* getChildObjectWithNodeLabel(std::string label);
+    void setMeshSkinningRootNodeRecursively(GameObject* rootNode);
 
     void clearAll(); //Release all associated memory with this object
     //remove deleted children from vector
@@ -219,9 +226,34 @@ public:
     void DrawMeshInstanced(RenderPipeline* pipeline, unsigned int inst_num);
     void setSkinningMatrices(RenderPipeline* pipeline);
 
+    //---------------------FOR EDITOR USE--------------------------------------------------------
+    void pick(); //Mark object and its children picked
+    void saveProperties(std::ofstream* stream); //Writes properties content at end of stream
+    void putToSnapshot(GameObjectSnapshot* snapshot);
+    void recoverFromSnapshot(Engine::GameObjectSnapshot* snapshot);
+
     GameObject();
+    ~GameObject();
 };
 
+class GameObjectSnapshot {
+public:
+    GameObject reserved_obj; //class object
+    std::vector<Engine::GameObjectLink> children; //Vector to store links to children of object
+    std::vector<GameObjectSnapshot> children_snapshots;
+    Engine::GameObjectProperty* properties[OBJ_PROPS_SIZE]; //pointers to properties of object
+    Engine::GameObjectProperty* scripts[OBJ_SCRIPT_PROPS_SIZE];
+
+    Engine::GameObjectLink parent_link;
+
+    int props_num; //number of properties
+    int scripts_num; //number of scripts
+
+    int obj_array_ind; //index in objects array
+
+    void clear();
+    GameObjectSnapshot();
+};
 
 class LabelProperty : public GameObjectProperty {
 public:
