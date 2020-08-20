@@ -9,11 +9,12 @@ Engine::ShadowCasterProperty::ShadowCasterProperty() {
     TextureHeight = 2048;
 
     shadow_bias = 0.005f;
-
     nearPlane = 1.0f;
     farPlane = 75.0f;
-
     projection_viewport = 20;
+
+    shadowBuffer = 0;
+    shadowDepthTexture = 0;
 }
 
 bool Engine::ShadowCasterProperty::isRenderAvailable() {
@@ -114,11 +115,15 @@ void Engine::ShadowCasterProperty::init() {
     this->initialized = true;
 }
 
+void Engine::ShadowCasterProperty::onObjectDeleted() {
+    glViewport(0, 0, TextureWidth, TextureHeight);
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer); //Bind framebuffer
+    glClear(GL_DEPTH_BUFFER_BIT);
+}
+
 void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pipeline) {
     if (!isRenderAvailable()) {
-        glViewport(0, 0, TextureWidth, TextureHeight);
-        glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer); //Bind framebuffer
-        glClear(GL_DEPTH_BUFFER_BIT);
+        onObjectDeleted();
         return;
     }
 
@@ -140,14 +145,13 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pip
     //Use shadowmap shader to draw objects
     pipeline->getShadowmapShader()->Use();
 
-    int dists[] = { 0, 20, 70, 100 };
+    float dists[] = { 40, 70, 110 };
     //iterate over all cascades
     for (unsigned int i = 0; i < 3; i++) {
-        ZSVECTOR3 cam_pos = cam->getCameraPosition() + cam->getCameraFrontVec() + 15 * (1 + i);
+        ZSVECTOR3 cam_pos = cam->getCameraPosition() - cam->getCameraFrontVec() * 15 * (1.f + (float)i);
         ZSMATRIX4x4 matview = matrixLookAt(cam_pos, cam_pos + light->direction * -1, ZSVECTOR3(0, 1, 0));
 
-
-        float w = projection_viewport * (1 + i);
+        float w = projection_viewport * (1 + i) * 1.5f;
         this->LightProjectionMat = getOrthogonal(-w, w, -w, w, nearPlane, farPlane);
 
         ZSMATRIX4x4 mat = matview * LightProjectionMat;

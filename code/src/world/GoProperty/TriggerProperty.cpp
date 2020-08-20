@@ -8,10 +8,7 @@ Engine::TriggerProperty::TriggerProperty() {
 }
 
 void Engine::TriggerProperty::onUpdate(float deltaTime) {
-    if (!created) {
-        initGhost();
-    }
-    else {
+    if (created) {
         //Get number of objects, that currently collide
         unsigned int overlaping = m_ghost->getNumOverlappingObjects();
         //Iterate over all overlapping objects
@@ -26,6 +23,11 @@ void Engine::TriggerProperty::onUpdate(float deltaTime) {
         }
     }
 }
+
+void Engine::TriggerProperty::onStart() {
+    initGhost();
+}
+
 void Engine::TriggerProperty::copyTo(Engine::GameObjectProperty* dest) {
     if (dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_TRIGGER) return;
 

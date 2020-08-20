@@ -8,7 +8,6 @@
 #include "../Scripting/AngelScript.hpp"
 
 namespace Engine {
-    void bindOPropertyScriptingToAngel(AGScriptMgr* mgr);
 enum class LIGHTSOURCE_TYPE {
     LIGHTSOURCE_TYPE_NONE,
     LIGHTSOURCE_TYPE_DIRECTIONAL,
@@ -164,6 +163,7 @@ public:
     void copyTo(Engine::GameObjectProperty* dest);
     void onValueChanged();
     void init();
+    void onObjectDeleted();
     void Draw(Engine::Camera* cam, RenderPipeline* pipeline);
     void setTexture();
     void setTextureSize();
@@ -228,6 +228,7 @@ public:
     void addPropertyInterfaceToInspector();
     void copyTo(Engine::GameObjectProperty* dest);
     void onUpdate(float deltaTime);
+    void onStart();
     Engine::TransformProperty* getTransformProperty();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
@@ -243,6 +244,7 @@ public:
 
     void addPropertyInterfaceToInspector();
     void onUpdate(float deltaTime);
+    void onStart();
     void copyTo(Engine::GameObjectProperty* dest);
     void onValueChanged();
     void onObjectDeleted(); //unregister in world
@@ -289,6 +291,7 @@ public:
     void copyTo(Engine::GameObjectProperty* dest);
     void initGhost();
     void onObjectDeleted(); //unregister in world
+    void onStart();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
 
@@ -358,6 +361,7 @@ public:
     void onAddToObject();
     void copyTo(Engine::GameObjectProperty* dest);
     void onUpdate(float deltaTime);
+    void onStart();
     
     void onMouseMotion(int posX, int posY, int screenY, bool isLeftButtonHold, bool isCtrlHold);
     void getPickedVertexId(int posX, int posY, int screenY, unsigned char* data);

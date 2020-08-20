@@ -11,17 +11,18 @@ Engine::RigidbodyProperty::RigidbodyProperty() {
     linearVel = ZSVECTOR3(0.f, 0.f, 0.f);
 }
 
-void Engine::RigidbodyProperty::onUpdate(float deltaTime) {
-    if (!created) {
-        //if uninitialized
-        if (init()) {
-            //if initialization suucessful
-            //then apply some settings
-            this->rigidBody->setGravity(btVector3(gravity.X, gravity.Y, gravity.Z));
-            this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
-        }
+void Engine::RigidbodyProperty::onStart() {
+    if (init()) {
+        //if initialization suucessful
+        //then apply some settings
+        this->rigidBody->setGravity(btVector3(gravity.X, gravity.Y, gravity.Z));
+        this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
     }
-    else {
+}
+
+void Engine::RigidbodyProperty::onUpdate(float deltaTime) {
+    if (created) {
+
         PhysicalProperty::onUpdate(deltaTime);
 
         Engine::TransformProperty* transform = this->go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();

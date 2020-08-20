@@ -8,8 +8,11 @@ void Engine::ColliderProperty::onObjectDeleted() {
 } //unregister in world
 
 void Engine::ColliderProperty::onUpdate(float deltaTime) {
-    if (!created)
-        init();
+
+}
+
+void Engine::ColliderProperty::onStart() {
+    init();
 }
 
 void Engine::ColliderProperty::copyTo(Engine::GameObjectProperty* dest) {
@@ -52,9 +55,9 @@ void Engine::ColliderProperty::loadPropertyFromMemory(const char* data, GameObje
         //Read custom translation vector
         memcpy(&transform_offset.X, data + offset, sizeof(float));
         offset += sizeof(float);
-        memcpy(&transform_offset.X, data + offset, sizeof(float));
+        memcpy(&transform_offset.Y, data + offset, sizeof(float));
         offset += sizeof(float);
-        memcpy(&transform_offset.X, data + offset, sizeof(float));
+        memcpy(&transform_offset.Z, data + offset, sizeof(float));
         offset += sizeof(float);
     }
 }

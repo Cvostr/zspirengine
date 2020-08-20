@@ -22,6 +22,8 @@ Engine::TerrainProperty::TerrainProperty(){
     edit_mode = 1;
 
     rigidBody = nullptr;
+    terrainUniformBuffer = nullptr;
+    transformBuffer = nullptr;
 }
 
 Engine::TerrainProperty::~TerrainProperty() {
@@ -178,4 +180,8 @@ void Engine::TerrainProperty::loadPropertyFromMemory(const char* data, GameObjec
     getTerrainData()->updateGrassBuffers();
 
     onValueChanged();
+}
+
+void Engine::TerrainProperty::onStart() {
+
 }

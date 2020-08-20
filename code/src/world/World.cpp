@@ -49,18 +49,14 @@ Engine::GameObject* Engine::World::addObject(GameObject obj){
     GameObject* newobj = new GameObject;
     *newobj = obj;
     //Getting index of free object space
-    unsigned int free_index = static_cast<unsigned int>(this->objects.size());
-    for(unsigned int obj_i = 0; obj_i < this->objects.size(); obj_i ++){
-        GameObject* obj_ptr = this->objects[obj_i];
-        if(obj_ptr->alive == false){
-            free_index = static_cast<unsigned int>(obj_i);
-        }
-    }
+    unsigned int free_index = getFreeObjectSpaceIndex();
     //all indices are busy by objects
     if(free_index == objects.size()){ 
         this->objects.push_back(newobj);
+        newobj->array_index = static_cast<int>(objects.size() - 1);
     }else{
         this->objects[free_index] = newobj;
+        newobj->array_index = free_index;
     }
 
     GameObject* obj_ptr = this->objects[free_index];
@@ -130,6 +126,17 @@ Engine::GameObject* Engine::World::dublicateObject(GameObject* original, bool pa
         new_obj->addProperty(prop_ptr->type);
         //Get created property
         auto new_prop = new_obj->getPropertyPtrByType(prop_ptr->type);
+        //start property copying
+        prop_ptr->copyTo(new_prop);
+    }
+    //Copying scripts data
+    for (unsigned int script_i = 0; script_i < original->scripts_num; script_i++) {
+        //Get pointer to original property
+        auto prop_ptr = original->scripts[script_i];
+        //register new property in new object
+        new_obj->addScript();
+        //Get created property
+        auto new_prop = new_obj->scripts[script_i];
         //start property copying
         prop_ptr->copyTo(new_prop);
     }
@@ -276,7 +283,7 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
             iter++; //Skip space
             //Spawn new property with readed type
             object_ptr->addScript();
-            auto script_ptr = object_ptr->scripts[object_ptr->scripts_num]; //get created property
+            auto script_ptr = object_ptr->scripts[object_ptr->scripts_num - 1]; //get created property
             //Read ACTIVE flag
             memcpy(&script_ptr->active, bytes + iter, sizeof(bool));
             iter += sizeof(bool);
@@ -402,13 +409,10 @@ int Engine::World::getFreeObjectSpaceIndex() {
     for (unsigned int objs_i = 0; objs_i < objects_num; objs_i++) {
         if (objects[objs_i]->alive == false) { //if object deleted
             index_to_push = objs_i; //set free index to index of deleted object
+            break;
         }
     }
 
-    if (index_to_push == objects.size()) { //if all indeces are busy
-        return static_cast<int>(objects.size());
-    }
-    else { //if vector has an empty space
-        return static_cast<int>(index_to_push);
-    }
+    //return result
+    return static_cast<int>(index_to_push);
 }

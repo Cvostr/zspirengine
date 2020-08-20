@@ -149,9 +149,18 @@ void Engine::AudioSourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr*
     result = mgr->RegisterObjectType(AUDSOURCE_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
     assert(result >= 0);
 
-    //result = mgr->RegisterObjectProperty(AUDSOURCE_PROP_TYPE_NAME, "float intensity", offsetof(LightsourceProperty, intensity));
-    //result = mgr->RegisterObjectProperty(AUDSOURCE_PROP_TYPE_NAME, "float range", offsetof(LightsourceProperty, range));
-    //result = mgr->RegisterObjectProperty(AUDSOURCE_PROP_TYPE_NAME, "float spot_angle", offsetof(LightsourceProperty, spot_angle));
-   // result = mgr->RegisterObjectProperty(AUDSOURCE_PROP_TYPE_NAME, "rgbColor color", offsetof(LightsourceProperty, color));
-
+    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void Play()", asMETHOD(AudioSourceProperty, audio_start), asCALL_THISCALL);
+    assert(result >= 0);
+    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void Stop()", asMETHOD(AudioSourceProperty, audio_stop), asCALL_THISCALL);
+    assert(result >= 0);
+    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void Pause()", asMETHOD(AudioSourceProperty, audio_pause), asCALL_THISCALL);
+    assert(result >= 0);
+    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "float getGain()", asMETHOD(AudioSourceProperty, getGain), asCALL_THISCALL);
+    assert(result >= 0);
+    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "float getPitch()", asMETHOD(AudioSourceProperty, getPitch), asCALL_THISCALL);
+    assert(result >= 0);
+    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void setPitch(float)", asMETHOD(AudioSourceProperty, setPitch), asCALL_THISCALL);
+    assert(result >= 0);
+    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void setGain(float)", asMETHOD(AudioSourceProperty, setGain), asCALL_THISCALL);
+    assert(result >= 0);
 }
