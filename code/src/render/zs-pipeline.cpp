@@ -267,7 +267,7 @@ void Engine::RenderPipeline::renderDepth(void* world_ptr){
     current_state = PIPELINE_STATE::PIPELINE_STATE_SHADOWDEPTH;
     //Iterate over all objects in the world
     for(unsigned int obj_i = 0; obj_i < _world_ptr->objects.size(); obj_i ++){
-        GameObject* obj_ptr = (GameObject*)_world_ptr->objects[obj_i];
+        GameObject* obj_ptr = _world_ptr->objects[obj_i];
         if(!obj_ptr->hasParent) //if it is a root object
             obj_ptr->processObject(this); //Draw object
     }
@@ -294,7 +294,7 @@ void Engine::GameObject::processObject(RenderPipeline* pipeline) {
     for (unsigned int obj_i = 0; obj_i < this->children.size(); obj_i++) {
         if (!children[obj_i].isEmpty()) { //if link isn't broken
             children[obj_i].updLinkPtr();
-            GameObject* child_ptr = (GameObject*)this->children[obj_i].ptr;
+            GameObject* child_ptr = this->children[obj_i].ptr;
             if (child_ptr == nullptr) return;
             child_ptr->processObject(pipeline);
         }
@@ -314,7 +314,7 @@ void Engine::GameObject::setSkinningMatrices(RenderPipeline* pipeline) {
             Engine::Bone* b = &mesh_prop->mesh_ptr->mesh_ptr->bones[bone_i];
 
             Engine::GameObject* node = nullptr;
-            GameObject* RootNode = (GameObject*)mesh_prop->skinning_root_node;
+            GameObject* RootNode = mesh_prop->skinning_root_node;
             ZSMATRIX4x4 rootNodeTransform;
 
             if (RootNode != nullptr) {
@@ -404,8 +404,6 @@ void Engine::MaterialProperty::onRender(Engine::RenderPipeline* pipeline){
 void Engine::SkyboxProperty::onPreRender(Engine::RenderPipeline* pipeline){
     pipeline->getRenderSettings()->skybox_obj_ptr = static_cast<void*>(this->go_link.updLinkPtr());
 }
-
-
 
 void Engine::SkyboxProperty::DrawSky(RenderPipeline* pipeline){
     if(!this->isActive())
@@ -662,6 +660,7 @@ Engine::GLframebuffer::GLframebuffer(unsigned int width, unsigned int height, bo
     this->Height = height;
 
     this->Depth = depth;
+    this->depthBuffer = 0;
     texture_size = 0;
 
     glGenFramebuffers(1, &fbuffer);

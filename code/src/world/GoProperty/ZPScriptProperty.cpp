@@ -16,6 +16,10 @@ void Engine::ZPScriptProperty::onStart() {
         script = new AGScript(game_data->script_manager, go_link.updLinkPtr(), "angel");
         script->compileFromResource(this->script_res);
 		script->obtainScriptModule();
+
+		if (script->hasCompilerErrors())
+			return;
+
 		//Write global variables
 		if(vars.size() > 0) {
 			//Send all global data to script

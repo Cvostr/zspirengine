@@ -128,7 +128,7 @@ bool TerrainData::loadFromFile(const char* file_path){
     std::ifstream world_stream;
     world_stream.open(file_path, std::ifstream::binary | std::ifstream::ate);
 
-    unsigned int size = world_stream.tellg();
+    unsigned int size = static_cast<unsigned int>(world_stream.tellg());
     char* data = new char[size];
     world_stream.seekg(0);
     world_stream.read(data, size);

@@ -151,6 +151,8 @@ void ZSpireEngine::loadGame(){
 
         game_data->world->loadFromMemory((const char*)world_resource->request->data, world_resource->request->size, game_data->pipeline->getRenderSettings());
     }
+    //call onStart on all objects
+    game_data->world->call_onStart();
 
     static uint64_t NOW = SDL_GetPerformanceCounter();
     static uint64_t last = 0;

@@ -46,6 +46,8 @@ namespace Engine {
     void bindGameObjectSDK(AGScriptMgr* mgr);
     void bindGameObjectPropertiesSDK(AGScriptMgr* mgr);
     void bindMathSDK(AGScriptMgr* mgr);
+    void bindResourcesSDK(AGScriptMgr* mgr);
+
     template<class T>
     void bindGameObjectPropertySDK(AGScriptMgr* mgr, const char* obj_type) {
         int result = 0;

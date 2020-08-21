@@ -61,9 +61,10 @@ void MessageCallback(const asSMessageInfo* msg, void* param)
 	std::string _msg = "(" + std::string(msg->section) + ") " + "(" + std::to_string(msg->row)
 		+ ":" + std::to_string(msg->col) + ") " + msg->message;
 	//send message string
-	game_data->out_manager->addConsoleLog(le_type, _msg, se_type);
+	if(game_data->out_manager != nullptr)
+		game_data->out_manager->addConsoleLog(le_type, _msg, se_type);
 
-	if (msg->type == asMSGTYPE_ERROR)
+	if (msg->type == asMSGTYPE_ERROR && game_data->out_manager != nullptr)
 		game_data->out_manager->spawnRuntimeError(RuntimeErrorType::RE_TYPE_SCRIPT_ERROR);
 }
 

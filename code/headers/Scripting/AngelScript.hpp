@@ -114,6 +114,7 @@ namespace Engine{
         void getGlobalVariable(unsigned int index, const char** name, const char** _namespace, int* typeID);
         
         bool compileFromResource(Engine::ScriptResource* res);
+        bool hasCompilerErrors();
 
         void onStart();
         void onUpdate();

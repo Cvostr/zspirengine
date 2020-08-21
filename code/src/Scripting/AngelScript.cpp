@@ -35,6 +35,10 @@ void AGScript::onStart() {
 	assert(r >= 0);
 }
 
+bool AGScript::hasCompilerErrors() {
+	return hasErrors;
+}
+
 void AGScript::onUpdate() {
 	if (hasErrors == true)
 		return;

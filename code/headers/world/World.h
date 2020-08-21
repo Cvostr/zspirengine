@@ -122,7 +122,9 @@ public:
     void removeObject(GameObject* obj); //Remove object from world
     GameObject* dublicateObject(GameObject* original, bool parent = true);
     GameObject* Instantiate(GameObject* original);
-    void addObjectsFromPrefab(std::string file);
+
+    void processPrefabObject(Engine::GameObject* object_ptr, std::vector<Engine::GameObject>* objects_array);
+    GameObject* addObjectsFromPrefab(char* data, unsigned int size);
 
     void call_onStart();
     void call_onStop();
@@ -261,7 +263,6 @@ public:
 
     void addPropertyInterfaceToInspector();
     void onValueChanged();
-    void onObjectDeleted();
     void copyTo(Engine::GameObjectProperty* dest);
     void loadPropertyFromMemory(const char* data, Engine::GameObject* obj);
 

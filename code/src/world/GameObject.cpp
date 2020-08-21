@@ -428,7 +428,7 @@ void Engine::GameObject::putToSnapshot(GameObjectSnapshot* snapshot) {
     for (unsigned int i = 0; i < this->children.size(); i++) {
         snapshot->children.push_back(this->children[i]);
         //Call putToSnapshot() on object
-        static_cast<GameObject*>(children[i].ptr)->putToSnapshot(&snapshot->children_snapshots[i]);
+        children[i].ptr->putToSnapshot(&snapshot->children_snapshots[i]);
     }
 }
 
@@ -438,7 +438,7 @@ void Engine::GameObject::setMeshSkinningRootNodeRecursively(GameObject* rootNode
         mesh->skinning_root_node = rootNode;
 
     for (unsigned int ch_i = 0; ch_i < children.size(); ch_i++) {
-        GameObject* obj_ptr = (GameObject*)children[ch_i].updLinkPtr();
+        GameObject* obj_ptr = children[ch_i].updLinkPtr();
         obj_ptr->setMeshSkinningRootNodeRecursively(rootNode);
     }
 }

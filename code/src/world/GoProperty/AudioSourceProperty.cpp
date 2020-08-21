@@ -148,7 +148,7 @@ void Engine::AudioSourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr*
     int result = 0;
     result = mgr->RegisterObjectType(AUDSOURCE_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
     assert(result >= 0);
-
+    /*
     result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void Play()", asMETHOD(AudioSourceProperty, audio_start), asCALL_THISCALL);
     assert(result >= 0);
     result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void Stop()", asMETHOD(AudioSourceProperty, audio_stop), asCALL_THISCALL);
@@ -162,5 +162,5 @@ void Engine::AudioSourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr*
     result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void setPitch(float)", asMETHOD(AudioSourceProperty, setPitch), asCALL_THISCALL);
     assert(result >= 0);
     result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void setGain(float)", asMETHOD(AudioSourceProperty, setGain), asCALL_THISCALL);
-    assert(result >= 0);
+    assert(result >= 0);*/
 }

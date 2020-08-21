@@ -15,8 +15,14 @@ ZSVECTOR3* newvec_xyz(float x, float y, float z) {
 	return new ZSVECTOR3(x, y, z);
 }
 
-ZSRGBCOLOR* newcolor() {
-	return new ZSRGBCOLOR();
+static void newcolor(ZSRGBCOLOR* ptr) {
+	new (ptr) ZSRGBCOLOR();
+}
+
+void delcolor(void* memory)
+{
+	// Uninitialize the memory by calling the object destructor
+	((ZSRGBCOLOR*)memory)->~ZSRGBCOLOR();
 }
 
 void Engine::bindGameObjectSDK(AGScriptMgr* mgr) {
@@ -58,14 +64,25 @@ void Engine::bindMathSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectProperty(VEC3_TYPE_NAME, "float x", offsetof(ZSVECTOR3, X));
 	mgr->RegisterObjectProperty(VEC3_TYPE_NAME, "float y", offsetof(ZSVECTOR3, Y));
 	mgr->RegisterObjectProperty(VEC3_TYPE_NAME, "float z", offsetof(ZSVECTOR3, Z));
-	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, " void Normalize()", asMETHOD(ZSVECTOR3, Normalize), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, "void Normalize()", asMETHOD(ZSVECTOR3, Normalize), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, "Vec3@ opAddAssign(Vec3@)", asMETHOD(ZSVECTOR3, operator+=), asCALL_THISCALL);
 	//Bind RGB color
-	result = mgr->RegisterObjectType(RGBCOLOR_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+	result = mgr->RegisterObjectType(RGBCOLOR_TYPE_NAME, sizeof(ZSRGBCOLOR), asOBJ_VALUE);
 	assert(result >= 0);
-	result = mgr->RegisterObjectBehaviour(RGBCOLOR_TYPE_NAME, asBEHAVE_FACTORY, "rgbColor@ new_col()", asFUNCTION(newcolor), asCALL_CDECL);
+	result = mgr->RegisterObjectBehaviour(RGBCOLOR_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(newcolor), asCALL_CDECL_OBJLAST);
 	assert(result >= 0);
-	mgr->RegisterObjectProperty(RGBCOLOR_TYPE_NAME, "int r", offsetof(ZSRGBCOLOR, r));
-	mgr->RegisterObjectProperty(RGBCOLOR_TYPE_NAME, "int g", offsetof(ZSRGBCOLOR, g));
-	mgr->RegisterObjectProperty(RGBCOLOR_TYPE_NAME, "int b", offsetof(ZSRGBCOLOR, b));
+	result = mgr->RegisterObjectBehaviour(RGBCOLOR_TYPE_NAME, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(delcolor), asCALL_CDECL_OBJLAST);
+	assert(result >= 0);
+	result = mgr->RegisterObjectMethod(RGBCOLOR_TYPE_NAME, "rgbColor &opAssign(rgbColor &in)", asMETHODPR(ZSRGBCOLOR, operator =, (ZSRGBCOLOR), ZSRGBCOLOR&), asCALL_THISCALL);
+	assert(result >= 0);
+	result = mgr->RegisterObjectProperty(RGBCOLOR_TYPE_NAME, "int r", offsetof(ZSRGBCOLOR, r));
+	assert(result >= 0);
+	result = mgr->RegisterObjectProperty(RGBCOLOR_TYPE_NAME, "int g", offsetof(ZSRGBCOLOR, g));
+	assert(result >= 0);
+	result = mgr->RegisterObjectProperty(RGBCOLOR_TYPE_NAME, "int b", offsetof(ZSRGBCOLOR, b));
+	assert(result >= 0);
+}
+
+void Engine::bindResourcesSDK(AGScriptMgr* mgr) {
+
 }

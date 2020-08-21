@@ -182,14 +182,10 @@ Engine::GameObject* Engine::World::Instantiate(GameObject* original){
 void Engine::World::clear() {
     //iterate over all objects and purge them all
     for (unsigned int objs_i = 0; objs_i < objects.size(); objs_i++) {
-        GameObject* obj_ptr = (GameObject*)objects[objs_i];
+        GameObject* obj_ptr = objects[objs_i];
         removeObject(obj_ptr);
     }
     objects.clear();
-}
-
-void Engine::World::addObjectsFromPrefab(std::string file){
-
 }
 
 void Engine::World::loadFromFile(std::string file, RenderSettings* settings_ptr){
@@ -415,4 +411,88 @@ int Engine::World::getFreeObjectSpaceIndex() {
 
     //return result
     return static_cast<int>(index_to_push);
+}
+
+void Engine::World::processPrefabObject(Engine::GameObject* object_ptr, std::vector<Engine::GameObject>* objects_array) {
+    unsigned int props_amount = object_ptr->props_num;
+    //iterate over all props and update gameobject links
+    for (unsigned int prop_i = 0; prop_i < props_amount; prop_i++) {
+        Engine::GameObjectProperty* prop_ptr = object_ptr->properties[prop_i];
+        prop_ptr->go_link.obj_str_id = object_ptr->str_id; //set new string id
+
+        prop_ptr->go_link.updLinkPtr();
+    }
+    //Obtain amount of objects
+    unsigned int children_amount = static_cast<unsigned int>(object_ptr->children.size());
+    //Iterate over all objects
+    for (unsigned int chi_i = 0; chi_i < children_amount; chi_i++) {
+        Engine::GameObjectLink link = object_ptr->children[chi_i];
+        //find object with same string name as in link
+        for (unsigned int obj_i = 0; obj_i < objects_array->size(); obj_i++) {
+            Engine::GameObject* _object_ptr = &objects_array->at(obj_i);
+            if (_object_ptr->str_id.compare(link.obj_str_id) == 0) { //we found object
+                genRandomString(&_object_ptr->str_id, 15); //generate new string ID
+                object_ptr->children[chi_i].obj_str_id = _object_ptr->str_id; //update string id in children array
+                _object_ptr->parent.obj_str_id = object_ptr->str_id; //update string ID of parent link
+                _object_ptr->hasParent = true;
+
+                processPrefabObject(_object_ptr, objects_array);
+            }
+        }
+    }
+}
+
+Engine::GameObject* Engine::World::addObjectsFromPrefab(char* data, unsigned int size) {
+    unsigned int iter = 0;
+    std::string test_header;
+    //Read header
+    while (data[iter] != ' ' && data[iter] != '\n') {
+        test_header += data[iter];
+        iter++;
+    }
+
+    if (test_header.compare("ZSPIRE_PREFAB") != 0) //If it isn't zspire scene
+        return nullptr; //Go out, we have nothing to do
+    iter++;
+    //array for objects
+    std::vector<Engine::GameObject> mObjects;
+
+    while (iter < size) { //until file is over
+        std::string prefix;
+        //read prefix
+        while (data[iter] == ' ' || data[iter] == '\n') {
+            iter++;
+        }
+        while (data[iter] != ' ' && data[iter] != '\n') {
+            prefix += data[iter];
+            iter++;
+        }
+        //if we found an object
+        if (!prefix.compare("G_OBJECT")) {
+            Engine::GameObject obj;
+            this->loadGameObjectFromMemory(&obj, data + iter, size - iter);
+            mObjects.push_back(obj);
+        }
+    }
+
+    genRandomString(&mObjects[0].str_id, 15); //generate new string ID for first object
+    processPrefabObject(&mObjects[0], &mObjects);
+    //iterate over all objects and push them to world
+    for (unsigned int obj_i = 0; obj_i < mObjects.size(); obj_i++) {
+        std::string label = *mObjects[obj_i].label_ptr;
+        int add_num = 0; //Declaration of addititonal integer
+        getAvailableNumObjLabel(label, &add_num);
+
+        *mObjects[obj_i].label_ptr += std::to_string(add_num); //Set new label to object
+
+        Engine::GameObject* newObjPtr = this->addObject(mObjects[obj_i]);
+    }
+    Engine::GameObject* object = this->getGameObjectByStrId(mObjects[0].str_id);
+
+    for (unsigned int obj_i = 1; obj_i < mObjects.size(); obj_i++) {
+        Engine::GameObject* object_ptr = this->getGameObjectByStrId(mObjects[obj_i].str_id);
+        object_ptr->parent.world_ptr = this;
+    }
+    object->setMeshSkinningRootNodeRecursively(object);
+    return object;
 }

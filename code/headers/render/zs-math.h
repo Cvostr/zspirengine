@@ -44,6 +44,12 @@
 			Y += r.Y;
 			Z += r.Z;
 		}
+		ZSVECTOR3& operator=(ZSVECTOR3 r) {
+			X = r.X;
+			Y = r.Y;
+			Z = r.Z;
+			return *this;
+		}
 
         ZSVECTOR3(){
             X = 0;
@@ -186,6 +192,16 @@
 		float gl_a;
 
 		void updateGL();
+
+
+		ZSRGBCOLOR& operator=(ZSRGBCOLOR r) {
+			this->r = r.r;
+			g = r.g;
+			b = r.b;
+			a = r.a;
+			this->updateGL();
+			return *this;
+		}
 
 		ZSRGBCOLOR(int r, int g, int b, int a) {
 			this->r = r;
