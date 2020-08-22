@@ -12,7 +12,8 @@
 #include <iostream>
 
 #define AG_STRING 67108876
-#define AG_VECTOR3 1140850705
+#define AG_VECTOR3 67108881
+#define AG_RGB_COLOR 67108882
 
 namespace Engine{
 
@@ -34,9 +35,9 @@ namespace Engine{
                 memcpy(address, value_ptr, size);
             }
             else {
-                void* moved = address;
-                uint64_t* vc = (uint64_t*)(*((uint64_t*)address));
-                memcpy(vc, value_ptr, sizeof(ZSVECTOR3));
+                //void* moved = address;
+                ///uint64_t* vc = (uint64_t*)(*((uint64_t*)address));
+                //memcpy(vc, value_ptr, sizeof(ZSVECTOR3));
             }
         }
         void updValue() {
@@ -44,9 +45,9 @@ namespace Engine{
                 memcpy(value_ptr, address, size);
             }
             else {
-                void* moved = address;
-                uint64_t* vc = (uint64_t*)(*((uint64_t*)address));
-                memcpy(value_ptr, vc, sizeof(ZSVECTOR3));
+                //void* moved = address;
+               // uint64_t* vc = (uint64_t*)(*((uint64_t*)address));
+               // memcpy(value_ptr, vc, sizeof(ZSVECTOR3));
             }
         }
 
@@ -78,7 +79,10 @@ namespace Engine{
             case AG_VECTOR3:
                 size = sizeof(ZSVECTOR3);
                 value_ptr = new ZSVECTOR3;
-                isRef = true;
+                break;
+            case AG_RGB_COLOR:
+                size = sizeof(ZSRGBCOLOR);
+                value_ptr = new ZSRGBCOLOR;
                 break;
             case AG_STRING:
                 size = sizeof(std::string);

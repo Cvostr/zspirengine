@@ -75,5 +75,4 @@ void Engine::LightsourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr*
     result = mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float range", offsetof(LightsourceProperty, range));
     result = mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float spot_angle", offsetof(LightsourceProperty, spot_angle));
     result = mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "rgbColor color", offsetof(LightsourceProperty, color));
-    assert(result >= 0);
 }

@@ -79,9 +79,12 @@ AGScriptMgr::AGScriptMgr() {
 
 	bindGameObjectSDK(this);
 	bindMathSDK(this);
+	bindResourcesSDK(this);
 	bindGameObjectPropertySDK<TransformProperty>(this, TRANSFORM_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<LightsourceProperty>(this, LIGHTSOURCE_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<AudioSourceProperty>(this, AUDSOURCE_PROP_TYPE_NAME);
+	bindGameObjectPropertySDK<CharacterControllerProperty>(this, CHAR_CTRL_PROP_TYPE_NAME);
+
 	bindGameObjectPropertiesSDK(this);
 
 	r = RegisterGlobalFunction("void print(?&in, ?&in)", asFUNCTION(printToConsole), asCALL_GENERIC);
@@ -109,8 +112,8 @@ int AGScriptMgr::RegisterObjectBehaviour(const char* obj, asEBehaviours behaviou
 	return ag_engine->RegisterObjectBehaviour(obj, behaviour, declaration, funcPointer, callConv, auxiliary, compositeOffset, isCompositeIndirect);
 }
 
-int AGScriptMgr::RegisterObjectMethod(const char* obj, const char* declaration, const asSFuncPtr& funcPointer, asDWORD callConv, void* auxiliary, int compositeOffset, bool isCompositeIndirect) {
-	return ag_engine->RegisterObjectMethod(obj, declaration, funcPointer, callConv, auxiliary, compositeOffset, isCompositeIndirect);
+int AGScriptMgr::RegisterObjectMethod(const char* obj, std::string declaration, const asSFuncPtr& funcPointer, asDWORD callConv, void* auxiliary, int compositeOffset, bool isCompositeIndirect) {
+	return ag_engine->RegisterObjectMethod(obj, declaration.c_str(), funcPointer, callConv, auxiliary, compositeOffset, isCompositeIndirect);
 }
 
 int AGScriptMgr::RegisterGlobalProperty(const char* declaration, void* pointer) {

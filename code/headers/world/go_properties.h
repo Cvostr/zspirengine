@@ -278,6 +278,7 @@ public:
     void walk(float x, float z);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
+    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     CharacterControllerProperty();
 };

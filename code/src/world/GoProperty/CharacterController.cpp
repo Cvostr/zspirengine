@@ -134,3 +134,14 @@ void Engine::CharacterControllerProperty::loadPropertyFromMemory(const char* dat
     offset += sizeof(float);
 
 }
+
+void Engine::CharacterControllerProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    int result = 0;
+    result = mgr->RegisterObjectType(CHAR_CTRL_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+    assert(result >= 0);
+
+    result = mgr->RegisterObjectProperty(CHAR_CTRL_PROP_TYPE_NAME, "float gravity", offsetof(CharacterControllerProperty, gravity));
+    result = mgr->RegisterObjectProperty(CHAR_CTRL_PROP_TYPE_NAME, "float linearVelocity", offsetof(CharacterControllerProperty, linearVel));
+    result = mgr->RegisterObjectMethod(CHAR_CTRL_PROP_TYPE_NAME, "void Jump(float)", asMETHOD(CharacterControllerProperty, jump), asCALL_THISCALL);
+    result = mgr->RegisterObjectMethod(CHAR_CTRL_PROP_TYPE_NAME, "void Walk(float, float)", asMETHOD(CharacterControllerProperty, walk), asCALL_THISCALL);
+}

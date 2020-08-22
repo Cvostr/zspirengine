@@ -39,7 +39,7 @@
 			Z *= invrt;
 		}
 
-		void operator+=(ZSVECTOR3& r) {
+		void operator+=(ZSVECTOR3 r) {
 			X += r.X;
 			Y += r.Y;
 			Z += r.Z;

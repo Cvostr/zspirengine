@@ -129,12 +129,13 @@ void Engine::TransformProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* m
     assert(result >= 0);
 
     result = mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 translation", offsetof(TransformProperty, translation));
+    assert(result >= 0);
     result = mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 scale", offsetof(TransformProperty, scale));
     result = mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 rotation", offsetof(TransformProperty, rotation));
 
-    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setTranslation(Vec3@)", asMETHOD(TransformProperty, setTranslation), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setScale(Vec3@)", asMETHOD(TransformProperty, setScale), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setRotation(Vec3@)", asMETHOD(TransformProperty, setRotation), asCALL_THISCALL);
+    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setTranslation(Vec3 &in)", asMETHOD(TransformProperty, setTranslation), asCALL_THISCALL);
+    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setScale(Vec3 &in)", asMETHOD(TransformProperty, setScale), asCALL_THISCALL);
+    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setRotation(Vec3 &in)", asMETHOD(TransformProperty, setRotation), asCALL_THISCALL);
     assert(result >=0 );
 }
 
