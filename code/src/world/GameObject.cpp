@@ -105,6 +105,12 @@ void Engine::GameObject::removeProperty(int index){
     props_num -= 1;
 }
 
+void Engine::GameObject::removeProperty(Engine::GameObjectProperty* pProp) {
+    for (unsigned int i = 0; i < props_num; i++) {
+        if (properties[i] == pProp)
+            removeProperty(i);
+    }
+}
 
 void Engine::GameObject::addChildObject(GameObjectLink link, bool updTransform){
     GameObjectLink _link = link;

@@ -6,6 +6,7 @@
 #include <string>
 
 #define GAME_OBJECT_TYPE_NAME "GameObject"
+#define WORLD_TYPE_NAME "World"
 #define GAME_OBJECT_PROP_TYPE_NAME "GameObjectProperty"
 
 #define RESOURCE_TYPE_NAME "Resource"
@@ -14,13 +15,19 @@
 #define AUDRESOURCE_TYPE_NAME "AudioResource"
 
 #define VEC3_TYPE_NAME "Vec3"
+#define QUAT_TYPE_NAME "Quat"
 #define RGBCOLOR_TYPE_NAME "rgbColor"
 #define CAM_TYPE_NAME "Camera"
+#define KEY_TYPE_NAME "Key"
+#define MOUSE_STATE_NAME "MouseState"
 
 #define TRANSFORM_PROP_TYPE_NAME "Transform"
 #define LIGHTSOURCE_PROP_TYPE_NAME "LightSource"
 #define AUDSOURCE_PROP_TYPE_NAME "AudioSource"
 #define CHAR_CTRL_PROP_TYPE_NAME "CharacterController"
+#define ANIM_PROP_TYPE_NAME "Animation"
+#define MESH_PROP_TYPE_NAME "Mesh"
+#define MAT_PROP_TYPE_NAME "Material"
 
 namespace Engine {
     class AGScriptMgr {
@@ -44,6 +51,9 @@ namespace Engine {
                                 asDWORD 	callConv,
                                 void* auxiliary = 0);
 
+        int RegisterEnum(const char* type);
+        int RegisterEnumValue(const char* type, const char* name, int value);
+
         asIScriptModule* GetModule(std::string module,
             asEGMFlags 	flag = asGM_ONLY_IF_EXISTS
         );
@@ -52,11 +62,12 @@ namespace Engine {
         ~AGScriptMgr();
     };
     void bindGameObjectSDK(AGScriptMgr* mgr);
+    void bindWorldSDK(AGScriptMgr* mgr);
     void bindGameObjectPropertiesSDK(AGScriptMgr* mgr);
     void bindMathSDK(AGScriptMgr* mgr);
-    //template <typename T>
     void bindResourceSDK(const char* className, AGScriptMgr* mgr);
     void bindResourcesSDK(AGScriptMgr* mgr);
+    void bindInputSDK(AGScriptMgr* mgr);
 
     template<class T>
     void bindGameObjectPropertySDK(AGScriptMgr* mgr, const char* obj_type) {

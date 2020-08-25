@@ -321,6 +321,7 @@ public:
     void updateAnimationPtr();
     void updateNodeTransform(GameObject* obj, ZSMATRIX4x4 parent);
 
+    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
     void loadPropertyFromMemory(const char* data, GameObject* obj);
 
     AnimationProperty();

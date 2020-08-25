@@ -180,6 +180,7 @@ public:
     int getAliveChildrenAmount(); //Gets current amount of children objects (exclude removed chidren)
     //Remove property with type
     void removeProperty(int index);
+    void removeProperty(Engine::GameObjectProperty* pProp);
 
     GameObject* getChildObjectWithNodeLabel(std::string label);
     void setMeshSkinningRootNodeRecursively(GameObject* rootNode);

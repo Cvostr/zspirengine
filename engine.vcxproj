@@ -175,6 +175,7 @@
     <ClCompile Include="code\src\Scripting\AngelScript.cpp" />
     <ClCompile Include="code\src\Scripting\AngelScriptMgr.cpp" />
     <ClCompile Include="code\src\Scripting\GameObjectAG.cpp" />
+    <ClCompile Include="code\src\Scripting\InputAG.cpp" />
     <ClCompile Include="code\src\ui\zs-uibutton.cpp" />
     <ClCompile Include="code\src\ui\zs-uiwidget.cpp" />
     <ClCompile Include="code\src\vulkan\vk_mesh.cpp" />
@@ -221,11 +222,13 @@
     <ClInclude Include="code\headers\misc\RefCounter.hpp" />
     <ClInclude Include="code\headers\misc\zs3m-master.h" />
     <ClInclude Include="code\headers\ogl\ogl.h" />
+    <ClInclude Include="code\headers\render\screen_effects\gauss_blur.h" />
     <ClInclude Include="code\headers\render\zs-animation.h" />
     <ClInclude Include="code\headers\render\zs-materials.h" />
     <ClInclude Include="code\headers\render\zs-math.h" />
     <ClInclude Include="code\headers\render\zs-mesh.h" />
     <ClInclude Include="code\headers\render\zs-pipeline.h" />
+    <ClInclude Include="code\headers\render\zs-screen-effect.h" />
     <ClInclude Include="code\headers\render\zs-shader.h" />
     <ClInclude Include="code\headers\render\zs-texture.h" />
     <ClInclude Include="code\headers\render\zs-uniform-buffer.h" />

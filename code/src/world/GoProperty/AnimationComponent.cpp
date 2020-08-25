@@ -128,3 +128,12 @@ void Engine::AnimationProperty::loadPropertyFromMemory(const char* data, GameObj
     }
     updateAnimationPtr();
 }
+
+void Engine::AnimationProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    int result = 0;
+    result = mgr->RegisterObjectType(ANIM_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+    assert(result >= 0);
+
+    result = mgr->RegisterObjectMethod(ANIM_PROP_TYPE_NAME, "void Play()", asMETHOD(AnimationProperty, play), asCALL_THISCALL);
+    result = mgr->RegisterObjectMethod(ANIM_PROP_TYPE_NAME, "void Stop()", asMETHOD(AnimationProperty, stop), asCALL_THISCALL);
+    }

@@ -79,11 +79,14 @@ AGScriptMgr::AGScriptMgr() {
 
 	bindGameObjectSDK(this);
 	bindMathSDK(this);
+	bindWorldSDK(this);
 	bindResourcesSDK(this);
+	bindInputSDK(this);
 	bindGameObjectPropertySDK<TransformProperty>(this, TRANSFORM_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<LightsourceProperty>(this, LIGHTSOURCE_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<AudioSourceProperty>(this, AUDSOURCE_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<CharacterControllerProperty>(this, CHAR_CTRL_PROP_TYPE_NAME);
+	bindGameObjectPropertySDK<AnimationProperty>(this, ANIM_PROP_TYPE_NAME);
 
 	bindGameObjectPropertiesSDK(this);
 
@@ -132,6 +135,13 @@ bool AGScriptMgr::RegisterGlobalFunction(std::string func_name,
 	int result = ag_engine->RegisterGlobalFunction(func_name.c_str(), funcPointer, callConv, auxiliary);
 
 	return (result >= 0);
+}
+
+int AGScriptMgr::RegisterEnum(const char* type) {
+	return ag_engine->RegisterEnum(type);
+}
+int AGScriptMgr::RegisterEnumValue(const char* type, const char* name, int value) {
+	return ag_engine->RegisterEnumValue(type, name, value);
 }
 
 asIScriptModule* AGScriptMgr::GetModule(std::string module, asEGMFlags 	flag) {

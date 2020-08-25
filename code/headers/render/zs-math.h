@@ -91,6 +91,14 @@
             this->Z = z;
             this->W = w;
         }
+
+		ZSQUATERNION& operator=(ZSQUATERNION r) {
+			X = r.X;
+			Y = r.Y;
+			Z = r.Z;
+			W = r.W;
+			return *this;
+		}
     };
 
 	typedef struct ZSVECTOR4 {

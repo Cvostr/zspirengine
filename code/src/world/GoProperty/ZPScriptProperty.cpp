@@ -13,10 +13,10 @@ Engine::ZPScriptProperty::~ZPScriptProperty() {
 }
 void Engine::ZPScriptProperty::onStart() {
     if (script_res != nullptr) {
-        script = new AGScript(game_data->script_manager, go_link.updLinkPtr(), "angel");
+        script = new AGScript(game_data->script_manager, go_link.updLinkPtr(), script_res->rel_path);
         script->compileFromResource(this->script_res);
 		script->obtainScriptModule();
-
+		//if script contains errors, then stop further activity 
 		if (script->hasCompilerErrors())
 			return;
 
@@ -30,9 +30,9 @@ void Engine::ZPScriptProperty::onStart() {
 		}
 		//call onStart() inside script
         script->onStart(); 
-		if(vars.size() == 0)
+		//if(vars.size() == 0)
 			//update vars list
-			makeGlobalVarsList();
+		//	makeGlobalVarsList();
 		
     }
 }

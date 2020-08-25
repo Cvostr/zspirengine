@@ -16,7 +16,7 @@ void Engine::LightsourceProperty::copyTo(Engine::GameObjectProperty* dest) {
 void Engine::LightsourceProperty::onPreRender(Engine::RenderPipeline* pipeline) {
     Engine::TransformProperty* transform_prop = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
 
-    pipeline->addLight(static_cast<void*>(this)); //put light pointer to vector
+    pipeline->addLight(this); //put light pointer to vector
 
     //check, if light transformation changed
     if ((this->last_pos != transform_prop->abs_translation || this->last_rot != transform_prop->rotation)) {

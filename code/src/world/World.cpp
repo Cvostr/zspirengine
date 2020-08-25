@@ -290,6 +290,8 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
 }
 
 void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderSettings* settings_ptr) {
+    //Clear all objects
+    clear();
     unsigned int iter = 0;
     std::string test_header;
     //Read header
