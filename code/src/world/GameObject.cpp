@@ -112,6 +112,27 @@ void Engine::GameObject::removeProperty(Engine::GameObjectProperty* pProp) {
     }
 }
 
+void Engine::GameObject::removeScript(int index) {
+    auto script_ptr = this->scripts[index];
+    //Call onObjectDeleted() on removing property
+    script_ptr->onObjectDeleted();
+    delete this->scripts[index];
+    //set as deleted
+    this->scripts[index] = nullptr;
+    //Trim properties pointers vector
+    for (unsigned int i = static_cast<unsigned int>(index); i < scripts_num - 1; i++) {
+        scripts[i] = scripts[i + 1];
+    }
+    //Reduce variable props_num
+    scripts_num -= 1;
+}
+void Engine::GameObject::removeScript(Engine::GameObjectProperty* pProp) {
+    for (unsigned int i = 0; i < scripts_num; i++) {
+        if (scripts[i] == pProp)
+            removeScript(i);
+    }
+}
+
 void Engine::GameObject::addChildObject(GameObjectLink link, bool updTransform){
     GameObjectLink _link = link;
     _link.updLinkPtr(); //Calculating object pointer

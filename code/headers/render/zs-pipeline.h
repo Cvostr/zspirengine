@@ -12,8 +12,7 @@
 #include "../world/zs-camera.h"
 #include "../../headers/engine/resources.h"
 #include <vector>
-
-#define MAX_RENDERER_ATTACHMENT_COUNT 7
+#include "zs-screen-effect.h"
 
 enum class PIPELINE_STATE {
     PIPELINE_STATE_DEFAULT,
@@ -40,38 +39,16 @@ struct RenderSettings {
     }
 };
 
-class GLframebuffer {
-private:
-    GLuint fbuffer;
-    GLuint depthBuffer;
 
-    unsigned int texture_size;
-
-    unsigned int Width;
-    unsigned int Height;
-
-    bool Depth;
-
-public:
-
-    GLuint textures[MAX_RENDERER_ATTACHMENT_COUNT];
-
-    void bind();
-
-    void bindTextures(unsigned int m);
-
-    void addTexture(GLint intFormat = GL_RGBA8, GLint format = GL_RGBA);
-
-    ~GLframebuffer();
-    GLframebuffer(unsigned int width, unsigned int height, bool depth);
-};
 
 class RenderPipeline : public EngineComponentManager{
 protected:
     //Vector to store lights
     std::vector<void*> lights_ptr;
     RenderSettings render_settings;
+
     GLframebuffer* gbuffer;
+    GLframebuffer* df_light_buffer;
 
     void setLightsToBuffer();
     void updateShadersCameraInfo(Engine::Camera* cam_ptr);
@@ -114,6 +91,8 @@ public:
     Engine::Shader* getTileShader();
     Engine::Shader* getShadowmapShader();
     Engine::Shader* getUiShader();
+
+    void processObjects(void* world_ptr);
 
     void addLight(void* light_ptr);
     void removeLights();

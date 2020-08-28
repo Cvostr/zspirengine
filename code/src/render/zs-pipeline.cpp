@@ -123,8 +123,12 @@ void Engine::RenderPipeline::create_G_Buffer(unsigned int width, unsigned int he
     gbuffer->addTexture(GL_RGBA8, GL_RGBA); //Diffuse map
     gbuffer->addTexture(GL_RGB16F, GL_RGB); //Normal map
     gbuffer->addTexture(GL_RGB16F, GL_RGB); //Position map
-    gbuffer->addTexture(GL_RGBA, GL_RGBA); //Position frame
+    gbuffer->addTexture(GL_RGBA, GL_RGBA); //Transparent map
     gbuffer->addTexture(GL_RGBA, GL_RGBA); //Masks map
+
+    df_light_buffer = new GLframebuffer(width, height, false);
+    df_light_buffer->addTexture(GL_RGBA, GL_RGBA); //Diffuse map
+    df_light_buffer->addTexture(GL_RGB, GL_RGB); //Bloom map
 }
 
 void Engine::RenderPipeline::destroy(){
@@ -153,8 +157,6 @@ void Engine::RenderPipeline::destroy(){
 
         delete gbuffer;
     }
-
-    //freeDefaultMeshes();
 }
 
 void Engine::RenderPipeline::setLightsToBuffer(){
@@ -219,11 +221,7 @@ void Engine::RenderPipeline::render2D(){
         ClearFBufferGL(true, true);
 
         //Iterate over all objects in the world
-        for(unsigned int obj_i = 0; obj_i < world_ptr->objects.size(); obj_i ++){
-            GameObject* obj_ptr = world_ptr->objects[obj_i];
-            if(!obj_ptr->hasParent) //if it is a root object
-                obj_ptr->processObject(this); //Draw object
-        }
+        processObjects(world_ptr);
     }
 }
 void Engine::RenderPipeline::render3D(Engine::Camera* cam){
@@ -244,33 +242,36 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
     setDepthState(true);
     setFaceCullState(true);
     //Iterate over all objects in the world
-    for(unsigned int obj_i = 0; obj_i < world_ptr->objects.size(); obj_i ++){
-        GameObject* obj_ptr = world_ptr->objects[obj_i];
-        if(!obj_ptr->hasParent) //if it is a root object
-        obj_ptr->processObject(this); //Draw object
-    }
+    processObjects(world_ptr);
     //Disable depth rendering to draw plane correctly
     setDepthState(false);
     setFaceCullState(false);
 
+    //df_light_buffer->bind();
     glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
     ClearFBufferGL(true, false); //Clear screen
     gbuffer->bindTextures(10); //Bind gBuffer textures
     deffered_light->Use(); //use deffered shader
 
+    //df_light_buffer->bindTextures(0);
     Engine::getPlaneMesh2D()->Draw(); //Draw screen
 
+}
+
+void Engine::RenderPipeline::processObjects(void* world_ptr) {
+    World* _world_ptr = static_cast<World*>(world_ptr);
+    for (unsigned int obj_i = 0; obj_i < _world_ptr->objects.size(); obj_i++) {
+        GameObject* obj_ptr = _world_ptr->objects[obj_i];
+        if (!obj_ptr->hasParent) //if it is a root object
+            obj_ptr->processObject(this); //Draw object
+    }
 }
 
 void Engine::RenderPipeline::renderDepth(void* world_ptr){
     World* _world_ptr = static_cast<World*>(world_ptr);
     current_state = PIPELINE_STATE::PIPELINE_STATE_SHADOWDEPTH;
     //Iterate over all objects in the world
-    for(unsigned int obj_i = 0; obj_i < _world_ptr->objects.size(); obj_i ++){
-        GameObject* obj_ptr = _world_ptr->objects[obj_i];
-        if(!obj_ptr->hasParent) //if it is a root object
-            obj_ptr->processObject(this); //Draw object
-    }
+    processObjects(world_ptr);
     current_state = PIPELINE_STATE::PIPELINE_STATE_DEFAULT;
 }
 

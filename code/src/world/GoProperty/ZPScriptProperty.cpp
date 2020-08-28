@@ -76,6 +76,9 @@ void Engine::ZPScriptProperty::makeGlobalVarsList() {
 	delete script;
 }
 
+void Engine::ZPScriptProperty::onStop() {
+	delete script;
+}
 
 void Engine::ZPScriptProperty::copyTo(Engine::GameObjectProperty* dest) {
 	if (dest->type != this->type) return; //if it isn't transform
@@ -83,6 +86,7 @@ void Engine::ZPScriptProperty::copyTo(Engine::GameObjectProperty* dest) {
 	ZPScriptProperty* _dest = static_cast<ZPScriptProperty*>(dest);
 	//write path to script
 	_dest->script_path = this->script_path;
+	script_res = game_data->resources->getScriptByLabel(script_path);
 	//copy global variable handlers
 	for (unsigned int v_i = 0; v_i < vars.size(); v_i++) {
 		GlobVarHandle* old_handle = vars[v_i];

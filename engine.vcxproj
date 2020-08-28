@@ -163,6 +163,7 @@
     <ClCompile Include="code\src\render\zs-math.cpp" />
     <ClCompile Include="code\src\render\zs-mesh.cpp" />
     <ClCompile Include="code\src\render\zs-pipeline.cpp" />
+    <ClCompile Include="code\src\render\zs-screen-effect.cpp" />
     <ClCompile Include="code\src\render\zs-shader.cpp" />
     <ClCompile Include="code\src\render\zs-texture.cpp" />
     <ClCompile Include="code\src\render\zs-uniform-buffer.cpp" />

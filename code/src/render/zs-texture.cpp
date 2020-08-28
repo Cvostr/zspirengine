@@ -167,7 +167,7 @@ bool Engine::Texture3D::pushTextureBuffer(int index, unsigned char* data){
     return result;
 }
 bool Engine::Texture3D::pushTexture(int index, std::string path){
-    if(index > 5) return false;
+    if(index > 5 || path.compare("@none") == 0) return false;
 
     this->units[index].path = path;
     this->units[index].req = new Engine::Loader::LoadRequest;

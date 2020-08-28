@@ -1,6 +1,7 @@
 #include "../../headers/Scripting/AngelScriptMgr.h"
 #include "../../headers/world/World.h"
 #include "../../headers/world/go_properties.h"
+#include <cmath>
 
 
 Engine::GameObject* newobj() {
@@ -34,7 +35,7 @@ void Engine::bindWorldSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectType(WORLD_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, "GameObject@ findObject(string)", asMETHOD(Engine::World, getGameObjectByLabel), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, "void removeObject(GameObject@)", asMETHOD(Engine::World, removeObject), asCALL_THISCALL);
-	mgr->RegisterObjectProperty(WORLD_TYPE_NAME, "Camera@ camera", offsetof(Engine::World, world_camera));
+	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, "Camera@ getCamera()", asMETHOD(Engine::World, getCameraPtr), asCALL_THISCALL);
 
 	mgr->RegisterObjectProperty(GAME_OBJECT_TYPE_NAME, "World@ world", offsetof(Engine::GameObject, world_ptr));
 }
@@ -48,7 +49,7 @@ void Engine::bindGameObjectPropertiesSDK(AGScriptMgr* mgr) {
 }
 
 void Engine::bindMathSDK(AGScriptMgr* mgr) {
-	mgr->RegisterObjectType(VEC3_TYPE_NAME, sizeof(ZSVECTOR3), asOBJ_VALUE);
+	mgr->RegisterObjectType(VEC3_TYPE_NAME, sizeof(ZSVECTOR3), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<ZSVECTOR3>());
 	mgr->RegisterObjectBehaviour(VEC3_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(new_as_obj_T<ZSVECTOR3>), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(VEC3_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(float, float, float)", asFUNCTION(CreateVec3), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(VEC3_TYPE_NAME, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(del_as_obj_T<ZSVECTOR3>), asCALL_CDECL_OBJLAST);
@@ -57,9 +58,12 @@ void Engine::bindMathSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectProperty(VEC3_TYPE_NAME, "float z", offsetof(ZSVECTOR3, Z));
 	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, "void Normalize()", asMETHOD(ZSVECTOR3, Normalize), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, "Vec3 &opAddAssign(Vec3 &in)", asMETHOD(ZSVECTOR3, operator+=), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, "Vec3 &opAssign(Vec3 &in)", asMETHODPR(ZSVECTOR3, operator =, (ZSVECTOR3), ZSVECTOR3&), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, "Vec3 &opAssign(Vec3 &in)", asMETHOD(ZSVECTOR3, operator=), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, "Vec3 opMul(float) const", asMETHOD(ZSVECTOR3, operator*), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, "Vec3 opAdd(const Vec3&in) const", asMETHOD(ZSVECTOR3, operator+), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, "bool opEquals(const Vec3&in) const", asMETHOD(ZSVECTOR3, operator ==), asCALL_THISCALL);
 	//Bind Quaternion
-	mgr->RegisterObjectType(QUAT_TYPE_NAME, sizeof(ZSQUATERNION), asOBJ_VALUE);
+	mgr->RegisterObjectType(QUAT_TYPE_NAME, sizeof(ZSQUATERNION), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<ZSQUATERNION>());
 	mgr->RegisterObjectBehaviour(QUAT_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(new_as_obj_T<ZSQUATERNION>), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(QUAT_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(CreateQuat), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(QUAT_TYPE_NAME, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(del_as_obj_T<ZSQUATERNION>), asCALL_CDECL_OBJLAST);
@@ -67,11 +71,11 @@ void Engine::bindMathSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectProperty(QUAT_TYPE_NAME, "float y", offsetof(ZSQUATERNION, Y));
 	mgr->RegisterObjectProperty(QUAT_TYPE_NAME, "float z", offsetof(ZSQUATERNION, Z));
 	mgr->RegisterObjectProperty(QUAT_TYPE_NAME, "float w", offsetof(ZSQUATERNION, W));
-	//mgr->RegisterObjectMethod(QUAT_TYPE_NAME, "void Normalize()", asMETHOD(ZSQUATERNION, Normalize), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(QUAT_TYPE_NAME, "void Normalize()", asMETHOD(ZSQUATERNION, Normalize), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(QUAT_TYPE_NAME, "Quat &opAssign(Quat &in)", asMETHODPR(ZSQUATERNION, operator =, (ZSQUATERNION), ZSQUATERNION&), asCALL_THISCALL);
 
 	//Bind RGB color
-	mgr->RegisterObjectType(RGBCOLOR_TYPE_NAME, sizeof(ZSRGBCOLOR), asOBJ_VALUE);
+	mgr->RegisterObjectType(RGBCOLOR_TYPE_NAME, sizeof(ZSRGBCOLOR), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<ZSRGBCOLOR>());
 	mgr->RegisterObjectBehaviour(RGBCOLOR_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(new_as_obj_T<ZSRGBCOLOR>), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(RGBCOLOR_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(int, int, int)", asFUNCTION(CreateRgbColor), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(RGBCOLOR_TYPE_NAME, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(del_as_obj_T<ZSRGBCOLOR>), asCALL_CDECL_OBJLAST);
@@ -87,6 +91,14 @@ void Engine::bindMathSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float FOV", offsetof(Engine::Camera, FOV));
 	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float nearZ", offsetof(Engine::Camera, nearZ));
 	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float farZ", offsetof(Engine::Camera, farZ));
+	mgr->RegisterObjectMethod(CAM_TYPE_NAME, "void updateViewMat()", asMETHOD(Engine::Camera, updateViewMat), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(CAM_TYPE_NAME, "void updateProjectionMat()", asMETHOD(Engine::Camera, updateProjectionMat), asCALL_THISCALL);
+	//Base Math methods
+	mgr->RegisterGlobalFunction("float sin(float)", asFUNCTION(sinf), asCALL_CDECL);
+	mgr->RegisterGlobalFunction("float cos(float)", asFUNCTION(cosf), asCALL_CDECL);
+	mgr->RegisterGlobalFunction("float rad(float)", asFUNCTION(DegToRad), asCALL_CDECL);
+	mgr->RegisterGlobalFunction("Vec3 cross(const Vec3&in, const Vec3&in)", asFUNCTION(vCross), asCALL_CDECL);
+	mgr->RegisterGlobalFunction("float dot(const Vec3&in, const Vec3&in)", asFUNCTION(vDot), asCALL_CDECL);
 }
 
 void Engine::bindResourceSDK(const char* className, AGScriptMgr* mgr) {
@@ -95,8 +107,6 @@ void Engine::bindResourceSDK(const char* className, AGScriptMgr* mgr) {
 	mgr->RegisterObjectProperty(className, "string label", offsetof(ZsResource, rel_path));
 	mgr->RegisterObjectProperty(className, "string path", offsetof(ZsResource, resource_label));
 }
-
-
 
 void Engine::bindResourcesSDK(AGScriptMgr* mgr) {
 	bindResourceSDK(TEXRESOURCE_TYPE_NAME, mgr);

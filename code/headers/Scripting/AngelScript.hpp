@@ -19,8 +19,6 @@ namespace Engine{
 
     class GlobVarHandle {
     protected:
-        
-        bool isRef;
     public:
         unsigned int index;
         std::string name;
@@ -30,66 +28,15 @@ namespace Engine{
         int typeID;
         unsigned int size;
 
-        void applyValue() {
-            if (!isRef) {
-                memcpy(address, value_ptr, size);
-            }
-            else {
-                //void* moved = address;
-                ///uint64_t* vc = (uint64_t*)(*((uint64_t*)address));
-                //memcpy(vc, value_ptr, sizeof(ZSVECTOR3));
-            }
-        }
-        void updValue() {
-            if (!isRef) {
-                memcpy(value_ptr, address, size);
-            }
-            else {
-                //void* moved = address;
-               // uint64_t* vc = (uint64_t*)(*((uint64_t*)address));
-               // memcpy(value_ptr, vc, sizeof(ZSVECTOR3));
-            }
-        }
+        void applyValue();
+        void updValue();
 
         template <typename T>
         T* getValue() {
             return static_cast<T*>(value_ptr);
         }
 
-        GlobVarHandle(int typeID) {
-            index = 0;
-            name = "";
-            address = nullptr;
-            this->typeID = typeID;
-            isRef = false;
-
-            switch (typeID) {
-            case asTYPEID_INT32:
-                size = sizeof(int);
-                value_ptr = malloc(size);
-                break;
-            case asTYPEID_FLOAT:
-                size = sizeof(float);
-                value_ptr = malloc(size);
-                break;
-            case asTYPEID_BOOL:
-                size = sizeof(bool);
-                value_ptr = malloc(size);
-                break;
-            case AG_VECTOR3:
-                size = sizeof(ZSVECTOR3);
-                value_ptr = new ZSVECTOR3;
-                break;
-            case AG_RGB_COLOR:
-                size = sizeof(ZSRGBCOLOR);
-                value_ptr = new ZSRGBCOLOR;
-                break;
-            case AG_STRING:
-                size = sizeof(std::string);
-                value_ptr = new std::string;
-                break;
-            }
-        }
+        GlobVarHandle(int typeID);
     };
 
     class AGScript{

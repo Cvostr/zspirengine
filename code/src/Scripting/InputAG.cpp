@@ -22,10 +22,10 @@ void bindKeyCodes(Engine::AGScriptMgr* mgr) {
 
 void bindMouseStateClassSDK(Engine::AGScriptMgr* mgr) {
 	mgr->RegisterObjectType(MOUSE_STATE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
-	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "float mouseX", offsetof(Input::MouseState, mouseX));
-	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "float mouseY", offsetof(Input::MouseState, mouseY));
-	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "float relX", offsetof(Input::MouseState, mouseRelX));
-	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "float relY", offsetof(Input::MouseState, mouseRelY));
+	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "int mouseX", offsetof(Input::MouseState, mouseX));
+	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "int mouseY", offsetof(Input::MouseState, mouseY));
+	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "int relX", offsetof(Input::MouseState, mouseRelX));
+	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "int relY", offsetof(Input::MouseState, mouseRelY));
 
 	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "bool isLButtonDown", offsetof(Input::MouseState, isLButtonDown));
 	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "bool isRButtonDown", offsetof(Input::MouseState, isRButtonDown));

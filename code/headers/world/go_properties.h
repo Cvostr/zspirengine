@@ -47,6 +47,7 @@ public:
     void onValueChanged();
     void addPropertyInterfaceToInspector();
     void onStart();
+    void onStop();
     void onUpdate(float deltaTime); //calls update in scripts
     void copyTo(Engine::GameObjectProperty* dest);
     void makeGlobalVarsList();

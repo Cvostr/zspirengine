@@ -94,7 +94,7 @@ ZSVECTOR3 Engine::Camera::getCameraViewCenterPos(){
         int viewport_y = static_cast<int>(viewport.endY - viewport.startY) / 2;
         int viewport_x = (viewport.endX - viewport.startX) / 2;
         viewport_x *= -1;
-        ZSVECTOR3 result = camera_pos + ZSVECTOR3(viewport_x, (viewport_y), 0);
+        ZSVECTOR3 result = camera_pos + ZSVECTOR3(static_cast<float>(viewport_x), static_cast<float>(viewport_y), 0);
         return result;
     }
     return this->camera_pos;
@@ -145,7 +145,7 @@ void Engine::Camera::startMoving(){
         int viewport_size_x = static_cast<int>(viewport.endX) - static_cast<int>(viewport.startX);
         int viewport_size_y = static_cast<int>(viewport.endY) - static_cast<int>(viewport.startY);
         viewport_size_y *= -1;
-        ZSVECTOR3 to_add = ZSVECTOR3(viewport_size_x / 2, viewport_size_y / 2, 0);
+        ZSVECTOR3 to_add = ZSVECTOR3(static_cast<float>(viewport_size_x) / 2.f, static_cast<float>(viewport_size_y) / 2.f, 0);
         _dest_pos = _dest_pos + to_add;
     }
 

@@ -181,6 +181,8 @@ public:
     //Remove property with type
     void removeProperty(int index);
     void removeProperty(Engine::GameObjectProperty* pProp);
+    void removeScript(int index);
+    void removeScript(Engine::GameObjectProperty* pProp);
 
     GameObject* getChildObjectWithNodeLabel(std::string label);
     void setMeshSkinningRootNodeRecursively(GameObject* rootNode);

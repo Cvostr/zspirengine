@@ -236,7 +236,7 @@ void TerrainData::processNormalsTangentSpace(HeightmapVertex* vert_array, unsign
         //Calculate normal
         v1->normal = vCross(v12, v13);
         //Normalize vector
-        vNormalize(&v1->normal);
+        v1->normal.Normalize();
         //--------------Calculate Tangent 
         ZSVECTOR3 edge1 = v2->pos - v1->pos;
         ZSVECTOR3 edge2 = v3->pos - v1->pos;
@@ -249,12 +249,12 @@ void TerrainData::processNormalsTangentSpace(HeightmapVertex* vert_array, unsign
         tangent.X = f * (deltaUV2.Y * edge1.X - deltaUV1.Y * edge2.X);
         tangent.Y = f * (deltaUV2.Y * edge1.Y - deltaUV1.Y * edge2.Y);
         tangent.Z = f * (deltaUV2.Y * edge1.Z - deltaUV1.Y * edge2.Z);
-        vNormalize(&tangent);
+        tangent.Normalize();
 
         bitangent.X = f * (-deltaUV2.X * edge1.X + deltaUV1.X * edge2.X);
         bitangent.Y = f * (-deltaUV2.X * edge1.Y + deltaUV1.X * edge2.Y);
         bitangent.Z = f * (-deltaUV2.X * edge1.Z + deltaUV1.X * edge2.Z);
-        vNormalize(&bitangent);
+        bitangent.Normalize();
         for(int i = 0; i < 3; i ++){
             vert_array[indices_array[ind_i + i]].tangent = tangent;
             vert_array[indices_array[ind_i + i]].bitangent = bitangent;

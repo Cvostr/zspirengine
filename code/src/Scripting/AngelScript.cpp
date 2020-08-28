@@ -6,6 +6,69 @@ using namespace Engine;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
 
+GlobVarHandle::GlobVarHandle(int typeID) {
+	index = 0;
+	name = "";
+	address = nullptr;
+	this->typeID = typeID;
+
+	switch (typeID) {
+	case asTYPEID_INT32:
+		size = sizeof(int);
+		value_ptr = malloc(size);
+		break;
+	case asTYPEID_FLOAT:
+		size = sizeof(float);
+		value_ptr = malloc(size);
+		break;
+	case asTYPEID_BOOL:
+		size = sizeof(bool);
+		value_ptr = malloc(size);
+		break;
+	case AG_VECTOR3:
+		size = sizeof(ZSVECTOR3);
+		value_ptr = new ZSVECTOR3;
+		break;
+	case AG_RGB_COLOR:
+		size = sizeof(ZSRGBCOLOR);
+		value_ptr = new ZSRGBCOLOR;
+		break;
+	case AG_STRING:
+		size = sizeof(std::string);
+		value_ptr = new std::string;
+		break;
+	}
+}
+
+void GlobVarHandle::applyValue() {
+	switch (typeID) {
+	case AG_STRING: {
+		std::string* address_Str = static_cast<std::string*>(address);
+		std::string* value_Str = static_cast<std::string*>(value_ptr);
+
+		*address_Str = *value_Str;
+		break;
+	}
+	default:
+		memcpy(address, value_ptr, size);
+		break;
+	}
+}
+void GlobVarHandle::updValue() {
+	switch (typeID) {
+	case AG_STRING: {
+		std::string* address_Str = static_cast<std::string*>(address);
+		std::string* value_Str = static_cast<std::string*>(value_ptr);
+
+		*value_Str = *address_Str;
+		break;
+	}
+	default:
+		memcpy(value_ptr, address, size);
+		break;
+	}
+}
+
 bool AGScript::compileFromResource(Engine::ScriptResource* res) {
 	int result = 0;
 	
@@ -73,6 +136,7 @@ void AGScript::obtainScriptModule() {
 }
 
 void AGScript::obtainScriptMainClass() {
+	int result = 0;
 	obtainScriptModule();
 	//Obtain class with interface ZPScript
 	main_class = getClassWithInterface("ZPScript");
@@ -84,7 +148,7 @@ void AGScript::obtainScriptMainClass() {
 	{
 		engine->getAgScriptContext()->Prepare(factory);
 		engine->getAgScriptContext()->SetArgObject(0, obj);
-		engine->getAgScriptContext()->Execute();
+		result = engine->getAgScriptContext()->Execute();
 	}
 	//Get returned created class
 	mainClass_obj = *(asIScriptObject**)engine->getAgScriptContext()->GetAddressOfReturnValue();
@@ -120,7 +184,12 @@ AGScript::AGScript(AGScriptMgr* engine, Engine::GameObject* obj, std::string Cla
 
 	int r = builder.StartNewModule(engine->getAgScriptEngine(), ModuleName.c_str());
 	hasErrors = false;
+	//nullptr to pointers
+	module = nullptr;
+	mainClass_obj = nullptr;
+	main_class = nullptr;
 }
 AGScript::~AGScript() {
-	module->Discard();
+	if(module != nullptr)
+		module->Discard();
 }

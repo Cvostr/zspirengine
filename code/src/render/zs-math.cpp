@@ -19,36 +19,22 @@ void vNormalize(ZSVECTOR3* v)
 
 }
 
-void qNormalize(ZSQUATERNION* q){
-    float m = q->X * q->X + q->Y * q->Y + q->Z * q->Z + q->W * q->W;
 
-    if (REAL_NUM_EQ(m, 1) || REAL_NUM_EQ(m, 0))
-        return;
-
-    m = 1.f / sqrt(m);
-
-    q->X *= m;
-    q->Y *= m;
-    q->Z *= m;
-    q->W *= m;
-}
-
-ZSVECTOR3 quatToEuler(ZSQUATERNION q) {
+ZSVECTOR3 quatToEuler(const ZSQUATERNION& q) {
     return _getDirection(q.X, q.Y, q.Z);
 }
 
-ZSVECTOR3 vCross(ZSVECTOR3 v1, ZSVECTOR3 v2)
+ZSVECTOR3 vCross(const ZSVECTOR3& v1, const ZSVECTOR3& v2)
 {
-	ZSVECTOR3 out = ZSVECTOR3(v1.Y*v2.Z - v1.Z*v2.Y, v1.Z*v2.X - v1.X*v2.Z, v1.X*v2.Y - v1.Y*v2.X);
-	return out;
+	return ZSVECTOR3(v1.Y * v2.Z - v1.Z * v2.Y, v1.Z * v2.X - v1.X * v2.Z, v1.X * v2.Y - v1.Y * v2.X);
 }
 
-float vDot(ZSVECTOR3 v1, ZSVECTOR3 v2)
+float vDot(const ZSVECTOR3& v1, const ZSVECTOR3& v2)
 {
 	return v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
 }
 
-bool isDistanceFits(ZSVECTOR3 pos1, ZSVECTOR3 pos2, float max_dist){
+bool isDistanceFits(const ZSVECTOR3& pos1, const ZSVECTOR3& pos2, float max_dist){
     float dist = getDistance(pos1, pos2);
     return dist <= max_dist ? true : false;
 }
@@ -57,11 +43,21 @@ ZSVECTOR3 lerp(ZSVECTOR3 v1, ZSVECTOR3 v2, float factor){
     ZSVECTOR3 result = v1 * (1.f - factor) + v2 * factor;
     return result;
 }
+
+ZSVECTOR3 vmul(ZSVECTOR3& v, float f) {
+    ZSVECTOR3 Ret(v.X * f, v.Y * f, v.Z * f);
+    return Ret;
+}
+ZSVECTOR3 vadd(ZSVECTOR3& v1, ZSVECTOR3& v2) {
+    ZSVECTOR3 Ret(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
+    return Ret;
+}
+
 ZSQUATERNION slerp(ZSQUATERNION q1, ZSQUATERNION q2, float factor){
     ZSQUATERNION result;
     //Normalize quaternions
-    qNormalize(&q1);
-    qNormalize(&q2);
+    q1.Normalize();
+    q2.Normalize();
 
     float dot_product = result.X * result.X + result.Y * result.Y + result.Z * result.Z + result.W * result.W;
     float one_minus_blend = 1.0f - factor;
@@ -81,7 +77,7 @@ ZSQUATERNION slerp(ZSQUATERNION q1, ZSQUATERNION q2, float factor){
         result.W = q1.W * one_minus_blend + factor * q2.W;
     }
 
-    qNormalize(&result);
+    result.Normalize();
 
     return result;
 }
@@ -97,7 +93,7 @@ ZSMATRIX4x4 getIdentity() {
 	return Ret;
 }
 
-ZSMATRIX4x4 matrixMM(ZSMATRIX4x4 l, ZSMATRIX4x4 r) {
+ZSMATRIX4x4 matrixMM(const ZSMATRIX4x4& l, const ZSMATRIX4x4& r) {
 	ZSMATRIX4x4 Ret;
 	for (unsigned int i = 0; i < 4; i++) {
 		for (unsigned int b = 0; b < 4; b++) {
@@ -105,20 +101,17 @@ ZSMATRIX4x4 matrixMM(ZSMATRIX4x4 l, ZSMATRIX4x4 r) {
 				l.m[i][1] * r.m[1][b] +
 				l.m[i][2] * r.m[2][b] +
 				l.m[i][3] * r.m[3][b];
-
 		}
-
 	}
 	return Ret;
 }
 
-ZSMATRIX4x4 matrixSum(ZSMATRIX4x4 l, ZSMATRIX4x4 r) {
+ZSMATRIX4x4 matrixSum(const ZSMATRIX4x4& l, const ZSMATRIX4x4& r) {
     ZSMATRIX4x4 Ret;
     for (unsigned int i = 0; i < 4; i++) {
         for (unsigned int b = 0; b < 4; b++) {
             Ret.m[i][b] = l.m[i][b] + r.m[i][b];
         }
-
     }
     return Ret;
 }
@@ -142,7 +135,7 @@ ZSMATRIX4x4 getPerspective(float fovy, float aspect, float zNear, float zFar) {
 	return result;
 }
 
-ZSMATRIX4x4 transpose(ZSMATRIX4x4 mat) {
+ZSMATRIX4x4 transpose(const ZSMATRIX4x4& mat) {
 	ZSMATRIX4x4 result;
 
 	for (unsigned int i = 0; i < 4; i++) {
@@ -153,7 +146,7 @@ ZSMATRIX4x4 transpose(ZSMATRIX4x4 mat) {
 	return result;
 }
 
-float determinant(ZSMATRIX4x4 mat){
+float determinant(const ZSMATRIX4x4& mat){
     //[0][0] [0][1] [0][2] [0][3]
     //[1][0] [1][1] [1][2] [1][3]
     //[2][0] [2][1] [2][2] [2][3]
@@ -174,7 +167,7 @@ float determinant(float a, float b, float c, float d, float e, float f, float g,
     return (a * e * i) + (d * c * h) + (g * b * f) - (g * e * c) - (d * b * i) - (h * f * a);
 }
 
-ZSMATRIX4x4 invert(ZSMATRIX4x4 mat){
+ZSMATRIX4x4 invert(const ZSMATRIX4x4& mat){
     float _determinant = determinant(mat);
     _determinant = 1.f / _determinant;
 
@@ -204,7 +197,7 @@ ZSMATRIX4x4 invert(ZSMATRIX4x4 mat){
     return result;
 }
 
-ZSMATRIX4x4 matrixLookAt(ZSVECTOR3 eye, ZSVECTOR3 center, ZSVECTOR3 up)
+ZSMATRIX4x4 matrixLookAt(const ZSVECTOR3& eye, const ZSVECTOR3& center, const ZSVECTOR3& up)
 {
 	ZSMATRIX4x4 out;
 
@@ -280,7 +273,7 @@ ZSMATRIX4x4 getScaleMat(float scaleX, float scaleY, float scaleZ) {
 	return mat;
 }
 
-ZSMATRIX4x4 getScaleMat(ZSVECTOR3 scale){
+ZSMATRIX4x4 getScaleMat(const ZSVECTOR3& scale){
     return getScaleMat(scale.X, scale.Y, scale.Z);
 }
 
@@ -296,7 +289,7 @@ ZSMATRIX4x4 getTranslationMat(float trX, float trY, float trZ) {
 	return mat;
 }
 
-ZSMATRIX4x4 getTranslationMat(ZSVECTOR3 translation){
+ZSMATRIX4x4 getTranslationMat(const ZSVECTOR3& translation){
     return getTranslationMat(translation.X, translation.Y, translation.Z);
 }
 
@@ -349,18 +342,18 @@ ZSMATRIX4x4 getRotationMat(float thetaX, float thetaY, float thetaZ){
     return result;
 }
 
-ZSMATRIX4x4 getRotationMat(ZSVECTOR3 rotation){
+ZSMATRIX4x4 getRotationMat(const ZSVECTOR3& rotation){
     return getRotationMat(rotation.X, rotation.Y, rotation.Z);
 }
 
-ZSMATRIX4x4 getRotationMat(ZSVECTOR3 rotation, ZSVECTOR3 center){
+ZSMATRIX4x4 getRotationMat(const ZSVECTOR3& rotation, const ZSVECTOR3& center){
     ZSMATRIX4x4 result = getTranslationMat(center);
     result = result * getRotationMat(rotation);
     result = result * getTranslationMat(center * -1);
     return result;
 }
 
-ZSMATRIX4x4 getRotationMat(ZSQUATERNION quat){
+ZSMATRIX4x4 getRotationMat(const ZSQUATERNION& quat){
     float x2 = quat.X * quat.X;
     float y2 = quat.Y * quat.Y;
     float z2 = quat.Z * quat.Z;
@@ -418,12 +411,12 @@ void ZSRGBCOLOR::updateGL() {
 ZSVECTOR3 _getDirection(float pitch, float yaw, float roll) {
 	ZSVECTOR3 q;
 
-    float cy = cos(DegToRad(yaw * 0.5f));
-    float sy = sin(DegToRad(yaw * 0.5f));
-    float cr = cos(DegToRad(roll * 0.5f));
-    float sr = sin(DegToRad(roll * 0.5f));
-    float cp = cos(DegToRad(pitch * 0.5f));
-    float sp = sin(DegToRad(pitch * 0.5f));
+    float cy = cosf(DegToRad(yaw * 0.5f));
+    float sy = sinf(DegToRad(yaw * 0.5f));
+    float cr = cosf(DegToRad(roll * 0.5f));
+    float sr = sinf(DegToRad(roll * 0.5f));
+    float cp = cosf(DegToRad(pitch * 0.5f));
+    float sp = sinf(DegToRad(pitch * 0.5f));
 
 
     q.Z = (cy * sr * cp - sy * cr * sp);
@@ -433,14 +426,11 @@ ZSVECTOR3 _getDirection(float pitch, float yaw, float roll) {
 	return q;
 }
 
-float getDistance(ZSVECTOR3 p1, ZSVECTOR3 p2) {
+float getDistance(const ZSVECTOR3& p1, const ZSVECTOR3& p2) {
 	float dx = p1.X - p2.X;
 	float dy = p1.Y - p2.Y;
 	float dz = p1.Z - p2.Z;
 
-    return static_cast<float>(sqrt(dx * dx + dy * dy + dz * dz));
+    return static_cast<float>(sqrtf(dx * dx + dy * dy + dz * dz));
 }
 
-float getLength(ZSVECTOR3 vec){
-    return static_cast<float>(sqrt(vec.X * vec.X + vec.Y * vec.Y + vec.Z * vec.Z));
-}

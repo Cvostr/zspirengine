@@ -83,7 +83,7 @@ void Engine::TileProperty::updTexturePtr(){
 
 void Engine::TileProperty::onUpdate(float deltaTime){
     if(this->anim_state.playing == true){ //if we playing anim
-        anim_state.current_time += static_cast<float>(deltaTime);
+        anim_state.current_time += static_cast<int>(deltaTime);
         if(anim_state.current_time >= anim_property.frame_time){ //if its time to switch frame
             anim_state.current_time = 0; //make time zero
             anim_state.current_frame += 1; //switch to next frame

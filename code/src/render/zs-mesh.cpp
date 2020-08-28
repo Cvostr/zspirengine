@@ -416,12 +416,12 @@ void Engine::processTangentSpace(ZSVERTEX* vert_array, unsigned int* indices_arr
         tangent.X = f * (deltaUV2.Y * edge1.X - deltaUV1.Y * edge2.X);
         tangent.Y = f * (deltaUV2.Y * edge1.Y - deltaUV1.Y * edge2.Y);
         tangent.Z = f * (deltaUV2.Y * edge1.Z - deltaUV1.Y * edge2.Z);
-        vNormalize(&tangent);
+        tangent.Normalize();
 
         bitangent.X = f * (-deltaUV2.X * edge1.X + deltaUV1.X * edge2.X);
         bitangent.Y = f * (-deltaUV2.X * edge1.Y + deltaUV1.X * edge2.Y);
         bitangent.Z = f * (-deltaUV2.X * edge1.Z + deltaUV1.X * edge2.Z);
-        vNormalize(&bitangent);
+        bitangent.Normalize();
         for(int i = 0; i < 3; i ++){
             vert_array[indices_array[ind_i + i]].tangent = tangent;
             vert_array[indices_array[ind_i + i]].bitangent = bitangent;
@@ -446,12 +446,12 @@ void Engine::processTangentSpace(ZSVERTEX* vert_array, int vertices_num){
         tangent.X = f * (deltaUV2.Y * edge1.X - deltaUV1.Y * edge2.X);
         tangent.Y = f * (deltaUV2.Y * edge1.Y - deltaUV1.Y * edge2.Y);
         tangent.Z = f * (deltaUV2.Y * edge1.Z - deltaUV1.Y * edge2.Z);
-        vNormalize(&tangent);
+        tangent.Normalize();
 
         bitangent.X = f * (-deltaUV2.X * edge1.X + deltaUV1.X * edge2.X);
         bitangent.Y = f * (-deltaUV2.X * edge1.Y + deltaUV1.X * edge2.Y);
         bitangent.Z = f * (-deltaUV2.X * edge1.Z + deltaUV1.X * edge2.Z);
-        vNormalize(&bitangent);
+        bitangent.Normalize();
 
         tangent.Z *= -1;
         bitangent.Z *= -1;

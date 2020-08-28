@@ -39,16 +39,40 @@
 			Z *= invrt;
 		}
 
-		void operator+=(ZSVECTOR3 r) {
+		float Length() { //Calculates module length of vector
+			return sqrtf(X * X + Y * Y + Z * Z);
+		}
+
+		ZSVECTOR3& operator+=(const ZSVECTOR3& r) {
 			X += r.X;
 			Y += r.Y;
 			Z += r.Z;
+			return *this;
 		}
+		ZSVECTOR3& operator*=(const float& d){
+			X *= d;
+			Y *= d;
+			Z *= d;
+			return *this;
+		}
+
 		ZSVECTOR3& operator=(ZSVECTOR3 r) {
 			X = r.X;
 			Y = r.Y;
 			Z = r.Z;
 			return *this;
+		}
+		
+		ZSVECTOR3 operator*(float d) const {
+			return ZSVECTOR3(X * d, Y * d, Z * d);
+		}
+
+		ZSVECTOR3 operator+(const ZSVECTOR3& r) const {
+			return ZSVECTOR3(X + r.X, Y + r.Y, Z + r.Z);
+		}
+
+		bool operator ==(const ZSVECTOR3& r) const {
+			return X == r.X && Y == r.Y && Z == r.Z; 
 		}
 
         ZSVECTOR3(){
@@ -91,6 +115,20 @@
             this->Z = z;
             this->W = w;
         }
+
+		void Normalize() {
+			float m = X * X + Y * Y + Z * Z + W * W;
+
+			if (REAL_NUM_EQ(m, 1) || REAL_NUM_EQ(m, 0))
+				return;
+
+			m = 1.f / static_cast<float>(sqrt(m));
+
+			X *= m;
+			Y *= m;
+			Z *= m;
+			W *= m;
+		}
 
 		ZSQUATERNION& operator=(ZSQUATERNION r) {
 			X = r.X;
@@ -240,12 +278,11 @@
 	}ZSRGBCOLOR;
     //Converts degrees into radians
     float DegToRad(float degrees);
-    //Get vector with identity lenght
-	void vNormalize(ZSVECTOR3* v);
-    void qNormalize(ZSQUATERNION* q);
-	ZSVECTOR3 vCross(ZSVECTOR3 v1, ZSVECTOR3 v2);
-	float vDot(ZSVECTOR3 v1, ZSVECTOR3 v2);
-    bool isDistanceFits(ZSVECTOR3 pos1, ZSVECTOR3 pos2, float max_dist);
+	ZSVECTOR3 vCross(const ZSVECTOR3& v1, const ZSVECTOR3& v2);
+	float vDot(const ZSVECTOR3& v1, const ZSVECTOR3& v2);
+	ZSVECTOR3 vmul(ZSVECTOR3& v, float f);
+	ZSVECTOR3 vadd(ZSVECTOR3& v1, ZSVECTOR3& v2);
+    bool isDistanceFits(const ZSVECTOR3& pos1, const ZSVECTOR3& pos2, float max_dist);
     template<typename T>
     int sign(T value){
         if(typeid (value) == typeid (int) || typeid (value) == typeid (float))
@@ -253,40 +290,38 @@
         return 1;
     }
 
-	ZSVECTOR3 quatToEuler(ZSQUATERNION q);
-
+	ZSVECTOR3 quatToEuler(const ZSQUATERNION& q);
     ZSVECTOR3 lerp(ZSVECTOR3 v1, ZSVECTOR3 v2, float factor);
     ZSQUATERNION slerp(ZSQUATERNION q1, ZSQUATERNION q2, float factor);
 
 	ZSMATRIX4x4 getIdentity();
-	ZSMATRIX4x4 transpose(ZSMATRIX4x4 mat);
-    float determinant(ZSMATRIX4x4 mat);
+	ZSMATRIX4x4 transpose(const ZSMATRIX4x4& mat);
+    float determinant(const ZSMATRIX4x4& mat);
     float determinant(float a, float b, float c, float d, float e, float f, float g, float h, float i);
-    ZSMATRIX4x4 invert(ZSMATRIX4x4 mat);
-	ZSMATRIX4x4 matrixMM(ZSMATRIX4x4 l, ZSMATRIX4x4 r);
-    ZSMATRIX4x4 matrixSum(ZSMATRIX4x4 l, ZSMATRIX4x4 r);
+    ZSMATRIX4x4 invert(const ZSMATRIX4x4& mat);
+	ZSMATRIX4x4 matrixMM(const ZSMATRIX4x4& l, const ZSMATRIX4x4& r);
+    ZSMATRIX4x4 matrixSum(const ZSMATRIX4x4& l, const ZSMATRIX4x4& r);
 	ZSMATRIX4x4 getPerspective(float fovy, float aspect, float zNear, float zFar);
 	ZSMATRIX4x4 getOrthogonal(float left, float right, float bottom, float top);
 	ZSMATRIX4x4 getOrthogonal(float left, float right, float bottom, float top, float zNear, float zFar);
-	ZSMATRIX4x4 matrixLookAt(ZSVECTOR3 eye, ZSVECTOR3 center, ZSVECTOR3 up);
+	ZSMATRIX4x4 matrixLookAt(const ZSVECTOR3& eye, const ZSVECTOR3& center, const ZSVECTOR3& up);
     ZSMATRIX4x4 removeTranslationFromViewMat(ZSMATRIX4x4 viewMat);
     ZSMATRIX4x4 removeRotationFromTransformMat(ZSMATRIX4x4 transform, ZSMATRIX4x4 view);
 
 	ZSMATRIX4x4 getScaleMat(float scaleX, float scaleY, float scaleZ);
-    ZSMATRIX4x4 getScaleMat(ZSVECTOR3 scale);
+    ZSMATRIX4x4 getScaleMat(const ZSVECTOR3& scale);
 	ZSMATRIX4x4 getTranslationMat(float trX, float trY, float trZ);
-    ZSMATRIX4x4 getTranslationMat(ZSVECTOR3 translation);
+    ZSMATRIX4x4 getTranslationMat(const ZSVECTOR3& translation);
 	ZSMATRIX4x4 getRotationXMat(float thetaN);
 	ZSMATRIX4x4 getRotationYMat(float thetaN);
 	ZSMATRIX4x4 getRotationZMat(float thetaN);
     ZSMATRIX4x4 getRotationMat(float thetaX, float thetaY, float thetaZ);
-    ZSMATRIX4x4 getRotationMat(ZSVECTOR3 rotation);
-    ZSMATRIX4x4 getRotationMat(ZSVECTOR3 rotation, ZSVECTOR3 center);
-    ZSMATRIX4x4 getRotationMat(ZSQUATERNION quat);
+    ZSMATRIX4x4 getRotationMat(const ZSVECTOR3& rotation);
+    ZSMATRIX4x4 getRotationMat(const ZSVECTOR3& rotation, const ZSVECTOR3& center);
+    ZSMATRIX4x4 getRotationMat(const ZSQUATERNION& quat);
     //ZSMATRIX4x4 parent
 
-	float getDistance(ZSVECTOR3 p1, ZSVECTOR3 p2);
-    float getLength(ZSVECTOR3 vec); //Calculates module length of vector
+	float getDistance(const ZSVECTOR3& p1, const ZSVECTOR3& p2);
 	ZSVECTOR3 _getDirection(float pitch, float yaw, float roll);
 
 	inline ZSMATRIX4x4 operator*(const ZSMATRIX4x4& l, const ZSMATRIX4x4& r)
@@ -329,19 +364,8 @@
 		return Ret;
 	}
 
-	inline ZSVECTOR3 operator+(const ZSVECTOR3& l, const ZSVECTOR3& r)
-	{
-		ZSVECTOR3 Ret(l.X + r.X, l.Y + r.Y, l.Z + r.Z);
+	
 
-		return Ret;
-	}
-
-	inline ZSVECTOR3 operator*(const ZSVECTOR3& l, const float& d)
-	{
-		ZSVECTOR3 Ret(l.X * d, l.Y * d, l.Z * d);
-
-		return Ret;
-	}
 	inline ZSVECTOR3 operator/(const ZSVECTOR3& l, const float& d)
 	{
 		ZSVECTOR3 Ret(l.X / d, l.Y / d, l.Z / d);
