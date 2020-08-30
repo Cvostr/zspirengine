@@ -39,8 +39,6 @@ struct RenderSettings {
     }
 };
 
-
-
 class RenderPipeline : public EngineComponentManager{
 protected:
     //Vector to store lights
@@ -76,6 +74,7 @@ public:
     Engine::Shader* grass_shader;
     Engine::Shader* shadowMap;
     Engine::Shader* ui_shader;
+    Engine::Shader* final_shader;
 
     UniformBuffer* transformBuffer; //0
     UniformBuffer* lightsBuffer;    //1

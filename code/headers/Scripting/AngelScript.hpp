@@ -30,6 +30,7 @@ namespace Engine{
 
         void applyValue();
         void updValue();
+        void copyValue(void* src, void* dest);
 
         template <typename T>
         T* getValue() {
@@ -37,6 +38,7 @@ namespace Engine{
         }
 
         GlobVarHandle(int typeID);
+        ~GlobVarHandle();
     };
 
     class AGScript{

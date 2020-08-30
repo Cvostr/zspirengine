@@ -30,10 +30,6 @@ void Engine::ZPScriptProperty::onStart() {
 		}
 		//call onStart() inside script
         script->onStart(); 
-		//if(vars.size() == 0)
-			//update vars list
-		//	makeGlobalVarsList();
-		
     }
 }
 
@@ -86,7 +82,7 @@ void Engine::ZPScriptProperty::copyTo(Engine::GameObjectProperty* dest) {
 	ZPScriptProperty* _dest = static_cast<ZPScriptProperty*>(dest);
 	//write path to script
 	_dest->script_path = this->script_path;
-	script_res = game_data->resources->getScriptByLabel(script_path);
+	_dest->script_res = game_data->resources->getScriptByLabel(script_path);
 	//copy global variable handlers
 	for (unsigned int v_i = 0; v_i < vars.size(); v_i++) {
 		GlobVarHandle* old_handle = vars[v_i];
@@ -127,8 +123,20 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 
 		Engine::GlobVarHandle* var = new Engine::GlobVarHandle(typeID);
 		var->index = index;
-		memcpy(var->value_ptr, data + offset, var->size);
-		offset += var->size;
+		if (typeID != AG_STRING) {
+			memcpy(var->value_ptr, data + offset, var->size);
+			offset += var->size;
+		}
+		else {
+			std::string* str = static_cast<std::string*>(var->value_ptr);
+			unsigned int str_size = 0;
+			memcpy(&str_size, data + offset, sizeof(unsigned int));
+			offset += sizeof(unsigned int);
+			for (unsigned int i = 0; i < str_size; i++) {
+				str->push_back(*(data + offset));	
+				offset += 1;
+			}
+		}
 		
 		this->vars.push_back(var);
 	}

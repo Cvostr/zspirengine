@@ -10,6 +10,7 @@ GlobVarHandle::GlobVarHandle(int typeID) {
 	index = 0;
 	name = "";
 	address = nullptr;
+	value_ptr = nullptr;
 	this->typeID = typeID;
 
 	switch (typeID) {
@@ -40,31 +41,32 @@ GlobVarHandle::GlobVarHandle(int typeID) {
 	}
 }
 
-void GlobVarHandle::applyValue() {
-	switch (typeID) {
-	case AG_STRING: {
-		std::string* address_Str = static_cast<std::string*>(address);
-		std::string* value_Str = static_cast<std::string*>(value_ptr);
+GlobVarHandle::~GlobVarHandle() {
+	auto cl = value_ptr;
+	delete cl;
+}
 
-		*address_Str = *value_Str;
-		break;
-	}
-	default:
-		memcpy(address, value_ptr, size);
-		break;
-	}
+void GlobVarHandle::applyValue() {
+	copyValue(value_ptr, address);
 }
 void GlobVarHandle::updValue() {
+	copyValue(address, value_ptr);
+}
+
+void GlobVarHandle::copyValue(void* src, void* dest) {
 	switch (typeID) {
 	case AG_STRING: {
-		std::string* address_Str = static_cast<std::string*>(address);
-		std::string* value_Str = static_cast<std::string*>(value_ptr);
-
-		*value_Str = *address_Str;
+#ifdef _DEBUG
+		std::string* src_Str = static_cast<std::string*>(src);
+		std::string* dest_Str = static_cast<std::string*>(dest);
+		*dest_Str = *src_Str;
+#else
+		memcpy(dest, src, size);
+#endif
 		break;
 	}
 	default:
-		memcpy(value_ptr, address, size);
+		memcpy(dest, src, size);
 		break;
 	}
 }

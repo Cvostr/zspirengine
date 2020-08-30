@@ -115,6 +115,9 @@ void ZSpireEngine::loadGame(){
     //Allocate script manager
     game_data->script_manager = new Engine::AGScriptMgr;
 
+    game_data->out_manager = new Engine::OutputManager;
+    game_data->out_manager->consoleLogWorking = true;
+
     game_data->world = new Engine::World();
 
     switch(this->desc->game_perspective){

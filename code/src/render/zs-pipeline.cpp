@@ -6,6 +6,8 @@
 
 #define LIGHT_STRUCT_SIZE 64
 extern ZSpireEngine* engine_ptr;
+//Hack to support resources
+extern ZSGAME_DATA* game_data;
 
 void Engine::RenderSettings::defaults(){
     ambient_light_color = ZSRGBCOLOR(255, 255, 255, 255);
@@ -32,6 +34,7 @@ void Engine::RenderPipeline::initShaders(){
         this->terrain_shader = allocShader();
         this->grass_shader = Engine::allocShader();
         this->shadowMap = Engine::allocShader();
+        this->final_shader = Engine::allocShader();
 
         this->deffered_light->compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag");
         this->default3d->compileFromFile("Shaders/3d/3d.vert", "Shaders/3d/3d.frag");
@@ -39,6 +42,7 @@ void Engine::RenderPipeline::initShaders(){
         this->terrain_shader->compileFromFile("Shaders/heightmap/heightmap.vert", "Shaders/heightmap/heightmap.frag");
         this->grass_shader->compileFromFile("Shaders/heightmap/grass.vert", "Shaders/heightmap/grass.frag");
         this->shadowMap->compileFromFile("Shaders/shadowmap/shadowmap.vert", "Shaders/shadowmap/shadowmap.frag");
+        this->final_shader->compileFromFile("Shaders/postprocess/final/final.vert", "Shaders/postprocess/final/final.frag");
 
         MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, 9);
     }
@@ -156,6 +160,7 @@ void Engine::RenderPipeline::destroy(){
         shadowMap->Destroy();
 
         delete gbuffer;
+        delete df_light_buffer;
     }
 }
 
@@ -193,12 +198,12 @@ void Engine::RenderPipeline::setLightsToBuffer(){
 }
 
 void Engine::RenderPipeline::render(){
-    ZSGAME_DATA* game = static_cast<ZSGAME_DATA*>(engine_ptr->getGameDataPtr());
-    World* world_ptr = game->world;
-    //send lights to uniform buffer
-    setLightsToBuffer();
+    World* world_ptr = game_data->world;
+
     //set camera data to transform buffer
     updateShadersCameraInfo(world_ptr->getCameraPtr());
+    //send lights to uniform buffer
+    setLightsToBuffer();
 
     switch(engine_ptr->desc->game_perspective){
         case PERSP_2D:{
@@ -213,20 +218,23 @@ void Engine::RenderPipeline::render(){
 }
 
 void Engine::RenderPipeline::render2D(){
-    ZSGAME_DATA* game = static_cast<ZSGAME_DATA*>(engine_ptr->getGameDataPtr());
-    World* world_ptr = game->world;
+    World* world_ptr = game_data->world;
 
     if(engine_ptr->engine_info->graphicsApi == OGL32){
-        glClearColor(0,0,0,1);
+        glClearColor(0, 0, 0, 1);
         ClearFBufferGL(true, true);
+        glEnable(GL_BLEND); //Disable blending to render Skybox and shadows
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        setFullscreenViewport(this->WIDTH, this->HEIGHT);
 
-        //Iterate over all objects in the world
+        glEnable(GL_DEPTH_TEST);
+
+        //Render objects
         processObjects(world_ptr);
     }
 }
 void Engine::RenderPipeline::render3D(Engine::Camera* cam){
-    ZSGAME_DATA* game = static_cast<ZSGAME_DATA*>(engine_ptr->getGameDataPtr());
-    World* world_ptr = game->world;
+    World* world_ptr = game_data->world;
     //Render shadows, first
     TryRenderShadows(cam);
 
@@ -247,13 +255,16 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
     setDepthState(false);
     setFaceCullState(false);
 
-    //df_light_buffer->bind();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0); //Back to default framebuffer
+    df_light_buffer->bind();
     ClearFBufferGL(true, false); //Clear screen
     gbuffer->bindTextures(10); //Bind gBuffer textures
     deffered_light->Use(); //use deffered shader
+    Engine::getPlaneMesh2D()->Draw(); //Draw screen
 
-    //df_light_buffer->bindTextures(0);
+    //Draw result into main buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    df_light_buffer->bindTextures(0);
+    final_shader->Use();
     Engine::getPlaneMesh2D()->Draw(); //Draw screen
 
 }
@@ -606,71 +617,4 @@ void Engine::RenderPipeline::TryRenderSkybox() {
         if (skybox != nullptr)
             skybox->DrawSky(this);
     }
-}
-
-void Engine::GLframebuffer::bind() {
-    glBindFramebuffer(GL_FRAMEBUFFER, fbuffer);
-    glViewport(0, 0, Width, Height);
-}
-
-void Engine::GLframebuffer::bindTextures(unsigned int m) {
-    for (unsigned int t = 0; t < texture_size; t++) {
-        glActiveTexture(GL_TEXTURE0 + m + t);
-        glBindTexture(GL_TEXTURE_2D, textures[t]);
-    }
-}
-
-void Engine::GLframebuffer::addTexture(GLint intFormat, GLint format) {
-    if (texture_size == MAX_RENDERER_ATTACHMENT_COUNT) return;
-    bind();
-    //Create texture
-    glGenTextures(1, &textures[texture_size]);
-    glBindTexture(GL_TEXTURE_2D, textures[texture_size]);
-    glTexImage2D(GL_TEXTURE_2D, 0, intFormat, Width, Height, 0, format, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + texture_size, GL_TEXTURE_2D, textures[texture_size], 0);
-    texture_size++; //Add texture
-
-    unsigned int attachments[MAX_RENDERER_ATTACHMENT_COUNT] =
-    { GL_COLOR_ATTACHMENT0,
-    GL_COLOR_ATTACHMENT1,
-    GL_COLOR_ATTACHMENT2,
-    GL_COLOR_ATTACHMENT3,
-    GL_COLOR_ATTACHMENT4,
-    GL_COLOR_ATTACHMENT5,
-    GL_COLOR_ATTACHMENT6 };
-
-    glDrawBuffers(texture_size, attachments);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-Engine::GLframebuffer::~GLframebuffer() {
-    if (Depth)
-        glDeleteRenderbuffers(1, &this->depthBuffer);
-    glDeleteFramebuffers(1, &this->fbuffer);
-
-    for (unsigned int t = 0; t < texture_size; t++) {
-        glDeleteTextures(1, &textures[t]);
-    }
-}
-Engine::GLframebuffer::GLframebuffer(unsigned int width, unsigned int height, bool depth) {
-    textures[0] = 0;
-    this->Width = width;
-    this->Height = height;
-
-    this->Depth = depth;
-    this->depthBuffer = 0;
-    texture_size = 0;
-
-    glGenFramebuffers(1, &fbuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbuffer);
-    if (depth) {
-        glGenRenderbuffers(1, &depthBuffer);
-        glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0); //return back to default
 }
