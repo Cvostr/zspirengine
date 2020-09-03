@@ -298,6 +298,19 @@ void Engine::GameObject::onTrigger(GameObject* obj){
     }
 }
 
+void Engine::GameObject::onTriggerEnter(GameObject* obj) {
+    for (unsigned int i = 0; i < props_num; i++) { //iterate over all properties
+        if (!properties[i]->active) continue; //if property is inactive, then skip it
+        properties[i]->onTriggerEnter(obj); //and call onUpdate on each property
+    }
+}
+void Engine::GameObject::onTriggerExit(GameObject* obj) {
+    for (unsigned int i = 0; i < props_num; i++) { //iterate over all properties
+        if (!properties[i]->active) continue; //if property is inactive, then skip it
+        properties[i]->onTriggerExit(obj); //and call onUpdate on each property
+    }
+}
+
 void Engine::GameObject::copyTo(GameObject* dest){
     dest->array_index = this->array_index;
     dest->alive = this->alive;

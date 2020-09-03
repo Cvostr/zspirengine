@@ -55,6 +55,7 @@ void PhysicalWorld::rayTest(ZSVECTOR3 pos, ZSVECTOR3 dir, btCollisionWorld::RayR
 }
 
 void PhysicalWorld::stepSimulation(float stepSimulation){
+    if (stepSimulation > 200) return;
     //Simulate physics
     this->physic_world->stepSimulation(stepSimulation);
     physic_world->performDiscreteCollisionDetection();
@@ -79,7 +80,6 @@ Engine::PhysicalProperty::PhysicalProperty(){
 
     coll_type = COLLIDER_TYPE::COLLIDER_TYPE_BOX;
     mass = 0;
-
 }
 
 void Engine::PhysicalProperty::copyTo(Engine::GameObjectProperty* dest){
@@ -107,17 +107,7 @@ bool Engine::PhysicalProperty::init(){
     if (isDynamic)
         shape->calculateLocalInertia(mass, localInertia);
     //Declare start transform
-    btTransform startTransform;
-    startTransform.setIdentity();
-    //Set start transform
-    startTransform.setOrigin(btVector3( btScalar(transform->abs_translation.X + transform_offset.X),
-                                                btScalar(transform->abs_translation.Y + transform_offset.Y),
-                                                btScalar(transform->abs_translation.Z + transform_offset.Z)));
-
-    btQuaternion b;
-    b.setEuler(transform->abs_rotation.Z, transform->abs_rotation.Y, transform->abs_rotation.X);
-    //Set start rotation
-    startTransform.setRotation(btQuaternion(transform->abs_rotation.X, transform->abs_rotation.Y, transform->abs_rotation.Z));
+    btTransform startTransform = getBtTransform();
 
     //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
     btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
@@ -135,14 +125,10 @@ bool Engine::PhysicalProperty::init(){
 void Engine::TriggerProperty::initGhost() {
     Engine::TransformProperty* transform = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
 
-    ZSVECTOR3 scale = transform->abs_scale;
     ZSVECTOR3 pos = transform->abs_translation;
-    //if Custom Physical Size is checked
-    if (isCustomPhysicalSize) {
-        scale = cust_size;
-    }   
     //if uninitialized
-    this->shape = new btCapsuleShape(scale.X, scale.Y);
+    if (!updateCollisionShape())
+        return;
     //Declare start transform
     btTransform startTransform;
     startTransform.setIdentity();
@@ -152,11 +138,33 @@ void Engine::TriggerProperty::initGhost() {
     startTransform.setRotation(btQuaternion(transform->abs_rotation.X, transform->abs_rotation.Y, transform->abs_rotation.Z));
     //Create Ghost Object
     m_ghost = new btGhostObject();
+    m_ghost->setCollisionFlags(m_ghost->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
     m_ghost->setCollisionShape(shape);
+    m_ghost->setUserIndex(this->go_link.updLinkPtr()->array_index);
     m_ghost->setWorldTransform(startTransform);
     go_link.world_ptr->physical_world->addCollisionObjToWorld(m_ghost);
 
     created = true;
+}
+
+btTransform Engine::PhysicalProperty::getBtTransform() {
+    Engine::TransformProperty* transform = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
+
+    ZSVECTOR3 pos = transform->abs_translation;
+    ZSVECTOR3 rot = transform->abs_rotation;
+
+    btTransform startTransform;
+    startTransform.setIdentity();
+    //Set start transform
+    startTransform.setOrigin(btVector3(btScalar(pos.X + transform_offset.X),
+                                       btScalar(pos.Y + transform_offset.Y),
+                                       btScalar(pos.Z + transform_offset.Z)));
+    //Set start rotation
+    startTransform.setRotation(btQuaternion(rot.X, rot.Y, rot.Z));
+    //btQuaternion b;
+    //b.setEuler(transform->abs_rotation.Z, transform->abs_rotation.Y, transform->abs_rotation.X);
+
+    return startTransform;
 }
 
 bool Engine::PhysicalProperty::updateCollisionShape(){

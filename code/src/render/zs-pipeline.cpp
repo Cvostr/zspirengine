@@ -133,6 +133,9 @@ void Engine::RenderPipeline::create_G_Buffer(unsigned int width, unsigned int he
     df_light_buffer = new GLframebuffer(width, height, false);
     df_light_buffer->addTexture(GL_RGBA, GL_RGBA); //Diffuse map
     df_light_buffer->addTexture(GL_RGB, GL_RGB); //Bloom map
+
+    ui_buffer = new GLframebuffer(width, height, false);
+    ui_buffer->addTexture(GL_RGBA, GL_RGBA); //UI Diffuse map
 }
 
 void Engine::RenderPipeline::destroy(){
@@ -221,14 +224,12 @@ void Engine::RenderPipeline::render2D(){
     World* world_ptr = game_data->world;
 
     if(engine_ptr->engine_info->graphicsApi == OGL32){
-        glClearColor(0, 0, 0, 1);
+        setClearColor(0, 0, 0, 1);
         ClearFBufferGL(true, true);
         glEnable(GL_BLEND); //Disable blending to render Skybox and shadows
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         setFullscreenViewport(this->WIDTH, this->HEIGHT);
-
-        glEnable(GL_DEPTH_TEST);
-
+        setDepthState(true);
         //Render objects
         processObjects(world_ptr);
     }
@@ -238,35 +239,57 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
     //Render shadows, first
     TryRenderShadows(cam);
 
-    //Bind Geometry Buffer to make Deferred Shading
-    gbuffer->bind();
-    glClearColor(0,0,0,1);
-    ClearFBufferGL(true, true);
-    setBlendingState(false);
-    setFullscreenViewport(this->WIDTH, this->HEIGHT);
+    {
+        //Bind Geometry Buffer to make Deferred Shading
+        gbuffer->bind();
+        setClearColor(0, 0, 0, 1);
+        ClearFBufferGL(true, true);
+        {
+            //Render Skybox
+            setBlendingState(false);
+            setFullscreenViewport(this->WIDTH, this->HEIGHT);
+            TryRenderSkybox();
+        }
+        {
+            //Render World
+            setDepthState(true);
+            setFaceCullState(true);
+            //Render whole world
+            processObjects(world_ptr);
+        }
+    }
 
-    TryRenderSkybox();
-    
-    setDepthState(true);
-    setFaceCullState(true);
-    //Iterate over all objects in the world
-    processObjects(world_ptr);
-    //Disable depth rendering to draw plane correctly
-    setDepthState(false);
-    setFaceCullState(false);
+    //Process Deffered lights
+    {
+        df_light_buffer->bind();
+        ClearFBufferGL(true, false); //Clear screen
+        //Disable depth rendering to draw plane correctly
+        setDepthState(false);
+        setFaceCullState(false);
+        gbuffer->bindTextures(10); //Bind gBuffer textures
+        deffered_light->Use(); //use deffered shader
+        Engine::getPlaneMesh2D()->Draw(); //Draw screen
+    }
 
-    df_light_buffer->bind();
-    ClearFBufferGL(true, false); //Clear screen
-    gbuffer->bindTextures(10); //Bind gBuffer textures
-    deffered_light->Use(); //use deffered shader
-    Engine::getPlaneMesh2D()->Draw(); //Draw screen
+    //Render ALL UI
+    {
+        ui_buffer->bind();
+        setClearColor(0, 0, 0, 0);
+        ClearFBufferGL(true, false); //Clear screen 
+        setDepthState(false);
+        setBlendingState(true);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        renderUI();
+    }
 
     //Draw result into main buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    df_light_buffer->bindTextures(0);
-    final_shader->Use();
-    Engine::getPlaneMesh2D()->Draw(); //Draw screen
-
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        df_light_buffer->bindTextures(0);
+        ui_buffer->bindTextures(1);
+        final_shader->Use();
+        Engine::getPlaneMesh2D()->Draw(); //Draw screen
+    }
 }
 
 void Engine::RenderPipeline::processObjects(void* world_ptr) {
@@ -431,8 +454,6 @@ void Engine::SkyboxProperty::DrawSky(RenderPipeline* pipeline){
     Engine::getSkyboxMesh()->Draw();
 }
 
-
-
 void Engine::TileProperty::onRender(Engine::RenderPipeline* pipeline){
     Engine::Shader* tile_shader = pipeline->getTileShader();
 
@@ -487,6 +508,23 @@ void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
     skyboxTransformUniformBuffer->bind();
     skyboxTransformUniformBuffer->writeData(0, sizeof (ZSMATRIX4x4), &proj);
     skyboxTransformUniformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &view);
+}
+
+void Engine::RenderPipeline::renderUI() {
+    GlyphFontContainer* c = game_data->resources->getFontByLabel("LiberationMono-Regular.ttf")->font_ptr;
+    int f[12];
+    f[0] = static_cast<int>(L'H');
+    f[1] = static_cast<int>(L'e');
+    f[2] = static_cast<int>(L'l');
+    f[3] = static_cast<int>(L'l');
+    f[4] = static_cast<int>(L'o');
+    f[5] = static_cast<int>(L' ');
+    f[6] = static_cast<int>(L'W');
+    f[7] = static_cast<int>(L'o');
+    f[8] = static_cast<int>(L'r');
+    f[9] = static_cast<int>(L'l');
+    f[10] = static_cast<int>(L'd');
+    c->DrawString(f, 11, ZSVECTOR2(10,10));
 }
 
 void Engine::RenderPipeline::renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY){
@@ -599,6 +637,10 @@ void Engine::RenderPipeline::ClearFBufferGL(bool clearColor, bool clearDepth) {
         clearMask |= GL_DEPTH_BUFFER_BIT;
 
     glClear(clearMask);
+}
+
+void Engine::RenderPipeline::setClearColor(float r, float g, float b, float a) {
+    glClearColor(r, g, b, a);
 }
 
 void Engine::RenderPipeline::TryRenderShadows(Engine::Camera* cam) {

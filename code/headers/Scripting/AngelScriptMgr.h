@@ -10,6 +10,7 @@
 #define GAME_OBJECT_PROP_TYPE_NAME "GameObjectProperty"
 
 #define RESOURCE_TYPE_NAME "Resource"
+#define RESOURCEMAN_TYPE_NAME "ResourceManager"
 #define TEXRESOURCE_TYPE_NAME "TextureResource"
 #define MESHRESOURCE_TYPE_NAME "MeshResource"
 #define AUDRESOURCE_TYPE_NAME "AudioResource"
@@ -42,7 +43,7 @@ namespace Engine {
         int RegisterInterface(const char* name);
         int RegisterObjectType(const char* name, int byteSize, asDWORD flags);
         int RegisterObjectMethod(const char* obj, std::string declaration, const asSFuncPtr& funcPointer, asDWORD callConv, void* auxiliary = 0, int compositeOffset = 0, bool isCompositeIndirect = false);
-        int RegisterGlobalProperty(const char* declaration, void* pointer);
+        int RegisterGlobalProperty(std::string declaration, void* pointer);
         int RegisterObjectProperty(const char* obj, const char* declaration, int byteOffset, int compositeOffset = 0, bool isCompositeIndirect = false);
 
         int RegisterObjectBehaviour(const char* obj, asEBehaviours behaviour, const char* declaration, const asSFuncPtr& funcPointer, asDWORD callConv, void* auxiliary = 0, int compositeOffset = 0, bool isCompositeIndirect = false);
@@ -68,6 +69,7 @@ namespace Engine {
     void bindResourceSDK(const char* className, AGScriptMgr* mgr);
     void bindResourcesSDK(AGScriptMgr* mgr);
     void bindInputSDK(AGScriptMgr* mgr);
+    void bindResourceManagerSDK(AGScriptMgr* mgr);
 
     template<class T>
     void bindGameObjectPropertySDK(AGScriptMgr* mgr, const char* obj_type) {

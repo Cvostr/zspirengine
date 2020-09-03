@@ -14,11 +14,13 @@ void Engine::TriggerProperty::onUpdate(float deltaTime) {
         //Iterate over all overlapping objects
         for (int i = 0; i < (int)overlaping; i++) {
             btCollisionObject* coll_obj = m_ghost->getOverlappingObject(i);
-            if (coll_obj == nullptr) continue;
+            if (coll_obj == nullptr) 
+                continue;
             btRigidBody* pRigidBody = static_cast<btRigidBody*>(coll_obj);
             int obj_ind = pRigidBody->getUserIndex();
             GameObject* obj = this->go_link.world_ptr->getGameObjectByArrayIndex(obj_ind);
-            if (obj == nullptr) continue;
+            if (obj == nullptr) 
+                continue;
             this->go_link.updLinkPtr()->onTrigger(obj);
         }
     }

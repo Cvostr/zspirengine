@@ -16,19 +16,34 @@ void printToConsole(asIScriptGeneric* gen)
 		int typeId = gen->GetArgTypeId(arg_i);
 
 		switch (typeId) {
-		case asTYPEID_INT32: {
-			int v = 0;
-			memcpy(&v, ref, sizeof(int));
-			out += std::to_string(v) + " ";
-			break;
+			case asTYPEID_INT32: {
+				int* v = static_cast<int*>(ref);
+				out += std::to_string(*v);
+				break;
+			}
+			case asTYPEID_FLOAT: {
+				float* f = static_cast<float*>(ref);
+				out += std::to_string(*f);
+				break;
+			}
+			case asTYPEID_BOOL: {
+				bool* f = static_cast<bool*>(ref);
+				out += (*f == true) ? "true" : "false";
+				break;
+			}
+			case AG_STRING: {
+				std::string* str = static_cast<std::string*>(ref);
+				out += *str;
+				break;
+			}
+			case AG_VECTOR3: {
+				ZSVECTOR3* vec = static_cast<ZSVECTOR3*>(ref);
+				out += "(" + std::to_string(vec->X) + ", " + std::to_string(vec->Y) + ", " + std::to_string(vec->Z) + ")";
+				break;
+			}
 		}
-		case asTYPEID_FLOAT: {
-			float f = 0;
-			memcpy(&f, ref, sizeof(float));
-			out += std::to_string(f) + " ";
-			break;
-		}
-		}
+		//Add space
+		out += " ";
 	}
 	game_data->out_manager->addConsoleLog(LogEntryType::LE_TYPE_SCRIPT_MESSAGE, out);
 }
@@ -70,6 +85,7 @@ void MessageCallback(const asSMessageInfo* msg, void* param)
 
 AGScriptMgr::AGScriptMgr() {
 	ag_engine = asCreateScriptEngine();
+	
 	int r = ag_engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
 	assert(r >= 0);
 	RegisterStdString(ag_engine);
@@ -81,6 +97,7 @@ AGScriptMgr::AGScriptMgr() {
 	bindMathSDK(this);
 	bindWorldSDK(this);
 	bindResourcesSDK(this);
+	bindResourceManagerSDK(this);
 	bindInputSDK(this);
 	bindGameObjectPropertySDK<TransformProperty>(this, TRANSFORM_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<LightsourceProperty>(this, LIGHTSOURCE_PROP_TYPE_NAME);
@@ -90,7 +107,12 @@ AGScriptMgr::AGScriptMgr() {
 
 	bindGameObjectPropertiesSDK(this);
 
-	r = RegisterGlobalFunction("void print(?&in, ?&in)", asFUNCTION(printToConsole), asCALL_GENERIC);
+	std::string args = "?&in";
+	for (unsigned int i = 0; i < 9; i++) {
+		args += ", ?&in";
+		std::string func = "void print(" + args + ")";
+		r = RegisterGlobalFunction(func.c_str(), asFUNCTION(printToConsole), asCALL_GENERIC);
+	}
 
 	assert(r >= 0);
 
@@ -119,8 +141,8 @@ int AGScriptMgr::RegisterObjectMethod(const char* obj, std::string declaration, 
 	return ag_engine->RegisterObjectMethod(obj, declaration.c_str(), funcPointer, callConv, auxiliary, compositeOffset, isCompositeIndirect);
 }
 
-int AGScriptMgr::RegisterGlobalProperty(const char* declaration, void* pointer) {
-	return ag_engine->RegisterGlobalProperty(declaration, pointer);
+int AGScriptMgr::RegisterGlobalProperty(std::string declaration, void* pointer) {
+	return ag_engine->RegisterGlobalProperty(declaration.c_str(), pointer);
 }
 
 int AGScriptMgr::RegisterObjectProperty(const char* obj, const char* declaration, int byteOffset, int compositeOffset, bool isCompositeIndirect ) {

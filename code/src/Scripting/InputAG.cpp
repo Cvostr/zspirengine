@@ -18,6 +18,7 @@ void bindKeyCodes(Engine::AGScriptMgr* mgr) {
 	mgr->RegisterEnumValue(KEY_TYPE_NAME, "KEY_LALT", SDLK_LALT);
 	mgr->RegisterEnumValue(KEY_TYPE_NAME, "KEY_RALT", SDLK_RALT);
 	mgr->RegisterEnumValue(KEY_TYPE_NAME, "KEY_ENTER", SDLK_RETURN);
+	mgr->RegisterEnumValue(KEY_TYPE_NAME, "KEY_SPACE", SDLK_SPACE);
 }
 
 void bindMouseStateClassSDK(Engine::AGScriptMgr* mgr) {

@@ -93,6 +93,8 @@ public:
     virtual void loadPropertyFromMemory(const char* data, GameObject* obj);
     virtual void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
     virtual void onTrigger(Engine::GameObject* obj);
+    virtual void onTriggerEnter(Engine::GameObject* obj);
+    virtual void onTriggerExit(Engine::GameObject* obj);
     //Editor specific functions
     virtual void addPropertyInterfaceToInspector();
     virtual void onValueChanged();
@@ -220,6 +222,8 @@ public:
     void onPreRender(RenderPipeline* pipeline); //calls onPreRender on all properties
     void onRender(RenderPipeline* pipeline); //calls onRender on all properties
     void onTrigger(GameObject* obj);
+    void onTriggerEnter(GameObject* obj);
+    void onTriggerExit(GameObject* obj);
     //true, if object has rigidbody component
     bool isRigidbody();
     void* getPhysicalProperty();

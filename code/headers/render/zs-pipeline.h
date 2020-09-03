@@ -47,10 +47,12 @@ protected:
 
     GLframebuffer* gbuffer;
     GLframebuffer* df_light_buffer;
+    GLframebuffer* ui_buffer;
 
     void setLightsToBuffer();
     void updateShadersCameraInfo(Engine::Camera* cam_ptr);
 
+    void setClearColor(float r, float g, float b, float a);
     void setBlendingState(bool blend);
     void setDepthState(bool depth);
     void setFaceCullState(bool face_cull);
@@ -98,6 +100,8 @@ public:
 
     void TryRenderShadows(Engine::Camera* cam);
     void TryRenderSkybox();
+
+    void renderUI();
 
     void renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY);
     void renderSprite(Engine::TextureResource* texture_sprite, int X, int Y, int scaleX, int scaleY);

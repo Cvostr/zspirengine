@@ -205,6 +205,7 @@ protected:
 
     bool init();
     bool updateCollisionShape();
+    btTransform getBtTransform();
 public:
     bool isCustomPhysicalSize;
     ZSVECTOR3 cust_size;
@@ -271,6 +272,7 @@ public:
     void addPropertyInterfaceToInspector();
     void copyTo(Engine::GameObjectProperty* dest);
     void onUpdate(float deltaTime);
+    void onStart();
 
     void setLinearVelocity(ZSVECTOR3 lvel);
 

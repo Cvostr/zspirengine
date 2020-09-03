@@ -49,6 +49,14 @@ void Engine::GameObjectProperty::onTrigger(Engine::GameObject* obj){
     assert(obj);
 }
 
+void Engine::GameObjectProperty::onTriggerEnter(Engine::GameObject* obj) {
+
+}
+
+void Engine::GameObjectProperty::onTriggerExit(Engine::GameObject* obj) {
+
+}
+
 void Engine::GameObjectProperty::addPropertyInterfaceToInspector(){
 }
 
