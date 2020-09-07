@@ -70,7 +70,11 @@ namespace Engine{
         bool hasCompilerErrors();
 
         void onStart();
+        void onStop();
         void onUpdate();
+        void onTrigger(Engine::GameObject* obj);
+        void onTriggerEnter(Engine::GameObject* obj);
+        void onTriggerExit(Engine::GameObject* obj);
 
         AGScript(AGScriptMgr* engine, Engine::GameObject* obj, std::string ClassName);
         ~AGScript();

@@ -14,6 +14,8 @@
 #define TEXRESOURCE_TYPE_NAME "TextureResource"
 #define MESHRESOURCE_TYPE_NAME "MeshResource"
 #define AUDRESOURCE_TYPE_NAME "AudioResource"
+#define ANIMRESOURCE_TYPE_NAME "AnimationResource"
+#define MATRESOURCE_TYPE_NAME "MaterialResource"
 
 #define VEC3_TYPE_NAME "Vec3"
 #define QUAT_TYPE_NAME "Quat"

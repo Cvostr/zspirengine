@@ -33,6 +33,7 @@ public:
     void addPropertyInterfaceToInspector();
     void onValueChanged(); //Update mesh    pointer
     void loadPropertyFromMemory(const char* data, GameObject* obj);
+    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     MeshProperty();
 };
@@ -53,6 +54,10 @@ public:
     void makeGlobalVarsList();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
+
+    void onTrigger(Engine::GameObject* obj);
+    void onTriggerEnter(Engine::GameObject* obj);
+    void onTriggerExit(Engine::GameObject* obj);
 
     ZPScriptProperty();
     ~ZPScriptProperty();
@@ -195,6 +200,7 @@ public:
     void onRender(Engine::RenderPipeline* pipeline);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
+    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     MaterialProperty();
 };
@@ -287,6 +293,8 @@ public:
 };
 
 class TriggerProperty : public Engine::PhysicalProperty {
+private:
+    
 public:
     btGhostObject* m_ghost;
 

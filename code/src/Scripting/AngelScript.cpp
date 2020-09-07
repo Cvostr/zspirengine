@@ -100,6 +100,19 @@ void AGScript::onStart() {
 	assert(r >= 0);
 }
 
+void AGScript::onStop() {
+	if (hasErrors == true)
+		return;
+
+	//Obtain Stop() function
+	asIScriptFunction* func = main_class->GetMethodByDecl("void Stop()");
+	//Execute function
+	engine->getAgScriptContext()->Prepare(func);
+	engine->getAgScriptContext()->SetObject(mainClass_obj);
+	int r = engine->getAgScriptContext()->Execute();
+	assert(r >= 0);
+}
+
 bool AGScript::hasCompilerErrors() {
 	return hasErrors;
 }
@@ -113,8 +126,27 @@ void AGScript::onUpdate() {
 	//Execute function
 	engine->getAgScriptContext()->Prepare(func);
 	engine->getAgScriptContext()->SetObject(mainClass_obj);
-	int r = engine->getAgScriptContext()->Execute();
-	assert(r >= 0);
+	engine->getAgScriptContext()->Execute();
+}
+
+void AGScript::onTrigger(Engine::GameObject* obj) {
+	if (hasErrors == true)
+		return;
+
+	//Obtain Update() function
+	asIScriptFunction* func = main_class->GetMethodByDecl("void onTrigger(GameObject@)");
+	//Execute function
+	engine->getAgScriptContext()->Prepare(func);
+	engine->getAgScriptContext()->SetObject(mainClass_obj);
+	engine->getAgScriptContext()->SetArgObject(0, obj);
+	engine->getAgScriptContext()->Execute();
+}
+
+void AGScript::onTriggerEnter(Engine::GameObject* obj) {
+
+}
+void AGScript::onTriggerExit(Engine::GameObject* obj) {
+
 }
 
 unsigned int AGScript::getGlobalVarsCount() {

@@ -296,6 +296,11 @@ void Engine::GameObject::onTrigger(GameObject* obj){
         if(!properties[i]->active) continue; //if property is inactive, then skip it
         properties[i]->onTrigger(obj); //and call onUpdate on each property
     }
+    //Work with scripts
+    for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
+        if (!scripts[i]->active) continue; //if script is inactive, then skip it
+        scripts[i]->onTrigger(obj); //and call onUpdate on each script
+    }
 }
 
 void Engine::GameObject::onTriggerEnter(GameObject* obj) {

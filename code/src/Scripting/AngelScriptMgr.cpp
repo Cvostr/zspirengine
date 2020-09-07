@@ -104,14 +104,16 @@ AGScriptMgr::AGScriptMgr() {
 	bindGameObjectPropertySDK<AudioSourceProperty>(this, AUDSOURCE_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<CharacterControllerProperty>(this, CHAR_CTRL_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<AnimationProperty>(this, ANIM_PROP_TYPE_NAME);
+	bindGameObjectPropertySDK<MeshProperty>(this, MESH_PROP_TYPE_NAME);
+	bindGameObjectPropertySDK<MaterialProperty>(this, MAT_PROP_TYPE_NAME);
 
 	bindGameObjectPropertiesSDK(this);
 
 	std::string args = "?&in";
 	for (unsigned int i = 0; i < 9; i++) {
-		args += ", ?&in";
 		std::string func = "void print(" + args + ")";
 		r = RegisterGlobalFunction(func.c_str(), asFUNCTION(printToConsole), asCALL_GENERIC);
+		args += ", ?&in";
 	}
 
 	assert(r >= 0);

@@ -80,17 +80,22 @@ void Engine::AudioSourceProperty::setAudioResource(Engine::AudioResource* res) {
 }
 
 void Engine::AudioSourceProperty::audio_start() {
-    if (buffer_ptr->resource_state == RESOURCE_STATE::STATE_LOADED) {
-        //Update source buffer
-        if (buffer_ptr == nullptr) return;
-        this->source.setAlBuffer(this->buffer_ptr->buffer);
-        //play source
-        this->source.play();
-
-    }
-    else {
-        this->buffer_ptr->load();
-        isPlaySheduled = true;
+    //Check, if resource exists
+    if (buffer_ptr != nullptr) {
+        //resource exists
+        //Check, if resource loaded
+        if (buffer_ptr->resource_state == RESOURCE_STATE::STATE_LOADED) {
+            //resource loaded
+            //Update source buffer
+            this->source.setAlBuffer(this->buffer_ptr->buffer);
+            //play source
+            this->source.play();
+        }
+        else {
+            //resource isn't loaded
+            this->buffer_ptr->load();
+            isPlaySheduled = true;
+        }
     }
 }
 
@@ -145,15 +150,14 @@ void Engine::AudioSourceProperty::loadPropertyFromMemory(const char* data, GameO
 }
 
 void Engine::AudioSourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
-    int result = 0;
-    result = mgr->RegisterObjectType(AUDSOURCE_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
-    assert(result >= 0);
+    mgr->RegisterObjectType(AUDSOURCE_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
     
-    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void Play()", asMETHOD(AudioSourceProperty, audio_start), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void Stop()", asMETHOD(AudioSourceProperty, audio_stop), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void Pause()", asMETHOD(AudioSourceProperty, audio_pause), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "float getGain()", asMETHOD(AudioSourceProperty, getGain), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "float getPitch()", asMETHOD(AudioSourceProperty, getPitch), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void setPitch(float)", asMETHOD(AudioSourceProperty, setPitch), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void setGain(float)", asMETHOD(AudioSourceProperty, setGain), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void Play()", asMETHOD(AudioSourceProperty, audio_start), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void Stop()", asMETHOD(AudioSourceProperty, audio_stop), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void Pause()", asMETHOD(AudioSourceProperty, audio_pause), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "float getGain()", asMETHOD(AudioSourceProperty, getGain), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "float getPitch()", asMETHOD(AudioSourceProperty, getPitch), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void setPitch(float)", asMETHOD(AudioSourceProperty, setPitch), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void setGain(float)", asMETHOD(AudioSourceProperty, setGain), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(AUDSOURCE_PROP_TYPE_NAME, "void setAudio(AudioResource@)", asMETHOD(AudioSourceProperty, setAudioResource), asCALL_THISCALL);
 }

@@ -259,7 +259,7 @@ void Engine::ScriptResource::load(){
         for(unsigned int i = 0; i < this->request->size; i ++){
             this->script_content.push_back(static_cast<char>(request->data[i]));
         }
-        size = request->size;
+        //size = request->size;
 
         delete[] request->data;
         delete this->request;

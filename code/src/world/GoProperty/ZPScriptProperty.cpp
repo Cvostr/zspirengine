@@ -96,6 +96,16 @@ void Engine::ZPScriptProperty::copyTo(Engine::GameObjectProperty* dest) {
 	}
 }
 
+void Engine::ZPScriptProperty::onTrigger(Engine::GameObject* obj) {
+	script->onTrigger(obj);
+}
+void Engine::ZPScriptProperty::onTriggerEnter(Engine::GameObject* obj) {
+	script->onTriggerEnter(obj);
+}
+void Engine::ZPScriptProperty::onTriggerExit(Engine::GameObject* obj) {
+	script->onTriggerExit(obj);
+}
+
 void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
 	unsigned int offset = 1;
 	unsigned int vars = 0;

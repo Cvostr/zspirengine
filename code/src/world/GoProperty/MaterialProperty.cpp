@@ -53,3 +53,9 @@ void Engine::MaterialProperty::loadPropertyFromMemory(const char* data, GameObje
     this->group_label = material_ptr->group_ptr->groupCaption;
 }
 
+void Engine::MaterialProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    mgr->RegisterObjectType(MAT_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+
+    mgr->RegisterObjectMethod(MAT_PROP_TYPE_NAME, "void setMaterial(MaterialResource@)", asMETHOD(MaterialProperty, _setMaterial), asCALL_THISCALL);
+
+}

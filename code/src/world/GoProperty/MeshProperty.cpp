@@ -61,3 +61,10 @@ void Engine::MeshProperty::loadPropertyFromMemory(const char* data, GameObject* 
     memcpy(&castShadows, data + offset, sizeof(bool));
     offset += sizeof(bool);
 }
+
+void Engine::MeshProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    mgr->RegisterObjectType(MESH_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+
+    mgr->RegisterObjectMethod(MESH_PROP_TYPE_NAME, "void setMesh(MeshResource@)", asMETHOD(MeshProperty, setMeshResource), asCALL_THISCALL);
+
+}
