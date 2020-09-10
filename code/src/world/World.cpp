@@ -1,5 +1,5 @@
 #include "../../headers/world/World.h"
-#include "../../headers/misc/randomg.h"
+#include "../../headers/misc/misc.h"
 
 Engine::World::World(){
     objects.reserve(MAX_OBJS);
@@ -97,6 +97,20 @@ void Engine::World::removeObject(GameObject* obj) {
     Engine::GameObjectLink link = obj->getLinkToThisObject();
     //call object remove
     removeObj(link);
+}
+
+Engine::GameObject* Engine::World::newObject() {
+    Engine::GameObject obj; //Creating base gameobject
+    int add_num = 0; //Declaration of addititonal integer
+    getAvailableNumObjLabel("GameObject_", &add_num);
+
+    obj.world_ptr = this;
+    obj.addProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL);
+    obj.label_ptr = &obj.getLabelProperty()->label;
+    *obj.label_ptr = "GameObject_" + std::to_string(add_num); //Assigning label to object
+
+    obj.addProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM);
+    return this->addObject(obj); //Return pointer to new object
 }
 
 

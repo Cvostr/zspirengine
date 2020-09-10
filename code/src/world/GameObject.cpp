@@ -1,6 +1,6 @@
 #include "../../headers/world/World.h"
 #include "../../headers/world/go_properties.h"
-#include "../../headers/misc/randomg.h"
+#include "../../headers/misc/misc.h"
 
 Engine::GameObjectLink::GameObjectLink(){
     ptr = nullptr;

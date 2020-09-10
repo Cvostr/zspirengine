@@ -52,15 +52,13 @@ namespace Engine{
 
         asITypeInfo* getClassWithInterface(std::string class_name);
         
-        
-        void obtainScriptMainClass();
-
         asIScriptModule* module; //Module of the script
         asIScriptObject* mainClass_obj; //Object of main script class
         asITypeInfo* main_class; //Type of main script class
         bool hasErrors;
     public:
         void obtainScriptModule();
+        void obtainScriptMainClass();
 
         unsigned int getGlobalVarsCount();
         void* getGlobalVariableAddr(unsigned int index);

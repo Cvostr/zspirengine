@@ -64,8 +64,13 @@ public:
     std::string mesh_string; //Mesh to generate
 
     void copyTo(Engine::GameObjectProperty* dest);
+    void addPropertyInterfaceToInspector();
+
+    void process();
+    void clear();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
+    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
 
     TileGroupProperty();
 };
@@ -95,6 +100,7 @@ public:
     void setDiffuseTexture(std::string texture);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
+    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
 
     TileProperty();
 };

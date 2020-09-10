@@ -34,12 +34,12 @@ void Engine::TileGroupProperty::loadPropertyFromMemory(const char* data, GameObj
 
     memcpy(&isCreated, data + offset, sizeof(int));
     offset += sizeof(int);
-
+    //Write size
     memcpy(&geometry.tileWidth, data + offset, sizeof(int));
     offset += sizeof(int);
     memcpy(&geometry.tileHeight, data + offset, sizeof(int));
     offset += sizeof(int);
-
+    //Write amounts
     memcpy(&tiles_amount_X, data + offset, sizeof(int));
     offset += sizeof(int);
     memcpy(&tiles_amount_Y, data + offset, sizeof(int));
@@ -47,21 +47,30 @@ void Engine::TileGroupProperty::loadPropertyFromMemory(const char* data, GameObj
 
     this->isCreated = static_cast<bool>(isCreated);
 
-    offset ++; //Skip space
     //Read diffuse and mesh
-    //*world_stream >> t_ptr->diffuse_relpath >> t_ptr->mesh_string;
-
     diffuse_relpath.clear();
-    while (data[offset] != ' ' && data[offset] != '\n') {
+    while (data[offset] != '\0' && data[offset] != '\n') {
         diffuse_relpath += data[offset];
         offset++;
     }
     offset++;
     mesh_string.clear();
-    while (data[offset] != ' ' && data[offset] != '\n') {
+    while (data[offset] != '\0' && data[offset] != '\n') {
         mesh_string += data[offset];
         offset++;
     }
+}
+
+void Engine::TileGroupProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    int isCreated = static_cast<int>(this->isCreated);
+
+    stream->write(reinterpret_cast<char*>(&isCreated), sizeof(int));
+    stream->write(reinterpret_cast<char*>(&geometry.tileWidth), sizeof(int));
+    stream->write(reinterpret_cast<char*>(&geometry.tileHeight), sizeof(int));
+    stream->write(reinterpret_cast<char*>(&tiles_amount_X), sizeof(int));
+    stream->write(reinterpret_cast<char*>(&tiles_amount_Y), sizeof(int));
+
+    *stream << diffuse_relpath << '\0' << mesh_string << '\0';
 }
 
 Engine::TileProperty::TileProperty(){
@@ -124,7 +133,7 @@ void Engine::TileProperty::stopAnim(){
 }
 void Engine::TileProperty::setDiffuseTexture(std::string texture){
     diffuse_relpath = texture;
-        //Update texture pointer
+    //Update texture pointer
     updTexturePtr();
 }
 
@@ -132,17 +141,10 @@ void Engine::TileProperty::loadPropertyFromMemory(const char* data, GameObject* 
     unsigned int offset = 0;
     offset += 1; //Skip space
     //read textures relative pathes
-    diffuse_relpath.clear();
-    while (data[offset] != ' ' && data[offset] != '\n') {
-        diffuse_relpath += data[offset];
-        offset++;
-    }
+    readString(diffuse_relpath, data, offset);
+    
     offset++;
-    transparent_relpath.clear();
-    while (data[offset] != ' ' && data[offset] != '\n') {
-        transparent_relpath += data[offset];
-        offset++;
-    }
+    readString(transparent_relpath, data, offset);
 
     //set pointers to textures
     updTexturePtr();
@@ -156,5 +158,24 @@ void Engine::TileProperty::loadPropertyFromMemory(const char* data, GameObject* 
         offset += sizeof(int);
         memcpy(&anim_property.framesY, data + offset, sizeof(int));
         offset += sizeof(int);
+    }
+}
+
+void Engine::TileProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    if (diffuse_relpath.empty()) //check if object has no texture
+        *stream << "@none";
+    else
+        *stream << diffuse_relpath << '\0';
+
+    if (transparent_relpath.empty()) //check if object has no texture
+        *stream << "@none";
+    else
+        *stream << transparent_relpath << '\0';
+
+    //Animation stuff
+    stream->write(reinterpret_cast<char*>(&anim_property.isAnimated), sizeof(bool));
+    if (anim_property.isAnimated) { //if animated, then write animation properties
+        stream->write(reinterpret_cast<char*>(&anim_property.framesX), sizeof(int));
+        stream->write(reinterpret_cast<char*>(&anim_property.framesY), sizeof(int));
     }
 }

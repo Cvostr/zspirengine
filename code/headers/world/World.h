@@ -91,6 +91,7 @@ public:
     virtual void onAddToObject();
     virtual void onObjectDeleted();
     virtual void loadPropertyFromMemory(const char* data, GameObject* obj);
+    virtual void savePropertyToStream(std::ofstream* stream, GameObject* obj);
     virtual void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
     virtual void onTrigger(Engine::GameObject* obj);
     virtual void onTriggerEnter(Engine::GameObject* obj);
@@ -120,6 +121,7 @@ public:
     GameObject* getGameObjectByLabel(std::string label);
     GameObject* getGameObjectByArrayIndex(unsigned int index);
     GameObject* addObject(GameObject obj);
+    Engine::GameObject* newObject(); //Add new object to world
     void removeObj(Engine::GameObjectLink& link); //Remove object from world
     void removeObject(GameObject* obj); //Remove object from world
     GameObject* dublicateObject(GameObject* original, bool parent = true);
@@ -238,6 +240,7 @@ public:
     //---------------------FOR EDITOR USE--------------------------------------------------------
     void pick(); //Mark object and its children picked
     void saveProperties(std::ofstream* stream); //Writes properties content at end of stream
+    void saveProperty(GameObjectProperty* prop, std::ofstream* stream);
     void putToSnapshot(GameObjectSnapshot* snapshot);
     void recoverFromSnapshot(Engine::GameObjectSnapshot* snapshot);
 
@@ -272,6 +275,7 @@ public:
     void onValueChanged();
     void copyTo(Engine::GameObjectProperty* dest);
     void loadPropertyFromMemory(const char* data, Engine::GameObject* obj);
+    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
 
     LabelProperty();
     ~LabelProperty();
@@ -304,6 +308,7 @@ public:
     void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
+    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
 
     TransformProperty();
 };

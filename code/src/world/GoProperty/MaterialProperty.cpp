@@ -40,10 +40,7 @@ void Engine::MaterialProperty::_setMaterial(MaterialResource* mat) {
 void Engine::MaterialProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
     //Read material path
-    while (data[offset] != ' ' && data[offset] != '\n') {
-        material_path += data[offset];
-        offset++;
-    }
+    readString(material_path, data, offset);
     //get material by label
     material_ptr = game_data->resources->getMaterialByLabel(material_path)->material; //find it and process
 
@@ -51,6 +48,16 @@ void Engine::MaterialProperty::loadPropertyFromMemory(const char* data, GameObje
     //Read receiveShadows boolean
     memcpy(&receiveShadows, data + offset, sizeof(bool));
     this->group_label = material_ptr->group_ptr->groupCaption;
+}
+
+void Engine::MaterialProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    //Write path to material string
+    if (material_ptr != nullptr)
+        *stream << material_path << '\0'; //Write material relpath
+    else
+        *stream << "@none" << '\0';
+
+    stream->write(reinterpret_cast<char*>(&receiveShadows), sizeof(bool));
 }
 
 void Engine::MaterialProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {

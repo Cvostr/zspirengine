@@ -84,6 +84,16 @@ void Engine::ShadowCasterProperty::loadPropertyFromMemory(const char* data, Game
     offset += sizeof(float);
 }
 
+void Engine::ShadowCasterProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    //write collider type
+    stream->write(reinterpret_cast<char*>(&TextureWidth), sizeof(int));
+    stream->write(reinterpret_cast<char*>(&TextureHeight), sizeof(int));
+    stream->write(reinterpret_cast<char*>(&shadow_bias), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&nearPlane), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&farPlane), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&projection_viewport), sizeof(float));
+}
+
 void Engine::ShadowCasterProperty::onPreRender(Engine::RenderPipeline* pipeline) {
     pipeline->getRenderSettings()->shadowcaster_obj_ptr = static_cast<void*>(this->go_link.updLinkPtr());
 }

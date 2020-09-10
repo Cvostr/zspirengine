@@ -42,6 +42,9 @@ void Engine::GameObjectProperty::onObjectDeleted(){
 void Engine::GameObjectProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
 
 }
+void Engine::GameObjectProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+
+}
 void Engine::GameObjectProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
 
 }
@@ -175,12 +178,17 @@ void Engine::LabelProperty::copyTo(Engine::GameObjectProperty* dest) {
 void Engine::LabelProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
     std::string label;
-    while (data[offset] != ' ' && data[offset] != '\n') {
+    while (data[offset] != '\0' && data[offset] != '\n') {
         label += data[offset];
         offset++;
     }
     obj->label_ptr = &this->label; //Making GameObjects's pointer to string in label property
     this->label = label; //Write loaded string
+}
+
+void Engine::LabelProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    *stream << this->label;
+    *stream << '\0';
 }
 
 Engine::SkyboxProperty::SkyboxProperty(){

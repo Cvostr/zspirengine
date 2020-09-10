@@ -94,23 +94,30 @@ void Engine::RigidbodyProperty::onObjectDeleted() { //unregister in world
 void Engine::RigidbodyProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
     //read collider type
-    memcpy(&coll_type, data + offset, sizeof(COLLIDER_TYPE));
-    offset += sizeof(COLLIDER_TYPE);
+    readBinaryValue<COLLIDER_TYPE>(&coll_type, data + offset, offset);
     //Read mass of rigidbody
-    memcpy(&mass, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue<float>(&mass, data + offset, offset);
     //Read Gravity vector
-    memcpy(&gravity.X, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&gravity.Y, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&gravity.Z, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue<float>(&gravity.X, data + offset, offset);
+    readBinaryValue<float>(&gravity.Y, data + offset, offset);
+    readBinaryValue<float>(&gravity.Z, data + offset, offset);
     //read linear velocity
-    memcpy(&linearVel.Z, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&linearVel.Z, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&linearVel.Z, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue<float>(&linearVel.X, data + offset, offset);
+    readBinaryValue<float>(&linearVel.Y, data + offset, offset);
+    readBinaryValue<float>(&linearVel.Z, data + offset, offset);
+}
+
+void Engine::RigidbodyProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    //write collider type
+    stream->write(reinterpret_cast<char*>(&coll_type), sizeof(COLLIDER_TYPE));
+    //write isTrigger boolean
+    stream->write(reinterpret_cast<char*>(&mass), sizeof(float));
+    //write gravity
+    stream->write(reinterpret_cast<char*>(&gravity.X), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&gravity.Y), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&gravity.Z), sizeof(float));
+    //write linear velocity
+    stream->write(reinterpret_cast<char*>(&linearVel.X), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&linearVel.Y), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&linearVel.Z), sizeof(float));
 }

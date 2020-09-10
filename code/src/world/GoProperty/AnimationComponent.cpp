@@ -121,12 +121,13 @@ void Engine::AnimationProperty::onValueChanged() {
 void Engine::AnimationProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
     //Read animation clip name
-    anim_label.clear();
-    while (data[offset] != ' ' && data[offset] != '\n') {
-        anim_label += data[offset];
-        offset++;
-    }
+    readString(anim_label, data, offset);
+    //update pointer to resource
     updateAnimationPtr();
+}
+
+void Engine::AnimationProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    *stream << anim_label << '\0';
 }
 
 void Engine::AnimationProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {

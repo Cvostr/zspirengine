@@ -1,4 +1,4 @@
-#include "../../headers/misc/randomg.h"
+#include "../../headers/misc/misc.h"
 #ifdef __linux__
 #include <sys/time.h>
 #endif
@@ -21,4 +21,12 @@ void genRandomString(std::string* result, unsigned int len){
 
         result->push_back(rstring_palette[v]); //Push symbol at random value
      }
+}
+
+void readString(std::string& str, const char* data, unsigned int& offset) {
+    str.clear();
+    while (data[offset] != '\0' && data[offset] != '\n') {
+        str += data[offset];
+        offset++;
+    }
 }

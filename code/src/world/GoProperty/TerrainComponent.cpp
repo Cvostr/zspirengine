@@ -94,17 +94,12 @@ void Engine::TerrainProperty::onUpdate(float deltaTime) {
 void Engine::TerrainProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
 
-    while (data[offset] != ' ' && data[offset] != '\n') {
-        file_label += data[offset];
-        offset++;
-    }
+    readString(file_label, data, offset);
 
     offset++;
     //read dimensions
-    memcpy(&Width, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&Length, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue<int>(&Width, data + offset, offset);
+    readBinaryValue<int>(&Length, data + offset, offset);
     memcpy(&MaxHeight, data + offset, sizeof(float));
     offset += sizeof(float);
 
@@ -142,18 +137,10 @@ void Engine::TerrainProperty::loadPropertyFromMemory(const char* data, GameObjec
     for (int texture_i = 0; texture_i < textures_size; texture_i++) {
         HeightmapTexturePair texture_pair;
         //Read texture pair
-        texture_pair.diffuse_relpath.clear();
-        while (data[offset] != ' ' && data[offset] != '\n') {
-            texture_pair.diffuse_relpath += data[offset];
-            offset++;
-        }
+        readString(texture_pair.diffuse_relpath, data, offset);
         offset++;
         //Read normal pair
-        texture_pair.normal_relpath.clear();    
-        while (data[offset] != ' ' && data[offset] != '\n') {
-            texture_pair.normal_relpath += data[offset];
-            offset++;
-        }
+        readString(texture_pair.normal_relpath, data, offset);
         offset++;
         //Push texture to array
         textures.push_back(texture_pair);
@@ -162,11 +149,7 @@ void Engine::TerrainProperty::loadPropertyFromMemory(const char* data, GameObjec
     for (int grass_i = 0; grass_i < grassType_size; grass_i++) {
         HeightmapGrass grass;
         //Read grass diffuse texture
-        grass.diffuse_relpath.clear();
-        while (data[offset] != ' ' && data[offset] != '\n') {
-            grass.diffuse_relpath += data[offset];
-            offset++;
-        }
+        readString(grass.diffuse_relpath, data, offset);
         //Write grass size
         offset++;
         memcpy(&grass.scale.X, data + offset, sizeof(float));

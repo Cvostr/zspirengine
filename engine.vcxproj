@@ -152,7 +152,7 @@
     <ClCompile Include="code\src\misc\GlyphManager.cpp" />
     <ClCompile Include="code\src\misc\oal_manager.cpp" />
     <ClCompile Include="code\src\misc\output.cpp" />
-    <ClCompile Include="code\src\misc\randomg.cpp" />
+    <ClCompile Include="code\src\misc\misc.cpp" />
     <ClCompile Include="code\src\misc\zs3m-master.cpp" />
     <ClCompile Include="code\src\ogl\ogl_mesh.cpp" />
     <ClCompile Include="code\src\ogl\ogl_shader.cpp" />
@@ -223,7 +223,7 @@
     <ClInclude Include="code\headers\misc\GlyphManager.h" />
     <ClInclude Include="code\headers\misc\oal_manager.h" />
     <ClInclude Include="code\headers\misc\output.hpp" />
-    <ClInclude Include="code\headers\misc\randomg.h" />
+    <ClInclude Include="code\headers\misc\misc.h" />
     <ClInclude Include="code\headers\misc\RefCounter.hpp" />
     <ClInclude Include="code\headers\misc\zs3m-master.h" />
     <ClInclude Include="code\headers\ogl\ogl.h" />

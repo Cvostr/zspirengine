@@ -38,8 +38,7 @@ Engine::ColliderProperty::ColliderProperty() {
 void Engine::ColliderProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
     //read collider type
-    memcpy(&coll_type, data + offset, sizeof(COLLIDER_TYPE));
-    offset += sizeof(COLLIDER_TYPE);
+    readBinaryValue<COLLIDER_TYPE>(&coll_type, data + offset, offset);
     //read isCustomPhysicalSize boolean
     memcpy(&isCustomPhysicalSize, data + offset, sizeof(bool));
     offset += sizeof(bool);
@@ -59,5 +58,20 @@ void Engine::ColliderProperty::loadPropertyFromMemory(const char* data, GameObje
         offset += sizeof(float);
         memcpy(&transform_offset.Z, data + offset, sizeof(float));
         offset += sizeof(float);
+    }
+}
+
+void Engine::ColliderProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    //write collider type
+    stream->write(reinterpret_cast<char*>(&coll_type), sizeof(COLLIDER_TYPE));
+    //boolean if collider has custom size and transform
+    stream->write(reinterpret_cast<char*>(&isCustomPhysicalSize), sizeof(bool));
+    if (isCustomPhysicalSize) {
+        stream->write(reinterpret_cast<char*>(&cust_size.X), sizeof(float));
+        stream->write(reinterpret_cast<char*>(&cust_size.Y), sizeof(float));
+        stream->write(reinterpret_cast<char*>(&cust_size.Z), sizeof(float));
+        stream->write(reinterpret_cast<char*>(&transform_offset.X), sizeof(float));
+        stream->write(reinterpret_cast<char*>(&transform_offset.Y), sizeof(float));
+        stream->write(reinterpret_cast<char*>(&transform_offset.Z), sizeof(float));
     }
 }

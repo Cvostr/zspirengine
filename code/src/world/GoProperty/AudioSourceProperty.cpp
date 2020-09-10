@@ -130,11 +130,7 @@ void Engine::AudioSourceProperty::onObjectDeleted() {
 void Engine::AudioSourceProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
 
-    resource_relpath.clear();
-    while (data[offset] != ' ' && data[offset] != '\n') {
-        resource_relpath += data[offset];
-        offset++;
-    }
+    readString(resource_relpath, data, offset);
 
     if (resource_relpath.compare("@none") != 0) {
         updateAudioPtr(); //Pointer will now point to mesh resource
@@ -147,6 +143,17 @@ void Engine::AudioSourceProperty::loadPropertyFromMemory(const char* data, GameO
     offset += sizeof(float);
 
     source.apply_settings(); //Apply settings to openal
+}
+
+void Engine::AudioSourceProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    if (resource_relpath.empty()) //check if object has no audioclip
+        *stream << "@none" << '\0';
+    else
+        *stream << resource_relpath << '\0';
+
+    stream->write(reinterpret_cast<char*>(&source.source_gain), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&source.source_pitch), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&source.looped), sizeof(bool));
 }
 
 void Engine::AudioSourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {

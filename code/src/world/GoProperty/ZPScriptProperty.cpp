@@ -73,6 +73,7 @@ void Engine::ZPScriptProperty::makeGlobalVarsList() {
 }
 
 void Engine::ZPScriptProperty::onStop() {
+	script->onStop();
 	delete script;
 }
 
@@ -110,44 +111,77 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 	unsigned int offset = 1;
 	unsigned int vars = 0;
 
-	while (data[offset] != ' ' && data[offset] != '\n') {
-		script_path += data[offset];
-		offset++;
-	}
+	readString(script_path, data, offset);
 	offset++;
-
-	script_res = game_data->resources->getScriptByLabel(script_path);
-	//makeGlobalVarsList();
-
+	//get ScriptResource pointer
+	{
+		script_res = game_data->resources->getScriptByLabel(script_path);
+		script = new AGScript(game_data->script_manager, nullptr, script_res->rel_path);
+		makeGlobalVarsList();
+	}
+	//get count of variables
 	memcpy(&vars, data + offset, sizeof(unsigned int));
 	offset += sizeof(unsigned int);
 	//read all variables data
 	for (unsigned int v_i = 0; v_i < vars; v_i++) {
 		int typeID = 0;
 		unsigned int index = 0;
+		//read index
+		readBinaryValue<unsigned int>(&index, data + offset, offset);
+		//read ID of type
+		readBinaryValue<int>(&typeID, data + offset, offset);
 
-		memcpy(&index, data + offset, sizeof(unsigned int));
-		offset += sizeof(unsigned int);
-		memcpy(&typeID, data + offset, sizeof(int));
-		offset += sizeof(int);
-
-		Engine::GlobVarHandle* var = new Engine::GlobVarHandle(typeID);
+		Engine::GlobVarHandle* var = this->vars[index];
 		var->index = index;
 		if (typeID != AG_STRING) {
+			//if value is non-std string
 			memcpy(var->value_ptr, data + offset, var->size);
 			offset += var->size;
 		}
 		else {
+			//value is string
+			//then load its symbols
 			std::string* str = static_cast<std::string*>(var->value_ptr);
+			//clear old string
+			str->clear();
+			//Obtain size of string
 			unsigned int str_size = 0;
-			memcpy(&str_size, data + offset, sizeof(unsigned int));
-			offset += sizeof(unsigned int);
+			{
+				memcpy(&str_size, data + offset, sizeof(unsigned int));
+				offset += sizeof(unsigned int);
+			}
+			//Read and append string symbols
 			for (unsigned int i = 0; i < str_size; i++) {
 				str->push_back(*(data + offset));	
 				offset += 1;
 			}
 		}
-		
-		this->vars.push_back(var);
+	}
+}
+
+void Engine::ZPScriptProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj){
+	//Write header
+	*stream << "\nG_SCRIPT ";
+	stream->write(reinterpret_cast<char*>(&active), sizeof(bool));
+	*stream << " ";
+	//Write script
+	*stream << script_path << '\0';
+	unsigned int varsNum = static_cast<unsigned int>(vars.size());
+	stream->write(reinterpret_cast<char*>(&varsNum), sizeof(unsigned int));
+
+	for (unsigned int v_i = 0; v_i < vars.size(); v_i++) {
+		Engine::GlobVarHandle* var = vars[v_i];
+
+		stream->write(reinterpret_cast<char*>(&var->index), sizeof(unsigned int));
+		stream->write(reinterpret_cast<char*>(&var->typeID), sizeof(int));
+		if (var->typeID != AG_STRING)
+			stream->write(reinterpret_cast<char*>(var->value_ptr), var->size);
+		else {
+			std::string* str = static_cast<std::string*>(var->value_ptr);
+			const char* ch = str->c_str();
+			unsigned int str_size = str->size();
+			stream->write(reinterpret_cast<char*>(&str_size), sizeof(unsigned int));
+			stream->write(ch, str_size);
+		}
 	}
 }

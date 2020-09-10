@@ -128,6 +128,15 @@ void Engine::CharacterControllerProperty::loadPropertyFromMemory(const char* dat
 
 }
 
+void Engine::CharacterControllerProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    stream->write(reinterpret_cast<char*>(&width), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&height), sizeof(float));
+
+    stream->write(reinterpret_cast<char*>(&transform_offset.X), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&transform_offset.Y), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&transform_offset.Z), sizeof(float));
+}
+
 void Engine::CharacterControllerProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
     int result = 0;
     result = mgr->RegisterObjectType(CHAR_CTRL_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);

@@ -41,16 +41,12 @@ Engine::LightsourceProperty::LightsourceProperty() {
 void Engine::LightsourceProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
     //Read Type of Light Source
-    memcpy(&light_type, data + offset, sizeof(LIGHTSOURCE_TYPE));
-    offset += sizeof(LIGHTSOURCE_TYPE);
+    readBinaryValue<LIGHTSOURCE_TYPE>(&light_type, data + offset, offset);
     //Read Intensity of source
-    memcpy(&intensity, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue<float>(&intensity, data + offset, offset);
     //Read Range of source
-    memcpy(&range, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&spot_angle, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue<float>(&range, data + offset, offset);
+    readBinaryValue<float>(&spot_angle, data + offset, offset);
 
     int cl_r;
     int cl_g;
@@ -66,13 +62,22 @@ void Engine::LightsourceProperty::loadPropertyFromMemory(const char* data, GameO
     color = ZSRGBCOLOR(cl_r, cl_g, cl_b);
 }
 
-void Engine::LightsourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
-    int result = 0;
-    result = mgr->RegisterObjectType(LIGHTSOURCE_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
-    assert(result >= 0);
+void Engine::LightsourceProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    stream->write(reinterpret_cast<char*>(&light_type), sizeof(Engine::LIGHTSOURCE_TYPE));
+    stream->write(reinterpret_cast<char*>(&intensity), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&range), sizeof(float));
+    stream->write(reinterpret_cast<char*>(&spot_angle), sizeof(float));
 
-    result = mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float intensity", offsetof(LightsourceProperty, intensity));
-    result = mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float range", offsetof(LightsourceProperty, range));
-    result = mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float spot_angle", offsetof(LightsourceProperty, spot_angle));
-    result = mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "rgbColor color", offsetof(LightsourceProperty, color));
+    stream->write(reinterpret_cast<char*>(&color.r), sizeof(int));
+    stream->write(reinterpret_cast<char*>(&color.g), sizeof(int));
+    stream->write(reinterpret_cast<char*>(&color.b), sizeof(int));
+}
+
+void Engine::LightsourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    mgr->RegisterObjectType(LIGHTSOURCE_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+
+    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float intensity", offsetof(LightsourceProperty, intensity));
+    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float range", offsetof(LightsourceProperty, range));
+    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float spot_angle", offsetof(LightsourceProperty, spot_angle));
+    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "rgbColor color", offsetof(LightsourceProperty, color));
 }

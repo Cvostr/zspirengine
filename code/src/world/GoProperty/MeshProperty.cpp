@@ -9,6 +9,8 @@ Engine::MeshProperty::MeshProperty() {
     castShadows = true;
 
     this->skinning_root_node = nullptr;
+
+    this->resource_relpath = "@none";
     this->rootNodeStr = "@none";
 }
 void Engine::MeshProperty::copyTo(GameObjectProperty* dest) {
@@ -41,18 +43,12 @@ void Engine::MeshProperty::onValueChanged() {
 void Engine::MeshProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
 
-    while (data[offset] != ' ' && data[offset] != '\n') {
-        resource_relpath += data[offset];
-        offset++;
-    }
+    readString(resource_relpath, data, offset);
     offset++;
 
     rootNodeStr.clear();
     //Read Root Node label
-    while (data[offset] != ' ' && data[offset] != '\n') {
-        rootNodeStr += data[offset];
-        offset++;
-    }
+    readString(rootNodeStr, data, offset);
     //Pointer will now point to mesh resource
     updateMeshPtr();
 
@@ -60,6 +56,15 @@ void Engine::MeshProperty::loadPropertyFromMemory(const char* data, GameObject* 
     //Read castShadows bool
     memcpy(&castShadows, data + offset, sizeof(bool));
     offset += sizeof(bool);
+}
+
+void Engine::MeshProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    *stream << resource_relpath << '\0';
+    if (skinning_root_node != nullptr)
+        *stream << *skinning_root_node->label_ptr << '\0';
+    else
+        *stream << "@none" << '\0';
+    stream->write(reinterpret_cast<char*>(&castShadows), sizeof(bool));
 }
 
 void Engine::MeshProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {

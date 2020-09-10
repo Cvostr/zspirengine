@@ -93,11 +93,12 @@ void AGScript::onStart() {
 	
 	//Obtain Start() function
 	asIScriptFunction* func = main_class->GetMethodByDecl("void Start()");
-	//Execute function
-	engine->getAgScriptContext()->Prepare(func);
-	engine->getAgScriptContext()->SetObject(mainClass_obj);
-	int r = engine->getAgScriptContext()->Execute();
-	assert(r >= 0);
+	if (func != nullptr) {
+		//Execute function
+		engine->getAgScriptContext()->Prepare(func);
+		engine->getAgScriptContext()->SetObject(mainClass_obj);
+		engine->getAgScriptContext()->Execute();
+	}
 }
 
 void AGScript::onStop() {
@@ -106,11 +107,12 @@ void AGScript::onStop() {
 
 	//Obtain Stop() function
 	asIScriptFunction* func = main_class->GetMethodByDecl("void Stop()");
-	//Execute function
-	engine->getAgScriptContext()->Prepare(func);
-	engine->getAgScriptContext()->SetObject(mainClass_obj);
-	int r = engine->getAgScriptContext()->Execute();
-	assert(r >= 0);
+	if (func != nullptr) {
+		//Execute function
+		engine->getAgScriptContext()->Prepare(func);
+		engine->getAgScriptContext()->SetObject(mainClass_obj);
+		engine->getAgScriptContext()->Execute();
+	}
 }
 
 bool AGScript::hasCompilerErrors() {
@@ -123,10 +125,12 @@ void AGScript::onUpdate() {
 
 	//Obtain Update() function
 	asIScriptFunction* func = main_class->GetMethodByDecl("void Update()");
-	//Execute function
-	engine->getAgScriptContext()->Prepare(func);
-	engine->getAgScriptContext()->SetObject(mainClass_obj);
-	engine->getAgScriptContext()->Execute();
+	if (func != nullptr) {
+		//Execute function
+		engine->getAgScriptContext()->Prepare(func);
+		engine->getAgScriptContext()->SetObject(mainClass_obj);
+		engine->getAgScriptContext()->Execute();
+	}
 }
 
 void AGScript::onTrigger(Engine::GameObject* obj) {
@@ -135,11 +139,13 @@ void AGScript::onTrigger(Engine::GameObject* obj) {
 
 	//Obtain Update() function
 	asIScriptFunction* func = main_class->GetMethodByDecl("void onTrigger(GameObject@)");
-	//Execute function
-	engine->getAgScriptContext()->Prepare(func);
-	engine->getAgScriptContext()->SetObject(mainClass_obj);
-	engine->getAgScriptContext()->SetArgObject(0, obj);
-	engine->getAgScriptContext()->Execute();
+	if (func != nullptr) {
+		//Execute function
+		engine->getAgScriptContext()->Prepare(func);
+		engine->getAgScriptContext()->SetObject(mainClass_obj);
+		engine->getAgScriptContext()->SetArgObject(0, obj);
+		engine->getAgScriptContext()->Execute();
+	}
 }
 
 void AGScript::onTriggerEnter(Engine::GameObject* obj) {
@@ -181,7 +187,8 @@ void AGScript::obtainScriptMainClass() {
 	//Allocate class by Constructor
 	{
 		engine->getAgScriptContext()->Prepare(factory);
-		engine->getAgScriptContext()->SetArgObject(0, obj);
+		if(obj != nullptr)
+			engine->getAgScriptContext()->SetArgObject(0, obj);
 		result = engine->getAgScriptContext()->Execute();
 	}
 	//Get returned created class
@@ -213,8 +220,10 @@ AGScript::AGScript(AGScriptMgr* engine, Engine::GameObject* obj, std::string Cla
 	this->ClassName = ClassName;
 	this->engine = engine;
 	this->obj = obj;
-
-	ModuleName = ClassName + "_" + obj->str_id;
+	if (obj != nullptr)
+		ModuleName = ClassName + "_" + obj->str_id;
+	else
+		ModuleName = "startupModule";
 
 	int r = builder.StartNewModule(engine->getAgScriptEngine(), ModuleName.c_str());
 	hasErrors = false;

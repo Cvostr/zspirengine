@@ -124,45 +124,47 @@ void Engine::TransformProperty::onPreRender(RenderPipeline* pipeline) {
 }
 
 void Engine::TransformProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
-    int result = 0;
-    result = mgr->RegisterObjectType(TRANSFORM_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
-    assert(result >= 0);
 
-    result = mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 translation", offsetof(TransformProperty, translation));
-    assert(result >= 0);
-    result = mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 scale", offsetof(TransformProperty, scale));
-    result = mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 rotation", offsetof(TransformProperty, rotation));
+    mgr->RegisterObjectType(TRANSFORM_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
 
-    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setTranslation(Vec3 &in)", asMETHOD(TransformProperty, setTranslation), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setScale(Vec3 &in)", asMETHOD(TransformProperty, setScale), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setRotation(Vec3 &in)", asMETHOD(TransformProperty, setRotation), asCALL_THISCALL);
-    assert(result >=0 );
+    mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 translation", offsetof(TransformProperty, translation));
+    mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 scale", offsetof(TransformProperty, scale));
+    mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 rotation", offsetof(TransformProperty, rotation));
+
+    mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setTranslation(Vec3 &in)", asMETHOD(TransformProperty, setTranslation), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setScale(Vec3 &in)", asMETHOD(TransformProperty, setScale), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setRotation(Vec3 &in)", asMETHOD(TransformProperty, setRotation), asCALL_THISCALL);
 }
 
 void Engine::TransformProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 0;
     offset += 1; //Skip space
     //Read Translation vector
-    memcpy(&translation.X, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&translation.Y, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&translation.Z, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue<float>(&translation.X, data + offset, offset);
+    readBinaryValue<float>(&translation.Y, data + offset, offset);
+    readBinaryValue<float>(&translation.Z, data + offset, offset);
     //Read Scale vector
-    memcpy(&scale.X, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&scale.Y, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&scale.Z, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue<float>(&scale.X, data + offset, offset);
+    readBinaryValue<float>(&scale.Y, data + offset, offset);
+    readBinaryValue<float>(&scale.Z, data + offset, offset);
     //Read Rotation vector
-    memcpy(&rotation.X, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&rotation.Y, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&rotation.Z, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue<float>(&rotation.X, data + offset, offset);
+    readBinaryValue<float>(&rotation.Y, data + offset, offset);
+    readBinaryValue<float>(&rotation.Z, data + offset, offset);
     //After everything is loaded, update matrices
     updateMatrix(); 
+}
+
+void Engine::TransformProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+    stream->write(reinterpret_cast<char*>(&translation.X), sizeof(float));//Writing position X
+    stream->write(reinterpret_cast<char*>(&translation.Y), sizeof(float)); //Writing position Y
+    stream->write(reinterpret_cast<char*>(&translation.Z), sizeof(float)); //Writing position Z
+
+    stream->write(reinterpret_cast<char*>(&scale.X), sizeof(float));//Writing scale X
+    stream->write(reinterpret_cast<char*>(&scale.Y), sizeof(float)); //Writing scale Y
+    stream->write(reinterpret_cast<char*>(&scale.Z), sizeof(float)); //Writing scale Z
+
+    stream->write(reinterpret_cast<char*>(&rotation.X), sizeof(float));//Writing rotation X
+    stream->write(reinterpret_cast<char*>(&rotation.Y), sizeof(float)); //Writing rotation Y
+    stream->write(reinterpret_cast<char*>(&rotation.Z), sizeof(float)); //Writing rotation Z
 }
