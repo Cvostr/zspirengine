@@ -114,18 +114,13 @@ void Engine::CharacterControllerProperty::onStart() {
 void Engine::CharacterControllerProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1; //Skip space
     //Read character sizes
-    memcpy(&width, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&height, data + offset, sizeof(float));
-    offset += sizeof(float);
-    //Read translation offset vector
-    memcpy(&transform_offset.X, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&transform_offset.Y, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&transform_offset.Z, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue(&width, data + offset, offset);
+    readBinaryValue(&height, data + offset, offset);
 
+    //Read translation offset vector
+    readBinaryValue(&transform_offset.X, data + offset, offset);
+    readBinaryValue(&transform_offset.Y, data + offset, offset);
+    readBinaryValue(&transform_offset.Z, data + offset, offset);
 }
 
 void Engine::CharacterControllerProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {

@@ -45,29 +45,20 @@ void Engine::TriggerProperty::onObjectDeleted() { //unregister in world
 }
 
 void Engine::TriggerProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
-    unsigned int offset = 0;
-    offset += 1; //Skip space
+    unsigned int offset = 1;
     //read collider type
-    memcpy(&coll_type, data + offset, sizeof(COLLIDER_TYPE));
-    offset += sizeof(COLLIDER_TYPE);
+    readBinaryValue<COLLIDER_TYPE>(&coll_type, data + offset, offset);
     //read isCustomPhysicalSize boolean
-    memcpy(&isCustomPhysicalSize, data + offset, sizeof(bool));
-    offset += sizeof(bool);
+    readBinaryValue<bool>(&isCustomPhysicalSize, data + offset, offset);
     //Check, if trigger has custom size specified
     if (isCustomPhysicalSize) {
-        memcpy(&cust_size.X, data + offset, sizeof(float));
-        offset += sizeof(float);
-        memcpy(&cust_size.Y, data + offset, sizeof(float));
-        offset += sizeof(float);
-        memcpy(&cust_size.Z, data + offset, sizeof(float));
-        offset += sizeof(float);
+        readBinaryValue(&cust_size.X, data + offset, offset);
+        readBinaryValue(&cust_size.Y, data + offset, offset);
+        readBinaryValue(&cust_size.Z, data + offset, offset);
         //Load Transform offset vector
-        memcpy(&transform_offset.Z, data + offset, sizeof(float));
-        offset += sizeof(float);
-        memcpy(&transform_offset.Z, data + offset, sizeof(float));
-        offset += sizeof(float);
-        memcpy(&transform_offset.Z, data + offset, sizeof(float));
-        offset += sizeof(float);
+        readBinaryValue(&transform_offset.X, data + offset, offset);
+        readBinaryValue(&transform_offset.Y, data + offset, offset);
+        readBinaryValue(&transform_offset.Z, data + offset, offset);
     }
 }
 

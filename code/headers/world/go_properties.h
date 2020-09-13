@@ -397,6 +397,7 @@ public:
     TerrainData* getTerrainData();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
+    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
 
     TerrainProperty();
     ~TerrainProperty();

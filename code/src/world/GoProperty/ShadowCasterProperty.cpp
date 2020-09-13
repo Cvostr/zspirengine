@@ -70,18 +70,12 @@ void Engine::ShadowCasterProperty::onValueChanged() {
 void Engine::ShadowCasterProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
 
-    memcpy(&TextureWidth, data + offset, sizeof(int));
-    offset += sizeof(int);
-    memcpy(&TextureHeight, data + offset, sizeof(int));
-    offset += sizeof(int);
-    memcpy(&shadow_bias, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&nearPlane, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&farPlane, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&projection_viewport, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue<int>(&TextureWidth, data + offset, offset);
+    readBinaryValue<int>(&TextureHeight, data + offset, offset);
+    readBinaryValue<float>(&shadow_bias, data + offset, offset);
+    readBinaryValue<float>(&nearPlane, data + offset, offset);
+    readBinaryValue<float>(&farPlane, data + offset, offset);
+    readBinaryValue<int>(&projection_viewport, data + offset, offset);
 }
 
 void Engine::ShadowCasterProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {

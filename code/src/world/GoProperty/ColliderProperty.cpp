@@ -40,24 +40,17 @@ void Engine::ColliderProperty::loadPropertyFromMemory(const char* data, GameObje
     //read collider type
     readBinaryValue<COLLIDER_TYPE>(&coll_type, data + offset, offset);
     //read isCustomPhysicalSize boolean
-    memcpy(&isCustomPhysicalSize, data + offset, sizeof(bool));
-    offset += sizeof(bool);
+    readBinaryValue<bool>(&isCustomPhysicalSize, data + offset, offset);
 
     if (isCustomPhysicalSize) {
         //Read custom Size vector
-        memcpy(&cust_size.X, data + offset, sizeof(float));
-        offset += sizeof(float);
-        memcpy(&cust_size.Y, data + offset, sizeof(float));
-        offset += sizeof(float);
-        memcpy(&cust_size.Z, data + offset, sizeof(float));
-        offset += sizeof(float);
+        readBinaryValue<float>(&cust_size.X, data + offset, offset);
+        readBinaryValue<float>(&cust_size.Y, data + offset, offset);
+        readBinaryValue<float>(&cust_size.Z, data + offset, offset);
         //Read custom translation vector
-        memcpy(&transform_offset.X, data + offset, sizeof(float));
-        offset += sizeof(float);
-        memcpy(&transform_offset.Y, data + offset, sizeof(float));
-        offset += sizeof(float);
-        memcpy(&transform_offset.Z, data + offset, sizeof(float));
-        offset += sizeof(float);
+        readBinaryValue<float>(&transform_offset.X, data + offset, offset);
+        readBinaryValue<float>(&transform_offset.Y, data + offset, offset);
+        readBinaryValue<float>(&transform_offset.Z, data + offset, offset);
     }
 }
 

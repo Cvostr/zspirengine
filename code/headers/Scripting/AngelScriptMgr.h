@@ -24,6 +24,9 @@
 #define KEY_TYPE_NAME "Key"
 #define MOUSE_STATE_NAME "MouseState"
 
+#define FILE_STREAM_OBJ "File"
+#define KV_FILE_OBJ "KeyValFile"
+
 #define TRANSFORM_PROP_TYPE_NAME "Transform"
 #define LIGHTSOURCE_PROP_TYPE_NAME "LightSource"
 #define AUDSOURCE_PROP_TYPE_NAME "AudioSource"
@@ -71,6 +74,7 @@ namespace Engine {
     void bindResourceSDK(const char* className, AGScriptMgr* mgr);
     void bindResourcesSDK(AGScriptMgr* mgr);
     void bindInputSDK(AGScriptMgr* mgr);
+    void bindFilesSDK(AGScriptMgr* mgr);
     void bindResourceManagerSDK(AGScriptMgr* mgr);
 
     template<class T>

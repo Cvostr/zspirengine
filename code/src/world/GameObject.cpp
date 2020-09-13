@@ -211,6 +211,15 @@ void Engine::GameObject::setActive(bool active){
     this->active = active;
 }
 
+bool Engine::GameObject::isActive() {
+    bool isParentActive = true;
+    if(hasParent && active)
+        if (!parent.updLinkPtr()->isActive())
+            isParentActive = false;
+
+    return active && isParentActive;
+}
+
 Engine::TransformProperty* Engine::GameObject::getTransformProperty(){
     return getPropertyPtr<TransformProperty>();
 }
@@ -445,12 +454,12 @@ Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(std::string 
 
 
 void Engine::GameObject::putToSnapshot(GameObjectSnapshot* snapshot) {
+    //set base variables
     snapshot->props_num = 0;
     snapshot->scripts_num = 0;
-
     snapshot->parent_link = this->parent;
     snapshot->obj_array_ind = this->array_index;
-
+    //Copy Object
     this->copyTo(&snapshot->reserved_obj);
     //Copy all properties
     for (unsigned int i = 0; i < this->props_num; i++) {

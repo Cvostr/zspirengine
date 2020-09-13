@@ -198,6 +198,7 @@ public:
     std::string getLabel();
     void setLabel(std::string label);
     void setActive(bool active);
+    bool isActive();
 
     template<typename T>
     T* getPropertyPtr(){

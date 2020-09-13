@@ -229,10 +229,8 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
     }
     iter++;
     //Read ACTIVE and STATIC flags
-    memcpy(&object_ptr->active, bytes + iter, sizeof(bool));
-    iter += sizeof(bool);
-    memcpy(&object_ptr->IsStatic, bytes + iter, sizeof(bool));
-    iter += sizeof(bool);
+    readBinaryValue(&object_ptr->active, bytes + iter, iter);
+    readBinaryValue(&object_ptr->IsStatic, bytes + iter, iter);
     //Then do the same sh*t, iterate until "G_END" came up
     while (true) {
         prefix.clear();
@@ -253,8 +251,7 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
             unsigned int amount = 0;
             iter++;
             //Read amount of children of object
-            memcpy(&amount, bytes + iter, sizeof(int));
-            iter += sizeof(int);
+            readBinaryValue(&amount, bytes + iter, iter);
             //Iterate over these children
             for (unsigned int ch_i = 0; ch_i < amount; ch_i++) { //Iterate over all written children to file
                 std::string child_str_id;
@@ -277,26 +274,24 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
             //Call function to load that property
             PROPERTY_TYPE type;
             iter++; //Skip space
-            memcpy(&type, bytes + iter, sizeof(int));
-            iter += sizeof(int);
+            //Read property type
+            readBinaryValue(&type, bytes + iter, iter);
             //Spawn new property with readed type
             object_ptr->addProperty(type);
             auto prop_ptr = object_ptr->getPropertyPtrByType(type); //get created property
             //Read ACTIVE flag
-            memcpy(&prop_ptr->active, bytes + iter, sizeof(bool));
-            iter += sizeof(bool);
+            readBinaryValue(&prop_ptr->active, bytes + iter, iter);
             //Load property
             prop_ptr->loadPropertyFromMemory(bytes + iter, object_ptr);
         }
-        if (prefix.compare("G_SCRIPT") == 0) { //We found an property, zaeb*s'
+        if (prefix.compare("G_SCRIPT") == 0) { //We found an script, zaeb*s'
             //Call function to load that property
             iter++; //Skip space
             //Spawn new property with readed type
             object_ptr->addScript();
             auto script_ptr = object_ptr->scripts[object_ptr->scripts_num - 1]; //get created property
             //Read ACTIVE flag
-            memcpy(&script_ptr->active, bytes + iter, sizeof(bool));
-            iter += sizeof(bool);
+            readBinaryValue(&script_ptr->active, bytes + iter, iter);
             //Load property
             script_ptr->loadPropertyFromMemory(bytes + iter, object_ptr);
         }
@@ -320,11 +315,9 @@ void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderS
     int version = 0; //define version on world file
     int objs_num = 0; //define number of objects
     //Parse Version Integer
-    memcpy(&version, bytes + iter, sizeof(int));
-    iter += 4;
+    readBinaryValue(&version, bytes + iter, iter);
     //Read amount of objects
-    memcpy(&objs_num, bytes + iter, sizeof(int));
-    iter += 5;
+    readBinaryValue(&objs_num, bytes + iter, iter);
 
     while (iter < size) { //until file is over
         std::string prefix;
@@ -339,12 +332,9 @@ void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderS
 
         if (prefix.compare("RENDER_SETTINGS_AMB_COLOR") == 0) { //if it is render setting of ambient light color
             iter++;
-            memcpy(&settings_ptr->ambient_light_color.r, bytes + iter, sizeof(int));
-            iter += 4;
-            memcpy(&settings_ptr->ambient_light_color.g, bytes + iter, sizeof(int));
-            iter += 4;
-            memcpy(&settings_ptr->ambient_light_color.b, bytes + iter, sizeof(int));
-            iter += 4;
+            readBinaryValue(&settings_ptr->ambient_light_color.r, bytes + iter, iter);
+            readBinaryValue(&settings_ptr->ambient_light_color.g, bytes + iter, iter);
+            readBinaryValue(&settings_ptr->ambient_light_color.b, bytes + iter, iter);
         }
 
         if (prefix.compare("G_OBJECT") == 0) { //if it is game object

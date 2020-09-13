@@ -177,6 +177,7 @@
     <ClCompile Include="code\src\resources\TextureResource.cpp" />
     <ClCompile Include="code\src\Scripting\AngelScript.cpp" />
     <ClCompile Include="code\src\Scripting\AngelScriptMgr.cpp" />
+    <ClCompile Include="code\src\Scripting\FilesAG.cpp" />
     <ClCompile Include="code\src\Scripting\GameObjectAG.cpp" />
     <ClCompile Include="code\src\Scripting\InputAG.cpp" />
     <ClCompile Include="code\src\Scripting\MathAG.cpp" />
@@ -239,6 +240,7 @@
     <ClInclude Include="code\headers\render\zs-uniform-buffer.h" />
     <ClInclude Include="code\headers\Scripting\AngelScript.hpp" />
     <ClInclude Include="code\headers\Scripting\AngelScriptMgr.h" />
+    <ClInclude Include="code\headers\Scripting\FilesAG.hpp" />
     <ClInclude Include="code\headers\ui\zs-uibutton.h" />
     <ClInclude Include="code\headers\ui\zs-uiwidget.h" />
     <ClInclude Include="code\headers\world\go_properties.h" />

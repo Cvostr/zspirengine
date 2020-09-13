@@ -46,7 +46,7 @@ void Engine::MaterialProperty::loadPropertyFromMemory(const char* data, GameObje
 
     offset++;
     //Read receiveShadows boolean
-    memcpy(&receiveShadows, data + offset, sizeof(bool));
+    readBinaryValue<bool>(&receiveShadows, data + offset, offset);
     this->group_label = material_ptr->group_ptr->groupCaption;
 }
 
