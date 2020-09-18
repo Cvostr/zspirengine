@@ -34,6 +34,7 @@
 #define ANIM_PROP_TYPE_NAME "Animation"
 #define MESH_PROP_TYPE_NAME "Mesh"
 #define MAT_PROP_TYPE_NAME "Material"
+#define RIGIDBODY_PROP_TYPE_NAME "Rigidbody"
 
 namespace Engine {
     class AGScriptMgr {

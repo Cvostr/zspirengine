@@ -123,7 +123,7 @@ void Engine::CharacterControllerProperty::loadPropertyFromMemory(const char* dat
     readBinaryValue(&transform_offset.Z, data + offset, offset);
 }
 
-void Engine::CharacterControllerProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::CharacterControllerProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     stream->write(reinterpret_cast<char*>(&width), sizeof(float));
     stream->write(reinterpret_cast<char*>(&height), sizeof(float));
 

@@ -112,7 +112,6 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 	unsigned int vars = 0;
 
 	readString(script_path, data, offset);
-	offset++;
 	//get ScriptResource pointer
 	{
 		script_res = game_data->resources->getScriptByLabel(script_path);
@@ -120,8 +119,7 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 		makeGlobalVarsList();
 	}
 	//get count of variables
-	memcpy(&vars, data + offset, sizeof(unsigned int));
-	offset += sizeof(unsigned int);
+	readBinaryValue(&vars, data + offset, offset);
 	//read all variables data
 	for (unsigned int v_i = 0; v_i < vars; v_i++) {
 		int typeID = 0;
@@ -159,28 +157,28 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 	}
 }
 
-void Engine::ZPScriptProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj){
+void Engine::ZPScriptProperty::savePropertyToStream(ZsStream* stream, GameObject* obj){
 	//Write header
 	*stream << "\nG_SCRIPT ";
-	stream->write(reinterpret_cast<char*>(&active), sizeof(bool));
+	stream->writeBinaryValue(&active);
 	*stream << " ";
 	//Write script
 	*stream << script_path << '\0';
 	unsigned int varsNum = static_cast<unsigned int>(vars.size());
-	stream->write(reinterpret_cast<char*>(&varsNum), sizeof(unsigned int));
+	stream->writeBinaryValue(&varsNum);
 
 	for (unsigned int v_i = 0; v_i < vars.size(); v_i++) {
 		Engine::GlobVarHandle* var = vars[v_i];
 
-		stream->write(reinterpret_cast<char*>(&var->index), sizeof(unsigned int));
-		stream->write(reinterpret_cast<char*>(&var->typeID), sizeof(int));
+		stream->writeBinaryValue(&var->index);
+		stream->writeBinaryValue(&var->typeID);
 		if (var->typeID != AG_STRING)
 			stream->write(reinterpret_cast<char*>(var->value_ptr), var->size);
 		else {
 			std::string* str = static_cast<std::string*>(var->value_ptr);
 			const char* ch = str->c_str();
-			unsigned int str_size = str->size();
-			stream->write(reinterpret_cast<char*>(&str_size), sizeof(unsigned int));
+			unsigned int str_size = static_cast<unsigned int>(str->size());
+			stream->writeBinaryValue(&str_size);
 			stream->write(ch, str_size);
 		}
 	}

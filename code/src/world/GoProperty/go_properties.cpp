@@ -42,7 +42,7 @@ void Engine::GameObjectProperty::onObjectDeleted(){
 void Engine::GameObjectProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
 
 }
-void Engine::GameObjectProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::GameObjectProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
 
 }
 void Engine::GameObjectProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
@@ -153,42 +153,6 @@ Engine::GameObjectProperty* Engine::allocProperty(PROPERTY_TYPE type){
         }
     }
     return _ptr;
-}
-
-
-Engine::LabelProperty::LabelProperty(){
-    this->type = PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL;
-}
-
-Engine::LabelProperty::~LabelProperty() {
-
-}
-
-void Engine::LabelProperty::copyTo(Engine::GameObjectProperty* dest) {
-    if (dest->type != this->type) return; //if it isn't label
-
-    //Do base things
-    GameObjectProperty::copyTo(dest);
-
-    LabelProperty* _dest = static_cast<LabelProperty*>(dest);
-    _dest->label = label;
-}
-
-
-void Engine::LabelProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
-    unsigned int offset = 1;
-    std::string label;
-    while (data[offset] != '\0' && data[offset] != '\n') {
-        label += data[offset];
-        offset++;
-    }
-    obj->label_ptr = &this->label; //Making GameObjects's pointer to string in label property
-    this->label = label; //Write loaded string
-}
-
-void Engine::LabelProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
-    *stream << this->label;
-    *stream << '\0';
 }
 
 Engine::SkyboxProperty::SkyboxProperty(){

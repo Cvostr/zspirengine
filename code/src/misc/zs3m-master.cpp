@@ -18,7 +18,7 @@ void ZS3M::SceneFileExport::setRootNode(ZS3M::SceneNode* node){
 }
 void ZS3M::SceneFileExport::write(std::string output_file){
     std::cout << "ZS3M: Writing ZS3M scene " << output_file << std::endl;
-    std::ofstream stream;
+    ZsStream stream;
     stream.open(output_file.c_str(), std::ofstream::binary);
 
     stream << "zs3mscene\n";
@@ -27,9 +27,9 @@ void ZS3M::SceneFileExport::write(std::string output_file){
     unsigned int nodes_num = 0;
     getNodesNum(&nodes_num, this->rootNode);
 
-    stream.write(reinterpret_cast<char*>(&model_ver), sizeof (unsigned int));
-    stream.write(reinterpret_cast<char*>(&meshes_num), sizeof (unsigned int));
-    stream.write(reinterpret_cast<char*>(&nodes_num), sizeof (unsigned int));
+    stream.writeBinaryValue(&model_ver);
+    stream.writeBinaryValue(&meshes_num);
+    stream.writeBinaryValue(&nodes_num);
     stream << "\n"; //Write divider
     //Write all nodes
     writeNode(&stream, rootNode);
@@ -44,9 +44,9 @@ void ZS3M::SceneFileExport::write(std::string output_file){
         int indexNum = mesh_ptr->indices_num;
         unsigned int bonesNum = static_cast<unsigned int>(mesh_ptr->bones.size());
         //Write base numbers
-        stream.write(reinterpret_cast<char*>(&vertexNum), sizeof (int));
-        stream.write(reinterpret_cast<char*>(&indexNum), sizeof (int));
-        stream.write(reinterpret_cast<char*>(&bonesNum), sizeof (unsigned int));
+        stream.writeBinaryValue(&vertexNum);
+        stream.writeBinaryValue(&indexNum);
+        stream.writeBinaryValue(&bonesNum);
         stream << "\n"; //Write divider
         //Write all vertices
         for (unsigned int v_i = 0; v_i < static_cast<unsigned int>(vertexNum); v_i ++) {
@@ -62,12 +62,12 @@ void ZS3M::SceneFileExport::write(std::string output_file){
                 unsigned int bone_id = v_ptr->ids[vb_i];
                 float b_weight = v_ptr->weights[vb_i];
                 //Write bone values
-                stream.write(reinterpret_cast<char*>(&bone_id), sizeof(unsigned int));
-                stream.write(reinterpret_cast<char*>(&b_weight), sizeof(float));
+                stream.writeBinaryValue(&bone_id);
+                stream.writeBinaryValue(&b_weight);
             }
         }
         for(unsigned int ind_i = 0; ind_i < static_cast<unsigned int>(indexNum); ind_i ++){
-            stream.write(reinterpret_cast<char*>(&mesh_ptr->indices_arr[ind_i]), sizeof(unsigned int));
+            stream.writeBinaryValue(&mesh_ptr->indices_arr[ind_i]);
         }
         stream << "\n"; //Write divider
 
@@ -177,11 +177,8 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
             cur_pos += 6;
             ZS3M::SceneNode* node = new ZS3M::SceneNode;
 
-            char node_label[64];
             //Read NODE label string
-            strcpy(&node_label[0], &buffer[cur_pos]);
-            node->node_label = std::string(node_label);
-            cur_pos += static_cast<unsigned int>(strlen(node_label) + 1);
+            readString(node->node_label, buffer, cur_pos);
 
             unsigned int meshesNum = 0;
             unsigned int childrenNum = 0;
@@ -193,21 +190,19 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
 
             //iterate over all meshes, connected to this node
             for(unsigned int mesh_i = 0; mesh_i < meshesNum; mesh_i ++){
-                char mesh_label[64];
+                std::string mesh_label;
                 //Read NODE label string
-                strcpy(&mesh_label[0], &buffer[cur_pos]);
-                cur_pos += static_cast<unsigned int>(strlen(mesh_label) + 1);
+                readString(mesh_label, buffer, cur_pos);
                 //Put mesh name
                 node->mesh_names.push_back(mesh_label);
             }
             //iterate over all children nodes, connected to this node
             for(unsigned int ch_i = 0; ch_i < childrenNum; ch_i ++){
                 //Read child name
-                char child_node_label[64];
-                strcpy(&child_node_label[0], &buffer[cur_pos]);
-                cur_pos += static_cast<unsigned int>(strlen(child_node_label) + 1);
+                std::string child_node_label;
+                readString(child_node_label, buffer, cur_pos);
                 //Put child name
-                node->child_node_labels.push_back(std::string(child_node_label));
+                node->child_node_labels.push_back(child_node_label);
             }
             //Read node base matrix
             for(unsigned int m_i = 0; m_i < 4; m_i ++){
@@ -238,10 +233,9 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
         if(prefix[0] == '_' && prefix[1] == 'M' && prefix[2] == 'E' && prefix[3] == 'S' && prefix[4] == 'H'){
             cur_pos += 6;
 
-            char mesh_label[64];
+            std::string mesh_label;
             //Read mesh label string
-            strcpy(&mesh_label[0], &buffer[cur_pos]);
-            cur_pos += static_cast<unsigned int>(strlen(mesh_label) + 1);
+            readString(mesh_label, buffer, cur_pos);
 
             int vertexNum = 0;
             int indexNum = 0;

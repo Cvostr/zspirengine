@@ -155,7 +155,7 @@ void Engine::TransformProperty::loadPropertyFromMemory(const char* data, GameObj
     updateMatrix(); 
 }
 
-void Engine::TransformProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::TransformProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     stream->write(reinterpret_cast<char*>(&translation.X), sizeof(float));//Writing position X
     stream->write(reinterpret_cast<char*>(&translation.Y), sizeof(float)); //Writing position Y
     stream->write(reinterpret_cast<char*>(&translation.Z), sizeof(float)); //Writing position Z

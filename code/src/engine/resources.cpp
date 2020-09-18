@@ -3,6 +3,7 @@
 #include <iostream>
 #include "../../headers/engine.h"
 #include "../../headers/game.h"
+#include "../../headers/misc/misc.h"
 
 extern ZSpireEngine* engine_ptr;
 extern Material* default3dmat;
@@ -137,85 +138,97 @@ void Engine::ResourceManager::pushResource(ZsResource* resource){
     this->resources.push_back(resource);
 }
 
-void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
-    std::ifstream file_stream;
-    file_stream.open(resmap_path, std::ifstream::binary); //open resources map file
-
-    if (!file_stream.is_open()) {
-        std::cout << "Error opening Resource Table File " << resmap_path << std::endl; 
+Engine::ZsResource* Engine::ResourceManager::getResource(std::string label) {
+    unsigned int res = static_cast<unsigned int>(this->resources.size());
+    for (unsigned int res_i = 0; res_i < res; res_i++) {
+        auto property_ptr = this->resources[res_i];
+        if (!property_ptr->resource_label.compare(label)) { //If object already has one
+            return (property_ptr); //return it
+        }
     }
+    return nullptr;
+}
 
+void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int size) {
     std::string prefix;
+    unsigned int iter = 0;
 
-    while(!file_stream.eof()){
-        file_stream >> prefix;
-
-        if(prefix.compare("_END") == 0){
-            return;
+    while (true) {
+        prefix.clear();
+        //Read prefix
+        if (iter >= size)
+            break;
+        while (data[iter] != ' ' && data[iter] != '\n') {
+            if (data[iter] != '\0')
+                prefix += data[iter];
+            iter++;
         }
 
-        if(prefix.compare("entry") == 0){
+        if (prefix.compare("_END") == 0) { //If end reached
+            break; //Then end this infinity loop
+        }
+        if (prefix.compare("entry") == 0) { //If end reached
             ZsResource resource;
+            iter++;
 
-            //read relative path
-            file_stream >> resource.rel_path >> resource.resource_label >> resource.blob_path;
+            readString(resource.rel_path, data, iter);
 
-            file_stream.seekg(1, std::ofstream::cur); //Skip space
-            //start byte
-            file_stream.read(reinterpret_cast<char*>(&resource.offset), sizeof(uint64_t));
-            //resource size
-            file_stream.read(reinterpret_cast<char*>(&resource.size), sizeof(unsigned int));
-            //reading resource type
-            file_stream.read(reinterpret_cast<char*>(&resource.resource_type), sizeof(RESOURCE_TYPE));
-            file_stream.seekg(1, std::ofstream::cur); //Skip space
+            readString(resource.resource_label, data, iter);
+
+            readString(resource.blob_path, data, iter);
+
+            readBinaryValue(&resource.offset, data + iter, iter);
+            readBinaryValue(&resource.size, data + iter, iter);
+            readBinaryValue(&resource.resource_type, data + iter, iter);
+            iter++;
 
             ZsResource* resource_ptr = nullptr;
 
-            switch(resource.resource_type){
-                default:{
-                    resource_ptr = new ZsResource;
-                    break;
-                }
-                case RESOURCE_TYPE_FILE:{
-                    break;
-                }
-                case RESOURCE_TYPE_TEXTURE:{
-                    resource_ptr = new Engine::TextureResource;
+            switch (resource.resource_type) {
+            default: {
+                resource_ptr = new ZsResource;
+                break;
+            }
+            case RESOURCE_TYPE_FILE: {
+                break;
+            }
+            case RESOURCE_TYPE_TEXTURE: {
+                resource_ptr = new Engine::TextureResource;
 
-                    Engine::TextureResource* texture_ptr = static_cast<Engine::TextureResource*>(resource_ptr);
-                    texture_ptr->texture_ptr = allocTexture();
-                    break;
-                }
-                case RESOURCE_TYPE_MESH:{
-                    resource_ptr = new MeshResource;
+                Engine::TextureResource* texture_ptr = static_cast<Engine::TextureResource*>(resource_ptr);
+                texture_ptr->texture_ptr = allocTexture();
+                break;
+            }
+            case RESOURCE_TYPE_MESH: {
+                resource_ptr = new MeshResource;
 
-                    Engine::MeshResource* mesh_ptr = static_cast<Engine::MeshResource*>(resource_ptr);
-                    mesh_ptr->mesh_ptr = allocateMesh();
-                    break;
-                }
-                case RESOURCE_TYPE_AUDIO:{
-                    resource_ptr = new Engine::AudioResource;
-                    break;
-                }
-                case RESOURCE_TYPE_SCRIPT:{
-                    resource_ptr = new Engine::ScriptResource;
-                    break;
-                }
-                case RESOURCE_TYPE_MATERIAL:{
-                    resource_ptr = new Engine::MaterialResource;
-                    static_cast<Engine::MaterialResource*>(resource_ptr)->material = new Material;
-                    break;
-                }
-                case RESOURCE_TYPE_ANIMATION:{
-                    resource_ptr = new Engine::AnimationResource;
-                    static_cast<Engine::AnimationResource*>(resource_ptr)->animation_ptr = new Engine::Animation;
-                    break;
-                }
-                case RESOURCE_TYPE_FONT:{
-                    resource_ptr = new GlyphResource;
+                Engine::MeshResource* mesh_ptr = static_cast<Engine::MeshResource*>(resource_ptr);
+                mesh_ptr->mesh_ptr = allocateMesh();
+                break;
+            }
+            case RESOURCE_TYPE_AUDIO: {
+                resource_ptr = new Engine::AudioResource;
+                break;
+            }
+            case RESOURCE_TYPE_SCRIPT: {
+                resource_ptr = new Engine::ScriptResource;
+                break;
+            }
+            case RESOURCE_TYPE_MATERIAL: {
+                resource_ptr = new Engine::MaterialResource;
+                static_cast<Engine::MaterialResource*>(resource_ptr)->material = new Material;
+                break;
+            }
+            case RESOURCE_TYPE_ANIMATION: {
+                resource_ptr = new Engine::AnimationResource;
+                static_cast<Engine::AnimationResource*>(resource_ptr)->animation_ptr = new Engine::Animation;
+                break;
+            }
+            case RESOURCE_TYPE_FONT: {
+                resource_ptr = new GlyphResource;
 
-                    break;
-                }
+                break;
+            }
             }
             resource_ptr->blob_path = resource.blob_path;
             resource_ptr->offset = resource.offset;
@@ -223,13 +236,30 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
             resource_ptr->resource_label = resource.resource_label;
             resource_ptr->size = resource.size;
 
-            if(resource_ptr->loadInstantly)
+            if (resource_ptr->loadInstantly)
                 (resource_ptr)->load();
             //Add resource to vector
             this->resources.push_back(resource_ptr);
+        
         }
     }
-    //close resource map stream
+}
+
+void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
+    std::ifstream file_stream;
+    file_stream.open(resmap_path, std::ifstream::binary | std::ifstream::ate); //open resources map file
+
+    if (!file_stream.is_open()) {
+        std::cout << "Error opening Resource Table File " << resmap_path << std::endl; 
+    }
+
+    unsigned int size = static_cast<unsigned int>(file_stream.tellg());
+    file_stream.seekg(0);
+    char* data = new  char[size];
+    file_stream.read(data, size);
+    loadResourcesTableFromMem(data, size);
+
+    delete[] data;
     file_stream.close();
 }
 

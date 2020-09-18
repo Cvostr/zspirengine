@@ -52,25 +52,22 @@ void Engine::LightsourceProperty::loadPropertyFromMemory(const char* data, GameO
     int cl_g;
     int cl_b;
     //Read light color
-    memcpy(&cl_r, data + offset, sizeof(int));
-    offset += sizeof(float);
-    memcpy(&cl_g, data + offset, sizeof(int));
-    offset += sizeof(float);
-    memcpy(&cl_b, data + offset, sizeof(int));
-    offset += sizeof(float);
+    readBinaryValue(&cl_r, data + offset, offset);
+    readBinaryValue(&cl_g, data + offset, offset);
+    readBinaryValue(&cl_b, data + offset, offset);
 
     color = ZSRGBCOLOR(cl_r, cl_g, cl_b);
 }
 
-void Engine::LightsourceProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
-    stream->write(reinterpret_cast<char*>(&light_type), sizeof(Engine::LIGHTSOURCE_TYPE));
-    stream->write(reinterpret_cast<char*>(&intensity), sizeof(float));
-    stream->write(reinterpret_cast<char*>(&range), sizeof(float));
-    stream->write(reinterpret_cast<char*>(&spot_angle), sizeof(float));
+void Engine::LightsourceProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
+    stream->writeBinaryValue(&light_type);
+    stream->writeBinaryValue(&intensity);
+    stream->writeBinaryValue(&range);
+    stream->writeBinaryValue(&spot_angle);
 
-    stream->write(reinterpret_cast<char*>(&color.r), sizeof(int));
-    stream->write(reinterpret_cast<char*>(&color.g), sizeof(int));
-    stream->write(reinterpret_cast<char*>(&color.b), sizeof(int));
+    stream->writeBinaryValue(&color.r);
+    stream->writeBinaryValue(&color.g);
+    stream->writeBinaryValue(&color.b);
 }
 
 void Engine::LightsourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {

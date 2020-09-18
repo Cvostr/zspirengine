@@ -96,19 +96,14 @@ void Engine::TerrainProperty::loadPropertyFromMemory(const char* data, GameObjec
 
     readString(file_label, data, offset);
 
-    offset++;
     //read dimensions
-    readBinaryValue<int>(&Width, data + offset, offset);
-    readBinaryValue<int>(&Length, data + offset, offset);
-    memcpy(&MaxHeight, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue(&Width, data + offset, offset);
+    readBinaryValue(&Length, data + offset, offset);
+    readBinaryValue(&MaxHeight, data + offset, offset);
 
-    memcpy(&castShadows, data + offset, sizeof(bool));
-    offset += sizeof(bool);
-    memcpy(&textures_size, data + offset, sizeof(int));
-    offset += sizeof(int);
-    memcpy(&grassType_size, data + offset, sizeof(int));
-    offset += sizeof(int);
+    readBinaryValue(&castShadows, data + offset, offset);
+    readBinaryValue(&textures_size, data + offset, offset);
+    readBinaryValue(&grassType_size, data + offset, offset);
 
     if (!game_data->isEditor) {
         ZsResource* terrain_res = game_data->resources->getResource<Engine::ZsResource>(file_label);
@@ -138,10 +133,8 @@ void Engine::TerrainProperty::loadPropertyFromMemory(const char* data, GameObjec
         HeightmapTexturePair texture_pair;
         //Read texture pair
         readString(texture_pair.diffuse_relpath, data, offset);
-        offset++;
         //Read normal pair
         readString(texture_pair.normal_relpath, data, offset);
-        offset++;
         //Push texture to array
         textures.push_back(texture_pair);
     }
@@ -151,11 +144,8 @@ void Engine::TerrainProperty::loadPropertyFromMemory(const char* data, GameObjec
         //Read grass diffuse texture
         readString(grass.diffuse_relpath, data, offset);
         //Write grass size
-        offset++;
-        memcpy(&grass.scale.X, data + offset, sizeof(float));
-        offset += sizeof(float);
-        memcpy(&grass.scale.Y, data + offset, sizeof(float));
-        offset += sizeof(float);
+        readBinaryValue(&grass.scale.X, data + offset, offset);
+        readBinaryValue(&grass.scale.Y, data + offset, offset);
         //Push Grass to array
         getTerrainData()->grass.push_back(grass);
     }

@@ -72,6 +72,7 @@ private:
     std::vector<ZsResource*> resources;
 public:
     void loadResourcesTable(std::string resmap_path);
+    void loadResourcesTableFromMem(char* data, unsigned int size);
     void clear();
     //Push manually configured ZsResource from outside
     void pushResource(ZsResource* resource);
@@ -99,6 +100,8 @@ public:
         }
         return nullptr;
     }
+
+    Engine::ZsResource* getResource(std::string label);
 
     ResourceManager();
     ~ResourceManager();

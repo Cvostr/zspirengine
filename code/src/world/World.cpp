@@ -223,11 +223,7 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
     unsigned int iter = 1;
     object_ptr->world_ptr = this; //Assign pointer to world
     object_ptr->str_id.clear(); //Clear old string id
-    while (bytes[iter] != ' ') {
-        object_ptr->str_id += bytes[iter];
-        iter++;
-    }
-    iter++;
+    readString(object_ptr->str_id, bytes, iter);
     //Read ACTIVE and STATIC flags
     readBinaryValue(&object_ptr->active, bytes + iter, iter);
     readBinaryValue(&object_ptr->IsStatic, bytes + iter, iter);
@@ -255,14 +251,7 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
             //Iterate over these children
             for (unsigned int ch_i = 0; ch_i < amount; ch_i++) { //Iterate over all written children to file
                 std::string child_str_id;
-                //Reading child string id
-                while (bytes[iter] == ' ' || bytes[iter] == '\n') {
-                    iter++;
-                }
-                while (bytes[iter] != ' ' && bytes[iter] != '\n') {
-                    child_str_id += bytes[iter];
-                    iter++;
-                }
+                readString(child_str_id, bytes, iter);
                 //Create link for object
                 GameObjectLink link;
                 link.world_ptr = this; //Setting world pointer

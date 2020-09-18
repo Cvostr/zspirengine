@@ -22,8 +22,6 @@ void Engine::NodeProperty::copyTo(GameObjectProperty* dest) {
 void Engine::NodeProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
     readString(node_label, data, offset);
-    //Skip 1 byte
-    offset++;
     //Now read node matrix
     for (unsigned int m_i = 0; m_i < 4; m_i++) {
         for (unsigned int m_j = 0; m_j < 4; m_j++) {
@@ -33,14 +31,14 @@ void Engine::NodeProperty::loadPropertyFromMemory(const char* data, GameObject* 
     }
 }
 
-void Engine::NodeProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::NodeProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     //Write node name
     *stream << node_label << '\0';
     //Write node transform matrix
     for (unsigned int m_i = 0; m_i < 4; m_i++) {
         for (unsigned int m_j = 0; m_j < 4; m_j++) {
             float m_v = transform_mat.m[m_i][m_j];
-            stream->write(reinterpret_cast<char*>(&m_v), sizeof(float));
+            stream->writeBinaryValue(&m_v);
         }
     }
 }

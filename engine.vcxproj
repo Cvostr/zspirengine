@@ -150,6 +150,7 @@
     <ClCompile Include="code\src\engine\resources.cpp" />
     <ClCompile Include="code\src\input\zs-input.cpp" />
     <ClCompile Include="code\src\misc\GlyphManager.cpp" />
+    <ClCompile Include="code\src\misc\KeyValueFile.cpp" />
     <ClCompile Include="code\src\misc\oal_manager.cpp" />
     <ClCompile Include="code\src\misc\output.cpp" />
     <ClCompile Include="code\src\misc\misc.cpp" />
@@ -196,6 +197,7 @@
     <ClCompile Include="code\src\world\GoProperty\CharacterController.cpp" />
     <ClCompile Include="code\src\world\GoProperty\ColliderProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\go_properties.cpp" />
+    <ClCompile Include="code\src\world\GoProperty\LabelProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\LightsourceProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\MaterialProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\MeshProperty.cpp" />
@@ -222,6 +224,7 @@
     <ClInclude Include="code\headers\game.h" />
     <ClInclude Include="code\headers\input\zs-input.h" />
     <ClInclude Include="code\headers\misc\GlyphManager.h" />
+    <ClInclude Include="code\headers\misc\KeyValueFile.hpp" />
     <ClInclude Include="code\headers\misc\oal_manager.h" />
     <ClInclude Include="code\headers\misc\output.hpp" />
     <ClInclude Include="code\headers\misc\misc.h" />

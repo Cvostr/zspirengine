@@ -126,7 +126,7 @@ void Engine::AnimationProperty::loadPropertyFromMemory(const char* data, GameObj
     updateAnimationPtr();
 }
 
-void Engine::AnimationProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::AnimationProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     *stream << anim_label << '\0';
 }
 

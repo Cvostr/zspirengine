@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "../engine/resources.h"
+#include "../misc/misc.h"
 #include "zs-camera.h"
 
 #include "Physics.h"
@@ -91,7 +92,7 @@ public:
     virtual void onAddToObject();
     virtual void onObjectDeleted();
     virtual void loadPropertyFromMemory(const char* data, GameObject* obj);
-    virtual void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    virtual void savePropertyToStream(ZsStream* stream, GameObject* obj);
     virtual void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
     virtual void onTrigger(Engine::GameObject* obj);
     virtual void onTriggerEnter(Engine::GameObject* obj);
@@ -167,6 +168,7 @@ public:
     GameObjectLink parent;
 
     std::vector<GameObjectLink> children; //Vector to store links to children of object
+    GameObject* getChild(unsigned int index);
     //Pointers to properties and scripts
     GameObjectProperty* properties[OBJ_PROPS_SIZE];
     GameObjectProperty* scripts[OBJ_SCRIPT_PROPS_SIZE];
@@ -178,9 +180,11 @@ public:
     Engine::GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
     Engine::GameObjectProperty* getPropertyPtrByTypeI(int property);
     //Add object link as child
+    void addChildObject(GameObject* obj, bool updTransform = true);
     void addChildObject(GameObjectLink link, bool updTransform = true);
     //unparent object from this
     void removeChildObject(GameObjectLink link);
+    void removeChildObject(GameObject* obj);
     int getAliveChildrenAmount(); //Gets current amount of children objects (exclude removed chidren)
     //Remove property with type
     void removeProperty(int index);
@@ -199,6 +203,7 @@ public:
     void setLabel(std::string label);
     void setActive(bool active);
     bool isActive();
+    unsigned int getChildrenNum();
 
     template<typename T>
     T* getPropertyPtr(){
@@ -240,8 +245,8 @@ public:
 
     //---------------------FOR EDITOR USE--------------------------------------------------------
     void pick(); //Mark object and its children picked
-    void saveProperties(std::ofstream* stream); //Writes properties content at end of stream
-    void saveProperty(GameObjectProperty* prop, std::ofstream* stream);
+    void saveProperties(ZsStream* stream); //Writes properties content at end of stream
+    void saveProperty(GameObjectProperty* prop, ZsStream* stream);
     void putToSnapshot(GameObjectSnapshot* snapshot);
     void recoverFromSnapshot(Engine::GameObjectSnapshot* snapshot);
 
@@ -276,7 +281,7 @@ public:
     void onValueChanged();
     void copyTo(Engine::GameObjectProperty* dest);
     void loadPropertyFromMemory(const char* data, Engine::GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     LabelProperty();
     ~LabelProperty();
@@ -309,7 +314,7 @@ public:
     void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     TransformProperty();
 };

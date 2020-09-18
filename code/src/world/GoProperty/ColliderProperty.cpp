@@ -54,17 +54,18 @@ void Engine::ColliderProperty::loadPropertyFromMemory(const char* data, GameObje
     }
 }
 
-void Engine::ColliderProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::ColliderProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     //write collider type
-    stream->write(reinterpret_cast<char*>(&coll_type), sizeof(COLLIDER_TYPE));
+    stream->writeBinaryValue(&coll_type);
     //boolean if collider has custom size and transform
-    stream->write(reinterpret_cast<char*>(&isCustomPhysicalSize), sizeof(bool));
+    stream->writeBinaryValue(&isCustomPhysicalSize);
     if (isCustomPhysicalSize) {
-        stream->write(reinterpret_cast<char*>(&cust_size.X), sizeof(float));
-        stream->write(reinterpret_cast<char*>(&cust_size.Y), sizeof(float));
-        stream->write(reinterpret_cast<char*>(&cust_size.Z), sizeof(float));
-        stream->write(reinterpret_cast<char*>(&transform_offset.X), sizeof(float));
-        stream->write(reinterpret_cast<char*>(&transform_offset.Y), sizeof(float));
-        stream->write(reinterpret_cast<char*>(&transform_offset.Z), sizeof(float));
+        stream->writeBinaryValue(&cust_size.X);
+        stream->writeBinaryValue(&cust_size.Y);
+        stream->writeBinaryValue(&cust_size.Z);
+
+        stream->writeBinaryValue(&transform_offset.X);
+        stream->writeBinaryValue(&transform_offset.Y);
+        stream->writeBinaryValue(&transform_offset.Z);
     }
 }

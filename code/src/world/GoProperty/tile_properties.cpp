@@ -61,7 +61,7 @@ void Engine::TileGroupProperty::loadPropertyFromMemory(const char* data, GameObj
     }
 }
 
-void Engine::TileGroupProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::TileGroupProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     int isCreated = static_cast<int>(this->isCreated);
 
     stream->write(reinterpret_cast<char*>(&isCreated), sizeof(int));
@@ -142,26 +142,20 @@ void Engine::TileProperty::loadPropertyFromMemory(const char* data, GameObject* 
     offset += 1; //Skip space
     //read textures relative pathes
     readString(diffuse_relpath, data, offset);
-    
-    offset++;
-    readString(transparent_relpath, data, offset);
 
+    readString(transparent_relpath, data, offset);
     //set pointers to textures
     updTexturePtr();
 
-    offset++;
-    memcpy(&anim_property.isAnimated, data + offset, sizeof(bool));
-    offset += sizeof(bool);
+    readBinaryValue(&anim_property.isAnimated, data + offset, offset);
 
     if (anim_property.isAnimated) { //if animated, then write animation properties
-        memcpy(&anim_property.framesX, data + offset, sizeof(int));
-        offset += sizeof(int);
-        memcpy(&anim_property.framesY, data + offset, sizeof(int));
-        offset += sizeof(int);
+        readBinaryValue(&anim_property.framesX, data + offset, offset);
+        readBinaryValue(&anim_property.framesY, data + offset, offset);
     }
 }
 
-void Engine::TileProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::TileProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     if (diffuse_relpath.empty()) //check if object has no texture
         *stream << "@none";
     else
@@ -173,9 +167,9 @@ void Engine::TileProperty::savePropertyToStream(std::ofstream* stream, GameObjec
         *stream << transparent_relpath << '\0';
 
     //Animation stuff
-    stream->write(reinterpret_cast<char*>(&anim_property.isAnimated), sizeof(bool));
+    stream->writeBinaryValue(&anim_property.isAnimated);
     if (anim_property.isAnimated) { //if animated, then write animation properties
-        stream->write(reinterpret_cast<char*>(&anim_property.framesX), sizeof(int));
-        stream->write(reinterpret_cast<char*>(&anim_property.framesY), sizeof(int));
+        stream->writeBinaryValue(&anim_property.framesX);
+        stream->writeBinaryValue(&anim_property.framesY);
     }
 }

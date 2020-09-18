@@ -193,7 +193,7 @@ void Material::saveToFile(){
     //if it is a default material, then quit function
     if(file_path[0] == '@') return;
 
-    std::ofstream mat_stream;
+    ZsStream mat_stream;
     mat_stream.open(file_path, std::ofstream::out);
 
     if(!mat_stream){ //File isn't opened
@@ -227,48 +227,48 @@ void Material::saveToFile(){
                 //Cast pointer
                 FloatMtShPropConf* float_conf = static_cast<FloatMtShPropConf*>(conf_ptr);
                 //Write value
-                mat_stream.write(reinterpret_cast<char*>(&float_conf->value), sizeof (float));
+                mat_stream.writeBinaryValue(&float_conf->value);
                 break;
             }
             case MATSHPROP_TYPE_INTEGER:{
                 //Cast pointer
                 IntegerMtShPropConf* int_conf = static_cast<IntegerMtShPropConf*>(conf_ptr);
                 //Write value
-                mat_stream.write(reinterpret_cast<char*>(&int_conf->value), sizeof(int));
+                mat_stream.writeBinaryValue(&int_conf->value);
                 break;
             }
             case MATSHPROP_TYPE_COLOR:{
                 //Cast pointer
                 ColorMtShPropConf* color_conf = static_cast<ColorMtShPropConf*>(conf_ptr);
                 //Write value
-                mat_stream.write(reinterpret_cast<char*>(&color_conf->color.r), 4);
-                mat_stream.write(reinterpret_cast<char*>(&color_conf->color.g), 4);
-                mat_stream.write(reinterpret_cast<char*>(&color_conf->color.b), 4);
+                mat_stream.writeBinaryValue(&color_conf->color.r);
+                mat_stream.writeBinaryValue(&color_conf->color.g);
+                mat_stream.writeBinaryValue(&color_conf->color.b);
                 break;
             }
             case MATSHPROP_TYPE_FVEC3:{
                 //Cast pointer
                 Float3MtShPropConf* fvec3_conf = static_cast<Float3MtShPropConf*>(conf_ptr);
                 //Write value
-                mat_stream.write(reinterpret_cast<char*>(&fvec3_conf->value.X), sizeof (float));
-                mat_stream.write(reinterpret_cast<char*>(&fvec3_conf->value.Y), sizeof (float));
-                mat_stream.write(reinterpret_cast<char*>(&fvec3_conf->value.Z), sizeof (float));
+                mat_stream.writeBinaryValue(&fvec3_conf->value.X);
+                mat_stream.writeBinaryValue(&fvec3_conf->value.Y);
+                mat_stream.writeBinaryValue(&fvec3_conf->value.Z);
                 break;
             }
             case MATSHPROP_TYPE_FVEC2:{
                 //Cast pointer
                 Float2MtShPropConf* fvec2_conf = static_cast<Float2MtShPropConf*>(conf_ptr);
                 //Write value
-                mat_stream.write(reinterpret_cast<char*>(&fvec2_conf->value.X), sizeof (float));
-                mat_stream.write(reinterpret_cast<char*>(&fvec2_conf->value.Y), sizeof (float));
+                mat_stream.writeBinaryValue(&fvec2_conf->value.X);
+                mat_stream.writeBinaryValue(&fvec2_conf->value.Y);
                 break;
             }
             case MATSHPROP_TYPE_IVEC2:{
                 //Cast pointer
                 Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
                 //Write value
-                mat_stream.write(reinterpret_cast<char*>(&ivec2_conf->value[0]), sizeof (int));
-                mat_stream.write(reinterpret_cast<char*>(&ivec2_conf->value[1]), sizeof (int));
+                mat_stream.writeBinaryValue(&ivec2_conf->value[0]);
+                mat_stream.writeBinaryValue(&ivec2_conf->value[1]);
                 break;
             }
             case MATSHPROP_TYPE_TEXTURE3:{
@@ -351,8 +351,8 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                             //Cast pointer
                             FloatMtShPropConf* float_conf = static_cast<FloatMtShPropConf*>(conf_ptr);
 
-                            memcpy(&float_conf->value, &buffer[position], sizeof(float));
-                            position += sizeof (float) + 1;
+                            readBinaryValue(&float_conf->value, buffer + position, position);
+
                             break;
                         }
 
@@ -369,12 +369,9 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                             //Cast pointer
                             ColorMtShPropConf* color_conf = static_cast<ColorMtShPropConf*>(conf_ptr);
                             //Read color values
-                            memcpy(&color_conf->color.r, &buffer[position], sizeof(int));
-                            position += sizeof (int);
-                            memcpy(&color_conf->color.g, &buffer[position], sizeof(int));
-                            position += sizeof (int);
-                            memcpy(&color_conf->color.b, &buffer[position], sizeof(int));
-                            position += sizeof (int);
+                            readBinaryValue(&color_conf->color.r, buffer + position, position);
+                            readBinaryValue(&color_conf->color.g, buffer + position, position);
+                            readBinaryValue(&color_conf->color.b, buffer + position, position);
                             position += 1;
                             break;
                         }
@@ -383,12 +380,9 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                             //Cast pointer
                             Float3MtShPropConf* fvec3_conf = static_cast<Float3MtShPropConf*>(conf_ptr);
                             //Read float vector values
-                            memcpy(&fvec3_conf->value.X, &buffer[position], sizeof(float));
-                            position += sizeof (float);
-                            memcpy(&fvec3_conf->value.Y, &buffer[position], sizeof(float));
-                            position += sizeof (float);
-                            memcpy(&fvec3_conf->value.Z, &buffer[position], sizeof(float));
-                            position += sizeof (float);
+                            readBinaryValue(&fvec3_conf->value.X, buffer + position, position);
+                            readBinaryValue(&fvec3_conf->value.Y, buffer + position, position);
+                            readBinaryValue(&fvec3_conf->value.Z, buffer + position, position);
                             position += 1;
                             break;
                         }
@@ -397,11 +391,8 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                             //Cast pointer
                             Float2MtShPropConf* fvec2_conf = static_cast<Float2MtShPropConf*>(conf_ptr);
                             //Read float vector values
-                            memcpy(&fvec2_conf->value.X, &buffer[position], sizeof(float));
-                            position += sizeof (float);
-                            memcpy(&fvec2_conf->value.Y, &buffer[position], sizeof(float));
-                            position += sizeof (float);
-
+                            readBinaryValue(&fvec2_conf->value.X, buffer + position, position);
+                            readBinaryValue(&fvec2_conf->value.Y, buffer + position, position);
                             position += 1;
                             break;
                         }
@@ -410,10 +401,8 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                             //Cast pointer
                             Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
                             //Read float vector values
-                            memcpy(&ivec2_conf->value[0], &buffer[position], sizeof(int));
-                            position += sizeof (int);
-                            memcpy(&ivec2_conf->value[1], &buffer[position], sizeof(int));
-                            position += sizeof (int);
+                            readBinaryValue(&ivec2_conf->value[0], buffer + position, position);
+                            readBinaryValue(&ivec2_conf->value[1], buffer + position, position);
 
                             position += 1;
                             break;

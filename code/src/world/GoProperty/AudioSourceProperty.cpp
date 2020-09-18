@@ -135,25 +135,23 @@ void Engine::AudioSourceProperty::loadPropertyFromMemory(const char* data, GameO
     if (resource_relpath.compare("@none") != 0) {
         updateAudioPtr(); //Pointer will now point to mesh resource
     }
-    offset++;
+    
     //Load settings
-    memcpy(&source.source_gain, data + offset, sizeof(float));
-    offset += sizeof(float);
-    memcpy(&source.source_pitch, data + offset, sizeof(float));
-    offset += sizeof(float);
+    readBinaryValue(&source.source_gain, data + offset, offset);
+    readBinaryValue(&source.source_pitch, data + offset, offset);
 
     source.apply_settings(); //Apply settings to openal
 }
 
-void Engine::AudioSourceProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::AudioSourceProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     if (resource_relpath.empty()) //check if object has no audioclip
-        *stream << "@none" << '\0';
+        stream->writeString("@none");
     else
-        *stream << resource_relpath << '\0';
+        stream->writeString(resource_relpath);
 
-    stream->write(reinterpret_cast<char*>(&source.source_gain), sizeof(float));
-    stream->write(reinterpret_cast<char*>(&source.source_pitch), sizeof(float));
-    stream->write(reinterpret_cast<char*>(&source.looped), sizeof(bool));
+    stream->writeBinaryValue(&source.source_gain);
+    stream->writeBinaryValue(&source.source_pitch);
+    stream->writeBinaryValue(&source.looped);
 }
 
 void Engine::AudioSourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {

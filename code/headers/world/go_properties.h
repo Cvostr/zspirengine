@@ -34,7 +34,7 @@ public:
     void addPropertyInterfaceToInspector();
     void onValueChanged(); //Update mesh    pointer
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
     void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     MeshProperty();
@@ -56,7 +56,7 @@ public:
     void makeGlobalVarsList();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     void onTrigger(Engine::GameObject* obj);
     void onTriggerEnter(Engine::GameObject* obj);
@@ -85,7 +85,7 @@ public:
     void copyTo(Engine::GameObjectProperty* dest);
     void onPreRender(Engine::RenderPipeline* pipeline);
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
     void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     LightsourceProperty();
@@ -120,7 +120,7 @@ public:
     void setPitch(float pitch);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
     void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     AudioSourceProperty();
@@ -142,7 +142,7 @@ public:
     void copyTo(GameObjectProperty* dest);
    // void addPropertyInterfaceToInspector();
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     NodeProperty();
 };
@@ -182,7 +182,7 @@ public:
     bool isRenderAvailable();
     //function to read shadowcaster property from memory
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     ShadowCasterProperty();
 };
@@ -208,7 +208,7 @@ public:
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     MaterialProperty();
 };
@@ -248,7 +248,7 @@ public:
     Engine::TransformProperty* getTransformProperty();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     ColliderProperty();
 };
@@ -269,7 +269,8 @@ public:
     void setLinearVelocity(ZSVECTOR3 lvel);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
+    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     RigidbodyProperty();
 };
@@ -297,7 +298,7 @@ public:
     void walk(float x, float z);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
     void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     CharacterControllerProperty();
@@ -317,7 +318,7 @@ public:
     void onStart();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     TriggerProperty();
 };
@@ -346,7 +347,7 @@ public:
 
     void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     AnimationProperty();
 };
@@ -397,7 +398,7 @@ public:
     TerrainData* getTerrainData();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     TerrainProperty();
     ~TerrainProperty();

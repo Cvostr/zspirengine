@@ -70,7 +70,7 @@ public:
     void clear();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     TileGroupProperty();
 };
@@ -100,7 +100,7 @@ public:
     void setDiffuseTexture(std::string texture);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(std::ofstream* stream, GameObject* obj);
+    void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     TileProperty();
 };

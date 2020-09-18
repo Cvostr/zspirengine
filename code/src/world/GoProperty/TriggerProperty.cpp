@@ -62,11 +62,11 @@ void Engine::TriggerProperty::loadPropertyFromMemory(const char* data, GameObjec
     }
 }
 
-void Engine::TriggerProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::TriggerProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     //write collider type
-    stream->write(reinterpret_cast<char*>(&coll_type), sizeof(COLLIDER_TYPE));
+    stream->writeBinaryValue(&coll_type);
     //boolean if collider has custom size and transform
-    stream->write(reinterpret_cast<char*>(&isCustomPhysicalSize), sizeof(bool));
+    stream->writeBinaryValue(&isCustomPhysicalSize);
     if (isCustomPhysicalSize) {
         stream->write(reinterpret_cast<char*>(&cust_size.X), sizeof(float));
         stream->write(reinterpret_cast<char*>(&cust_size.Y), sizeof(float));

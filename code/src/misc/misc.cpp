@@ -25,8 +25,16 @@ void genRandomString(std::string* result, unsigned int len){
 
 void readString(std::string& str, const char* data, unsigned int& offset) {
     str.clear();
-    while (data[offset] != '\0' && data[offset] != '\n') {
+    while (data[offset] != '\0') {
         str += data[offset];
         offset++;
     }
+    offset++;
+}
+
+void ZsStream::writeString(std::string str) {
+    char term = '\0';
+    unsigned int size = static_cast<unsigned int>(str.size());
+    write(str.c_str(), size);
+    write(&term, 1);
 }

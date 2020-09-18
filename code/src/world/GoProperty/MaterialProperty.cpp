@@ -43,21 +43,19 @@ void Engine::MaterialProperty::loadPropertyFromMemory(const char* data, GameObje
     readString(material_path, data, offset);
     //get material by label
     material_ptr = game_data->resources->getMaterialByLabel(material_path)->material; //find it and process
-
-    offset++;
     //Read receiveShadows boolean
     readBinaryValue<bool>(&receiveShadows, data + offset, offset);
     this->group_label = material_ptr->group_ptr->groupCaption;
 }
 
-void Engine::MaterialProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::MaterialProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     //Write path to material string
     if (material_ptr != nullptr)
-        *stream << material_path << '\0'; //Write material relpath
+        stream->writeString(material_path);//Write material relpath
     else
-        *stream << "@none" << '\0';
+        stream->writeString("@none");
 
-    stream->write(reinterpret_cast<char*>(&receiveShadows), sizeof(bool));
+    stream->writeBinaryValue(&receiveShadows);
 }
 
 void Engine::MaterialProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {

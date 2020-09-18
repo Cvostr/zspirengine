@@ -86,8 +86,7 @@ void MessageCallback(const asSMessageInfo* msg, void* param)
 AGScriptMgr::AGScriptMgr() {
 	ag_engine = asCreateScriptEngine();
 	
-	int r = ag_engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
-	assert(r >= 0);
+	ag_engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
 	RegisterStdString(ag_engine);
 	RegisterScriptHandle(ag_engine);
 	//Add base script class
@@ -106,17 +105,16 @@ AGScriptMgr::AGScriptMgr() {
 	bindGameObjectPropertySDK<AnimationProperty>(this, ANIM_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<MeshProperty>(this, MESH_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<MaterialProperty>(this, MAT_PROP_TYPE_NAME);
+	bindGameObjectPropertySDK<RigidbodyProperty>(this, RIGIDBODY_PROP_TYPE_NAME);
 
 	bindGameObjectPropertiesSDK(this);
 
 	std::string args = "?&in";
 	for (unsigned int i = 0; i < 9; i++) {
 		std::string func = "void print(" + args + ")";
-		r = RegisterGlobalFunction(func.c_str(), asFUNCTION(printToConsole), asCALL_GENERIC);
+		RegisterGlobalFunction(func, asFUNCTION(printToConsole), asCALL_GENERIC);
 		args += ", ?&in";
 	}
-
-	assert(r >= 0);
 
 	//Create Context
 	ag_context = ag_engine->CreateContext();

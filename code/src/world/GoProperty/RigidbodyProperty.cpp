@@ -107,17 +107,23 @@ void Engine::RigidbodyProperty::loadPropertyFromMemory(const char* data, GameObj
     readBinaryValue<float>(&linearVel.Z, data + offset, offset);
 }
 
-void Engine::RigidbodyProperty::savePropertyToStream(std::ofstream* stream, GameObject* obj) {
+void Engine::RigidbodyProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     //write collider type
-    stream->write(reinterpret_cast<char*>(&coll_type), sizeof(COLLIDER_TYPE));
+    stream->writeBinaryValue(&coll_type);
     //write isTrigger boolean
-    stream->write(reinterpret_cast<char*>(&mass), sizeof(float));
+    stream->writeBinaryValue(&mass);
     //write gravity
-    stream->write(reinterpret_cast<char*>(&gravity.X), sizeof(float));
-    stream->write(reinterpret_cast<char*>(&gravity.Y), sizeof(float));
-    stream->write(reinterpret_cast<char*>(&gravity.Z), sizeof(float));
+    stream->writeBinaryValue(&gravity.X);
+    stream->writeBinaryValue(&gravity.Y);
+    stream->writeBinaryValue(&gravity.Z);
     //write linear velocity
-    stream->write(reinterpret_cast<char*>(&linearVel.X), sizeof(float));
-    stream->write(reinterpret_cast<char*>(&linearVel.Y), sizeof(float));
-    stream->write(reinterpret_cast<char*>(&linearVel.Z), sizeof(float));
+    stream->writeBinaryValue(&linearVel.X);
+    stream->writeBinaryValue(&linearVel.Y);
+    stream->writeBinaryValue(&linearVel.Z);
+}
+
+void Engine::RigidbodyProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    mgr->RegisterObjectType(RIGIDBODY_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+
+    mgr->RegisterObjectProperty(RIGIDBODY_PROP_TYPE_NAME, "float mass", offsetof(RigidbodyProperty, mass));
 }
