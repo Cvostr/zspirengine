@@ -37,7 +37,6 @@ Engine::GameObject::GameObject(){
     IsStatic = false; //Object is dynamic by default
 
     world_ptr = nullptr;
-    label_ptr = nullptr;
 
     genRandomString(&this->str_id, 15); //Generate random string ID
     properties[0] = nullptr;
@@ -133,6 +132,17 @@ void Engine::GameObject::removeScript(Engine::GameObjectProperty* pProp) {
     }
 }
 
+asIScriptObject* Engine::GameObject::getScriptObjectWithName(std::string name) {
+    for (unsigned int script_i = 0; script_i < scripts_num; script_i++) {
+        ZPScriptProperty* script = static_cast<ZPScriptProperty*>(scripts[script_i]);
+        if (script->getScript()->getClassName().compare(name) == 0) {
+            //script->getScript()->getMainClassPtr()->AddRef();
+            return script->getScript()->getMainClassPtr();
+        }
+    }
+    return nullptr;
+}
+
 void Engine::GameObject::addChildObject(GameObject* obj, bool updTransform) {
     GameObjectLink _link = obj->getLinkToThisObject();
     _link.updLinkPtr(); //Calculating object pointer
@@ -209,10 +219,13 @@ std::string Engine::GameObject::getLabel(){
     return getLabelProperty()->label;
 }
 
+std::string* Engine::GameObject::getLabelPtr() {
+    return &getLabelProperty()->label;
+}
+
 void Engine::GameObject::setLabel(std::string label){
     LabelProperty* label_prop = getLabelProperty(); //Obtain pointer to label property
     label_prop->label = label; //set new name
-    label_ptr = &label_prop->label; //update pointer
 }
 
 void Engine::GameObject::setActive(bool active){
@@ -333,11 +346,21 @@ void Engine::GameObject::onTriggerEnter(GameObject* obj) {
         if (!properties[i]->active) continue; //if property is inactive, then skip it
         properties[i]->onTriggerEnter(obj); //and call onUpdate on each property
     }
+    //Work with scripts
+    for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
+        if (!scripts[i]->active) continue; //if script is inactive, then skip it
+        scripts[i]->onTriggerEnter(obj); //and call onUpdate on each script
+    }
 }
 void Engine::GameObject::onTriggerExit(GameObject* obj) {
     for (unsigned int i = 0; i < props_num; i++) { //iterate over all properties
         if (!properties[i]->active) continue; //if property is inactive, then skip it
         properties[i]->onTriggerExit(obj); //and call onUpdate on each property
+    }
+    //Work with scripts
+    for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
+        if (!scripts[i]->active) continue; //if script is inactive, then skip it
+        scripts[i]->onTriggerExit(obj); //and call onUpdate on each script
     }
 }
 

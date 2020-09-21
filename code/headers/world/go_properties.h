@@ -47,13 +47,14 @@ public:
     std::vector<GlobVarHandle*> vars;
     std::string script_path;
     ScriptResource* script_res;
+    Engine::AGScript* getScript();
     void onValueChanged();
     void addPropertyInterfaceToInspector();
     void onStart();
     void onStop();
     void onUpdate(float deltaTime); //calls update in scripts
     void copyTo(Engine::GameObjectProperty* dest);
-    void makeGlobalVarsList();
+    bool makeGlobalVarsList();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);
@@ -266,7 +267,9 @@ public:
     void onValueChanged();
     void onObjectDeleted(); //unregister in world
 
-    void setLinearVelocity(ZSVECTOR3 lvel);
+    void setLinearVelocity(ZSVECTOR3& lvel);
+    void applyCentralImpulse(ZSVECTOR3& imp);
+    void applyCentralForce(ZSVECTOR3& v);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);
@@ -306,7 +309,8 @@ public:
 
 class TriggerProperty : public Engine::PhysicalProperty {
 private:
-    
+    SmArray<int>* _array;
+
 public:
     btGhostObject* m_ghost;
 

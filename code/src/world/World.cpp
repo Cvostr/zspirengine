@@ -3,7 +3,6 @@
 
 Engine::World::World(){
     objects.reserve(MAX_OBJS);
-    objects.resize(0);
 
     physical_world = new PhysicalWorld(&phys_settngs);
 }
@@ -106,8 +105,7 @@ Engine::GameObject* Engine::World::newObject() {
 
     obj.world_ptr = this;
     obj.addProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL);
-    obj.label_ptr = &obj.getLabelProperty()->label;
-    *obj.label_ptr = "GameObject_" + std::to_string(add_num); //Assigning label to object
+    obj.setLabel("GameObject_" + std::to_string(add_num)); //Assigning label to object
 
     obj.addProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM);
     return this->addObject(obj); //Return pointer to new object
@@ -231,9 +229,8 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
     while (true) {
         prefix.clear();
         //Read prefix
-        while (bytes[iter] == ' ' || bytes[iter] == '\n') {
-            iter++;
-        }
+        skipSpaces(bytes, iter);
+
         while (bytes[iter] != ' ' && bytes[iter] != '\n' && iter < left_bytes) {
             if(bytes[iter] != '\0')
                 prefix += bytes[iter];
@@ -311,9 +308,7 @@ void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderS
     while (iter < size) { //until file is over
         std::string prefix;
         //read prefix
-        while (bytes[iter] == ' ' || bytes[iter] == '\n') {
-            iter++;
-        }
+        skipSpaces(bytes, iter);
         while (bytes[iter] != ' ' && bytes[iter] != '\n') {
             prefix += bytes[iter];
             iter++;
@@ -371,7 +366,7 @@ bool Engine::World::isObjectLabelUnique(std::string label) {
         Engine::GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
         //if object was destroyed
         if (!obj_ptr->alive) continue;
-        if (obj_ptr->label_ptr->compare(label) == 0) {
+        if (obj_ptr->getLabelPtr()->compare(label) == 0) {
             ret_amount += 1;
             if (ret_amount > 1) return false;
         }
@@ -385,8 +380,8 @@ void Engine::World::getAvailableNumObjLabel(std::string label, int* result) {
     bool hasEqualName = false; //true if we already have this obj
     for (unsigned int obj_it = 0; obj_it < objs_num; obj_it++) { //Iterate over all objs in scene
         Engine::GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
-        if (obj_ptr->label_ptr == nullptr || !obj_ptr->alive) continue;
-        if (obj_ptr->label_ptr->compare(tocheck_str) == 0) //If label on object is same
+        if (!obj_ptr->alive) continue;
+        if (obj_ptr->getLabelPtr()->compare(tocheck_str) == 0) //If label on object is same
             hasEqualName = true; //Then we founded equal name
     }
     if (hasEqualName == true) {
@@ -455,9 +450,7 @@ Engine::GameObject* Engine::World::addObjectsFromPrefab(char* data, unsigned int
     while (iter < size) { //until file is over
         std::string prefix;
         //read prefix
-        while (data[iter] == ' ' || data[iter] == '\n') {
-            iter++;
-        }
+        skipSpaces(data, iter);
         while (data[iter] != ' ' && data[iter] != '\n') {
             prefix += data[iter];
             iter++;
@@ -474,11 +467,11 @@ Engine::GameObject* Engine::World::addObjectsFromPrefab(char* data, unsigned int
     processPrefabObject(&mObjects[0], &mObjects);
     //iterate over all objects and push them to world
     for (unsigned int obj_i = 0; obj_i < mObjects.size(); obj_i++) {
-        std::string label = *mObjects[obj_i].label_ptr;
+        std::string label = mObjects[obj_i].getLabel();
         int add_num = 0; //Declaration of addititonal integer
         getAvailableNumObjLabel(label, &add_num);
 
-        *mObjects[obj_i].label_ptr += std::to_string(add_num); //Set new label to object
+        *mObjects[obj_i].getLabelPtr() += std::to_string(add_num); //Set new label to object
 
         Engine::GameObject* newObjPtr = this->addObject(mObjects[obj_i]);
     }

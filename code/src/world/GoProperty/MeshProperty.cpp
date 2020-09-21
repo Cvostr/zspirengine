@@ -55,7 +55,7 @@ void Engine::MeshProperty::loadPropertyFromMemory(const char* data, GameObject* 
 void Engine::MeshProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     stream->writeString(resource_relpath);
     if (skinning_root_node != nullptr)
-        stream->writeString(*skinning_root_node->label_ptr);
+        stream->writeString(skinning_root_node->getLabel());
     else
         stream->writeString("@none");
 

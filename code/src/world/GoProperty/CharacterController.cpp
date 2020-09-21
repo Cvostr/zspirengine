@@ -133,12 +133,11 @@ void Engine::CharacterControllerProperty::savePropertyToStream(ZsStream* stream,
 }
 
 void Engine::CharacterControllerProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
-    int result = 0;
-    result = mgr->RegisterObjectType(CHAR_CTRL_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
-    assert(result >= 0);
+    mgr->RegisterObjectType(CHAR_CTRL_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
 
-    result = mgr->RegisterObjectProperty(CHAR_CTRL_PROP_TYPE_NAME, "float gravity", offsetof(CharacterControllerProperty, gravity));
-    result = mgr->RegisterObjectProperty(CHAR_CTRL_PROP_TYPE_NAME, "float linearVelocity", offsetof(CharacterControllerProperty, linearVel));
-    result = mgr->RegisterObjectMethod(CHAR_CTRL_PROP_TYPE_NAME, "void Jump(float)", asMETHOD(CharacterControllerProperty, jump), asCALL_THISCALL);
-    result = mgr->RegisterObjectMethod(CHAR_CTRL_PROP_TYPE_NAME, "void Walk(float, float)", asMETHOD(CharacterControllerProperty, walk), asCALL_THISCALL);
+    mgr->RegisterObjectProperty(CHAR_CTRL_PROP_TYPE_NAME, "float gravity", offsetof(CharacterControllerProperty, gravity));
+    mgr->RegisterObjectProperty(CHAR_CTRL_PROP_TYPE_NAME, "float linearVelocity", offsetof(CharacterControllerProperty, linearVel));
+    mgr->RegisterObjectMethod(CHAR_CTRL_PROP_TYPE_NAME, "void Jump(float)", asMETHOD(CharacterControllerProperty, jump), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(CHAR_CTRL_PROP_TYPE_NAME, "void Walk(float, float)", asMETHOD(CharacterControllerProperty, walk), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(CHAR_CTRL_PROP_TYPE_NAME, "bool isOnGround()", asMETHOD(CharacterControllerProperty, isOnGround), asCALL_THISCALL);
 }

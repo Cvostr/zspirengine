@@ -48,7 +48,7 @@ void Engine::RigidbodyProperty::onUpdate(float deltaTime) {
     }
 }
 
-void Engine::RigidbodyProperty::setLinearVelocity(ZSVECTOR3 lvel) {
+void Engine::RigidbodyProperty::setLinearVelocity(ZSVECTOR3& lvel) {
     if (!created) return;
     this->linearVel = lvel;
     this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
@@ -73,6 +73,14 @@ void Engine::RigidbodyProperty::onValueChanged() {
     this->rigidBody->setCollisionShape(shape);
 }
 
+void Engine::RigidbodyProperty::applyCentralImpulse(ZSVECTOR3& imp) {
+    if (!created) return;
+    rigidBody->applyCentralImpulse(btVector3(imp.X, imp.Y, imp.Z));
+}
+void Engine::RigidbodyProperty::applyCentralForce(ZSVECTOR3& v) {
+    if (!created) return;
+    rigidBody->applyCentralForce(btVector3(v.X, v.Y, v.Z));
+}
 
 void Engine::RigidbodyProperty::copyTo(Engine::GameObjectProperty* dest) {
     if (dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_RIGIDBODY) return;
@@ -126,4 +134,7 @@ void Engine::RigidbodyProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* m
     mgr->RegisterObjectType(RIGIDBODY_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     mgr->RegisterObjectProperty(RIGIDBODY_PROP_TYPE_NAME, "float mass", offsetof(RigidbodyProperty, mass));
+    mgr->RegisterObjectMethod(RIGIDBODY_PROP_TYPE_NAME, "void setLinearVelocity(Vec3)", asMETHOD(RigidbodyProperty, setLinearVelocity), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(RIGIDBODY_PROP_TYPE_NAME, "void applyCentralImpulse(Vec3)", asMETHOD(RigidbodyProperty, applyCentralImpulse), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(RIGIDBODY_PROP_TYPE_NAME, "void applyCentralForce(Vec3)", asMETHOD(RigidbodyProperty, applyCentralForce), asCALL_THISCALL);
 }

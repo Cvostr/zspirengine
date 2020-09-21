@@ -60,6 +60,8 @@ namespace Engine{
         void obtainScriptModule();
         void obtainScriptMainClass();
 
+        asIScriptObject* getMainClassPtr();
+        std::string getClassName();
         unsigned int getGlobalVarsCount();
         void* getGlobalVariableAddr(unsigned int index);
         void getGlobalVariable(unsigned int index, const char** name, const char** _namespace, int* typeID);

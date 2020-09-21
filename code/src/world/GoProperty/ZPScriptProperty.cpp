@@ -11,6 +11,11 @@ Engine::ZPScriptProperty::ZPScriptProperty() {
 Engine::ZPScriptProperty::~ZPScriptProperty() {
 	delete script;
 }
+
+Engine::AGScript* Engine::ZPScriptProperty::getScript() {
+	return script;
+}
+
 void Engine::ZPScriptProperty::onStart() {
     if (script_res != nullptr) {
         script = new AGScript(game_data->script_manager, go_link.updLinkPtr(), script_res->rel_path);
@@ -39,13 +44,14 @@ void Engine::ZPScriptProperty::onUpdate(float deltaTime) {
     }
 }
 
-void Engine::ZPScriptProperty::makeGlobalVarsList() {
-	if (script == nullptr) return;
+bool Engine::ZPScriptProperty::makeGlobalVarsList() {
+	if (script == nullptr) 
+		return false;
 	//Clear vars list
 	vars.clear();
 	if (!script->compileFromResource(this->script_res)) {
 		game_data->out_manager->spawnRuntimeError(RuntimeErrorType::RE_TYPE_SCRIPT_ERROR);
-		return;
+		return false;
 	}
 	script->obtainScriptModule();
 	unsigned int gVarsNum = script->getGlobalVarsCount();
@@ -70,6 +76,7 @@ void Engine::ZPScriptProperty::makeGlobalVarsList() {
 		this->vars.push_back(handle);
 	}
 	delete script;
+	return true;
 }
 
 void Engine::ZPScriptProperty::onStop() {
@@ -84,6 +91,7 @@ void Engine::ZPScriptProperty::copyTo(Engine::GameObjectProperty* dest) {
 	//write path to script
 	_dest->script_path = this->script_path;
 	_dest->script_res = game_data->resources->getScriptByLabel(script_path);
+	//_dest->lastCheckHasErrors = this->lastCheckHasErrors;
 	//copy global variable handlers
 	for (unsigned int v_i = 0; v_i < vars.size(); v_i++) {
 		GlobVarHandle* old_handle = vars[v_i];
@@ -112,12 +120,17 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 	unsigned int vars = 0;
 
 	readString(script_path, data, offset);
+	bool _hasErrors;
 	//get ScriptResource pointer
 	{
 		script_res = game_data->resources->getScriptByLabel(script_path);
 		script = new AGScript(game_data->script_manager, nullptr, script_res->rel_path);
-		makeGlobalVarsList();
+		_hasErrors = !makeGlobalVarsList();
 	}
+
+	if (_hasErrors)
+		return;
+
 	//get count of variables
 	readBinaryValue(&vars, data + offset, offset);
 	//read all variables data
@@ -125,9 +138,9 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 		int typeID = 0;
 		unsigned int index = 0;
 		//read index
-		readBinaryValue<unsigned int>(&index, data + offset, offset);
+		readBinaryValue(&index, data + offset, offset);
 		//read ID of type
-		readBinaryValue<int>(&typeID, data + offset, offset);
+		readBinaryValue(&typeID, data + offset, offset);
 
 		Engine::GlobVarHandle* var = this->vars[index];
 		var->index = index;
@@ -145,8 +158,7 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 			//Obtain size of string
 			unsigned int str_size = 0;
 			{
-				memcpy(&str_size, data + offset, sizeof(unsigned int));
-				offset += sizeof(unsigned int);
+				readBinaryValue(&str_size, data + offset, offset);
 			}
 			//Read and append string symbols
 			for (unsigned int i = 0; i < str_size; i++) {
@@ -163,7 +175,7 @@ void Engine::ZPScriptProperty::savePropertyToStream(ZsStream* stream, GameObject
 	stream->writeBinaryValue(&active);
 	*stream << " ";
 	//Write script
-	*stream << script_path << '\0';
+	stream->writeString(script_path);
 	unsigned int varsNum = static_cast<unsigned int>(vars.size());
 	stream->writeBinaryValue(&varsNum);
 

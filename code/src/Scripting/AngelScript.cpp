@@ -73,8 +73,23 @@ void GlobVarHandle::copyValue(void* src, void* dest) {
 
 bool AGScript::compileFromResource(Engine::ScriptResource* res) {
 	int result = 0;
+	unsigned int scr_file_offset = 0;
+	const char* script_str = res->script_content.c_str();
+	std::string line;
 	
-	result = builder.AddSectionFromMemory(res->rel_path.c_str(), res->script_content.c_str(), res->size);
+	//Add main script
+	result = builder.AddSectionFromMemory(res->rel_path.c_str(), script_str, res->size);
+	//read first script line
+	readLine(line, script_str, scr_file_offset);
+	while (startsWith(line, "//use")) {
+		const char* dep_str_c = line.c_str() + 6;
+		std::string dep_str = std::string(dep_str_c);
+		dep_str.pop_back();
+		Engine::ScriptResource* _res = game_data->resources->getScriptByLabel(dep_str);
+		readLine(line, script_str, scr_file_offset);
+		//include dependency
+		result = builder.AddSectionFromMemory(dep_str_c, _res->script_content.c_str(), res->size);
+	}
 
 	result = builder.BuildModule();
 	if (result < 0) {
@@ -119,6 +134,13 @@ bool AGScript::hasCompilerErrors() {
 	return hasErrors;
 }
 
+std::string AGScript::getClassName() {
+	return ClassName;
+}
+asIScriptObject* AGScript::getMainClassPtr() {
+	return mainClass_obj;
+}
+
 void AGScript::onUpdate() {
 	if (hasErrors == true)
 		return;
@@ -137,7 +159,7 @@ void AGScript::onTrigger(Engine::GameObject* obj) {
 	if (hasErrors == true)
 		return;
 
-	//Obtain Update() function
+	//Obtain onTrigger() function
 	asIScriptFunction* func = main_class->GetMethodByDecl("void onTrigger(GameObject@)");
 	if (func != nullptr) {
 		//Execute function
@@ -149,10 +171,32 @@ void AGScript::onTrigger(Engine::GameObject* obj) {
 }
 
 void AGScript::onTriggerEnter(Engine::GameObject* obj) {
+	if (hasErrors == true)
+		return;
 
+	//Obtain onTrigger() function
+	asIScriptFunction* func = main_class->GetMethodByDecl("void onTriggerEnter(GameObject@)");
+	if (func != nullptr) {
+		//Execute function
+		engine->getAgScriptContext()->Prepare(func);
+		engine->getAgScriptContext()->SetObject(mainClass_obj);
+		engine->getAgScriptContext()->SetArgObject(0, obj);
+		engine->getAgScriptContext()->Execute();
+	}
 }
 void AGScript::onTriggerExit(Engine::GameObject* obj) {
+	if (hasErrors == true)
+		return;
 
+	//Obtain onTrigger() function
+	asIScriptFunction* func = main_class->GetMethodByDecl("void onTriggerExit(GameObject@)");
+	if (func != nullptr) {
+		//Execute function
+		engine->getAgScriptContext()->Prepare(func);
+		engine->getAgScriptContext()->SetObject(mainClass_obj);
+		engine->getAgScriptContext()->SetArgObject(0, obj);
+		engine->getAgScriptContext()->Execute();
+	}
 }
 
 unsigned int AGScript::getGlobalVarsCount() {
@@ -179,7 +223,7 @@ void AGScript::obtainScriptMainClass() {
 	int result = 0;
 	obtainScriptModule();
 	//Obtain class with interface ZPScript
-	main_class = getClassWithInterface("ZPScript");
+	main_class = getClassWithInterface("ZPScript");	
 	ClassName = main_class->GetName();
 	//Get pointer to class contructor
 	std::string construct_str = this->ClassName + " @" + this->ClassName + "(GameObject@)";
@@ -225,7 +269,7 @@ AGScript::AGScript(AGScriptMgr* engine, Engine::GameObject* obj, std::string Cla
 	else
 		ModuleName = "startupModule";
 
-	int r = builder.StartNewModule(engine->getAgScriptEngine(), ModuleName.c_str());
+	builder.StartNewModule(engine->getAgScriptEngine(), ModuleName.c_str());
 	hasErrors = false;
 	//nullptr to pointers
 	module = nullptr;

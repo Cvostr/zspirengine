@@ -220,7 +220,7 @@ void Material::saveToFile(){
                 //Cast pointer
                 TextureMtShPropConf* texture_conf = static_cast<TextureMtShPropConf*>(conf_ptr);
                 //Write value
-                mat_stream << texture_conf->path + '\0';
+                mat_stream.writeString(texture_conf->path);
                 break;
             }
             case MATSHPROP_TYPE_FLOAT:{
@@ -275,8 +275,8 @@ void Material::saveToFile(){
                 //Cast pointer
                 Texture3MtShPropConf* tex3_conf = static_cast<Texture3MtShPropConf*>(conf_ptr);
                 //Write value
-                for(int i = 0; i < 6; i ++)
-                    mat_stream << (tex3_conf->texture_str[i] + '\0');
+                for (int i = 0; i < 6; i++)
+                    mat_stream.writeString(tex3_conf->texture_str[i]);
 
                 break;
             }
@@ -310,20 +310,18 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
 
         if(strcmp(prefix, "_GROUP") == 0){ //if it is game object
             position += 7;
-            char group_name[100];
+            std::string group_name;
             //Read shader group name
-            strcpy(group_name, &buffer[position]);
-            position += static_cast<unsigned int>(strlen(group_name)) + 2;
+            readString(group_name, buffer, position);
+            position += 1;
 
-            setPropertyGroup(MtShProps::getMtShaderPropertyGroup(std::string(group_name)));
+            setPropertyGroup(MtShProps::getMtShaderPropertyGroup(group_name));
         }
 
         if(strcmp(prefix, "_ENTRY") == 0){ //if it is game object
             position += 7;
-            char _prop_identifier[100];
-            strcpy(_prop_identifier, &buffer[position]);
-            std::string prop_identifier = std::string(_prop_identifier);
-            position += static_cast<unsigned int>(prop_identifier.size()) + 1;
+            std::string prop_identifier;
+            readString(prop_identifier, buffer, position);
 
             for(unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i ++){
                 MaterialShaderProperty* prop_ptr = group_ptr->properties[prop_i];
@@ -337,13 +335,9 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                         case MATSHPROP_TYPE_TEXTURE:{
                             //Cast pointer
                             TextureMtShPropConf* texture_conf = static_cast<TextureMtShPropConf*>(conf_ptr);
-                            char texture_relpath[64];
+                            readString(texture_conf->path, buffer, position);
 
-                            strcpy(texture_relpath, &buffer[position]);
-                            position += static_cast<unsigned int>(strlen(texture_relpath));
-                            texture_conf->path = std::string(texture_relpath);
-
-                            position += 2;
+                            position += 1;
                             break;
                         }
 
@@ -360,8 +354,7 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                             //Cast pointer
                             IntegerMtShPropConf* int_conf = static_cast<IntegerMtShPropConf*>(conf_ptr);
 
-                            memcpy(&int_conf->value, &buffer[position], sizeof(int));
-                            position += sizeof (int);
+                            readBinaryValue(&int_conf->value, &buffer[position], position);
                             break;
                         }
 
@@ -413,10 +406,7 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
                             Texture3MtShPropConf* texture3_conf = static_cast<Texture3MtShPropConf*>(conf_ptr);
 
                             for(int i = 0; i < 6; i ++){
-                                char texture_relpath[64];
-                                strcpy(texture_relpath, &buffer[position]);
-                                texture3_conf->texture_str[i] = std::string(texture_relpath);
-                                position += static_cast<unsigned int>(strlen(texture_relpath)) + 1;
+                                readString(texture3_conf->texture_str[i], buffer, position);
                             }
 
                             break;

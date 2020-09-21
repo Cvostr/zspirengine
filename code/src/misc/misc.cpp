@@ -32,6 +32,32 @@ void readString(std::string& str, const char* data, unsigned int& offset) {
     offset++;
 }
 
+void readLine(std::string& str, const char* data, unsigned int& offset) {
+    str.clear();
+    while (data[offset] != '\n') {
+        str += data[offset];
+        offset++;
+    }
+    offset++;
+}
+
+void skipSpaces(const char* data, unsigned int& offset) {
+    while (data[offset] == ' ' || data[offset] == '\n') {
+        offset++;
+    }
+}
+
+bool startsWith(std::string& s, std::string m) {
+    if (s.size() < m.size())
+        return false;
+    bool result = true;
+    for (unsigned i = 0; i < m.size(); i++) {
+        if (s[i] != m[i])
+            return false;
+    }
+    return true;
+}
+
 void ZsStream::writeString(std::string str) {
     char term = '\0';
     unsigned int size = static_cast<unsigned int>(str.size());

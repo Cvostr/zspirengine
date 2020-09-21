@@ -113,7 +113,8 @@ public:
     PhysicalWorldSettings phys_settngs;
     PhysicalWorld* physical_world;
 
-    std::vector<GameObject*> objects; //Vector, containing all gameobjects
+    SmArray<GameObject*> objects;//Vector, containing all gameobjects
+
     void loadFromMemory(const char* bytes, unsigned int size, RenderSettings* settings_ptr);
     void loadFromFile(std::string file, RenderSettings* settings_ptr);
     void loadGameObjectFromMemory(GameObject* object_ptr, const char* bytes, unsigned int left_bytes);
@@ -153,7 +154,7 @@ public:
     //Index in objects vector
     int array_index;
     std::string str_id; //Object's unique string ID
-    std::string* label_ptr;
+    std::string* getLabelPtr();
 
     bool active; //if true, object will be active in scene
     bool alive; //false, if object was remove
@@ -191,6 +192,7 @@ public:
     void removeProperty(Engine::GameObjectProperty* pProp);
     void removeScript(int index);
     void removeScript(Engine::GameObjectProperty* pProp);
+    asIScriptObject* getScriptObjectWithName(std::string name);
 
     GameObject* getChildObjectWithNodeLabel(std::string label);
     void setMeshSkinningRootNodeRecursively(GameObject* rootNode);

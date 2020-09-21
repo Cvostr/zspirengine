@@ -23,7 +23,6 @@ void Engine::LabelProperty::copyTo(Engine::GameObjectProperty* dest) {
 void Engine::LabelProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
     readString(this->label, data, offset);
-    obj->label_ptr = &this->label; //Making GameObjects's pointer to string in label property
 }
 
 void Engine::LabelProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {

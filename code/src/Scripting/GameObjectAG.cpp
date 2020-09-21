@@ -10,8 +10,11 @@ void Engine::bindGameObjectSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectProperty(GAME_OBJECT_TYPE_NAME, "int propsNum", offsetof(Engine::GameObject, props_num));
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "string getLabel()", asMETHOD(Engine::GameObject, getLabel), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "void setLabel(string)", asMETHOD(Engine::GameObject, setLabel), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "ZPScript &getScriptClass(string)", asMETHOD(Engine::GameObject, getScriptObjectWithName), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "uint getChildrenNum()", asMETHOD(Engine::GameObject, getChildrenNum), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "GameObject@ getChild(uint)", asMETHOD(Engine::GameObject, getChild), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "void addChild(GameObject@)", asMETHODPR(Engine::GameObject, addChildObject, (GameObject*, bool), void), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "void removeChild(GameObject@)", asMETHODPR(Engine::GameObject, removeChildObject, (GameObject*), void), asCALL_THISCALL);
 	//Register GameObjectProperty class
 	mgr->RegisterObjectType(GAME_OBJECT_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);	
 }
@@ -34,4 +37,5 @@ void Engine::bindGameObjectPropertiesSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(ANIM_PROP_TYPE_NAME) + "@ anim()", asMETHOD(Engine::GameObject, getPropertyPtr<AnimationProperty>), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(MESH_PROP_TYPE_NAME) + "@ mesh()", asMETHOD(Engine::GameObject, getPropertyPtr<MeshProperty>), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(MAT_PROP_TYPE_NAME) + "@ material()", asMETHOD(Engine::GameObject, getPropertyPtr<MaterialProperty>), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(RIGIDBODY_PROP_TYPE_NAME) + "@ rigidbody()", asMETHOD(Engine::GameObject, getPropertyPtr<RigidbodyProperty>), asCALL_THISCALL);
 }
