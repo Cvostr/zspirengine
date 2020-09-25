@@ -183,6 +183,7 @@
     <ClCompile Include="code\src\Scripting\InputAG.cpp" />
     <ClCompile Include="code\src\Scripting\MathAG.cpp" />
     <ClCompile Include="code\src\Scripting\ResourcesAG.cpp" />
+    <ClCompile Include="code\src\Scripting\ZPScriptClass.cpp" />
     <ClCompile Include="code\src\ui\zs-uibutton.cpp" />
     <ClCompile Include="code\src\ui\zs-uiwidget.cpp" />
     <ClCompile Include="code\src\vulkan\vk_mesh.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="code\headers\Scripting\AngelScript.hpp" />
     <ClInclude Include="code\headers\Scripting\AngelScriptMgr.h" />
     <ClInclude Include="code\headers\Scripting\FilesAG.hpp" />
+    <ClInclude Include="code\headers\Scripting\ZPScriptClass.hpp" />
     <ClInclude Include="code\headers\ui\zs-uibutton.h" />
     <ClInclude Include="code\headers\ui\zs-uiwidget.h" />
     <ClInclude Include="code\headers\world\go_properties.h" />

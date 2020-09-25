@@ -11,6 +11,8 @@
 #include <cstdint>
 #include <iostream>
 
+
+
 #define AG_STRING 67108876
 #define AG_VECTOR3 67108881
 #define AG_RGB_COLOR 67108882
@@ -50,6 +52,7 @@ namespace Engine{
         std::string ModuleName;
         CScriptBuilder builder;
 
+
         asITypeInfo* getClassWithInterface(std::string class_name);
         
         asIScriptModule* module; //Module of the script
@@ -57,9 +60,11 @@ namespace Engine{
         asITypeInfo* main_class; //Type of main script class
         bool hasErrors;
     public:
+        ZPScriptClass* scr_class;
         void obtainScriptModule();
         void obtainScriptMainClass();
-
+        asIScriptFunction* getFuncOnMainClass(const char* decl);
+        asITypeInfo* getMainClassType();
         asIScriptObject* getMainClassPtr();
         std::string getClassName();
         unsigned int getGlobalVarsCount();
@@ -79,6 +84,8 @@ namespace Engine{
         AGScript(AGScriptMgr* engine, Engine::GameObject* obj, std::string ClassName);
         ~AGScript();
     };
+
+    
 }
 
 #endif

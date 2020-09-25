@@ -43,6 +43,9 @@ namespace Engine {
         asIScriptContext* ag_context;
     public:
 
+        void create_Engine();
+        void recreate_Engine();
+
         asIScriptEngine* getAgScriptEngine();
         asIScriptContext* getAgScriptContext();
 

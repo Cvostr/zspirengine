@@ -13,6 +13,7 @@
 #include "../render/zs-pipeline.h"
 
 #include "../Scripting/AngelScriptMgr.h"
+#include "../Scripting/ZPScriptClass.hpp"
 
 #define OBJ_PROPS_SIZE 10
 #define OBJ_SCRIPT_PROPS_SIZE 5
@@ -192,7 +193,7 @@ public:
     void removeProperty(Engine::GameObjectProperty* pProp);
     void removeScript(int index);
     void removeScript(Engine::GameObjectProperty* pProp);
-    asIScriptObject* getScriptObjectWithName(std::string name);
+    ZPScriptClass* getScriptObjectWithName(std::string name);
 
     GameObject* getChildObjectWithNodeLabel(std::string label);
     void setMeshSkinningRootNodeRecursively(GameObject* rootNode);

@@ -7,7 +7,7 @@ extern ZSGAME_DATA* game_data;
 using namespace Engine;
 
 void printToConsole(asIScriptGeneric* gen)
-{
+{	
 	unsigned int args = gen->GetArgCount();
 	std::string out = "";
 
@@ -83,9 +83,9 @@ void MessageCallback(const asSMessageInfo* msg, void* param)
 		game_data->out_manager->spawnRuntimeError(RuntimeErrorType::RE_TYPE_SCRIPT_ERROR);
 }
 
-AGScriptMgr::AGScriptMgr() {
+void AGScriptMgr::create_Engine() {
 	ag_engine = asCreateScriptEngine();
-	
+
 	ag_engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
 	RegisterStdString(ag_engine);
 	RegisterScriptHandle(ag_engine);
@@ -118,6 +118,17 @@ AGScriptMgr::AGScriptMgr() {
 
 	//Create Context
 	ag_context = ag_engine->CreateContext();
+}
+void AGScriptMgr::recreate_Engine() {
+	//close old engine
+	ag_context->Release();
+	ag_engine->ShutDownAndRelease();
+	//Create new engine instance
+	create_Engine();
+}
+
+AGScriptMgr::AGScriptMgr() {
+	create_Engine();
 }
 
 AGScriptMgr::~AGScriptMgr() {

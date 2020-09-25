@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
-#include "../../headers/misc/misc.h"
+
 
 ZS3M::SceneFileExport::SceneFileExport(){
     rootNode = nullptr;
@@ -74,12 +74,12 @@ void ZS3M::SceneFileExport::write(std::string output_file){
         for (unsigned int b_i = 0; b_i < bonesNum; b_i ++) {
             Engine::Bone* bone = &mesh_ptr->bones[b_i];
             //Write bone name
-            stream << bone->bone_name + '\0';
+            stream.writeString(bone->bone_name);
             //Write offset matrix
             for(unsigned int m_i = 0; m_i < 4; m_i ++){
                 for(unsigned int m_j = 0; m_j < 4; m_j ++){
                     float m_v = bone->offset.m[m_i][m_j];
-                    stream.write(reinterpret_cast<char*>(&m_v), sizeof(float));
+                    stream.writeBinaryValue(&m_v);
                 }
             }
             stream << "\n"; //Write divider
@@ -89,45 +89,45 @@ void ZS3M::SceneFileExport::write(std::string output_file){
     stream.close();
 }
 
-void ZS3M::SceneFileExport::writeNode(std::ofstream *stream, ZS3M::SceneNode* node){
+void ZS3M::SceneFileExport::writeNode(ZsStream *stream, ZS3M::SceneNode* node){
     //Write node header
     *stream << "_NODE " << (node->node_label + '\0');
 
     unsigned int meshesNum = static_cast<unsigned int>(node->mesh_names.size());
     unsigned int childrenNum = static_cast<unsigned int>(node->children.size());
 
-    stream->write(reinterpret_cast<char*>(&meshesNum), sizeof(unsigned int));
-    stream->write(reinterpret_cast<char*>(&childrenNum), sizeof(unsigned int));
+    stream->writeBinaryValue(&meshesNum);
+    stream->writeBinaryValue(&childrenNum);
 
     *stream << "\n"; //Write divider
 
     for(unsigned int mesh_i = 0; mesh_i < node->mesh_names.size(); mesh_i ++){
         //Write mesh name
-        *stream << (node->mesh_names[mesh_i] + '\0');
+        stream->writeString(node->mesh_names[mesh_i]);
     }
     for(unsigned int ch_i = 0; ch_i < node->children.size(); ch_i ++){
         //Write child node string
-        *stream << (node->children[ch_i]->node_label + '\0');
+        stream->writeString(node->children[ch_i]->node_label);
     }
     //Write node base matrix
     for(unsigned int m_i = 0; m_i < 4; m_i ++){
         for(unsigned int m_j = 0; m_j < 4; m_j ++){
             float m_v = node->node_transform.m[m_i][m_j];
-            stream->write(reinterpret_cast<char*>(&m_v), sizeof(float));
+            stream->writeBinaryValue(&m_v);
         }
     }
-    stream->write(reinterpret_cast<char*>(&node->node_translation.X), sizeof(float));//Writing position X
-    stream->write(reinterpret_cast<char*>(&node->node_translation.Y), sizeof(float)); //Writing position Y
-    stream->write(reinterpret_cast<char*>(&node->node_translation.Z), sizeof(float)); //Writing position Z
+    stream->writeBinaryValue(&node->node_translation.X);//Writing position X
+    stream->writeBinaryValue(&node->node_translation.Y); //Writing position Y
+    stream->writeBinaryValue(&node->node_translation.Z); //Writing position Z
 
-    stream->write(reinterpret_cast<char*>(&node->node_scaling.X), sizeof(float));//Writing scale X
-    stream->write(reinterpret_cast<char*>(&node->node_scaling.Y), sizeof(float)); //Writing scale Y
-    stream->write(reinterpret_cast<char*>(&node->node_scaling.Z), sizeof(float)); //Writing scale Z
+    stream->writeBinaryValue(&node->node_scaling.X);//Writing scale X
+    stream->writeBinaryValue(&node->node_scaling.Y); //Writing scale Y
+    stream->writeBinaryValue(&node->node_scaling.Z); //Writing scale Z
 
-    stream->write(reinterpret_cast<char*>(&node->node_rotation.X), sizeof(float));//Writing rotation X
-    stream->write(reinterpret_cast<char*>(&node->node_rotation.Y), sizeof(float)); //Writing rotation Y
-    stream->write(reinterpret_cast<char*>(&node->node_rotation.Z), sizeof(float)); //Writing rotation Z
-    stream->write(reinterpret_cast<char*>(&node->node_rotation.W), sizeof(float)); //Writing rotation W
+    stream->writeBinaryValue(&node->node_rotation.X);//Writing rotation X
+    stream->writeBinaryValue(&node->node_rotation.Y); //Writing rotation Y
+    stream->writeBinaryValue(&node->node_rotation.Z); //Writing rotation Z
+    stream->writeBinaryValue(&node->node_rotation.W); //Writing rotation W
     *stream << "\n"; //Write divider
     //Write all children
     for(unsigned int ch_i = 0; ch_i < node->children.size(); ch_i ++){
@@ -305,13 +305,11 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
             newmesh->indices_arr = 0x0;
 
             for (unsigned int b_i = 0; b_i < bonesNum; b_i ++) {
-                char bone_label[64];
+                std::string bone_label;
                 //Read mesh label string
-                strcpy(&bone_label[0], &buffer[cur_pos]);
-                cur_pos += static_cast<unsigned int>(strlen(bone_label) + 1);
+                readString(bone_label, buffer, cur_pos);
 
-                std::string bone_label_strstd = std::string(bone_label);
-                Engine::Bone bone(bone_label_strstd);
+                Engine::Bone bone(bone_label);
                 for(unsigned int m_i = 0; m_i < 4; m_i ++){
                     for(unsigned int m_j = 0; m_j < 4; m_j ++){
                         float* m_v = &bone.offset.m[m_i][m_j];
@@ -429,14 +427,14 @@ void ZS3M::AnimationFileExport::writeChannel(std::ofstream* stream, unsigned int
     *stream << '\n';
 }
 void ZS3M::AnimationFileExport::write(std::string output_file){
-    std::ofstream stream;
+    ZsStream stream;
     stream.open(output_file.c_str(), std::ofstream::binary);
 
     stream << "zs3manim" << '\0' << anim_ptr->name + '\0'; //Write animation
     //Write main animation data
-    stream.write(reinterpret_cast<char*>(&anim_ptr->TPS), sizeof (double));
-    stream.write(reinterpret_cast<char*>(&anim_ptr->duration), sizeof (double));
-    stream.write(reinterpret_cast<char*>(&anim_ptr->NumChannels), sizeof (unsigned int));
+    stream.writeBinaryValue(&anim_ptr->TPS);
+    stream.writeBinaryValue(&anim_ptr->duration);
+    stream.writeBinaryValue(&anim_ptr->NumChannels);
     //Write divider
     stream << "\n";
 
@@ -464,10 +462,7 @@ void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size
     //Allocate animation class
     anim_ptr = new Engine::Animation; //allocate animation
     //Read animation name
-    strcpy(&prefix[0], &buffer[byte_offset]);
-    byte_offset += static_cast<unsigned int>(strlen(prefix) + 1);
-    //Set animation name
-    anim_ptr->name = std::string(prefix);
+    readString(anim_ptr->name, buffer, byte_offset);
     //Read Tick Per Second property
     readBinaryValue(&anim_ptr->TPS, &buffer[byte_offset], byte_offset);
     //Read duration property
@@ -485,11 +480,9 @@ void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size
         if(strcmp(prefix, "_CHAN") == 0){
             byte_offset += 6;
             //Read node, channel will work with
-            strcpy(&prefix[0], &buffer[byte_offset]);
-            byte_offset += static_cast<unsigned int>(strlen(prefix)) + 1;
             //Allocate animation channel
             Engine::AnimationChannel* chan = &anim_ptr->channels[ch_i];
-            chan->bone_name = std::string(prefix);
+            readString(chan->bone_name, buffer, byte_offset);
             chan->anim_ptr = anim_ptr;
 
             readBinaryValue(&chan->posKeysNum, &buffer[byte_offset], byte_offset);

@@ -16,6 +16,8 @@ enum class LIGHTSOURCE_TYPE {
     LIGHTSOURCE_TYPE_SPOT
 };
 
+
+
 class MeshProperty : public GameObjectProperty{
 public:
     std::string resource_relpath; //Relative path to resource
@@ -48,6 +50,8 @@ public:
     std::string script_path;
     ScriptResource* script_res;
     Engine::AGScript* getScript();
+    
+    
     void onValueChanged();
     void addPropertyInterfaceToInspector();
     void onStart();

@@ -49,6 +49,7 @@ namespace Engine {
 		void (*showDialog)(std::string, std::string);
 		void addConsoleLog(LogEntryType log_type, std::string message, ScriptErrorType err_type = ScriptErrorType::SE_TYPE_NONE);
 		void addConsoleLog(LogEntry entry);
+		bool hasAnyMsgsWithType(LogEntryType re_type);
 		void spawnRuntimeError(RuntimeErrorType re_type);
 		void unsetRuntimeError();
 		void clearMessagesWithType(LogEntryType log_type);

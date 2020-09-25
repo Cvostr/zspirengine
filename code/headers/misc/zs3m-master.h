@@ -5,6 +5,7 @@
 #include "../render/zs-animation.h"
 #include <string>
 #include <vector>
+#include "misc.h"
 namespace ZS3M {
 
 class SceneNode{
@@ -36,7 +37,7 @@ public:
     void pushMesh(Engine::Mesh* mesh);
     void setRootNode(ZS3M::SceneNode* node);
     void write(std::string output_file);
-    void writeNode(std::ofstream *stream, ZS3M::SceneNode* node);
+    void writeNode(ZsStream *stream, ZS3M::SceneNode* node);
     void getNodesNum(unsigned int* nds_ptr, ZS3M::SceneNode* node);
 
     SceneFileExport();

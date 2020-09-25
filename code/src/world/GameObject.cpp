@@ -132,12 +132,12 @@ void Engine::GameObject::removeScript(Engine::GameObjectProperty* pProp) {
     }
 }
 
-asIScriptObject* Engine::GameObject::getScriptObjectWithName(std::string name) {
+ZPScriptClass* Engine::GameObject::getScriptObjectWithName(std::string name) {
     for (unsigned int script_i = 0; script_i < scripts_num; script_i++) {
         ZPScriptProperty* script = static_cast<ZPScriptProperty*>(scripts[script_i]);
         if (script->getScript()->getClassName().compare(name) == 0) {
             //script->getScript()->getMainClassPtr()->AddRef();
-            return script->getScript()->getMainClassPtr();
+            return script->getScript()->scr_class;
         }
     }
     return nullptr;
@@ -485,7 +485,8 @@ Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(std::string 
             return l->updLinkPtr();
         //call function from this child
         GameObject* obj_ch = l->updLinkPtr()->getChildObjectWithNodeLabel(label);
-        if(obj_ch != nullptr) return obj_ch;
+        if(obj_ch != nullptr) 
+            return obj_ch;
 
     }
     return nullptr;

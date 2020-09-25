@@ -17,6 +17,8 @@
 #include "../ogl/ogl.h"
 #include "../vulkan/vk_data.h"
 
+
+
 enum RESOURCE_TYPE {RESOURCE_TYPE_NONE,
                     RESOURCE_TYPE_TEXTURE,
                     RESOURCE_TYPE_MESH,
@@ -143,6 +145,7 @@ public:
 
 class ScriptResource : public ZsResource{
 public:
+    bool hasError;
     std::string script_content;
 
     void load();

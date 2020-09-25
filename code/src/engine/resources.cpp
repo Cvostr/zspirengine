@@ -4,6 +4,7 @@
 #include "../../headers/engine.h"
 #include "../../headers/game.h"
 #include "../../headers/misc/misc.h"
+#include "../../headers/Scripting/ZPScriptClass.hpp"
 
 extern ZSpireEngine* engine_ptr;
 extern Material* default3dmat;
@@ -300,8 +301,11 @@ void Engine::ResourceManager::reloadScripts() {
     for (unsigned int i = 0; i < resources.size(); i++) {
         ZsResource* res = resources[i];
         if (res->resource_type == RESOURCE_TYPE_SCRIPT) {
+            ScriptResource* script_res = static_cast<ScriptResource*>(res);
             res->Release();
             res->load();
+
+            bindAgClass(script_res->script_content, game_data->script_manager);
         }
     }
 }

@@ -35,6 +35,8 @@ void Engine::ZPScriptProperty::onStart() {
 		}
 		//call onStart() inside script
         script->onStart(); 
+
+		
     }
 }
 
@@ -126,6 +128,7 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 		script_res = game_data->resources->getScriptByLabel(script_path);
 		script = new AGScript(game_data->script_manager, nullptr, script_res->rel_path);
 		_hasErrors = !makeGlobalVarsList();
+		script_res->hasError = _hasErrors;
 	}
 
 	if (_hasErrors)

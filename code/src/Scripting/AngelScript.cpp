@@ -94,8 +94,10 @@ bool AGScript::compileFromResource(Engine::ScriptResource* res) {
 	result = builder.BuildModule();
 	if (result < 0) {
 		hasErrors = true;
+		res->hasError = true;
 		return false;
 	}
+	res->hasError = false;
 	return true;
 }
 
@@ -107,13 +109,14 @@ void AGScript::onStart() {
 	obtainScriptMainClass();
 	
 	//Obtain Start() function
-	asIScriptFunction* func = main_class->GetMethodByDecl("void Start()");
+	asIScriptFunction* func = getFuncOnMainClass("void Start()");
 	if (func != nullptr) {
 		//Execute function
 		engine->getAgScriptContext()->Prepare(func);
 		engine->getAgScriptContext()->SetObject(mainClass_obj);
 		engine->getAgScriptContext()->Execute();
 	}
+
 }
 
 void AGScript::onStop() {
@@ -121,7 +124,7 @@ void AGScript::onStop() {
 		return;
 
 	//Obtain Stop() function
-	asIScriptFunction* func = main_class->GetMethodByDecl("void Stop()");
+	asIScriptFunction* func = getFuncOnMainClass("void Stop()");
 	if (func != nullptr) {
 		//Execute function
 		engine->getAgScriptContext()->Prepare(func);
@@ -141,12 +144,20 @@ asIScriptObject* AGScript::getMainClassPtr() {
 	return mainClass_obj;
 }
 
+asITypeInfo* AGScript::getMainClassType() {
+	return main_class;
+}
+
+asIScriptFunction* AGScript::getFuncOnMainClass(const char* decl) {
+	return main_class->GetMethodByDecl(decl);
+}
+
 void AGScript::onUpdate() {
 	if (hasErrors == true)
 		return;
 
 	//Obtain Update() function
-	asIScriptFunction* func = main_class->GetMethodByDecl("void Update()");
+	asIScriptFunction* func = getFuncOnMainClass("void Update()");
 	if (func != nullptr) {
 		//Execute function
 		engine->getAgScriptContext()->Prepare(func);
@@ -160,7 +171,7 @@ void AGScript::onTrigger(Engine::GameObject* obj) {
 		return;
 
 	//Obtain onTrigger() function
-	asIScriptFunction* func = main_class->GetMethodByDecl("void onTrigger(GameObject@)");
+	asIScriptFunction* func = getFuncOnMainClass("void onTrigger(GameObject@)");
 	if (func != nullptr) {
 		//Execute function
 		engine->getAgScriptContext()->Prepare(func);
@@ -175,7 +186,7 @@ void AGScript::onTriggerEnter(Engine::GameObject* obj) {
 		return;
 
 	//Obtain onTrigger() function
-	asIScriptFunction* func = main_class->GetMethodByDecl("void onTriggerEnter(GameObject@)");
+	asIScriptFunction* func = getFuncOnMainClass("void onTriggerEnter(GameObject@)");
 	if (func != nullptr) {
 		//Execute function
 		engine->getAgScriptContext()->Prepare(func);
@@ -189,7 +200,7 @@ void AGScript::onTriggerExit(Engine::GameObject* obj) {
 		return;
 
 	//Obtain onTrigger() function
-	asIScriptFunction* func = main_class->GetMethodByDecl("void onTriggerExit(GameObject@)");
+	asIScriptFunction* func = getFuncOnMainClass("void onTriggerExit(GameObject@)");
 	if (func != nullptr) {
 		//Execute function
 		engine->getAgScriptContext()->Prepare(func);
