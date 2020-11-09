@@ -171,13 +171,13 @@ void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int
         if (prefix.compare("entry") == 0) { //If end reached
             ZsResource resource;
             iter++;
-
+            //Read relative path
             readString(resource.rel_path, data, iter);
-
+            //Read Label
             readString(resource.resource_label, data, iter);
-
+            //read blob path
             readString(resource.blob_path, data, iter);
-
+            //Read file ccordinates
             readBinaryValue(&resource.offset, data + iter, iter);
             readBinaryValue(&resource.size, data + iter, iter);
             readBinaryValue(&resource.resource_type, data + iter, iter);
@@ -241,7 +241,6 @@ void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int
                 (resource_ptr)->load();
             //Add resource to vector
             this->resources.push_back(resource_ptr);
-        
         }
     }
 }
@@ -256,7 +255,7 @@ void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
 
     unsigned int size = static_cast<unsigned int>(file_stream.tellg());
     file_stream.seekg(0);
-    char* data = new  char[size];
+    char* data = new char[size];
     file_stream.read(data, size);
     loadResourcesTableFromMem(data, size);
 
@@ -272,52 +271,6 @@ unsigned int Engine::ResourceManager::getResourcesSize(){
     return static_cast<unsigned int>(resources.size());
 }
 
-Engine::ScriptResource::ScriptResource(){
-    this->resource_type = RESOURCE_TYPE_SCRIPT;
-    loadInstantly = true;
-}
-
-void Engine::ScriptResource::load(){
-    if(this->resource_state == RESOURCE_STATE::STATE_NOT_LOADED){
-        request = new Engine::Loader::LoadRequest;
-        request->offset = this->offset;
-        request->size = this->size;
-        request->file_path = this->blob_path;
-        loadImmideately(request);
-        this->resource_state = RESOURCE_STATE::STATE_LOADED;
-        //Clear string data, first
-        script_content.clear();
-        for(unsigned int i = 0; i < this->request->size; i ++){
-            this->script_content.push_back(static_cast<char>(request->data[i]));
-        }
-        //size = request->size;
-
-        delete[] request->data;
-        delete this->request;
-    }
-}
-
-void Engine::ResourceManager::reloadScripts() {
-    for (unsigned int i = 0; i < resources.size(); i++) {
-        ZsResource* res = resources[i];
-        if (res->resource_type == RESOURCE_TYPE_SCRIPT) {
-            ScriptResource* script_res = static_cast<ScriptResource*>(res);
-            res->Release();
-            res->load();
-
-            bindAgClass(script_res->script_content, game_data->script_manager);
-        }
-    }
-}
-
-Engine::ScriptResource* Engine::ResourceManager::getScriptByLabel(std::string label){
-    for(unsigned int res = 0; res < this->resources.size(); res ++){
-        ZsResource* resource_ptr = this->resources[res];
-        if(resource_ptr->resource_type == RESOURCE_TYPE_SCRIPT && resource_ptr->resource_label.compare(label) == 0)
-            return static_cast<ScriptResource*>(resource_ptr);
-    }
-    return nullptr;
-}
 
 Engine::Mesh* Engine::allocateMesh(unsigned int size){
     Engine::Mesh* result = nullptr;

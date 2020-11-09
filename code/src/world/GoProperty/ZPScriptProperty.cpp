@@ -86,7 +86,7 @@ void Engine::ZPScriptProperty::onStop() {
 	delete script;
 }
 
-void Engine::ZPScriptProperty::copyTo(Engine::GameObjectProperty* dest) {
+void Engine::ZPScriptProperty::copyTo(Engine::IGameObjectComponent* dest) {
 	if (dest->type != this->type) return; //if it isn't transform
 
 	ZPScriptProperty* _dest = static_cast<ZPScriptProperty*>(dest);
@@ -139,9 +139,10 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 	//read all variables data
 	for (unsigned int v_i = 0; v_i < vars; v_i++) {
 		int typeID = 0;
-		unsigned int index = 0;
+		unsigned int index = v_i;
 		//read index
 		readBinaryValue(&index, data + offset, offset);
+		index = v_i;
 		//read ID of type
 		readBinaryValue(&typeID, data + offset, offset);
 

@@ -4,7 +4,7 @@
 
 extern ZSpireEngine* engine_ptr;
 
-bool Engine::_vk_Shader::readBinaryShaderFile(std::string path, char* result, int* size){
+bool Engine::_vk_Shader::readBinaryShaderFile(std::string path, char* result, size_t* size){
     std::ifstream stream;
 
         stream.exceptions(std::ifstream::badbit);

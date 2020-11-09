@@ -1,10 +1,9 @@
-#ifndef go_properties
-#define go_properties
+#pragma once
 
-#include "World.h"
+#include "World.hpp"
 #include "../misc/oal_manager.h"
 #include "../game.h"
-#include "terrain.h"
+#include "Terrain.hpp"
 #include "../Scripting/AngelScript.hpp"
 #include "../misc/misc.h"
 
@@ -16,9 +15,7 @@ enum class LIGHTSOURCE_TYPE {
     LIGHTSOURCE_TYPE_SPOT
 };
 
-
-
-class MeshProperty : public GameObjectProperty{
+class MeshProperty : public IGameObjectComponent {
 public:
     std::string resource_relpath; //Relative path to resource
     MeshResource* mesh_ptr; //Pointer to mesh
@@ -28,7 +25,7 @@ public:
     GameObject* skinning_root_node;
 
     void updateMeshPtr(); //Updates pointer according to resource_relpath
-    void copyTo(GameObjectProperty* dest);
+    void copyTo(IGameObjectComponent* dest);
     void onRender(Engine::RenderPipeline* pipeline);
     void setMeshResource(MeshResource* resource);
 
@@ -42,7 +39,7 @@ public:
     MeshProperty();
 };
 
-class ZPScriptProperty : public Engine::GameObjectProperty {
+class ZPScriptProperty : public Engine::IGameObjectComponent {
 private:
     Engine::AGScript* script;
 public:
@@ -57,7 +54,7 @@ public:
     void onStart();
     void onStop();
     void onUpdate(float deltaTime); //calls update in scripts
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     bool makeGlobalVarsList();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
@@ -72,7 +69,7 @@ public:
 };
 
 
-class LightsourceProperty : public Engine::GameObjectProperty{
+class LightsourceProperty : public Engine::IGameObjectComponent {
 public:
     LIGHTSOURCE_TYPE light_type; //type of lightsource
 
@@ -87,7 +84,7 @@ public:
     float spot_angle;
 
     void addPropertyInterfaceToInspector();
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void onPreRender(Engine::RenderPipeline* pipeline);
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);
@@ -96,7 +93,7 @@ public:
     LightsourceProperty();
 };
 
-class AudioSourceProperty : public Engine::GameObjectProperty{
+class AudioSourceProperty : public Engine::IGameObjectComponent {
 private:
     bool isPlaySheduled;
 public:
@@ -110,7 +107,7 @@ public:
     void onValueChanged(); //Update soud buffer pointer and send source props
     void onUpdate(float deltaTime);
     void onObjectDeleted();
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
 
     void setAudioFile(std::string relpath);
     void setAudioResource(Engine::AudioResource* res);
@@ -132,7 +129,7 @@ public:
 };
 
 
-class NodeProperty : public GameObjectProperty {
+class NodeProperty : public IGameObjectComponent {
 public:
     std::string node_label;
 
@@ -144,7 +141,7 @@ public:
     //Caclulated node transform
     ZSMATRIX4x4 abs;
 
-    void copyTo(GameObjectProperty* dest);
+    void copyTo(IGameObjectComponent* dest);
    // void addPropertyInterfaceToInspector();
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);
@@ -152,14 +149,14 @@ public:
     NodeProperty();
 };
 
-class SkyboxProperty : public Engine::GameObjectProperty{
+class SkyboxProperty : public Engine::IGameObjectComponent {
 public:
     void onPreRender(Engine::RenderPipeline* pipeline);
     void DrawSky(RenderPipeline* pipeline);
     SkyboxProperty();
 };
 
-class ShadowCasterProperty : public Engine::GameObjectProperty{
+class ShadowCasterProperty : public Engine::IGameObjectComponent {
 private:
     bool initialized;
     unsigned int shadowBuffer;
@@ -177,7 +174,7 @@ public:
 
     void addPropertyInterfaceToInspector();
     void onPreRender(Engine::RenderPipeline* pipeline);
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void onValueChanged();
     void init();
     void onObjectDeleted();
@@ -192,7 +189,7 @@ public:
     ShadowCasterProperty();
 };
 
-class MaterialProperty : public Engine::GameObjectProperty{
+class MaterialProperty : public Engine::IGameObjectComponent {
 private:
     std::string group_label;
 public:
@@ -208,7 +205,7 @@ public:
     void setMaterial(std::string path);
     void addPropertyInterfaceToInspector();
     void onValueChanged();
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void onRender(Engine::RenderPipeline* pipeline);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
@@ -219,7 +216,7 @@ public:
 };
 
 
-class PhysicalProperty : public Engine::GameObjectProperty{
+class PhysicalProperty : public Engine::IGameObjectComponent {
 protected:
 
     bool init();
@@ -235,7 +232,7 @@ public:
     btCollisionShape* shape;
     COLLIDER_TYPE coll_type;
     float mass;
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void addColliderRadio();
     void addMassField();
     void addCustomSizeField();
@@ -247,7 +244,7 @@ class ColliderProperty : public Engine::PhysicalProperty{
 public:
     void onObjectDeleted(); //unregister in world
     void addPropertyInterfaceToInspector();
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void onUpdate(float deltaTime);
     void onStart();
     Engine::TransformProperty* getTransformProperty();
@@ -267,7 +264,7 @@ public:
     void addPropertyInterfaceToInspector();
     void onUpdate(float deltaTime);
     void onStart();
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void onValueChanged();
     void onObjectDeleted(); //unregister in world
 
@@ -294,7 +291,7 @@ public:
     ZSVECTOR3 angularVel;
 
     void addPropertyInterfaceToInspector();
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void onUpdate(float deltaTime);
     void onStart();
 
@@ -320,7 +317,7 @@ public:
 
     void addPropertyInterfaceToInspector();
     void onUpdate(float deltaTime);
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void initGhost();
     void onObjectDeleted(); //unregister in world
     void onStart();
@@ -331,7 +328,7 @@ public:
     TriggerProperty();
 };
 
-class AnimationProperty : public Engine::GameObjectProperty {
+class AnimationProperty : public Engine::IGameObjectComponent {
 private:
 public:
     bool Playing;
@@ -343,7 +340,7 @@ public:
     void addPropertyInterfaceToInspector();
     void onPreRender(Engine::RenderPipeline* pipeline);
     void onValueChanged();
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
 
     void play();
     void stop();
@@ -360,7 +357,7 @@ public:
     AnimationProperty();
 };
 
-class TerrainProperty : public Engine::GameObjectProperty{
+class TerrainProperty : public Engine::IGameObjectComponent {
 
 private:
     TerrainData data;
@@ -394,7 +391,7 @@ public:
     void DrawGrass(RenderPipeline* pipeline);
     void onValueChanged();
     void onAddToObject();
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void onUpdate(float deltaTime);
     void onStart();
     
@@ -413,5 +410,3 @@ public:
 };
 
 }
-
-#endif

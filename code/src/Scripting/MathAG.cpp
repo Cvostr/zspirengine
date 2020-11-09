@@ -1,5 +1,5 @@
 #include "../../headers/Scripting/AngelScriptMgr.h"
-#include "../../headers/world/World.h"
+#include "../../headers/world/World.hpp"
 #include <cmath>
 
 float ctg(float a) {

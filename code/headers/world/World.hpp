@@ -1,5 +1,4 @@
-#ifndef zs_world
-#define zs_world
+#pragma once
 
 #include <string>
 #include <vector>
@@ -7,7 +6,8 @@
 
 #include "../engine/resources.h"
 #include "../misc/misc.h"
-#include "zs-camera.h"
+#include "../misc/SmArray.hpp"
+#include "Camera.hpp"
 
 #include "Physics.h"
 #include "../render/zs-pipeline.h"
@@ -69,7 +69,7 @@ public:
     GameObjectLink();
 };
 
-class GameObjectProperty{
+class IGameObjectComponent{
 public:
     PROPERTY_TYPE type; //type of property
     GameObjectLink go_link; //link to object, that holds this property
@@ -81,17 +81,17 @@ public:
     //Check, if Property is Active
     bool isActive();
     //Virtual func to copy all property's values
-    virtual void copyTo(GameObjectProperty* dest);
+    virtual void copyTo(IGameObjectComponent* dest);
     //Virtual func to define property behaviour on scene start
-    virtual void onStart();
+    virtual void onStart(){}
     //Virtual func to define property behaviour on scene stop
-    virtual void onStop();
+    virtual void onStop(){}
     //Virtual func to define property behaviour each frame
-    virtual void onUpdate(float deltaTime);
-    virtual void onPreRender(RenderPipeline* pipeline = nullptr);
-    virtual void onRender(RenderPipeline* pipeline = nullptr);
-    virtual void onAddToObject();
-    virtual void onObjectDeleted();
+    virtual void onUpdate(float deltaTime){}
+    virtual void onPreRender(RenderPipeline* pipeline = nullptr){}
+    virtual void onRender(RenderPipeline* pipeline = nullptr){}
+    virtual void onAddToObject(){}
+    virtual void onObjectDeleted(){}
     virtual void loadPropertyFromMemory(const char* data, GameObject* obj);
     virtual void savePropertyToStream(ZsStream* stream, GameObject* obj);
     virtual void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
@@ -99,11 +99,11 @@ public:
     virtual void onTriggerEnter(Engine::GameObject* obj);
     virtual void onTriggerExit(Engine::GameObject* obj);
     //Editor specific functions
-    virtual void addPropertyInterfaceToInspector();
-    virtual void onValueChanged();
+    virtual void addPropertyInterfaceToInspector(){}
+    virtual void onValueChanged(){}
 
-    GameObjectProperty();
-    virtual ~GameObjectProperty();
+    IGameObjectComponent();
+    virtual ~IGameObjectComponent();
 };
 
 class World{
@@ -121,7 +121,7 @@ public:
     void loadGameObjectFromMemory(GameObject* object_ptr, const char* bytes, unsigned int left_bytes);
 
     GameObject* getGameObjectByStrId(std::string id);
-    GameObject* getGameObjectByLabel(std::string label);
+    GameObject* getGameObjectByLabel(const std::string& label);
     GameObject* getGameObjectByArrayIndex(unsigned int index);
     GameObject* addObject(GameObject obj);
     Engine::GameObject* newObject(); //Add new object to world
@@ -150,6 +150,9 @@ public:
     ~World();
 };
 
+class ZPScriptProperty;
+class PhysicalProperty;
+
 class GameObject{
 public:
     //Index in objects vector
@@ -157,7 +160,7 @@ public:
     std::string str_id; //Object's unique string ID
     std::string* getLabelPtr();
 
-    bool active; //if true, object will be active in scene
+    bool mActive; //if true, object will be active in scene
     bool alive; //false, if object was remove
     bool hasParent;
     bool IsStatic;
@@ -165,22 +168,22 @@ public:
     unsigned int props_num; //amount of properties
     unsigned int scripts_num;
 
-    World* world_ptr; //pointer to world, when object placed
+    World* mWorld; //pointer to world, when object placed
 
     GameObjectLink parent;
 
-    std::vector<GameObjectLink> children; //Vector to store links to children of object
+    std::vector<GameObjectLink> mChildren; //Vector to store links to children of object
     GameObject* getChild(unsigned int index);
     //Pointers to properties and scripts
-    GameObjectProperty* properties[OBJ_PROPS_SIZE];
-    GameObjectProperty* scripts[OBJ_SCRIPT_PROPS_SIZE];
+    IGameObjectComponent* properties[OBJ_PROPS_SIZE];
+    ZPScriptProperty* mScripts[OBJ_SCRIPT_PROPS_SIZE];
     //Allocate property in this object
     
     bool addScript();
     bool addProperty(PROPERTY_TYPE property); //Adds property with property ID
     //returns pointer to property by property type
-    Engine::GameObjectProperty* getPropertyPtrByType(PROPERTY_TYPE type);
-    Engine::GameObjectProperty* getPropertyPtrByTypeI(int property);
+    Engine::IGameObjectComponent* getPropertyPtrByType(PROPERTY_TYPE type);
+    Engine::IGameObjectComponent* getPropertyPtrByTypeI(int property);
     //Add object link as child
     void addChildObject(GameObject* obj, bool updTransform = true);
     void addChildObject(GameObjectLink link, bool updTransform = true);
@@ -190,21 +193,21 @@ public:
     int getAliveChildrenAmount(); //Gets current amount of children objects (exclude removed chidren)
     //Remove property with type
     void removeProperty(int index);
-    void removeProperty(Engine::GameObjectProperty* pProp);
+    void removeProperty(Engine::IGameObjectComponent* pProp);
     void removeScript(int index);
-    void removeScript(Engine::GameObjectProperty* pProp);
-    ZPScriptClass* getScriptObjectWithName(std::string name);
+    void removeScript(Engine::IGameObjectComponent* pProp);
+    asIScriptObject* getScriptObjectWithName(const std::string& name);
 
-    GameObject* getChildObjectWithNodeLabel(std::string label);
+    GameObject* getChildObjectWithNodeLabel(const std::string& label);
     void setMeshSkinningRootNodeRecursively(GameObject* rootNode);
 
     void clearAll(); //Release all associated memory with this object
     //remove deleted children from vector
     void trimChildrenArray();
 
-    std::string getLabel();
-    void setLabel(std::string label);
-    void setActive(bool active);
+    const std::string& getLabel();
+    void setLabel(const std::string& label);
+    void setActive(bool active) { mActive = active; }
     bool isActive();
     unsigned int getChildrenNum();
 
@@ -237,7 +240,7 @@ public:
     void onTriggerExit(GameObject* obj);
     //true, if object has rigidbody component
     bool isRigidbody();
-    void* getPhysicalProperty();
+    PhysicalProperty* getPhysicalProperty();
 
     bool hasMesh(); //Check if gameobject has mesh property and mesh inside
     bool hasTerrain(); //Check if gameobject has terrain inside
@@ -249,7 +252,7 @@ public:
     //---------------------FOR EDITOR USE--------------------------------------------------------
     void pick(); //Mark object and its children picked
     void saveProperties(ZsStream* stream); //Writes properties content at end of stream
-    void saveProperty(GameObjectProperty* prop, ZsStream* stream);
+    void saveProperty(IGameObjectComponent* prop, ZsStream* stream);
     void putToSnapshot(GameObjectSnapshot* snapshot);
     void recoverFromSnapshot(Engine::GameObjectSnapshot* snapshot);
 
@@ -262,8 +265,8 @@ public:
     GameObject reserved_obj; //class object
     std::vector<Engine::GameObjectLink> children; //Vector to store links to children of object
     std::vector<GameObjectSnapshot> children_snapshots;
-    Engine::GameObjectProperty* properties[OBJ_PROPS_SIZE]; //pointers to properties of object
-    Engine::GameObjectProperty* scripts[OBJ_SCRIPT_PROPS_SIZE];
+    Engine::IGameObjectComponent* properties[OBJ_PROPS_SIZE]; //pointers to properties of object
+    Engine::ZPScriptProperty* mScripts[OBJ_SCRIPT_PROPS_SIZE];
 
     Engine::GameObjectLink parent_link;
 
@@ -276,13 +279,13 @@ public:
     GameObjectSnapshot();
 };
 
-class LabelProperty : public GameObjectProperty {
+class LabelProperty : public IGameObjectComponent {
 public:
     std::string label; //Label of gameobject
 
     void addPropertyInterfaceToInspector();
     void onValueChanged();
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void loadPropertyFromMemory(const char* data, Engine::GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
@@ -290,7 +293,7 @@ public:
     ~LabelProperty();
 };
 
-class TransformProperty : public GameObjectProperty {
+class TransformProperty : public IGameObjectComponent {
 public:
     ZSMATRIX4x4 transform_mat;
 
@@ -304,13 +307,13 @@ public:
 
     void updateMatrix();
     void getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r);
-    void copyTo(GameObjectProperty* dest);
+    void copyTo(IGameObjectComponent* dest);
     void onPreRender(RenderPipeline* pipeline);
     void getAbsoluteRotationMatrix(ZSMATRIX4x4& m);
 
-    void setTranslation(ZSVECTOR3& new_translation);
-    void setScale(ZSVECTOR3& new_scale);
-    void setRotation(ZSVECTOR3& new_rotation);
+    void setTranslation(const ZSVECTOR3& new_translation);
+    void setScale(const ZSVECTOR3& new_scale);
+    void setRotation(const ZSVECTOR3& new_rotation);
     //Editor stuff
     void onValueChanged();
     void addPropertyInterfaceToInspector();
@@ -321,7 +324,5 @@ public:
 
     TransformProperty();
 };
-GameObjectProperty* allocProperty(PROPERTY_TYPE type);
+IGameObjectComponent* allocProperty(PROPERTY_TYPE type);
 }
-
-#endif

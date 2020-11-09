@@ -13,7 +13,7 @@ static char rstring_palette[RANDOM_VARIANTS + 1] = "ABCDEFGHIJKLMNOPQRSTUVWXYZab
 
 void genRandomString(std::string* result, unsigned int len){
     result->clear(); //make string empty, first
-    srand (SDL_GetPerformanceCounter());
+    srand (static_cast<unsigned int>(SDL_GetPerformanceCounter()));
     unsigned int _len = len + rand() % 3;
     for(unsigned int digit_i = 0; digit_i < _len; digit_i ++){//Iterate over all chars in string
 

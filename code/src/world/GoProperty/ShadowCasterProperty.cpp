@@ -35,11 +35,11 @@ bool Engine::ShadowCasterProperty::isRenderAvailable() {
     return true;
 }
 
-void Engine::ShadowCasterProperty::copyTo(Engine::GameObjectProperty* dest) {
+void Engine::ShadowCasterProperty::copyTo(Engine::IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't script group
 
     //Do base things
-    GameObjectProperty::copyTo(dest);
+    IGameObjectComponent::copyTo(dest);
 
     ShadowCasterProperty* _dest = static_cast<ShadowCasterProperty*>(dest);
     _dest->farPlane = this->farPlane;

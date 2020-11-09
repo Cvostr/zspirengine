@@ -52,7 +52,7 @@ typedef struct TileAnimationState{
     }
 }TileAnimationState;
 
-class TileGroupProperty : public Engine::GameObjectProperty{
+class TileGroupProperty : public Engine::IGameObjectComponent {
 public:
     int tiles_amount_X; //Tiles to add
     int tiles_amount_Y;
@@ -63,7 +63,7 @@ public:
     std::string diffuse_relpath; //Diffuse texture to generate
     std::string mesh_string; //Mesh to generate
 
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void addPropertyInterfaceToInspector();
 
     void process();
@@ -75,7 +75,7 @@ public:
     TileGroupProperty();
 };
 
-class TileProperty : public Engine::GameObjectProperty{
+class TileProperty : public Engine::IGameObjectComponent {
 public:
     Engine::TileGeometry geometry;
     //Defines color texture
@@ -91,7 +91,7 @@ public:
     void addPropertyInterfaceToInspector();
     void onValueChanged(); //Update texture pointer
     void updTexturePtr();
-    void copyTo(Engine::GameObjectProperty* dest);
+    void copyTo(Engine::IGameObjectComponent* dest);
     void onUpdate(float deltaTime);
     void onRender(Engine::RenderPipeline* pipeline);
 

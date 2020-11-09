@@ -1,4 +1,4 @@
-#include "../../headers/world/terrain.h"
+#include "../../headers/world/Terrain.hpp"
 #include <fstream>
 #include <iostream>
 #include <GL/glew.h>

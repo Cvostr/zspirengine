@@ -1,4 +1,4 @@
-#include "../../headers/world/zs-camera.h"
+#include "../../headers/world/Camera.hpp"
 
 void Engine::Camera::setFOV(float FOV){
     this->FOV = FOV;

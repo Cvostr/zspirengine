@@ -1,4 +1,4 @@
-#include "../../headers/world/terrain.h"
+#include "../../headers/world/Terrain.hpp"
 #include "../../headers/render/zs-pipeline.h"
 #include "../../headers/world/go_properties.h"
 #include <GL/glew.h>

@@ -1,4 +1,5 @@
-#include "../../headers/world/World.h"
+#include "../../headers/world/World.hpp"
+#include "../../headers/world/go_properties.h"
 #include "../../headers/misc/misc.h"
 
 Engine::World::World(){
@@ -12,8 +13,8 @@ Engine::World::~World() {
 }
 
 Engine::GameObject* Engine::World::getGameObjectByStrId(std::string id){
-    unsigned int objs_num = static_cast<unsigned int>(this->objects.size());
-    for(unsigned int obj_it = 0; obj_it < objs_num; obj_it ++){ //Iterate over all objs in scene
+    size_t objs_num = objects.size();
+    for(size_t obj_it = 0; obj_it < objs_num; obj_it ++){ //Iterate over all objs in scene
         GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
         if(obj_ptr->str_id.compare(id) == 0) //if labels are same
             return obj_ptr; //Return founded object
@@ -21,11 +22,13 @@ Engine::GameObject* Engine::World::getGameObjectByStrId(std::string id){
     return nullptr; //if we haven't found one
 }
 
-Engine::GameObject* Engine::World::getGameObjectByLabel(std::string label){
-    unsigned int objs_num = static_cast<unsigned int>(this->objects.size());
-    for(unsigned int obj_it = 0; obj_it < objs_num; obj_it ++){ //Iterate over all objs in scene
+Engine::GameObject* Engine::World::getGameObjectByLabel(const std::string& label){
+    size_t objs_num = objects.size();
+    for(size_t obj_it = 0; obj_it < objs_num; obj_it ++){ //Iterate over all objs in scene
         GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
         if(!obj_ptr->alive) continue;
+        if (obj_ptr->getLabelProperty() == nullptr)
+            continue;
         if(obj_ptr->getLabelProperty()->label.compare(label) == 0) //if labels are same
             return obj_ptr; //Return founded object
     }
@@ -33,8 +36,8 @@ Engine::GameObject* Engine::World::getGameObjectByLabel(std::string label){
 }
 
 Engine::GameObject* Engine::World::getGameObjectByArrayIndex(unsigned int index) {
-    unsigned int objs_num = static_cast<unsigned int>(this->objects.size());
-    for (unsigned int obj_it = 0; obj_it < objs_num; obj_it++) { //Iterate over all objs in scene
+    size_t objs_num = objects.size();
+    for (size_t obj_it = 0; obj_it < objs_num; obj_it++) { //Iterate over all objs in scene
         GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
         if (!obj_ptr->alive) continue;
         if (obj_ptr->array_index == index) //if labels are same
@@ -60,7 +63,7 @@ Engine::GameObject* Engine::World::addObject(GameObject obj){
 
     GameObject* obj_ptr = this->objects[free_index];
     //Assigning pointer to world
-    obj_ptr->world_ptr = this;
+    obj_ptr->mWorld = this;
 
     return obj_ptr;
 }
@@ -69,22 +72,22 @@ void Engine::World::removeObj(Engine::GameObjectLink& link) {
     Engine::GameObjectLink l = link;
     l.updLinkPtr()->alive = false; //Mark object as dead
     //Get amount of children
-    unsigned int children_num = static_cast<unsigned int>(l.updLinkPtr()->children.size());
+    size_t children_num = l.updLinkPtr()->mChildren.size();
 
-    for (unsigned int ch_i = 0; ch_i < children_num; ch_i++) { //Walk through all children an remove them
-        Engine::GameObjectLink link = l.updLinkPtr()->children[children_num - ch_i - 1]; //Remove first of children because of trim
+    for (size_t ch_i = 0; ch_i < children_num; ch_i++) { //Walk through all children an remove them
+        Engine::GameObjectLink link = l.updLinkPtr()->mChildren[children_num - ch_i - 1]; //Remove first of children because of trim
         removeObj(link);
     }
     //Remove all content in heap, related to object class object
-    (l.ptr)->clearAll();
+    l.ptr->clearAll();
     if (l.ptr->hasParent == true) { //If object parented by other obj
         Engine::GameObject* parent = l.ptr->parent.updLinkPtr(); //Receive pointer to object's parent
 
-        unsigned int children_am = static_cast<unsigned int>(parent->children.size()); //get children amount
-        for (unsigned int i = 0; i < children_am; i++) { //Iterate over all children in object
-            Engine::GameObjectLink* link_ptr = &parent->children[i];
+        size_t children_am = parent->mChildren.size(); //get children amount
+        for (size_t i = 0; i < children_am; i++) { //Iterate over all children in object
+            Engine::GameObjectLink* link_ptr = &parent->mChildren[i];
             if (l.obj_str_id.compare(link_ptr->obj_str_id) == 0) { //if str_id in requested link compares to iteratable link
-                parent->children[i].crack(); //Make link broken
+                parent->mChildren[i].crack(); //Make link broken
             }
         }
         //Remove cracked link from vector
@@ -103,7 +106,7 @@ Engine::GameObject* Engine::World::newObject() {
     int add_num = 0; //Declaration of addititonal integer
     getAvailableNumObjLabel("GameObject_", &add_num);
 
-    obj.world_ptr = this;
+    obj.mWorld = this;
     obj.addProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL);
     obj.setLabel("GameObject_" + std::to_string(add_num)); //Assigning label to object
 
@@ -113,10 +116,10 @@ Engine::GameObject* Engine::World::newObject() {
 
 
 void Engine::World::trimObjectsList(){
-    for (unsigned int i = 0; i < objects.size(); i ++) { //Iterating over all objects
+    for (size_t i = 0; i < objects.size(); i ++) { //Iterating over all objects
         if(objects[i]->alive == false){ //If object marked as deleted
             delete objects[i];
-            for (unsigned int obj_i = i + 1; obj_i < objects.size(); obj_i ++) { //Iterate over all next chidren
+            for (size_t obj_i = i + 1; obj_i < objects.size(); obj_i ++) { //Iterate over all next chidren
                 objects[obj_i - 1] = objects[obj_i]; //Move it to previous place
                 objects[obj_i - 1]->array_index = obj_i - 1;
 
@@ -144,11 +147,11 @@ Engine::GameObject* Engine::World::dublicateObject(GameObject* original, bool pa
     //Copying scripts data
     for (unsigned int script_i = 0; script_i < original->scripts_num; script_i++) {
         //Get pointer to original property
-        auto prop_ptr = original->scripts[script_i];
+        auto prop_ptr = original->mScripts[script_i];
         //register new property in new object
         new_obj->addScript();
         //Get created property
-        auto new_prop = new_obj->scripts[script_i];
+        auto new_prop = new_obj->mScripts[script_i];
         //start property copying
         prop_ptr->copyTo(new_prop);
     }
@@ -174,11 +177,11 @@ Engine::GameObject* Engine::World::dublicateObject(GameObject* original, bool pa
     //Add generated string to end of label
     new_obj->setLabel(label_prop->label + "_" + to_paste);
     //Dublicate chilldren object
-    unsigned int children_amount = static_cast<unsigned int>(original->children.size());
+    unsigned int children_amount = static_cast<unsigned int>(original->mChildren.size());
     //Iterate over all children
     for(unsigned int child_i = 0; child_i < children_amount; child_i ++){
         //Get pointer to original child object
-        GameObjectLink link = original->children[child_i];
+        GameObjectLink link = original->mChildren[child_i];
         //create new child obect by dublication of original
         GameObject* new_child = dublicateObject(link.ptr, false);
         //parenting
@@ -193,7 +196,7 @@ Engine::GameObject* Engine::World::Instantiate(GameObject* original){
 
 void Engine::World::clear() {
     //iterate over all objects and purge them all
-    for (unsigned int objs_i = 0; objs_i < objects.size(); objs_i++) {
+    for (size_t objs_i = 0; objs_i < objects.size(); objs_i++) {
         GameObject* obj_ptr = objects[objs_i];
         removeObject(obj_ptr);
     }
@@ -219,14 +222,15 @@ void Engine::World::loadFromFile(std::string file, RenderSettings* settings_ptr)
 void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char* bytes, unsigned int left_bytes) {
     std::string prefix;
     unsigned int iter = 1;
-    object_ptr->world_ptr = this; //Assign pointer to world
+    object_ptr->mWorld = this; //Assign pointer to world
     object_ptr->str_id.clear(); //Clear old string id
     readString(object_ptr->str_id, bytes, iter);
     //Read ACTIVE and STATIC flags
-    readBinaryValue(&object_ptr->active, bytes + iter, iter);
+    readBinaryValue(&object_ptr->mActive, bytes + iter, iter);
     readBinaryValue(&object_ptr->IsStatic, bytes + iter, iter);
     //Then do the same sh*t, iterate until "G_END" came up
     while (true) {
+
         prefix.clear();
         //Read prefix
         skipSpaces(bytes, iter);
@@ -253,7 +257,7 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
                 GameObjectLink link;
                 link.world_ptr = this; //Setting world pointer
                 link.obj_str_id = child_str_id; //Setting string ID
-                object_ptr->children.push_back(link); //Adding to object
+                object_ptr->mChildren.push_back(link); //Adding to object
             }
         }
         if (prefix.compare("G_PROPERTY") == 0) { //We found an property, zaeb*s'
@@ -275,7 +279,7 @@ void Engine::World::loadGameObjectFromMemory(GameObject* object_ptr, const char*
             iter++; //Skip space
             //Spawn new property with readed type
             object_ptr->addScript();
-            auto script_ptr = object_ptr->scripts[object_ptr->scripts_num - 1]; //get created property
+            auto script_ptr = object_ptr->mScripts[object_ptr->scripts_num - 1]; //get created property
             //Read ACTIVE flag
             readBinaryValue(&script_ptr->active, bytes + iter, iter);
             //Load property
@@ -330,10 +334,10 @@ void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderS
         }
     }
     //Now iterate over all objects and set depencies
-    for (unsigned int obj_i = 0; obj_i < this->objects.size(); obj_i++) {
+    for (size_t obj_i = 0; obj_i < this->objects.size(); obj_i++) {
         GameObject* obj_ptr = this->objects[obj_i];
-        for (unsigned int chi_i = 0; chi_i < obj_ptr->children.size(); chi_i++) { //Now iterate over all children
-            GameObjectLink* child_ptr = &obj_ptr->children[chi_i];
+        for (size_t chi_i = 0; chi_i < obj_ptr->mChildren.size(); chi_i++) { //Now iterate over all children
+            GameObjectLink* child_ptr = &obj_ptr->mChildren[chi_i];
             GameObject* child_go_ptr = child_ptr->updLinkPtr();
             child_go_ptr->parent = obj_ptr->getLinkToThisObject();
             child_go_ptr->hasParent = true;
@@ -360,9 +364,9 @@ void Engine::World::call_onStop() {
 }
 
 bool Engine::World::isObjectLabelUnique(std::string label) {
-    unsigned int objs_num = static_cast<unsigned int>(this->objects.size());
+    size_t objs_num = objects.size();
     int ret_amount = 0;
-    for (unsigned int obj_it = 0; obj_it < objs_num; obj_it++) { //Iterate over all objs in scene
+    for (size_t obj_it = 0; obj_it < objs_num; obj_it++) { //Iterate over all objs in scene
         Engine::GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
         //if object was destroyed
         if (!obj_ptr->alive) continue;
@@ -390,8 +394,8 @@ void Engine::World::getAvailableNumObjLabel(std::string label, int* result) {
     }
 }
 int Engine::World::getFreeObjectSpaceIndex() {
-    unsigned int index_to_push = static_cast<unsigned int>(objects.size()); //Set free index to objects amount
-    unsigned int objects_num = static_cast<unsigned int>(this->objects.size());
+    size_t index_to_push = objects.size(); //Set free index to objects amount
+    size_t objects_num = objects.size();
     for (unsigned int objs_i = 0; objs_i < objects_num; objs_i++) {
         if (objects[objs_i]->alive == false) { //if object deleted
             index_to_push = objs_i; //set free index to index of deleted object
@@ -407,22 +411,22 @@ void Engine::World::processPrefabObject(Engine::GameObject* object_ptr, std::vec
     unsigned int props_amount = object_ptr->props_num;
     //iterate over all props and update gameobject links
     for (unsigned int prop_i = 0; prop_i < props_amount; prop_i++) {
-        Engine::GameObjectProperty* prop_ptr = object_ptr->properties[prop_i];
+        Engine::IGameObjectComponent* prop_ptr = object_ptr->properties[prop_i];
         prop_ptr->go_link.obj_str_id = object_ptr->str_id; //set new string id
 
         prop_ptr->go_link.updLinkPtr();
     }
     //Obtain amount of objects
-    unsigned int children_amount = static_cast<unsigned int>(object_ptr->children.size());
+    size_t children_amount = object_ptr->mChildren.size();
     //Iterate over all objects
-    for (unsigned int chi_i = 0; chi_i < children_amount; chi_i++) {
-        Engine::GameObjectLink link = object_ptr->children[chi_i];
+    for (size_t chi_i = 0; chi_i < children_amount; chi_i++) {
+        Engine::GameObjectLink link = object_ptr->mChildren[chi_i];
         //find object with same string name as in link
         for (unsigned int obj_i = 0; obj_i < objects_array->size(); obj_i++) {
             Engine::GameObject* _object_ptr = &objects_array->at(obj_i);
             if (_object_ptr->str_id.compare(link.obj_str_id) == 0) { //we found object
                 genRandomString(&_object_ptr->str_id, 15); //generate new string ID
-                object_ptr->children[chi_i].obj_str_id = _object_ptr->str_id; //update string id in children array
+                object_ptr->mChildren[chi_i].obj_str_id = _object_ptr->str_id; //update string id in children array
                 _object_ptr->parent.obj_str_id = object_ptr->str_id; //update string ID of parent link
                 _object_ptr->hasParent = true;
 
@@ -466,7 +470,7 @@ Engine::GameObject* Engine::World::addObjectsFromPrefab(char* data, unsigned int
     genRandomString(&mObjects[0].str_id, 15); //generate new string ID for first object
     processPrefabObject(&mObjects[0], &mObjects);
     //iterate over all objects and push them to world
-    for (unsigned int obj_i = 0; obj_i < mObjects.size(); obj_i++) {
+    for (size_t obj_i = 0; obj_i < mObjects.size(); obj_i++) {
         std::string label = mObjects[obj_i].getLabel();
         int add_num = 0; //Declaration of addititonal integer
         getAvailableNumObjLabel(label, &add_num);
@@ -477,7 +481,7 @@ Engine::GameObject* Engine::World::addObjectsFromPrefab(char* data, unsigned int
     }
     Engine::GameObject* object = this->getGameObjectByStrId(mObjects[0].str_id);
 
-    for (unsigned int obj_i = 1; obj_i < mObjects.size(); obj_i++) {
+    for (size_t obj_i = 1; obj_i < mObjects.size(); obj_i++) {
         Engine::GameObject* object_ptr = this->getGameObjectByStrId(mObjects[obj_i].str_id);
         object_ptr->parent.world_ptr = this;
     }

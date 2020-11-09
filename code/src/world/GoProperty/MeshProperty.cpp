@@ -13,7 +13,7 @@ Engine::MeshProperty::MeshProperty() {
     this->resource_relpath = "@none";
     this->rootNodeStr = "@none";
 }
-void Engine::MeshProperty::copyTo(GameObjectProperty* dest) {
+void Engine::MeshProperty::copyTo(IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't transform
 
     MeshProperty* _dest = static_cast<MeshProperty*>(dest);

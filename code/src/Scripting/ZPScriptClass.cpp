@@ -41,9 +41,6 @@ void bindAgClass(std::string script_text, void* mgr) {
 	result = builder.BuildModule();
 
 
-	
-	
-
 	asITypeInfo* class_type = getZSPScript(mgr);
 
 	std::string _d = class_type->GetName();
@@ -55,6 +52,8 @@ void bindAgClass(std::string script_text, void* mgr) {
 		int res = _mgr->RegisterObjectMethod(_d.c_str(), decl, asFUNCTION(call_func), asCALL_GENERIC);
 		//assert(res >= 0);
 	}
+
+	_mgr->getAgScriptEngine()->GetModule("ss")->Discard();
 }
 
 void* ZPScriptClass::getScriptObject() {

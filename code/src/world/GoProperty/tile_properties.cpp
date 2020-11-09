@@ -14,11 +14,11 @@ Engine::TileGroupProperty::TileGroupProperty(){
     this->diffuse_relpath = "@none";
 }
 
-void Engine::TileGroupProperty::copyTo(Engine::GameObjectProperty* dest){
+void Engine::TileGroupProperty::copyTo(Engine::IGameObjectComponent* dest){
     if(dest->type != this->type) return; //if it isn't transform
 
     //Do base things
-    Engine::GameObjectProperty::copyTo(dest);
+    Engine::IGameObjectComponent::copyTo(dest);
 
     TileGroupProperty* _dest = static_cast<TileGroupProperty*>(dest);
     //Transfer all variables
@@ -112,11 +112,11 @@ void Engine::TileProperty::onUpdate(float deltaTime){
     }
 }
 
-void Engine::TileProperty::copyTo(Engine::GameObjectProperty* dest){
+void Engine::TileProperty::copyTo(Engine::IGameObjectComponent* dest){
     if(dest->type != this->type) return; //if it isn't transform
 
     //Do base things
-    Engine::GameObjectProperty::copyTo(dest);
+    Engine::IGameObjectComponent::copyTo(dest);
 
     TileProperty* _dest = static_cast<TileProperty*>(dest);
     _dest->diffuse_relpath = diffuse_relpath;

@@ -20,7 +20,7 @@ void Engine::CharacterControllerProperty::setLinearVelocity(ZSVECTOR3 lvel) {
     rigidBody->activate();
 }
 
-void Engine::CharacterControllerProperty::copyTo(Engine::GameObjectProperty* dest) {
+void Engine::CharacterControllerProperty::copyTo(Engine::IGameObjectComponent* dest) {
     if (dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_CHARACTER_CONTROLLER) return;
 
     //Do base things

@@ -49,13 +49,13 @@ void Engine::AudioSourceProperty::onUpdate(float deltaTime) {
     }
 }
 
-void Engine::AudioSourceProperty::copyTo(Engine::GameObjectProperty* dest) {
+void Engine::AudioSourceProperty::copyTo(Engine::IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't audiosource then exit
 
     AudioSourceProperty* _dest = static_cast<AudioSourceProperty*>(dest);
 
     //Do base things
-    GameObjectProperty::copyTo(dest);
+    IGameObjectComponent::copyTo(dest);
 
     _dest->source.Init();
     _dest->resource_relpath = this->resource_relpath;

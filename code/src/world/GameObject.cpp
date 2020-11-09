@@ -1,4 +1,4 @@
-#include "../../headers/world/World.h"
+#include "../../headers/world/World.hpp"
 #include "../../headers/world/go_properties.h"
 #include "../../headers/misc/misc.h"
 
@@ -27,20 +27,18 @@ void Engine::GameObjectLink::crack(){
     this->world_ptr = nullptr; //It will now pass isEmpty() check
 }
 
-Engine::GameObject::GameObject(){
-    array_index = 0;
-    props_num = 0; //No props by default
-    scripts_num = 0; //No scripts by default
-    alive = true; //Object exist by default
-    hasParent = false; //No parent by default
-    active = true;
-    IsStatic = false; //Object is dynamic by default
-
-    world_ptr = nullptr;
+Engine::GameObject::GameObject() : array_index(0),
+                                   props_num(0),
+                                   scripts_num(0),
+                                   alive(true),
+                                   mActive(true),
+                                   hasParent(false), 
+                                   IsStatic(false),
+                                   mWorld(nullptr){
 
     genRandomString(&this->str_id, 15); //Generate random string ID
     properties[0] = nullptr;
-    scripts[0] = nullptr;
+    mScripts[0] = nullptr;
 }
 
 Engine::GameObject::~GameObject() {
@@ -50,9 +48,9 @@ Engine::GameObject::~GameObject() {
 Engine::GameObjectLink Engine::GameObject::getLinkToThisObject(){
     GameObjectLink link; //Definition of result link
     link.obj_str_id = this->str_id; //Placing string id
-    link.world_ptr = this->world_ptr; //Placing world pointer
+    link.world_ptr = this->mWorld; //Placing world pointer
 
-    link.ptr = world_ptr->getGameObjectByStrId(link.obj_str_id);
+    link.ptr = mWorld->getGameObjectByStrId(link.obj_str_id);
     return link;
 }
 
@@ -63,16 +61,16 @@ bool Engine::GameObject::addProperty(PROPERTY_TYPE property){
         return false;
 
     for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
-        GameObjectProperty* property_ptr = this->properties[prop_i];
+        IGameObjectComponent* property_ptr = this->properties[prop_i];
         if(property_ptr->type == property){ //If object already has one
             return false; //Exit function
         }
     }
-    GameObjectProperty* _ptr = allocProperty(property);
+    IGameObjectComponent* _ptr = allocProperty(property);
 
     _ptr->go_link = this->getLinkToThisObject();
     _ptr->go_link.updLinkPtr();
-    _ptr->world_ptr = this->world_ptr; //Assign pointer to world
+    _ptr->world_ptr = this->mWorld; //Assign pointer to world
     this->properties[props_num] = _ptr; //Store property in gameobject
     this->props_num += 1;
     return true;
@@ -83,8 +81,8 @@ bool Engine::GameObject::addScript() {
 
     _ptr->go_link = this->getLinkToThisObject();
     _ptr->go_link.updLinkPtr();
-    _ptr->world_ptr = this->world_ptr; //Assign pointer to world
-    this->scripts[scripts_num] = _ptr; //Store property in gameobject
+    _ptr->world_ptr = this->mWorld; //Assign pointer to world
+    this->mScripts[scripts_num] = _ptr; //Store property in gameobject
     this->scripts_num += 1;
     return true;
 }
@@ -104,7 +102,7 @@ void Engine::GameObject::removeProperty(int index){
     props_num -= 1;
 }
 
-void Engine::GameObject::removeProperty(Engine::GameObjectProperty* pProp) {
+void Engine::GameObject::removeProperty(Engine::IGameObjectComponent* pProp) {
     for (unsigned int i = 0; i < props_num; i++) {
         if (properties[i] == pProp)
             removeProperty(i);
@@ -112,32 +110,32 @@ void Engine::GameObject::removeProperty(Engine::GameObjectProperty* pProp) {
 }
 
 void Engine::GameObject::removeScript(int index) {
-    auto script_ptr = this->scripts[index];
+    auto script_ptr = this->mScripts[index];
     //Call onObjectDeleted() on removing property
     script_ptr->onObjectDeleted();
-    delete this->scripts[index];
+    delete this->mScripts[index];
     //set as deleted
-    this->scripts[index] = nullptr;
+    this->mScripts[index] = nullptr;
     //Trim properties pointers vector
     for (unsigned int i = static_cast<unsigned int>(index); i < scripts_num - 1; i++) {
-        scripts[i] = scripts[i + 1];
+        mScripts[i] = mScripts[i + 1];
     }
     //Reduce variable props_num
     scripts_num -= 1;
 }
-void Engine::GameObject::removeScript(Engine::GameObjectProperty* pProp) {
+void Engine::GameObject::removeScript(Engine::IGameObjectComponent* pProp) {
     for (unsigned int i = 0; i < scripts_num; i++) {
-        if (scripts[i] == pProp)
+        if (mScripts[i] == pProp)
             removeScript(i);
     }
 }
 
-ZPScriptClass* Engine::GameObject::getScriptObjectWithName(std::string name) {
+asIScriptObject* Engine::GameObject::getScriptObjectWithName(const std::string& name) {
     for (unsigned int script_i = 0; script_i < scripts_num; script_i++) {
-        ZPScriptProperty* script = static_cast<ZPScriptProperty*>(scripts[script_i]);
+        ZPScriptProperty* script = static_cast<ZPScriptProperty*>(mScripts[script_i]);
         if (script->getScript()->getClassName().compare(name) == 0) {
             //script->getScript()->getMainClassPtr()->AddRef();
-            return script->getScript()->scr_class;
+            return script->getScript()->getMainClassPtr();
         }
     }
     return nullptr;
@@ -172,7 +170,7 @@ void Engine::GameObject::addChildObject(GameObject* obj, bool updTransform) {
         Cobj_transform->updateMatrix(); //Update transform matrix
     }
     //Add child to children vector
-    this->children.push_back(_link);
+    this->mChildren.push_back(_link);
 }
 
 void Engine::GameObject::addChildObject(GameObjectLink link, bool updTransform){
@@ -180,11 +178,11 @@ void Engine::GameObject::addChildObject(GameObjectLink link, bool updTransform){
 }
 
 void Engine::GameObject::removeChildObject(GameObject* obj) {
-    unsigned int children_am = static_cast<unsigned int>(children.size()); //get children amount
-    for (unsigned int i = 0; i < children_am; i++) { //Iterate over all children in object
-        GameObjectLink* link_ptr = &children[i];
+    size_t children_am = mChildren.size(); //get children amount
+    for (size_t i = 0; i < children_am; i++) { //Iterate over all children in object
+        GameObjectLink* link_ptr = &mChildren[i];
         if (obj->str_id.compare(link_ptr->obj_str_id) == 0) { //if str_id in requested link compares to iteratable link
-            children[i].crack(); //Make link broken
+            mChildren[i].crack(); //Make link broken
 
             //Updating child's transform
             //Now check, if it is possible
@@ -215,7 +213,7 @@ void Engine::GameObject::removeChildObject(GameObjectLink link){
     removeChildObject(link.updLinkPtr());
 }
 
-std::string Engine::GameObject::getLabel(){
+const std::string& Engine::GameObject::getLabel(){
     return getLabelProperty()->label;
 }
 
@@ -223,30 +221,26 @@ std::string* Engine::GameObject::getLabelPtr() {
     return &getLabelProperty()->label;
 }
 
-void Engine::GameObject::setLabel(std::string label){
+void Engine::GameObject::setLabel(const std::string& label){
     LabelProperty* label_prop = getLabelProperty(); //Obtain pointer to label property
     label_prop->label = label; //set new name
 }
 
-void Engine::GameObject::setActive(bool active){
-    this->active = active;
-}
-
 bool Engine::GameObject::isActive() {
     bool isParentActive = true;
-    if(hasParent && active)
+    if(hasParent && mActive)
         if (!parent.updLinkPtr()->isActive())
             isParentActive = false;
 
-    return active && isParentActive;
+    return mActive && isParentActive;
 }
 
 unsigned int Engine::GameObject::getChildrenNum() {
-    return static_cast<unsigned int>(children.size());
+    return static_cast<unsigned int>(mChildren.size());
 }
 
 Engine::GameObject* Engine::GameObject::getChild(unsigned int index) {
-    return children[index].updLinkPtr();
+    return mChildren[index].updLinkPtr();
 }
 
 Engine::TransformProperty* Engine::GameObject::getTransformProperty(){
@@ -257,10 +251,10 @@ Engine::LabelProperty* Engine::GameObject::getLabelProperty(){
     return static_cast<LabelProperty*>(getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL));
 }
 
-Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByType(PROPERTY_TYPE type){
+Engine::IGameObjectComponent* Engine::GameObject::getPropertyPtrByType(PROPERTY_TYPE type){
     unsigned int props = static_cast<unsigned int>(this->props_num);
     for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
-        GameObjectProperty* property_ptr = this->properties[prop_i];
+        IGameObjectComponent* property_ptr = this->properties[prop_i];
         if(property_ptr->type == type){ //If object already has one
             return property_ptr; //return it
         }
@@ -268,10 +262,10 @@ Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByType(PROPERTY_TY
     return nullptr;
 }
 
-Engine::GameObjectProperty* Engine::GameObject::getPropertyPtrByTypeI(int property){
+Engine::IGameObjectComponent* Engine::GameObject::getPropertyPtrByTypeI(int property){
     unsigned int props = static_cast<unsigned int>(this->props_num);
     for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
-        Engine::GameObjectProperty* property_ptr = this->properties[prop_i];
+        Engine::IGameObjectComponent* property_ptr = this->properties[prop_i];
         if((int)property_ptr->type == property){ //If object already has one
             return property_ptr; //return it
         }
@@ -286,8 +280,8 @@ void Engine::GameObject::onStart() {
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
-        if (!scripts[i]->active) continue; //if script is inactive, then skip it
-        scripts[i]->onStart(); //and call onStart on each script
+        if (!mScripts[i]->active) continue; //if script is inactive, then skip it
+        mScripts[i]->onStart(); //and call onStart on each script
     }
 }
 
@@ -298,8 +292,8 @@ void Engine::GameObject::onStop() {
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
-        if (!scripts[i]->active) continue; //if script is inactive, then skip it
-        scripts[i]->onStop(); //and call onStart on each script
+        if (!mScripts[i]->active) continue; //if script is inactive, then skip it
+        mScripts[i]->onStop(); //and call onStart on each script
     }
 }
 
@@ -310,8 +304,8 @@ void Engine::GameObject::onUpdate(int deltaTime){   //calls onUpdate on all prop
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
-        if (!scripts[i]->active) continue; //if script is inactive, then skip it
-        scripts[i]->onUpdate(static_cast<float>(deltaTime)); //and call onUpdate on each script
+        if (!mScripts[i]->active) continue; //if script is inactive, then skip it
+        mScripts[i]->onUpdate(static_cast<float>(deltaTime)); //and call onUpdate on each script
     }
 }
 
@@ -336,8 +330,8 @@ void Engine::GameObject::onTrigger(GameObject* obj){
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
-        if (!scripts[i]->active) continue; //if script is inactive, then skip it
-        scripts[i]->onTrigger(obj); //and call onUpdate on each script
+        if (!mScripts[i]->active) continue; //if script is inactive, then skip it
+        mScripts[i]->onTrigger(obj); //and call onUpdate on each script
     }
 }
 
@@ -348,8 +342,8 @@ void Engine::GameObject::onTriggerEnter(GameObject* obj) {
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
-        if (!scripts[i]->active) continue; //if script is inactive, then skip it
-        scripts[i]->onTriggerEnter(obj); //and call onUpdate on each script
+        if (!mScripts[i]->active) continue; //if script is inactive, then skip it
+        mScripts[i]->onTriggerEnter(obj); //and call onUpdate on each script
     }
 }
 void Engine::GameObject::onTriggerExit(GameObject* obj) {
@@ -359,15 +353,15 @@ void Engine::GameObject::onTriggerExit(GameObject* obj) {
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
-        if (!scripts[i]->active) continue; //if script is inactive, then skip it
-        scripts[i]->onTriggerExit(obj); //and call onUpdate on each script
+        if (!mScripts[i]->active) continue; //if script is inactive, then skip it
+        mScripts[i]->onTriggerExit(obj); //and call onUpdate on each script
     }
 }
 
 void Engine::GameObject::copyTo(GameObject* dest){
     dest->array_index = this->array_index;
     dest->alive = this->alive;
-    dest->active = this->active;
+    dest->mActive = this->mActive;
     dest->hasParent = this->hasParent;
     dest->parent = this->parent;
     dest->str_id = this->str_id;
@@ -382,27 +376,27 @@ void Engine::GameObject::clearAll(){
     }
     this->props_num = 0; //Set property counter to zero
     //Clear vector of children
-    children.clear();
+    mChildren.clear();
     hasParent = false;
     alive = false;
-    active = false;
+    mActive = false;
 }
 
 void Engine::GameObject::trimChildrenArray(){
-    for (unsigned int i = 0; i < children.size(); i ++) { //Iterating over all objects
-        if(children[i].isEmpty() == true){ //If object marked as deleted
-            for (unsigned int obj_i = i + 1; obj_i < children.size(); obj_i ++) { //Iterate over all next chidren
-                children[obj_i - 1] = children[obj_i]; //Move it to previous place
+    for (unsigned int i = 0; i < mChildren.size(); i ++) { //Iterating over all objects
+        if(mChildren[i].isEmpty() == true){ //If object marked as deleted
+            for (unsigned int obj_i = i + 1; obj_i < mChildren.size(); obj_i ++) { //Iterate over all next chidren
+                mChildren[obj_i - 1] = mChildren[obj_i]; //Move it to previous place
             }
-            children.resize(children.size() - 1); //Reduce vector length
+            mChildren.resize(mChildren.size() - 1); //Reduce vector length
         }
     }
 }
 
 int Engine::GameObject::getAliveChildrenAmount() {
     int result = 0;
-    for (unsigned int chi_i = 0; chi_i < children.size(); chi_i++) { //Now iterate over all children
-        Engine::GameObjectLink* child_ptr = &children[chi_i];
+    for (unsigned int chi_i = 0; chi_i < mChildren.size(); chi_i++) { //Now iterate over all children
+        Engine::GameObjectLink* child_ptr = &mChildren[chi_i];
         if (!child_ptr->isEmpty()) //if it points to something
             result += 1;
     }
@@ -450,7 +444,7 @@ bool Engine::GameObject::isRigidbody(){
     return false;
 }
 
-void* Engine::GameObject::getPhysicalProperty(){
+Engine::PhysicalProperty* Engine::GameObject::getPhysicalProperty() {
     ColliderProperty* coll = getPropertyPtr<ColliderProperty>();
     RigidbodyProperty* rigid = getPropertyPtr<RigidbodyProperty>();
     CharacterControllerProperty* controller = getPropertyPtr<CharacterControllerProperty>();
@@ -471,11 +465,11 @@ void* Engine::GameObject::getPhysicalProperty(){
     return phys;
 }
 
-Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(std::string label){
+Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(const std::string& label){
     //This function works recursively
     //Iterate over all children in current object
-    for (unsigned int i = 0; i < this->children.size(); i ++) {
-        Engine::GameObjectLink* l = &this->children[i];
+    for (unsigned int i = 0; i < this->mChildren.size(); i ++) {
+        Engine::GameObjectLink* l = &this->mChildren[i];
         Engine::NodeProperty* node_p = (l)->updLinkPtr()->getPropertyPtr<Engine::NodeProperty>();
         if (node_p == nullptr)
             continue;
@@ -503,26 +497,26 @@ void Engine::GameObject::putToSnapshot(GameObjectSnapshot* snapshot) {
     this->copyTo(&snapshot->reserved_obj);
     //Copy all properties
     for (unsigned int i = 0; i < this->props_num; i++) {
-        Engine::GameObjectProperty* prop_ptr = this->properties[i];
-        Engine::GameObjectProperty* new_prop_ptr = Engine::allocProperty(prop_ptr->type);
+        Engine::IGameObjectComponent* prop_ptr = this->properties[i];
+        Engine::IGameObjectComponent* new_prop_ptr = Engine::allocProperty(prop_ptr->type);
         prop_ptr->copyTo(new_prop_ptr);
         snapshot->properties[snapshot->props_num] = new_prop_ptr;
         snapshot->props_num += 1;
     }
     for (unsigned int i = 0; i < this->scripts_num; i++) {
-        Engine::ZPScriptProperty* script_ptr = static_cast<Engine::ZPScriptProperty*>(this->scripts[i]);
+        Engine::ZPScriptProperty* script_ptr = static_cast<Engine::ZPScriptProperty*>(this->mScripts[i]);
         Engine::ZPScriptProperty* new_script_ptr = static_cast<Engine::ZPScriptProperty*>(
             Engine::allocProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT));
         script_ptr->copyTo(new_script_ptr);
-        snapshot->scripts[snapshot->scripts_num] = new_script_ptr;
+        snapshot->mScripts[snapshot->scripts_num] = new_script_ptr;
         snapshot->scripts_num += 1;
     }
-    snapshot->children_snapshots.resize(this->children.size());
+    snapshot->children_snapshots.resize(this->mChildren.size());
     //Copy all children links
-    for (unsigned int i = 0; i < this->children.size(); i++) {
-        snapshot->children.push_back(this->children[i]);
+    for (size_t i = 0; i < this->mChildren.size(); i++) {
+        snapshot->children.push_back(this->mChildren[i]);
         //Call putToSnapshot() on object
-        children[i].ptr->putToSnapshot(&snapshot->children_snapshots[i]);
+        mChildren[i].ptr->putToSnapshot(&snapshot->children_snapshots[i]);
     }
 }
 
@@ -531,8 +525,8 @@ void Engine::GameObject::setMeshSkinningRootNodeRecursively(GameObject* rootNode
     if (mesh)
         mesh->skinning_root_node = rootNode;
 
-    for (unsigned int ch_i = 0; ch_i < children.size(); ch_i++) {
-        GameObject* obj_ptr = children[ch_i].updLinkPtr();
+    for (size_t ch_i = 0; ch_i < mChildren.size(); ch_i++) {
+        GameObject* obj_ptr = mChildren[ch_i].updLinkPtr();
         obj_ptr->setMeshSkinningRootNodeRecursively(rootNode);
     }
 }
@@ -548,7 +542,7 @@ void Engine::GameObjectSnapshot::clear() {
     }
     props_num = 0;
 
-    for (unsigned int child = 0; child < this->children.size(); child++) {
+    for (size_t child = 0; child < this->children.size(); child++) {
         children_snapshots[child].clear();
     }
     children_snapshots.clear(); //Free snapshot vector

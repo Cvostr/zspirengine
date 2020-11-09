@@ -1,5 +1,4 @@
-#ifndef TERRAIN_H
-#define TERRAIN_H
+#pragma once
 
 #define TERRAIN_TEXTURES_AMOUNT 12
 
@@ -164,5 +163,3 @@ public:
     TerrainData();
     ~TerrainData();
 };
-
-#endif // TERRAIN_H

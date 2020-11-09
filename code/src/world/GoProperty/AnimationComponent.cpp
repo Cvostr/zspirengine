@@ -84,16 +84,16 @@ void Engine::AnimationProperty::updateNodeTransform(GameObject* obj, ZSMATRIX4x4
     //Apply parent transform
     prop->abs = parent * prop->abs;
     //Go deeper in tree
-    for (unsigned int i = 0; i < obj->children.size(); i++) {
-        updateNodeTransform(obj->children[i].updLinkPtr(), prop->abs);
+    for (size_t i = 0; i < obj->mChildren.size(); i++) {
+        updateNodeTransform(obj->mChildren[i].updLinkPtr(), prop->abs);
     }
 }
 
-void Engine::AnimationProperty::copyTo(GameObjectProperty* dest) {
+void Engine::AnimationProperty::copyTo(IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't animation
 
     //Do base things
-    GameObjectProperty::copyTo(dest);
+    IGameObjectComponent::copyTo(dest);
     AnimationProperty* _dest = static_cast<AnimationProperty*>(dest);
 
     _dest->anim_label = this->anim_label;

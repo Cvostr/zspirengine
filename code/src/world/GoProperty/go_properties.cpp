@@ -3,152 +3,123 @@
 
 extern ZSGAME_DATA* game_data;
 
-Engine::GameObjectProperty::GameObjectProperty(){
+Engine::IGameObjectComponent::IGameObjectComponent(){
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_NONE;
     active = true;
     world_ptr = nullptr;
 }
-void Engine::GameObjectProperty::setActive(bool active){
+void Engine::IGameObjectComponent::setActive(bool active){
     this->active = active;
 }
-bool Engine::GameObjectProperty::isActive(){
-    return active && go_link.updLinkPtr()->active;
+bool Engine::IGameObjectComponent::isActive(){
+    return active && go_link.updLinkPtr()->mActive;
 }
-void Engine::GameObjectProperty::copyTo(GameObjectProperty* dest){
+void Engine::IGameObjectComponent::copyTo(IGameObjectComponent* dest){
     dest->active = this->active;
     dest->world_ptr = this->world_ptr;
 }
-void Engine::GameObjectProperty::onStart() {
+void Engine::IGameObjectComponent::loadPropertyFromMemory(const char* data, GameObject* obj) {
 
 }
-void Engine::GameObjectProperty::onStop() {
+void Engine::IGameObjectComponent::savePropertyToStream(ZsStream* stream, GameObject* obj) {
 
 }
-void Engine::GameObjectProperty::onUpdate(float deltaTime){
+void Engine::IGameObjectComponent::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
 
 }
-void Engine::GameObjectProperty::onPreRender(RenderPipeline* pipeline){
-
-}
-void Engine::GameObjectProperty::onRender(RenderPipeline* pipeline){
-
-}
-void Engine::GameObjectProperty::onAddToObject(){
-
-}
-void Engine::GameObjectProperty::onObjectDeleted(){
-
-}
-void Engine::GameObjectProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
-
-}
-void Engine::GameObjectProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
-
-}
-void Engine::GameObjectProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
-
-}
-void Engine::GameObjectProperty::onTrigger(Engine::GameObject* obj){
+void Engine::IGameObjectComponent::onTrigger(Engine::GameObject* obj){
     assert(obj);
 }
 
-void Engine::GameObjectProperty::onTriggerEnter(Engine::GameObject* obj) {
+void Engine::IGameObjectComponent::onTriggerEnter(Engine::GameObject* obj) {
 
 }
 
-void Engine::GameObjectProperty::onTriggerExit(Engine::GameObject* obj) {
+void Engine::IGameObjectComponent::onTriggerExit(Engine::GameObject* obj) {
+
+}
+Engine::IGameObjectComponent::~IGameObjectComponent(){
 
 }
 
-void Engine::GameObjectProperty::addPropertyInterfaceToInspector(){
-}
-
-void Engine::GameObjectProperty::onValueChanged(){
-
-}
-
-Engine::GameObjectProperty::~GameObjectProperty(){
-
-}
-
-Engine::GameObjectProperty* Engine::allocProperty(PROPERTY_TYPE type){
-    GameObjectProperty* _ptr = nullptr;
+Engine::IGameObjectComponent* Engine::allocProperty(PROPERTY_TYPE type){
+    IGameObjectComponent* _ptr = nullptr;
     PROPERTY_TYPE _type = static_cast<PROPERTY_TYPE>(type);
     switch (_type) {
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM:{ //If type is transfrom
-            _ptr = static_cast<GameObjectProperty*>(new TransformProperty); //Allocation of transform in heap
+            _ptr = static_cast<IGameObjectComponent*>(new TransformProperty); //Allocation of transform in heap
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_LABEL:{
             LabelProperty* ptr = new LabelProperty;
-            _ptr = static_cast<GameObjectProperty*>(ptr);
+            _ptr = static_cast<IGameObjectComponent*>(ptr);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH:{
-            _ptr = static_cast<GameObjectProperty*>(new MeshProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new MeshProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_NODE:{
-            _ptr = static_cast<GameObjectProperty*>(new NodeProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new NodeProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_LIGHTSOURCE:{
-            _ptr = static_cast<GameObjectProperty*>(new LightsourceProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new LightsourceProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT:{
             ZPScriptProperty* ptr = new ZPScriptProperty;
-            _ptr = static_cast<GameObjectProperty*>(ptr);
+            _ptr = static_cast<IGameObjectComponent*>(ptr);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_AUDSOURCE:{
-            _ptr = static_cast<GameObjectProperty*>(new AudioSourceProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new AudioSourceProperty);
             break;
         }
 
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_MATERIAL:{
-            _ptr = static_cast<GameObjectProperty*>(new MaterialProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new MaterialProperty);
             break;
         }
 
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_COLLIDER:{
-            _ptr = static_cast<GameObjectProperty*>(new ColliderProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new ColliderProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_RIGIDBODY:{
-            _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::RigidbodyProperty);
+            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::RigidbodyProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_CHARACTER_CONTROLLER:{
-            _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::CharacterControllerProperty);
+            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::CharacterControllerProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_TILE_GROUP:{
-            _ptr = static_cast<GameObjectProperty*>(new TileGroupProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new TileGroupProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_TILE:{
-            _ptr = static_cast<GameObjectProperty*>(new TileProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new TileProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_ANIMATION:{
-            _ptr = static_cast<GameObjectProperty*>(new AnimationProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new AnimationProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_SKYBOX:{
-            _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::SkyboxProperty);
+            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::SkyboxProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_SHADOWCASTER:{
-            _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::ShadowCasterProperty);
+            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::ShadowCasterProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_TERRAIN:{
-            _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::TerrainProperty);
+            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::TerrainProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_TRIGGER: {
-            _ptr = static_cast<Engine::GameObjectProperty*>(new Engine::TriggerProperty);
+            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::TriggerProperty);
             break;
         }
     }

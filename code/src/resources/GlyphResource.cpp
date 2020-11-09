@@ -4,7 +4,7 @@
 extern ZSGAME_DATA* game_data;
 
 Engine::GlyphResource::GlyphResource() {
-    this->resource_type = RESOURCE_TYPE_FONT;
+    this->resource_type = RESOURCE_TYPE::RESOURCE_TYPE_FONT;
     font_ptr = nullptr;
     this->loadInstantly = true;
 }

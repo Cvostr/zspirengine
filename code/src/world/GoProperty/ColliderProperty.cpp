@@ -15,7 +15,7 @@ void Engine::ColliderProperty::onStart() {
     init();
 }
 
-void Engine::ColliderProperty::copyTo(Engine::GameObjectProperty* dest) {
+void Engine::ColliderProperty::copyTo(Engine::IGameObjectComponent* dest) {
     if (dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_COLLIDER) return;
 
     PhysicalProperty::copyTo(dest);

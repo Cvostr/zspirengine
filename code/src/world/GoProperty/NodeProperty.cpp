@@ -8,11 +8,11 @@ Engine::NodeProperty::NodeProperty() {
     rotation = ZSQUATERNION(0.f, 0.f, 0.f, 0.f);
 }
 
-void Engine::NodeProperty::copyTo(GameObjectProperty* dest) {
+void Engine::NodeProperty::copyTo(IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't Node property
 
     //Do base things
-    GameObjectProperty::copyTo(dest);
+    IGameObjectComponent::copyTo(dest);
     NodeProperty* _dest = static_cast<NodeProperty*>(dest);
 
     _dest->transform_mat = this->transform_mat;

@@ -1,5 +1,5 @@
 #include "../../headers/Scripting/AngelScriptMgr.h"
-#include "../../headers/world/World.h"
+#include "../../headers/world/World.hpp"
 #include "../../headers/world/go_properties.h"
 
 void Engine::bindGameObjectSDK(AGScriptMgr* mgr) {
@@ -26,7 +26,7 @@ void Engine::bindWorldSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, "void removeObject(GameObject@)", asMETHOD(Engine::World, removeObject), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(CAM_TYPE_NAME) + "@ getCamera()", asMETHOD(Engine::World, getCameraPtr), asCALL_THISCALL);
 
-	mgr->RegisterObjectProperty(GAME_OBJECT_TYPE_NAME, "World@ world", offsetof(Engine::GameObject, world_ptr));
+	mgr->RegisterObjectProperty(GAME_OBJECT_TYPE_NAME, "World@ world", offsetof(Engine::GameObject, mWorld));
 }
 
 void Engine::bindGameObjectPropertiesSDK(AGScriptMgr* mgr) {

@@ -82,10 +82,10 @@ Engine::PhysicalProperty::PhysicalProperty(){
     mass = 0;
 }
 
-void Engine::PhysicalProperty::copyTo(Engine::GameObjectProperty* dest){
+void Engine::PhysicalProperty::copyTo(Engine::IGameObjectComponent* dest){
 
     //Do base things
-    GameObjectProperty::copyTo(dest);
+    IGameObjectComponent::copyTo(dest);
 
     PhysicalProperty* rigi_prop = static_cast<PhysicalProperty*>(dest);
     rigi_prop->mass = this->mass;

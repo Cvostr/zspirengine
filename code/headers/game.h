@@ -1,7 +1,7 @@
 #ifndef zs_GAME
 #define zs_GAME
 
-#include "world/World.h"
+#include "world/World.hpp"
 #include "render/zs-pipeline.h"
 #include "engine/resources.h"
 #include "misc/output.hpp"

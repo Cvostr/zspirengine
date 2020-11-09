@@ -9,12 +9,12 @@ Engine::MaterialProperty::MaterialProperty() {
     this->material_ptr = nullptr;
 }
 
-void Engine::MaterialProperty::copyTo(Engine::GameObjectProperty* dest) {
+void Engine::MaterialProperty::copyTo(Engine::IGameObjectComponent* dest) {
     //MaterialShaderProperty
     if (dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_MATERIAL) return;
 
     //Do base things
-    GameObjectProperty::copyTo(dest);
+    IGameObjectComponent::copyTo(dest);
 
     MaterialProperty* mat_prop = static_cast<MaterialProperty*>(dest);
     mat_prop->material_path = this->material_path;

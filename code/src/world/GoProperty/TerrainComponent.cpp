@@ -34,11 +34,11 @@ TerrainData* Engine::TerrainProperty::getTerrainData(){
     return &data;
 }
 
-void Engine::TerrainProperty::copyTo(Engine::GameObjectProperty* dest){
+void Engine::TerrainProperty::copyTo(Engine::IGameObjectComponent* dest){
     if(dest->type != this->type) return; //if it isn't script group
 
     //Do base things
-    GameObjectProperty::copyTo(dest);
+    IGameObjectComponent::copyTo(dest);
 
     Engine::TerrainProperty* _dest = static_cast<Engine::TerrainProperty*>(dest);
     _dest->Width = this->Width;

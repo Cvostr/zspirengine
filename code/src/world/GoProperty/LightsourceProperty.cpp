@@ -1,10 +1,10 @@
 #include "../../../headers/world/go_properties.h"
 
-void Engine::LightsourceProperty::copyTo(Engine::GameObjectProperty* dest) {
+void Engine::LightsourceProperty::copyTo(Engine::IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't Lightsource, then exit
 
     //Do base things
-    GameObjectProperty::copyTo(dest);
+    IGameObjectComponent::copyTo(dest);
 
     LightsourceProperty* _dest = static_cast<LightsourceProperty*>(dest);
     _dest->color = color;

@@ -9,11 +9,11 @@ Engine::LabelProperty::~LabelProperty() {
 
 }
 
-void Engine::LabelProperty::copyTo(Engine::GameObjectProperty* dest) {
+void Engine::LabelProperty::copyTo(Engine::IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't label
 
     //Do base things
-    GameObjectProperty::copyTo(dest);
+    IGameObjectComponent::copyTo(dest);
 
     LabelProperty* _dest = static_cast<LabelProperty*>(dest);
     _dest->label = label;

@@ -82,7 +82,7 @@ void Engine::RigidbodyProperty::applyCentralForce(ZSVECTOR3& v) {
     rigidBody->applyCentralForce(btVector3(v.X, v.Y, v.Z));
 }
 
-void Engine::RigidbodyProperty::copyTo(Engine::GameObjectProperty* dest) {
+void Engine::RigidbodyProperty::copyTo(Engine::IGameObjectComponent* dest) {
     if (dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_RIGIDBODY) return;
 
     //Do base things

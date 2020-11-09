@@ -4,7 +4,7 @@
 #include <angelscript/angelscript.h>
 #include <angelscript/scriptbuilder.h>
 
-#include "../world/World.h"
+#include "../world/World.hpp"
 #include "AngelScriptMgr.h"
 #include "../engine/resources.h"
 #include <string>
@@ -15,7 +15,8 @@
 
 #define AG_STRING 67108876
 #define AG_VECTOR3 67108881
-#define AG_RGB_COLOR 67108882
+#define AG_QUAT 67108882
+#define AG_RGB_COLOR 67108883
 
 namespace Engine{
 
@@ -60,7 +61,6 @@ namespace Engine{
         asITypeInfo* main_class; //Type of main script class
         bool hasErrors;
     public:
-        ZPScriptClass* scr_class;
         void obtainScriptModule();
         void obtainScriptMainClass();
         asIScriptFunction* getFuncOnMainClass(const char* decl);

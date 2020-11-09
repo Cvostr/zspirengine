@@ -172,7 +172,7 @@ void Engine::RenderPipeline::setLightsToBuffer(){
     this->lightsBuffer->bind();
     //Iterate over all lights
     for(unsigned int light_i = 0; light_i < this->lights_ptr.size(); light_i ++){
-        LightsourceProperty* _light_ptr = static_cast<LightsourceProperty*>(lights_ptr[light_i]);
+        LightsourceProperty* _light_ptr = lights_ptr[light_i];
 
         LIGHTSOURCE_TYPE light_type = (_light_ptr->light_type);
 
@@ -292,7 +292,7 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
     }
 }
 
-void Engine::RenderPipeline::processObjects(void* world_ptr) {
+void Engine::RenderPipeline::processObjects(World* world_ptr) {
     World* _world_ptr = static_cast<World*>(world_ptr);
     for (unsigned int obj_i = 0; obj_i < _world_ptr->objects.size(); obj_i++) {
         GameObject* obj_ptr = _world_ptr->objects[obj_i];
@@ -301,7 +301,7 @@ void Engine::RenderPipeline::processObjects(void* world_ptr) {
     }
 }
 
-void Engine::RenderPipeline::renderDepth(void* world_ptr){
+void Engine::RenderPipeline::renderDepth(World* world_ptr){
     World* _world_ptr = static_cast<World*>(world_ptr);
     current_state = PIPELINE_STATE::PIPELINE_STATE_SHADOWDEPTH;
     //Iterate over all objects in the world
@@ -310,7 +310,7 @@ void Engine::RenderPipeline::renderDepth(void* world_ptr){
 }
 
 void Engine::GameObject::processObject(RenderPipeline* pipeline) {
-    if (alive == false || active == false) return;
+    if (alive == false || mActive == false) return;
 
     Engine::TransformProperty* transform_prop = this->getTransformProperty();
     //Call update on every property in objects
@@ -326,10 +326,10 @@ void Engine::GameObject::processObject(RenderPipeline* pipeline) {
     //if(difts)
     this->Draw(pipeline);
 
-    for (unsigned int obj_i = 0; obj_i < this->children.size(); obj_i++) {
-        if (!children[obj_i].isEmpty()) { //if link isn't broken
-            children[obj_i].updLinkPtr();
-            GameObject* child_ptr = this->children[obj_i].ptr;
+    for (unsigned int obj_i = 0; obj_i < this->mChildren.size(); obj_i++) {
+        if (!mChildren[obj_i].isEmpty()) { //if link isn't broken
+            mChildren[obj_i].updLinkPtr();
+            GameObject* child_ptr = this->mChildren[obj_i].ptr;
             if (child_ptr == nullptr) return;
             child_ptr->processObject(pipeline);
         }
@@ -589,7 +589,7 @@ Engine::Shader* Engine::RenderPipeline::getUiShader() {
     return this->ui_shader;
 }
 
-void Engine::RenderPipeline::addLight(void* light_ptr){
+void Engine::RenderPipeline::addLight(LightsourceProperty* light_ptr){
     this->lights_ptr.push_back(light_ptr);
 }
 

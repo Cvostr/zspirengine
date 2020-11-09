@@ -64,7 +64,7 @@ void Engine::TriggerProperty::onStart() {
     initGhost();
 }
 
-void Engine::TriggerProperty::copyTo(Engine::GameObjectProperty* dest) {
+void Engine::TriggerProperty::copyTo(Engine::IGameObjectComponent* dest) {
     if (dest->type != PROPERTY_TYPE::GO_PROPERTY_TYPE_TRIGGER) return;
 
     //Do base things

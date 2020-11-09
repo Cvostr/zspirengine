@@ -164,7 +164,7 @@ void ZSpireEngine::loadGame(){
 
         last = NOW;
         NOW = SDL_GetPerformanceCounter();
-        deltaTime = (NOW - last) * 1000 / SDL_GetPerformanceFrequency();
+        deltaTime = (NOW - last) / 1000.f;
         updateDeltaTime(deltaTime);
 
         SDL_Event event;

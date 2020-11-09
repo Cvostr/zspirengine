@@ -92,21 +92,20 @@ void Engine::TransformProperty::getAbsoluteRotationMatrix(ZSMATRIX4x4& m) {
     }
 }
 
-void Engine::TransformProperty::setTranslation(ZSVECTOR3& new_translation) {
+void Engine::TransformProperty::setTranslation(const ZSVECTOR3& new_translation) {
     this->translation = new_translation;
     this->onValueChanged();
 }
-void Engine::TransformProperty::setScale(ZSVECTOR3& new_scale) {
+void Engine::TransformProperty::setScale(const ZSVECTOR3& new_scale) {
     this->scale = new_scale;
     this->onValueChanged();
 }
-void Engine::TransformProperty::setRotation(ZSVECTOR3& new_rotation) {
-    float* ptr = &new_rotation.X;
+void Engine::TransformProperty::setRotation(const ZSVECTOR3& new_rotation) {
     this->rotation = new_rotation;
     this->onValueChanged();
 }
 
-void Engine::TransformProperty::copyTo(GameObjectProperty* dest) {
+void Engine::TransformProperty::copyTo(IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't transform
     //cast pointer and send data
     TransformProperty* _dest = static_cast<TransformProperty*>(dest);
@@ -140,31 +139,31 @@ void Engine::TransformProperty::loadPropertyFromMemory(const char* data, GameObj
     unsigned int offset = 0;
     offset += 1; //Skip space
     //Read Translation vector
-    readBinaryValue<float>(&translation.X, data + offset, offset);
-    readBinaryValue<float>(&translation.Y, data + offset, offset);
-    readBinaryValue<float>(&translation.Z, data + offset, offset);
+    readBinaryValue(&translation.X, data + offset, offset);
+    readBinaryValue(&translation.Y, data + offset, offset);
+    readBinaryValue(&translation.Z, data + offset, offset);
     //Read Scale vector
-    readBinaryValue<float>(&scale.X, data + offset, offset);
-    readBinaryValue<float>(&scale.Y, data + offset, offset);
-    readBinaryValue<float>(&scale.Z, data + offset, offset);
+    readBinaryValue(&scale.X, data + offset, offset);
+    readBinaryValue(&scale.Y, data + offset, offset);
+    readBinaryValue(&scale.Z, data + offset, offset);
     //Read Rotation vector
-    readBinaryValue<float>(&rotation.X, data + offset, offset);
-    readBinaryValue<float>(&rotation.Y, data + offset, offset);
-    readBinaryValue<float>(&rotation.Z, data + offset, offset);
+    readBinaryValue(&rotation.X, data + offset, offset);
+    readBinaryValue(&rotation.Y, data + offset, offset);
+    readBinaryValue(&rotation.Z, data + offset, offset);
     //After everything is loaded, update matrices
     updateMatrix(); 
 }
 
 void Engine::TransformProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
-    stream->write(reinterpret_cast<char*>(&translation.X), sizeof(float));//Writing position X
-    stream->write(reinterpret_cast<char*>(&translation.Y), sizeof(float)); //Writing position Y
-    stream->write(reinterpret_cast<char*>(&translation.Z), sizeof(float)); //Writing position Z
+    stream->writeBinaryValue(&translation.X);   //Writing position X
+    stream->writeBinaryValue(&translation.Y);   //Writing position Y
+    stream->writeBinaryValue(&translation.Z);   //Writing position Z
 
-    stream->write(reinterpret_cast<char*>(&scale.X), sizeof(float));//Writing scale X
-    stream->write(reinterpret_cast<char*>(&scale.Y), sizeof(float)); //Writing scale Y
-    stream->write(reinterpret_cast<char*>(&scale.Z), sizeof(float)); //Writing scale Z
+    stream->writeBinaryValue(&scale.X); //Writing scale X
+    stream->writeBinaryValue(&scale.Y); //Writing scale Y
+    stream->writeBinaryValue(&scale.Z); //Writing scale Z
 
-    stream->write(reinterpret_cast<char*>(&rotation.X), sizeof(float));//Writing rotation X
-    stream->write(reinterpret_cast<char*>(&rotation.Y), sizeof(float)); //Writing rotation Y
-    stream->write(reinterpret_cast<char*>(&rotation.Z), sizeof(float)); //Writing rotation Z
+    stream->writeBinaryValue(&rotation.X);  //Writing rotation X
+    stream->writeBinaryValue(&rotation.Y);  //Writing rotation Y
+    stream->writeBinaryValue(&rotation.Z);  //Writing rotation Z
 }

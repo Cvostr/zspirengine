@@ -175,6 +175,7 @@
     <ClCompile Include="code\src\resources\GlyphResource.cpp" />
     <ClCompile Include="code\src\resources\MaterialResource.cpp" />
     <ClCompile Include="code\src\resources\MeshResource.cpp" />
+    <ClCompile Include="code\src\resources\ScriptResource.cpp" />
     <ClCompile Include="code\src\resources\TextureResource.cpp" />
     <ClCompile Include="code\src\Scripting\AngelScript.cpp" />
     <ClCompile Include="code\src\Scripting\AngelScriptMgr.cpp" />
@@ -213,7 +214,7 @@
     <ClCompile Include="code\src\world\PhysicalWorld.cpp" />
     <ClCompile Include="code\src\world\Terrain.cpp" />
     <ClCompile Include="code\src\world\World.cpp" />
-    <ClCompile Include="code\src\world\zs-camera.cpp" />
+    <ClCompile Include="code\src\world\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\headers\engine.h" />
@@ -230,6 +231,7 @@
     <ClInclude Include="code\headers\misc\output.hpp" />
     <ClInclude Include="code\headers\misc\misc.h" />
     <ClInclude Include="code\headers\misc\RefCounter.hpp" />
+    <ClInclude Include="code\headers\misc\SmArray.hpp" />
     <ClInclude Include="code\headers\misc\zs3m-master.h" />
     <ClInclude Include="code\headers\ogl\ogl.h" />
     <ClInclude Include="code\headers\render\screen_effects\gauss_blur.h" />
@@ -248,12 +250,15 @@
     <ClInclude Include="code\headers\Scripting\ZPScriptClass.hpp" />
     <ClInclude Include="code\headers\ui\zs-uibutton.h" />
     <ClInclude Include="code\headers\ui\zs-uiwidget.h" />
+    <ClInclude Include="code\headers\vulkan\vk_data.h" />
+    <ClInclude Include="code\headers\vulkan\zsvk_mem.h" />
+    <ClInclude Include="code\headers\vulkan\zsvulkan.h" />
     <ClInclude Include="code\headers\world\go_properties.h" />
     <ClInclude Include="code\headers\world\Physics.h" />
-    <ClInclude Include="code\headers\world\terrain.h" />
+    <ClInclude Include="code\headers\world\Terrain.hpp" />
     <ClInclude Include="code\headers\world\tile_properties.h" />
-    <ClInclude Include="code\headers\world\World.h" />
-    <ClInclude Include="code\headers\world\zs-camera.h" />
+    <ClInclude Include="code\headers\world\World.hpp" />
+    <ClInclude Include="code\headers\world\Camera.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="code\Shaders\3d\3d.frag" />

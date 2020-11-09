@@ -72,7 +72,7 @@ public:
     VkShaderModule vertexShader;
     VkShaderModule fragmentShader;
 
-    bool readBinaryShaderFile(std::string path, char* result, int* size);
+    bool readBinaryShaderFile(std::string path, char* result, size_t* size);
     bool compileFromFile(std::string VSpath, std::string FSpath);
     void Use();
     void Destroy();
