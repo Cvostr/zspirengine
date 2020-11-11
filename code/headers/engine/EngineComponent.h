@@ -1,5 +1,4 @@
-#ifndef engine_manager
-#define engine_manager
+#pragma once
 
 #include "../engine_types.h"
 
@@ -14,7 +13,7 @@ typedef struct Project{
 }Project;
 
 
-class EngineComponentManager{
+class IEngineComponent{
 private:
 
 public:
@@ -30,8 +29,6 @@ public:
     virtual void init();
     virtual void updateWindowSize(int W, int H);
 
-    EngineComponentManager();
-    virtual ~EngineComponentManager();
+    IEngineComponent();
+    virtual ~IEngineComponent();
 };
-
-#endif

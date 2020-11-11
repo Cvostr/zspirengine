@@ -1,7 +1,7 @@
 #ifndef OUTPUT_HPP
 #define OUTPUT_HPP
 
-#include "../engine/EngineManager.h"
+#include "../engine/EngineComponent.h"
 #include <string>
 #include <vector>
 
@@ -40,7 +40,7 @@ typedef struct LogEntry {
 
 namespace Engine {
 
-	class OutputManager : public EngineComponentManager {
+	class OutputManager : public IEngineComponent {
 	public:
 		RuntimeErrorType RE_TYPE;
 		std::vector<LogEntry> entries;

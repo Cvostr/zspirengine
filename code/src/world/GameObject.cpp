@@ -37,7 +37,7 @@ Engine::GameObject::GameObject() : array_index(0),
                                    mWorld(nullptr){
 
     genRandomString(&this->str_id, 15); //Generate random string ID
-    properties[0] = nullptr;
+    mComponents[0] = nullptr;
     mScripts[0] = nullptr;
 }
 
@@ -61,7 +61,7 @@ bool Engine::GameObject::addProperty(PROPERTY_TYPE property){
         return false;
 
     for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
-        IGameObjectComponent* property_ptr = this->properties[prop_i];
+        IGameObjectComponent* property_ptr = this->mComponents[prop_i];
         if(property_ptr->type == property){ //If object already has one
             return false; //Exit function
         }
@@ -70,8 +70,8 @@ bool Engine::GameObject::addProperty(PROPERTY_TYPE property){
 
     _ptr->go_link = this->getLinkToThisObject();
     _ptr->go_link.updLinkPtr();
-    _ptr->world_ptr = this->mWorld; //Assign pointer to world
-    this->properties[props_num] = _ptr; //Store property in gameobject
+    _ptr->mWorld = this->mWorld; //Assign pointer to world
+    this->mComponents[props_num] = _ptr; //Store property in gameobject
     this->props_num += 1;
     return true;
 }
@@ -81,22 +81,22 @@ bool Engine::GameObject::addScript() {
 
     _ptr->go_link = this->getLinkToThisObject();
     _ptr->go_link.updLinkPtr();
-    _ptr->world_ptr = this->mWorld; //Assign pointer to world
+    _ptr->mWorld = this->mWorld; //Assign pointer to world
     this->mScripts[scripts_num] = _ptr; //Store property in gameobject
     this->scripts_num += 1;
     return true;
 }
 
 void Engine::GameObject::removeProperty(int index){
-    auto prop_ptr = this->properties[index];
+    auto prop_ptr = this->mComponents[index];
     //Call onObjectDeleted() on removing property
     prop_ptr->onObjectDeleted();
-    delete this->properties[index];
+    delete this->mComponents[index];
     //set as deleted
-    this->properties[index] = nullptr;
+    this->mComponents[index] = nullptr;
     //Trim properties pointers vector
     for(unsigned int i = static_cast<unsigned int>(index); i < props_num - 1; i ++){
-        properties[i] = properties[i + 1];
+        mComponents[i] = mComponents[i + 1];
     }
     //Reduce variable props_num
     props_num -= 1;
@@ -104,7 +104,7 @@ void Engine::GameObject::removeProperty(int index){
 
 void Engine::GameObject::removeProperty(Engine::IGameObjectComponent* pProp) {
     for (unsigned int i = 0; i < props_num; i++) {
-        if (properties[i] == pProp)
+        if (mComponents[i] == pProp)
             removeProperty(i);
     }
 }
@@ -146,9 +146,9 @@ void Engine::GameObject::addChildObject(GameObject* obj, bool updTransform) {
     _link.updLinkPtr(); //Calculating object pointer
     _link.ptr->hasParent = true; //Object now has a parent (if it has't before)
     //Fill link to parent with information
-    _link.ptr->parent.obj_str_id = this->getLinkToThisObject().obj_str_id; //Assigning pointer to new parent
-    _link.ptr->parent.world_ptr = this->getLinkToThisObject().world_ptr;
-    _link.ptr->parent.updLinkPtr();
+    _link.ptr->mParent.obj_str_id = this->getLinkToThisObject().obj_str_id; //Assigning pointer to new parent
+    _link.ptr->mParent.world_ptr = this->getLinkToThisObject().world_ptr;
+    _link.ptr->mParent.updLinkPtr();
 
     //Updating child's transform
     //Now check, if it is possible
@@ -213,12 +213,12 @@ void Engine::GameObject::removeChildObject(GameObjectLink link){
     removeChildObject(link.updLinkPtr());
 }
 
-const std::string& Engine::GameObject::getLabel(){
-    return getLabelProperty()->label;
-}
-
 std::string* Engine::GameObject::getLabelPtr() {
     return &getLabelProperty()->label;
+}
+
+const std::string& Engine::GameObject::getLabel() {
+    return getLabelProperty()->label;
 }
 
 void Engine::GameObject::setLabel(const std::string& label){
@@ -229,7 +229,7 @@ void Engine::GameObject::setLabel(const std::string& label){
 bool Engine::GameObject::isActive() {
     bool isParentActive = true;
     if(hasParent && mActive)
-        if (!parent.updLinkPtr()->isActive())
+        if (!mParent.updLinkPtr()->isActive())
             isParentActive = false;
 
     return mActive && isParentActive;
@@ -254,7 +254,7 @@ Engine::LabelProperty* Engine::GameObject::getLabelProperty(){
 Engine::IGameObjectComponent* Engine::GameObject::getPropertyPtrByType(PROPERTY_TYPE type){
     unsigned int props = static_cast<unsigned int>(this->props_num);
     for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
-        IGameObjectComponent* property_ptr = this->properties[prop_i];
+        IGameObjectComponent* property_ptr = this->mComponents[prop_i];
         if(property_ptr->type == type){ //If object already has one
             return property_ptr; //return it
         }
@@ -265,7 +265,7 @@ Engine::IGameObjectComponent* Engine::GameObject::getPropertyPtrByType(PROPERTY_
 Engine::IGameObjectComponent* Engine::GameObject::getPropertyPtrByTypeI(int property){
     unsigned int props = static_cast<unsigned int>(this->props_num);
     for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
-        Engine::IGameObjectComponent* property_ptr = this->properties[prop_i];
+        Engine::IGameObjectComponent* property_ptr = this->mComponents[prop_i];
         if((int)property_ptr->type == property){ //If object already has one
             return property_ptr; //return it
         }
@@ -275,8 +275,8 @@ Engine::IGameObjectComponent* Engine::GameObject::getPropertyPtrByTypeI(int prop
 
 void Engine::GameObject::onStart() {
     for (unsigned int i = 0; i < props_num; i++) { //iterate over all properties
-        if (!properties[i]->active) continue; //if property is inactive, then skip it
-        properties[i]->onStart(); //and call onStart on each property
+        if (!mComponents[i]->active) continue; //if property is inactive, then skip it
+        mComponents[i]->onStart(); //and call onStart on each property
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
@@ -287,8 +287,8 @@ void Engine::GameObject::onStart() {
 
 void Engine::GameObject::onStop() {
     for (unsigned int i = 0; i < props_num; i++) { //iterate over all properties
-        if (!properties[i]->active) continue; //if property is inactive, then skip it
-        properties[i]->onStop(); //and call onStart on each property
+        if (!mComponents[i]->active) continue; //if property is inactive, then skip it
+        mComponents[i]->onStop(); //and call onStart on each property
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
@@ -299,8 +299,8 @@ void Engine::GameObject::onStop() {
 
 void Engine::GameObject::onUpdate(int deltaTime){   //calls onUpdate on all properties
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
-        if(!properties[i]->active) continue; //if property is inactive, then skip it
-        properties[i]->onUpdate(static_cast<float>(deltaTime)); //and call onUpdate on each property
+        if(!mComponents[i]->active) continue; //if property is inactive, then skip it
+        mComponents[i]->onUpdate(static_cast<float>(deltaTime)); //and call onUpdate on each property
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
@@ -311,22 +311,22 @@ void Engine::GameObject::onUpdate(int deltaTime){   //calls onUpdate on all prop
 
 void Engine::GameObject::onPreRender(Engine::RenderPipeline* pipeline){ //calls onPreRender on all properties
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
-        if(!properties[i]->active) continue; //if property is inactive, then skip it
-        properties[i]->onPreRender(pipeline); //and call onUpdate on each property
+        if(!mComponents[i]->active) continue; //if property is inactive, then skip it
+        mComponents[i]->onPreRender(pipeline); //and call onUpdate on each property
     }
 }
 
 void Engine::GameObject::onRender(RenderPipeline* pipeline){
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
-        if(!properties[i]->active) continue; //if property is inactive, then skip it
-        properties[i]->onRender(pipeline); //and call onUpdate on each property
+        if(!mComponents[i]->active) continue; //if property is inactive, then skip it
+        mComponents[i]->onRender(pipeline); //and call onUpdate on each property
     }
 }
 
 void Engine::GameObject::onTrigger(GameObject* obj){
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
-        if(!properties[i]->active) continue; //if property is inactive, then skip it
-        properties[i]->onTrigger(obj); //and call onUpdate on each property
+        if(!mComponents[i]->active) continue; //if property is inactive, then skip it
+        mComponents[i]->onTrigger(obj); //and call onUpdate on each property
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
@@ -337,8 +337,8 @@ void Engine::GameObject::onTrigger(GameObject* obj){
 
 void Engine::GameObject::onTriggerEnter(GameObject* obj) {
     for (unsigned int i = 0; i < props_num; i++) { //iterate over all properties
-        if (!properties[i]->active) continue; //if property is inactive, then skip it
-        properties[i]->onTriggerEnter(obj); //and call onUpdate on each property
+        if (!mComponents[i]->active) continue; //if property is inactive, then skip it
+        mComponents[i]->onTriggerEnter(obj); //and call onUpdate on each property
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
@@ -348,8 +348,8 @@ void Engine::GameObject::onTriggerEnter(GameObject* obj) {
 }
 void Engine::GameObject::onTriggerExit(GameObject* obj) {
     for (unsigned int i = 0; i < props_num; i++) { //iterate over all properties
-        if (!properties[i]->active) continue; //if property is inactive, then skip it
-        properties[i]->onTriggerExit(obj); //and call onUpdate on each property
+        if (!mComponents[i]->active) continue; //if property is inactive, then skip it
+        mComponents[i]->onTriggerExit(obj); //and call onUpdate on each property
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
@@ -363,7 +363,7 @@ void Engine::GameObject::copyTo(GameObject* dest){
     dest->alive = this->alive;
     dest->mActive = this->mActive;
     dest->hasParent = this->hasParent;
-    dest->parent = this->parent;
+    dest->mParent = this->mParent;
     dest->str_id = this->str_id;
 }
 
@@ -406,7 +406,7 @@ int Engine::GameObject::getAliveChildrenAmount() {
 bool Engine::GameObject::hasMesh(){
     Engine::MeshProperty* mesh_prop = getPropertyPtr<MeshProperty>();
     if(mesh_prop != nullptr){
-        if(!mesh_prop->active) return false;
+        if(!mesh_prop->isActive()) return false;
         if(mesh_prop->mesh_ptr != nullptr) return true;
     }
     return false;
@@ -415,7 +415,7 @@ bool Engine::GameObject::hasMesh(){
 bool Engine::GameObject::hasTerrain(){
     Engine::TerrainProperty* terrain = getPropertyPtr<Engine::TerrainProperty>();
     if(terrain != nullptr){
-        if(!terrain->active) return false;
+        if(!terrain->isActive()) return false;
         return true;
     }
     return false;
@@ -491,13 +491,13 @@ void Engine::GameObject::putToSnapshot(GameObjectSnapshot* snapshot) {
     //set base variables
     snapshot->props_num = 0;
     snapshot->scripts_num = 0;
-    snapshot->parent_link = this->parent;
+    snapshot->parent_link = this->mParent;
     snapshot->obj_array_ind = this->array_index;
     //Copy Object
     this->copyTo(&snapshot->reserved_obj);
     //Copy all properties
     for (unsigned int i = 0; i < this->props_num; i++) {
-        Engine::IGameObjectComponent* prop_ptr = this->properties[i];
+        Engine::IGameObjectComponent* prop_ptr = this->mComponents[i];
         Engine::IGameObjectComponent* new_prop_ptr = Engine::allocProperty(prop_ptr->type);
         prop_ptr->copyTo(new_prop_ptr);
         snapshot->properties[snapshot->props_num] = new_prop_ptr;

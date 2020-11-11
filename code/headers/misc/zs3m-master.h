@@ -1,8 +1,8 @@
-#ifndef ZS3MMASTER_H
-#define ZS3MMASTER_H
-#include "../render/zs-math.h"
+#pragma once
+
+#include "../render/Math.hpp"
 #include "../render/zs-mesh.h"
-#include "../render/zs-animation.h"
+#include "../render/Animation.hpp"
 #include <string>
 #include <vector>
 #include "misc.h"
@@ -83,4 +83,3 @@ public:
 
 }
 
-#endif // ZS3MMASTER_H

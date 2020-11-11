@@ -288,6 +288,7 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
                     readBinaryValue(bone_id, &buffer[cur_pos], cur_pos);
                     readBinaryValue(b_weight, &buffer[cur_pos], cur_pos);
                 }
+
                 newmesh->vertices_arr[v_i] = v_ptr;
             }
             //Read mesh indices

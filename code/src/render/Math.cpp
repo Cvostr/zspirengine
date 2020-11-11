@@ -1,4 +1,4 @@
-#include "../../headers/render/zs-math.h"
+#include "../../headers/render/Math.hpp"
 
 float DegToRad(float degrees){
 	return degrees * ZS_PI / 180;

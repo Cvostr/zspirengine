@@ -437,7 +437,7 @@ void Engine::MaterialProperty::onRender(Engine::RenderPipeline* pipeline){
 }
 
 void Engine::SkyboxProperty::onPreRender(Engine::RenderPipeline* pipeline){
-    pipeline->getRenderSettings()->skybox_obj_ptr = static_cast<void*>(this->go_link.updLinkPtr());
+    pipeline->getRenderSettings()->skybox_obj_ptr = this->go_link.updLinkPtr();
 }
 
 void Engine::SkyboxProperty::DrawSky(RenderPipeline* pipeline){

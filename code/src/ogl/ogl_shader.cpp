@@ -41,7 +41,7 @@ void Engine::_ogl_Shader::GLcheckCompileErrors(unsigned int shader, const char* 
     }
 }
 
-bool Engine::_ogl_Shader::readShaderFile(const char* path, char* result){
+bool Engine::_ogl_Shader::readShaderFile(const char* path, char** result, size_t& size){
     std::string res_data;
     std::ifstream stream;
 
@@ -55,7 +55,11 @@ bool Engine::_ogl_Shader::readShaderFile(const char* path, char* result){
 
         stream.close();//close file stream
         res_data = css.str();
-        strcpy(result, res_data.c_str());
+
+        char* mem = new char[res_data.size() + 1];
+        strcpy(mem, res_data.c_str());
+        mem[res_data.size()] = '\0';
+        *result = mem;
     }
     catch (std::ifstream::failure& e)
     {
@@ -65,88 +69,75 @@ bool Engine::_ogl_Shader::readShaderFile(const char* path, char* result){
     return true;
 }
 
-bool Engine::_ogl_Shader::compileFromFile(std::string VSpath, std::string FSpath){
+
+bool Engine::_ogl_Shader::compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath) {
     std::cout << "OGL: Compiling shader " << VSpath << " " << FSpath << std::endl;
 
-    GLchar* vs_data = new GLchar[SHADER_STR_LEN];
-    GLchar* fs_data = new GLchar[SHADER_STR_LEN];
+    GLchar* vs_data;
+    GLchar* fs_data;
+    GLchar* gs_data = nullptr;
 
-    const GLchar* vs = &vs_data[0];
-    const GLchar* fs = &fs_data[0];
-    //read shader files
-    readShaderFile(VSpath.c_str(), &vs_data[0]);
-    readShaderFile(FSpath.c_str(), &fs_data[0]);
-    //init opengl shaders
-    this->shader_id = glCreateProgram();
+    size_t size;
 
-    unsigned int VS = glCreateShader(GL_VERTEX_SHADER);
-    unsigned int FS = glCreateShader(GL_FRAGMENT_SHADER);
+    readShaderFile(VSpath.c_str(), &vs_data, size);
+    readShaderFile(FSpath.c_str(), &fs_data, size);
+    if(!GSpath.empty())
+        readShaderFile(GSpath.c_str(), &gs_data, size);
 
-    glShaderSource(VS, 1, &vs, nullptr); //Setting shader code text on vs
-    glShaderSource(FS, 1, &fs, nullptr); //Setting shader code text on fs
-
-    glCompileShader(VS); //Compile VS shader code
-    GLcheckCompileErrors(VS, "VERTEX", VSpath.c_str()); //Check vertex errors
-    glCompileShader(FS); //Compile FS shader code
-    GLcheckCompileErrors(FS, "FRAGMENT", FSpath.c_str()); //Check fragment compile errors
-
-    glAttachShader(this->shader_id, VS);
-    glAttachShader(this->shader_id, FS);
-
-    glLinkProgram(this->shader_id);
-    GLcheckCompileErrors(shader_id, "PROGRAM");
-    //Clear shaders, we don't need them anymore
-    glDeleteShader(VS);
-    glDeleteShader(FS);
-    //Free temporary memory
-    delete[] vs_data;
-    delete[] fs_data;
-
-    return true;
+    return compileFromStr(vs_data, fs_data, gs_data);
 }
-bool Engine::_ogl_Shader::compileFromStr(const char* _VS, const char* _FS){
-    std::cout << "OGL: Compiling shader " << std::endl;
-
-    this->shader_id = glCreateProgram();
+bool Engine::_ogl_Shader::compileFromStr(const char* _VS, const char* _FS, const char* _GS) {
+    this->mShaderID = glCreateProgram();
     unsigned int VS = glCreateShader(GL_VERTEX_SHADER);
     unsigned int FS = glCreateShader(GL_FRAGMENT_SHADER);
+    unsigned int GS = 0;
+    if(_GS != nullptr)
+        GS = glCreateShader(GL_GEOMETRY_SHADER);
 
-    GLchar vs_data[SHADER_STR_LEN];
-    GLchar fs_data[SHADER_STR_LEN];
-
-    strcpy(vs_data, _VS);
-    strcpy(fs_data, _FS);
-
-    const GLchar* vs = &vs_data[0];
-    const GLchar* fs = &fs_data[0];
+    const GLchar* vs = _VS;
+    const GLchar* fs = _FS;
+    const GLchar* gs = _GS;
 
     glShaderSource(VS, 1, &vs, nullptr); //Setting shader code text on vs
-    glShaderSource(FS, 1, &fs, nullptr); //Setting shader code text on fs
-
     glCompileShader(VS); //Compile VS shader code
     GLcheckCompileErrors(VS, "VERTEX", "VSpath"); //Check vertex errors
+    glAttachShader(this->mShaderID, VS);
+
+    glShaderSource(FS, 1, &fs, nullptr); //Setting shader code text on fs
     glCompileShader(FS); //Compile FS shader code
     GLcheckCompileErrors(FS, "FRAGMENT", "FSpath"); //Check fragment compile errors
+    glAttachShader(this->mShaderID, FS);
+    
+    if(_GS != nullptr){
+        glShaderSource(GS, 1, &gs, nullptr); //Setting shader code text on gs
+        glCompileShader(GS); //Compile GS shader code
+        GLcheckCompileErrors(GS, "Geometry", "GSpath"); //Check fragment compile errors
+        glAttachShader(this->mShaderID, GS);
+    }
 
-    glAttachShader(this->shader_id, VS);
-    glAttachShader(this->shader_id, FS);
-
-    glLinkProgram(this->shader_id);
-    GLcheckCompileErrors(shader_id, "PROGRAM");
+    glLinkProgram(this->mShaderID);
+    GLcheckCompileErrors(mShaderID, "PROGRAM");
     //Clear shaders, we don't need them anymore
     glDeleteShader(VS);
     glDeleteShader(FS);
+    if (_GS != nullptr) 
+        glDeleteShader(GS);
 
     this->isCreated = true; //Shader created & compiled now
     return true;
 }
+
 void Engine::_ogl_Shader::setUniformBufferBinding(const char* UB_NAME, unsigned int binding){
-    unsigned int SBI = glGetUniformBlockIndex(this->shader_id, UB_NAME);
-    glUniformBlockBinding(this->shader_id, SBI, binding);
+    unsigned int SBI = glGetUniformBlockIndex(this->mShaderID, UB_NAME);
+    glUniformBlockBinding(this->mShaderID, SBI, binding);
 }
 void Engine::_ogl_Shader::Destroy(){
-    glDeleteProgram(this->shader_id);
+    if (isCreated) {
+        glDeleteProgram(this->mShaderID);
+        isCreated = false;
+    }
 }
 void Engine::_ogl_Shader::Use(){
-    glUseProgram(this->shader_id);
+    if (isCreated)
+        glUseProgram(this->mShaderID);
 }

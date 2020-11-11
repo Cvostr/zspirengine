@@ -2,9 +2,9 @@
 #define I_OGL
 
 #include "../render/zs-mesh.h"
-#include "../render/zs-uniform-buffer.h"
-#include "../render/zs-shader.h"
-#include "../render/zs-texture.h"
+#include "../render/UniformBuffer.hpp"
+#include "../render/Shader.hpp"
+#include "../render/Texture.h"
 
 namespace Engine{
 
@@ -76,12 +76,12 @@ public:
 
 class _ogl_Shader : public Engine::Shader{
 private:
-    unsigned int shader_id;
+    unsigned int mShaderID;
 public:
     void GLcheckCompileErrors(unsigned int shader, const char* type, const char* filepath = nullptr);
-    bool readShaderFile(const char* path, char* result);
-    bool compileFromFile(std::string VSpath, std::string FSpath);
-    bool compileFromStr(const char* _VS, const char* _FS);
+    bool readShaderFile(const char* path, char** result, size_t& size);
+    bool compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath = "");
+    bool compileFromStr(const char* _VS, const char* _FS, const char* _GS = nullptr);
     void setUniformBufferBinding(const char* UB_NAME, unsigned int binding);
     void Use();
     void Destroy();

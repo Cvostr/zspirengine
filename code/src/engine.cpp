@@ -72,11 +72,11 @@ void* ZSpireEngine::getGameDataPtr(){
     return this->zsgame_ptr;
 }
 
-void ZSpireEngine::startManager(EngineComponentManager* manager){
-    manager->setDpMetrics(this->window_info->Width, this->window_info->Height);
-    manager->game_desc_ptr = this->desc;
-    manager->init();
-    this->components.push_back(manager);
+void ZSpireEngine::startManager(IEngineComponent* component){
+    component->setDpMetrics(this->window_info->Width, this->window_info->Height);
+    component->game_desc_ptr = this->desc;
+    component->init();
+    this->components.push_back(component);
 }
 void ZSpireEngine::updateDeltaTime(float deltaTime){
     this->deltaTime = deltaTime;

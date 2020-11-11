@@ -144,7 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="code\src\engine.cpp" />
-    <ClCompile Include="code\src\engine\EngineManager.cpp" />
+    <ClCompile Include="code\src\engine\EngineComponent.cpp" />
     <ClCompile Include="code\src\engine\loader.cpp" />
     <ClCompile Include="code\src\engine\LocaleStringsFile.cpp" />
     <ClCompile Include="code\src\engine\resources.cpp" />
@@ -163,12 +163,12 @@
     <ClCompile Include="code\src\render\terrain-render.cpp" />
     <ClCompile Include="code\src\render\zs-animation.cpp" />
     <ClCompile Include="code\src\render\zs-material-defines.cpp" />
-    <ClCompile Include="code\src\render\zs-math.cpp" />
-    <ClCompile Include="code\src\render\zs-mesh.cpp" />
+    <ClCompile Include="code\src\render\Math.cpp" />
+    <ClCompile Include="code\src\render\Mesh.cpp" />
     <ClCompile Include="code\src\render\zs-pipeline.cpp" />
     <ClCompile Include="code\src\render\zs-screen-effect.cpp" />
-    <ClCompile Include="code\src\render\zs-shader.cpp" />
-    <ClCompile Include="code\src\render\zs-texture.cpp" />
+    <ClCompile Include="code\src\render\Shader.cpp" />
+    <ClCompile Include="code\src\render\Texture.cpp" />
     <ClCompile Include="code\src\render\zs-uniform-buffer.cpp" />
     <ClCompile Include="code\src\resources\AnimationResource.cpp" />
     <ClCompile Include="code\src\resources\AudioResource.cpp" />
@@ -218,7 +218,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\headers\engine.h" />
-    <ClInclude Include="code\headers\engine\EngineManager.h" />
+    <ClInclude Include="code\headers\engine\EngineComponent.h" />
     <ClInclude Include="code\headers\engine\engine_window.h" />
     <ClInclude Include="code\headers\engine\loader.h" />
     <ClInclude Include="code\headers\engine\LocaleStringsFile.h" />
@@ -235,15 +235,15 @@
     <ClInclude Include="code\headers\misc\zs3m-master.h" />
     <ClInclude Include="code\headers\ogl\ogl.h" />
     <ClInclude Include="code\headers\render\screen_effects\gauss_blur.h" />
-    <ClInclude Include="code\headers\render\zs-animation.h" />
+    <ClInclude Include="code\headers\render\Animation.hpp" />
     <ClInclude Include="code\headers\render\zs-materials.h" />
-    <ClInclude Include="code\headers\render\zs-math.h" />
+    <ClInclude Include="code\headers\render\Math.hpp" />
     <ClInclude Include="code\headers\render\zs-mesh.h" />
     <ClInclude Include="code\headers\render\zs-pipeline.h" />
     <ClInclude Include="code\headers\render\zs-screen-effect.h" />
-    <ClInclude Include="code\headers\render\zs-shader.h" />
-    <ClInclude Include="code\headers\render\zs-texture.h" />
-    <ClInclude Include="code\headers\render\zs-uniform-buffer.h" />
+    <ClInclude Include="code\headers\render\Shader.hpp" />
+    <ClInclude Include="code\headers\render\Texture.h" />
+    <ClInclude Include="code\headers\render\UniformBuffer.hpp" />
     <ClInclude Include="code\headers\Scripting\AngelScript.hpp" />
     <ClInclude Include="code\headers\Scripting\AngelScriptMgr.h" />
     <ClInclude Include="code\headers\Scripting\FilesAG.hpp" />

@@ -6,7 +6,7 @@ extern ZSGAME_DATA* game_data;
 Engine::IGameObjectComponent::IGameObjectComponent(){
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_NONE;
     active = true;
-    world_ptr = nullptr;
+    mWorld = nullptr;
 }
 void Engine::IGameObjectComponent::setActive(bool active){
     this->active = active;
@@ -16,7 +16,7 @@ bool Engine::IGameObjectComponent::isActive(){
 }
 void Engine::IGameObjectComponent::copyTo(IGameObjectComponent* dest){
     dest->active = this->active;
-    dest->world_ptr = this->world_ptr;
+    dest->mWorld = this->mWorld;
 }
 void Engine::IGameObjectComponent::loadPropertyFromMemory(const char* data, GameObject* obj) {
 

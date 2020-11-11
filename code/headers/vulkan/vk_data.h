@@ -2,9 +2,9 @@
 #define VK_DATA_H
 
 #include "../render/zs-mesh.h"
-#include "../render/zs-uniform-buffer.h"
-#include "../render/zs-shader.h"
-#include "../render/zs-texture.h"
+#include "../render/UniformBuffer.hpp"
+#include "../render/Shader.hpp"
+#include "../render/Texture.h"
 #include "../vulkan/zsvulkan.h"
 
 namespace Engine{

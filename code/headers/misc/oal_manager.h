@@ -1,7 +1,6 @@
-#ifndef zs_oal_manager
-#define zs_oal_manager
+#pragma once
 
-#include "../render/zs-math.h"
+#include "../render/Math.hpp"
 
 namespace Engine {
 	namespace SFX {
@@ -52,4 +51,3 @@ public:
     void setAlBuffer(SoundBuffer* buffer);
 };
 }
-#endif

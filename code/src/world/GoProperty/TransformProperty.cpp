@@ -14,7 +14,7 @@ void Engine::TransformProperty::updateMatrix() {
     GameObject* ptr = go_link.updLinkPtr(); //Pointer to object with this property
     if (ptr != nullptr && ptr->hasParent) { //if object exist and dependent
         //Get parent's transform property
-        TransformProperty* property = static_cast<TransformProperty*>(ptr->parent.updLinkPtr()->getTransformProperty());
+        TransformProperty* property = static_cast<TransformProperty*>(ptr->mParent.updLinkPtr()->getTransformProperty());
         //Calculate parent transform offset
         property->getAbsoluteParentTransform(p_translation, p_scale, p_rotation);
 
@@ -71,7 +71,7 @@ void Engine::TransformProperty::getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTO
     r = r + this->rotation;
 
     if (ptr->hasParent) {
-        GameObject* parent_p = ptr->parent.ptr;
+        GameObject* parent_p = ptr->mParent.ptr;
         TransformProperty* property = static_cast<TransformProperty*>(parent_p->getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM));
         property->getAbsoluteParentTransform(t, s, r);
     }
@@ -83,7 +83,7 @@ void Engine::TransformProperty::getAbsoluteRotationMatrix(ZSMATRIX4x4& m) {
     if (ptr == nullptr) return;
 
     if (ptr->hasParent == true) {
-        GameObject* parent_p = ptr->parent.ptr;
+        GameObject* parent_p = ptr->mParent.ptr;
         TransformProperty* property = static_cast<TransformProperty*>(parent_p->getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM));
 
         ZSMATRIX4x4 rotation_mat1 = getRotationMat(property->rotation, ptr->getTransformProperty()->translation);
@@ -130,9 +130,9 @@ void Engine::TransformProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* m
     mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 scale", offsetof(TransformProperty, scale));
     mgr->RegisterObjectProperty(TRANSFORM_PROP_TYPE_NAME, "Vec3 rotation", offsetof(TransformProperty, rotation));
 
-    mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setTranslation(Vec3 &in)", asMETHOD(TransformProperty, setTranslation), asCALL_THISCALL);
-    mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setScale(Vec3 &in)", asMETHOD(TransformProperty, setScale), asCALL_THISCALL);
-    mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setRotation(Vec3 &in)", asMETHOD(TransformProperty, setRotation), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setTranslation(const Vec3 &in)", asMETHOD(TransformProperty, setTranslation), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setScale(const Vec3 &in)", asMETHOD(TransformProperty, setScale), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(TRANSFORM_PROP_TYPE_NAME, "void setRotation(const Vec3 &in)", asMETHOD(TransformProperty, setRotation), asCALL_THISCALL);
 }
 
 void Engine::TransformProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {

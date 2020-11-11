@@ -2,8 +2,8 @@
 
 #define TERRAIN_TEXTURES_AMOUNT 12
 
-#include "../render/zs-texture.h"
-#include "../render/zs-math.h"
+#include "../render/Texture.h"
+#include "../render/Math.hpp"
 #include "../engine/resources.h"
 
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>

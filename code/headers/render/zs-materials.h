@@ -1,9 +1,9 @@
 #ifndef matshaderprops
 #define matshaderprops
 
-#include "zs-texture.h"
-#include "zs-shader.h"
-#include "zs-uniform-buffer.h"
+#include "Texture.h"
+#include "Shader.hpp"
+#include "UniformBuffer.hpp"
 #include <vector>
 
 enum MATSHPROP_TYPE{

@@ -178,12 +178,8 @@
         float weights[MAX_BONE_PER_VERTEX];
         unsigned int bones_num;
 
-        ZSVERTEX() {
-            bones_num = 0;
-        }
-        ZSVERTEX(ZSVECTOR3 npos) : pos(npos.X, npos.Y, npos.Z) {
-            bones_num = 0;
-        }
+        ZSVERTEX() : bones_num(0) {}
+        ZSVERTEX(ZSVECTOR3 npos) : pos(npos.X, npos.Y, npos.Z), bones_num(0) {}
         ZSVERTEX(ZSVECTOR3 npos, ZSVECTOR2 nuv) : pos(npos.X, npos.Y, npos.Z), uv(nuv.X, nuv.Y) {
             bones_num = 0;
         }

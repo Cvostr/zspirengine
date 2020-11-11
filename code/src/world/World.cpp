@@ -81,7 +81,7 @@ void Engine::World::removeObj(Engine::GameObjectLink& link) {
     //Remove all content in heap, related to object class object
     l.ptr->clearAll();
     if (l.ptr->hasParent == true) { //If object parented by other obj
-        Engine::GameObject* parent = l.ptr->parent.updLinkPtr(); //Receive pointer to object's parent
+        Engine::GameObject* parent = l.ptr->mParent.updLinkPtr(); //Receive pointer to object's parent
 
         size_t children_am = parent->mChildren.size(); //get children amount
         for (size_t i = 0; i < children_am; i++) { //Iterate over all children in object
@@ -114,7 +114,6 @@ Engine::GameObject* Engine::World::newObject() {
     return this->addObject(obj); //Return pointer to new object
 }
 
-
 void Engine::World::trimObjectsList(){
     for (size_t i = 0; i < objects.size(); i ++) { //Iterating over all objects
         if(objects[i]->alive == false){ //If object marked as deleted
@@ -136,7 +135,7 @@ Engine::GameObject* Engine::World::dublicateObject(GameObject* original, bool pa
     //Copying properties data
     for(unsigned int prop_i = 0; prop_i < original->props_num; prop_i ++){
         //Get pointer to original property
-        auto prop_ptr = original->properties[prop_i];
+        auto prop_ptr = original->mComponents[prop_i];
         //register new property in new object
         new_obj->addProperty(prop_ptr->type);
         //Get created property
@@ -161,12 +160,12 @@ Engine::GameObject* Engine::World::dublicateObject(GameObject* original, bool pa
         ZSVECTOR3 p_translation = ZSVECTOR3(0,0,0);
         ZSVECTOR3 p_scale = ZSVECTOR3(1,1,1);
         ZSVECTOR3 p_rotation = ZSVECTOR3(0,0,0);
-        original->parent.ptr->getTransformProperty()->getAbsoluteParentTransform(p_translation, p_scale, p_rotation);
+        original->mParent.ptr->getTransformProperty()->getAbsoluteParentTransform(p_translation, p_scale, p_rotation);
         transform->translation = transform->translation + p_translation;
         transform->scale = transform->scale * p_scale;
         transform->rotation = transform->rotation + p_rotation;
         if(parent == true)
-            original->parent.ptr->addChildObject(new_obj->getLinkToThisObject());
+            original->mParent.ptr->addChildObject(new_obj->getLinkToThisObject());
     }
 
     //Set new name for object
@@ -329,8 +328,9 @@ void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderS
             GameObject obj;
             //Call function to load object
             loadGameObjectFromMemory(&obj, bytes + iter, size - iter);
-            //Add object to scene
-            this->addObject(obj);
+            if(obj.getLabelProperty() != nullptr)
+                //Add object to scene
+                this->addObject(obj);
         }
     }
     //Now iterate over all objects and set depencies
@@ -339,7 +339,7 @@ void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderS
         for (size_t chi_i = 0; chi_i < obj_ptr->mChildren.size(); chi_i++) { //Now iterate over all children
             GameObjectLink* child_ptr = &obj_ptr->mChildren[chi_i];
             GameObject* child_go_ptr = child_ptr->updLinkPtr();
-            child_go_ptr->parent = obj_ptr->getLinkToThisObject();
+            child_go_ptr->mParent = obj_ptr->getLinkToThisObject();
             child_go_ptr->hasParent = true;
         }
     }
@@ -411,7 +411,7 @@ void Engine::World::processPrefabObject(Engine::GameObject* object_ptr, std::vec
     unsigned int props_amount = object_ptr->props_num;
     //iterate over all props and update gameobject links
     for (unsigned int prop_i = 0; prop_i < props_amount; prop_i++) {
-        Engine::IGameObjectComponent* prop_ptr = object_ptr->properties[prop_i];
+        Engine::IGameObjectComponent* prop_ptr = object_ptr->mComponents[prop_i];
         prop_ptr->go_link.obj_str_id = object_ptr->str_id; //set new string id
 
         prop_ptr->go_link.updLinkPtr();
@@ -427,7 +427,7 @@ void Engine::World::processPrefabObject(Engine::GameObject* object_ptr, std::vec
             if (_object_ptr->str_id.compare(link.obj_str_id) == 0) { //we found object
                 genRandomString(&_object_ptr->str_id, 15); //generate new string ID
                 object_ptr->mChildren[chi_i].obj_str_id = _object_ptr->str_id; //update string id in children array
-                _object_ptr->parent.obj_str_id = object_ptr->str_id; //update string ID of parent link
+                _object_ptr->mParent.obj_str_id = object_ptr->str_id; //update string ID of parent link
                 _object_ptr->hasParent = true;
 
                 processPrefabObject(_object_ptr, objects_array);
@@ -483,7 +483,7 @@ Engine::GameObject* Engine::World::addObjectsFromPrefab(char* data, unsigned int
 
     for (size_t obj_i = 1; obj_i < mObjects.size(); obj_i++) {
         Engine::GameObject* object_ptr = this->getGameObjectByStrId(mObjects[obj_i].str_id);
-        object_ptr->parent.world_ptr = this;
+        object_ptr->mParent.world_ptr = this;
     }
     object->setMeshSkinningRootNodeRecursively(object);
     return object;

@@ -89,7 +89,7 @@ void Engine::ShadowCasterProperty::savePropertyToStream(ZsStream* stream, GameOb
 }
 
 void Engine::ShadowCasterProperty::onPreRender(Engine::RenderPipeline* pipeline) {
-    pipeline->getRenderSettings()->shadowcaster_obj_ptr = static_cast<void*>(this->go_link.updLinkPtr());
+    pipeline->getRenderSettings()->shadowcaster_obj_ptr = this->go_link.updLinkPtr();
 }
 
 void Engine::ShadowCasterProperty::init() {

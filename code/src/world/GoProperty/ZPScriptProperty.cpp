@@ -93,7 +93,6 @@ void Engine::ZPScriptProperty::copyTo(Engine::IGameObjectComponent* dest) {
 	//write path to script
 	_dest->script_path = this->script_path;
 	_dest->script_res = game_data->resources->getScriptByLabel(script_path);
-	//_dest->lastCheckHasErrors = this->lastCheckHasErrors;
 	//copy global variable handlers
 	for (unsigned int v_i = 0; v_i < vars.size(); v_i++) {
 		GlobVarHandle* old_handle = vars[v_i];
@@ -126,7 +125,12 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 	//get ScriptResource pointer
 	{
 		script_res = game_data->resources->getScriptByLabel(script_path);
+		//if resource isn't found, then exit function
+		if (script_res == nullptr)
+			return;
+		//Allocate script with that resource
 		script = new AGScript(game_data->script_manager, nullptr, script_res->rel_path);
+		//Create list with global variables
 		_hasErrors = !makeGlobalVarsList();
 		script_res->hasError = _hasErrors;
 	}

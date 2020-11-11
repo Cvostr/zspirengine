@@ -1,7 +1,7 @@
 #ifndef zs_mesh
 #define zs_mesh
 
-#include "zs-math.h"
+#include "Math.hpp"
 #include <string>
 #include <GL/glew.h>
 #include <vector>

@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 
 #include "vulkan/zsvulkan.h"
-#include "engine/EngineManager.h"
+#include "engine/EngineComponent.h"
 #include "engine/engine_window.h"
 #include "engine_types.h"
 
@@ -20,7 +20,7 @@ private:
     SDL_GLContext glcontext;
     ZsVulkan vkcontext;
 
-    std::vector<EngineComponentManager*> components;
+    std::vector<IEngineComponent*> components;
 public:
     ZSGAME_DESC* desc;
     ZSENGINE_CREATE_INFO* engine_info;
@@ -32,7 +32,7 @@ public:
     SDL_Window* getWindowSDL();
     void* getGameDataPtr();
 
-    void startManager(EngineComponentManager* manager);
+    void startManager(IEngineComponent* component);
     void updateDeltaTime(float deltaTime);
     void updateResolution(int W, int H);
     void setWindowMode(unsigned int mode);

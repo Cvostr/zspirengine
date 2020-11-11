@@ -76,7 +76,7 @@ void Engine::TerrainProperty::onUpdate(float deltaTime) {
         //if regidbody is already created
         if (rigidBody != nullptr) {
             //Remove RigidBody from world
-            world_ptr->physical_world->removeRidigbodyFromWorld(rigidBody);
+            mWorld->physical_world->removeRidigbodyFromWorld(rigidBody);
             //Remove rigidBody
             delete rigidBody;
         }

@@ -1,8 +1,7 @@
-#ifndef ZSANIMATION_H
-#define ZSANIMATION_H
+#pragma once
 
 #include <string>
-#include "zs-math.h"
+#include "Math.hpp"
 
 namespace Engine {
 
@@ -58,5 +57,3 @@ public:
 };
 
 }
-
-#endif // ZSANIMATION_H

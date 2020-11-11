@@ -42,18 +42,18 @@ void Engine::Camera::updateViewMat(){
     view = matrixLookAt(camera_pos, (camera_pos + camera_front), camera_up);
 }
 
-void Engine::Camera::setPosition(ZSVECTOR3 pos){
+void Engine::Camera::setPosition(const ZSVECTOR3& pos){
 
     this->camera_pos = pos;
     updateViewMat();
 }
 
-void Engine::Camera::setFront(ZSVECTOR3 front){
+void Engine::Camera::setFront(const ZSVECTOR3& front){
     this->camera_front = front;
     updateViewMat();
 }
 
-void Engine::Camera::setUp(ZSVECTOR3 up){
+void Engine::Camera::setUp(const ZSVECTOR3& up){
     this->camera_up = up;
     updateViewMat();
 }

@@ -25,14 +25,14 @@ namespace Engine {
 	public:
 
 		//Only for OGL : initialize texture in GL
-        virtual void Init();
+        virtual void Init(){}
 		//Loads texture from buffer
-        virtual bool LoadDDSTextureFromBuffer(unsigned char* data);
+        virtual bool LoadDDSTextureFromBuffer(unsigned char* data) { return false; }
 		//Loads texture from file
         bool LoadDDSTextureFromFile(const char* path);
 		//Use in rendering pipeline
-        virtual void Use(int slot);
-        virtual void Destroy();
+        virtual void Use(int slot){}
+        virtual void Destroy(){}
 
         Texture();
         virtual ~Texture();
@@ -45,12 +45,12 @@ namespace Engine {
 
         Texture3D_Unit units[6];
 
-        virtual void Init();
-        virtual bool pushTextureBuffer(int index, unsigned char* data);
+        virtual void Init(){}
+        virtual bool pushTextureBuffer(int index, unsigned char* data) { return true; }
         virtual bool pushTexture(int index, std::string path);
         //Use in rendering pipeline
-        virtual void Use(int slot);
-        virtual void Destroy();
+        virtual void Use(int slot){}
+        virtual void Destroy(){}
 
         Texture3D();
         virtual ~Texture3D();
@@ -59,7 +59,5 @@ namespace Engine {
     Texture* allocTexture();
     Texture3D* allocTexture3D();
 }
-
-
 
 #endif

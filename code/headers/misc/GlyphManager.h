@@ -1,12 +1,11 @@
-#ifndef zs_glyphmanager
-#define zs_glyphmanager
+#pragma once
 
 #include <map>
 #include <string>
 
-#include "../render/zs-math.h"
-#include "../engine/EngineManager.h"
-#include "../render/zs-shader.h"
+#include "../render/Math.hpp"
+#include "../engine/EngineComponent.h"
+#include "../render/Shader.hpp"
 #include "ft2build.h"
 
 #include FT_FREETYPE_H
@@ -43,10 +42,10 @@ public:
     void DrawString(int* string, unsigned int len, ZSVECTOR2 pos, ZSRGBCOLOR color = ZSRGBCOLOR(255,255,255));
 };
 
-class GlyphManager : public EngineComponentManager{
+class GlyphManager : public IEngineComponent {
 private:
-    FT_Library ftlib;
-    std::vector<GlyphFontContainer*> fonts;
+    FT_Library mFtlib;
+    std::vector<GlyphFontContainer*> mFonts;
 public:
 
     void addFontContainer(GlyphFontContainer* ptr); //add font container to vector
@@ -54,5 +53,3 @@ public:
     FT_Library getFreetypeLibraryInstance();
     GlyphManager();
 };
-
-#endif

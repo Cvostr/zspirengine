@@ -1,7 +1,6 @@
-#ifndef zs_camera
-#define zs_camera
+#pragma once
 
-#include "../render/zs-math.h"
+#include "../render/Math.hpp"
 #include "../misc/oal_manager.h"
 
 enum ZSCAMERAPROJECTIONTYPE {ZSCAMERA_PROJECTION_NONE,
@@ -64,9 +63,9 @@ namespace Engine{
             void updateProjectionMat();
             void updateViewMat();
 
-            void setPosition(ZSVECTOR3 pos);
-            void setFront(ZSVECTOR3 front);
-            void setUp(ZSVECTOR3 up);
+            void setPosition(const ZSVECTOR3& pos);
+            void setFront(const ZSVECTOR3& front);
+            void setUp(const ZSVECTOR3& up);
 
             void setFOV(float FOV);
             void setZplanes(float nearZ, float farZ);
@@ -84,5 +83,3 @@ namespace Engine{
             Camera();
     };
 }
-
-#endif

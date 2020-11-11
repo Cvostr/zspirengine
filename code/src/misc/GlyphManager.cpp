@@ -7,7 +7,7 @@
 extern ZSGAME_DATA* game_data;
 
 GlyphManager::GlyphManager(){
-    if (FT_Init_FreeType(&this->ftlib))
+    if (FT_Init_FreeType(&this->mFtlib))
         std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
 }
 
@@ -16,11 +16,11 @@ CharacterGlyph::CharacterGlyph(){
 }
 
 FT_Library GlyphManager::getFreetypeLibraryInstance(){
-    return this->ftlib;
+    return this->mFtlib;
 }
 
 void GlyphManager::addFontContainer(GlyphFontContainer* ptr){
-    this->fonts.push_back(ptr);
+    this->mFonts.push_back(ptr);
 }
 
 GlyphFontContainer::GlyphFontContainer(unsigned char* data, unsigned int bsize, unsigned int size, GlyphManager* manager){

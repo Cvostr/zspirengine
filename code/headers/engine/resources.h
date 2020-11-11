@@ -4,15 +4,15 @@
 #include <string>
 #include <vector>
 
-#include "../render/zs-texture.h"
+#include "../render/Texture.h"
 #include "../render/zs-mesh.h"
 #include "../render/zs-materials.h"
-#include "../render/zs-animation.h"
+#include "../render/Animation.hpp"
 #include "../misc/zs3m-master.h"
 #include "../misc/oal_manager.h"
 #include "../misc/GlyphManager.h"
 #include "loader.h"
-#include "EngineManager.h"
+#include "EngineComponent.h"
 
 #include "../ogl/ogl.h"
 #include "../vulkan/vk_data.h"
@@ -69,7 +69,7 @@ class MaterialResource;
 class AnimationResource;
 class GlyphResource;
 
-class ResourceManager : public EngineComponentManager{
+class ResourceManager : public IEngineComponent {
 private:
     std::vector<ZsResource*> resources;
 public:

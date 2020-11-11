@@ -75,7 +75,7 @@ public:
     GameObjectLink go_link; //link to object, that holds this property
     bool active; //Is property working
     //Pointer to World class
-    World* world_ptr;
+    World* mWorld;
     //Func to change active state
     void setActive(bool active);
     //Check, if Property is Active
@@ -170,12 +170,12 @@ public:
 
     World* mWorld; //pointer to world, when object placed
 
-    GameObjectLink parent;
+    GameObjectLink mParent;
 
     std::vector<GameObjectLink> mChildren; //Vector to store links to children of object
     GameObject* getChild(unsigned int index);
     //Pointers to properties and scripts
-    IGameObjectComponent* properties[OBJ_PROPS_SIZE];
+    IGameObjectComponent* mComponents[OBJ_PROPS_SIZE];
     ZPScriptProperty* mScripts[OBJ_SCRIPT_PROPS_SIZE];
     //Allocate property in this object
     
@@ -215,7 +215,7 @@ public:
     T* getPropertyPtr(){
         unsigned int props = static_cast<unsigned int>(this->props_num);
         for(unsigned int prop_i = 0; prop_i < props; prop_i ++){
-            auto property_ptr = this->properties[prop_i];
+            auto property_ptr = this->mComponents[prop_i];
             if(typeid( *property_ptr) == typeid(T)){ //If object already has one
                 return static_cast<T*>(property_ptr); //return it
             }

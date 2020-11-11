@@ -1,10 +1,10 @@
 #ifndef zs_pipeline
 #define zs_pipeline
 
-#include "zs-shader.h"
+#include "Shader.hpp"
 #include "zs-mesh.h"
-#include "../../headers/engine/EngineManager.h"
-#include "../../headers/render/zs-uniform-buffer.h"
+#include "../../headers/engine/EngineComponent.h"
+#include "../../headers/render/UniformBuffer.hpp"
 #include "../../headers/ogl/ogl.h"
 #include "../../headers/vulkan/vk_data.h"
 #include "SDL2/SDL.h"
@@ -25,11 +25,13 @@ namespace Engine{
 
 UniformBuffer* allocUniformBuffer();
 
+class GameObject;
+
 struct RenderSettings {
     ZSRGBCOLOR ambient_light_color;
 
-    void* skybox_obj_ptr;
-    void* shadowcaster_obj_ptr;
+    GameObject* skybox_obj_ptr;
+    GameObject* shadowcaster_obj_ptr;
         
     void defaults();
     void resetPointers();
@@ -42,7 +44,7 @@ struct RenderSettings {
 class LightsourceProperty;
 class World;
 
-class RenderPipeline : public EngineComponentManager{
+class RenderPipeline : public IEngineComponent {
 protected:
     //Vector to store lights
     std::vector<LightsourceProperty*> lights_ptr;

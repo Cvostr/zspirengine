@@ -19,7 +19,7 @@
 #include <BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h>
 #include <BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h>
 
-#include "../render/zs-math.h"
+#include "../render/Math.hpp"
 
 typedef struct PhysicalWorldSettings{
     ZSVECTOR3 gravity;

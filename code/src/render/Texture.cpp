@@ -1,5 +1,5 @@
 #include "../../headers/game.h"
-#include "../../headers/render/zs-texture.h"
+#include "../../headers/render/Texture.h"
 
 #include "../../headers/ogl/ogl.h"
 #include "../../headers/vulkan/vk_data.h"
@@ -38,34 +38,7 @@ Engine::Texture3D* Engine::allocTexture3D(){
     return result;
 }
 
-//Only for OGL : initialize texture in GL
-void Engine::Texture::Init(){
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            static_cast<_ogl_Texture*>(this)->Init();
-            break;
-        }
-        case VULKAN : {
-            static_cast<_vk_Texture*>(this)->Init();
-            break;
-        }
-    }
-}
-//Loads texture from buffer
-bool Engine::Texture::LoadDDSTextureFromBuffer(unsigned char* data){
-    bool result = false;
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            result = static_cast<_ogl_Texture*>(this)->LoadDDSTextureFromBuffer(data);
-            break;
-        }
-        case VULKAN : {
-            result = static_cast<_vk_Texture*>(this)->LoadDDSTextureFromBuffer(data);
-            break;
-        }
-    }
-    return result;
-}
+
 //Loads texture from file
 bool Engine::Texture::LoadDDSTextureFromFile(const char* path){
 
@@ -106,31 +79,7 @@ bool Engine::Texture::LoadDDSTextureFromFile(const char* path){
 
     return true;
 }
-//Use in rendering pipeline
-void Engine::Texture::Use(int slot){
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            static_cast<_ogl_Texture*>(this)->Use(slot);
-            break;
-        }
-        case VULKAN : {
-            static_cast<_vk_Texture*>(this)->Use(slot);
-            break;
-        }
-    }
-}
-void Engine::Texture::Destroy(){
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            static_cast<_ogl_Texture*>(this)->Destroy();
-            break;
-        }
-        case VULKAN : {
-            static_cast<_vk_Texture*>(this)->Destroy();
-            break;
-        }
-    }
-}
+
 
 Engine::Texture::Texture(){
 
@@ -139,33 +88,6 @@ Engine::Texture::~Texture(){
 
 }
 
-
-void Engine::Texture3D::Init(){
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            static_cast<_ogl_Texture3D*>(this)->Init();
-            break;
-        }
-        case VULKAN : {
-            static_cast<_vk_Texture3D*>(this)->Init();
-            break;
-        }
-    }
-}
-bool Engine::Texture3D::pushTextureBuffer(int index, unsigned char* data){
-    bool result = false;
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            result = static_cast<_ogl_Texture3D*>(this)->pushTextureBuffer(index, data);
-            break;
-        }
-        case VULKAN : {
-            result = static_cast<_vk_Texture3D*>(this)->pushTextureBuffer(index, data);
-            break;
-        }
-    }
-    return result;
-}
 bool Engine::Texture3D::pushTexture(int index, std::string path){
     if(index > 5 || path.compare("@none") == 0) return false;
 
@@ -196,31 +118,7 @@ bool Engine::Texture3D::pushTexture(int index, std::string path){
 
     return true;
 }
-    //Use in rendering pipeline
-void Engine::Texture3D::Use(int slot){
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            static_cast<_ogl_Texture3D*>(this)->Use(slot);
-            break;
-        }
-        case VULKAN : {
-            static_cast<_vk_Texture3D*>(this)->Use(slot);
-            break;
-        }
-    }
-}
-void Engine::Texture3D::Destroy(){
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            static_cast<_ogl_Texture3D*>(this)->Destroy();
-            break;
-        }
-        case VULKAN : {
-            static_cast<_vk_Texture3D*>(this)->Destroy();
-            break;
-        }
-    }
-}
+
 
 Engine::Texture3D::Texture3D(){
     created = false;
