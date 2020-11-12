@@ -1,7 +1,7 @@
-#ifndef zs_mesh
-#define zs_mesh
+#pragma once
 
 #include "Math.hpp"
+#include "../../headers/math/BB3.hpp"
 #include <string>
 #include <GL/glew.h>
 #include <vector>
@@ -15,7 +15,7 @@ namespace Engine {
     class Bone{
     public:
         std::string bone_name;
-        ZSMATRIX4x4 offset;
+        Mat4 offset;
 
         unsigned int vertices_affected;
 
@@ -28,8 +28,8 @@ namespace Engine {
         bool alive; //Non destroyed
         std::string mesh_label;
 
-        int vertices_num;
-        int indices_num;
+        int mVerticesNum;
+        int mIndicesNum;
 
         //Used to store vertex data (in editor only)
         ZSVERTEX* vertices_arr;
@@ -41,15 +41,17 @@ namespace Engine {
         std::vector<Bone> bones;
         bool hasBones();
 
-        virtual void Init();
-        virtual void setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num);
-        virtual void setMeshData(ZSVERTEX* vertices, unsigned int vertices_num);
-        virtual void Draw();
-        virtual void DrawInstanced(unsigned int instances);
-        virtual void DrawLines();
-        virtual void Destroy();
+        BoundingBox3 mBoundingBox;
 
-        Mesh();
+        virtual void Init(){}
+        virtual void setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num){}
+        virtual void setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){}
+        virtual void Draw(){}
+        virtual void DrawInstanced(unsigned int instances){}
+        virtual void DrawLines();
+        virtual void Destroy(){}
+
+        Mesh() : mVerticesNum(0), mIndicesNum(0){}
         virtual ~Mesh();
     };
 
@@ -70,6 +72,3 @@ namespace Engine {
     Mesh* getSkyboxMesh();
     Mesh* getGrassMesh();
 }
-
-
-#endif

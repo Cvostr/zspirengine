@@ -207,7 +207,7 @@ void TerrainData::updateGrassBuffers() {
             if (texel_ptr->grass > 0) {
                 HeightmapGrass* grass = &this->grass[static_cast<unsigned int>(texel_ptr->grass - 1)];
                 ZSVECTOR3 pos = ZSVECTOR3(texelZ, texel_ptr->height, texelX);
-                ZSMATRIX4x4 m = getScaleMat(ZSVECTOR3(grass->scale.X, grass->scale.Y, grass->scale.X)) * getTranslationMat(pos);
+                Mat4 m = getScaleMat(ZSVECTOR3(grass->scale.X, grass->scale.Y, grass->scale.X)) * getTranslationMat(pos);
                 grass->inst_transform.push_back(m);
             }
         }

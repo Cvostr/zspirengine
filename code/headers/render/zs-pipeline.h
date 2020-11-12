@@ -2,7 +2,7 @@
 #define zs_pipeline
 
 #include "Shader.hpp"
-#include "zs-mesh.h"
+#include "Mesh.hpp"
 #include "../../headers/engine/EngineComponent.h"
 #include "../../headers/render/UniformBuffer.hpp"
 #include "../../headers/ogl/ogl.h"
@@ -119,6 +119,8 @@ public:
     void init();
     void updateWindowSize(int W, int H);
     void destroy();
+
+    Engine::Camera* cam;
 
     RenderPipeline();
     ~RenderPipeline();

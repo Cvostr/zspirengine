@@ -15,6 +15,8 @@
 #include "../Scripting/AngelScriptMgr.h"
 #include "../Scripting/ZPScriptClass.hpp"
 
+#include "../math/BB3.hpp"
+
 #define OBJ_PROPS_SIZE 10
 #define OBJ_SCRIPT_PROPS_SIZE 5
 #define MAX_OBJS 15000
@@ -170,6 +172,8 @@ public:
 
     World* mWorld; //pointer to world, when object placed
 
+    BoundingBox3 mBoundingBox;
+
     GameObjectLink mParent;
 
     std::vector<GameObjectLink> mChildren; //Vector to store links to children of object
@@ -209,7 +213,7 @@ public:
     void setLabel(const std::string& label);
     void setActive(bool active) { mActive = active; }
     bool isActive();
-    unsigned int getChildrenNum();
+    size_t getChildrenNum(){ return mChildren.size(); }
 
     template<typename T>
     T* getPropertyPtr(){
@@ -241,6 +245,7 @@ public:
     //true, if object has rigidbody component
     bool isRigidbody();
     PhysicalProperty* getPhysicalProperty();
+    const BoundingBox3& getBoundingBox();
 
     bool hasMesh(); //Check if gameobject has mesh property and mesh inside
     bool hasTerrain(); //Check if gameobject has terrain inside
@@ -295,7 +300,7 @@ public:
 
 class TransformProperty : public IGameObjectComponent {
 public:
-    ZSMATRIX4x4 transform_mat;
+    Mat4 transform_mat;
 
     ZSVECTOR3 translation;
     ZSVECTOR3 scale;
@@ -309,7 +314,7 @@ public:
     void getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r);
     void copyTo(IGameObjectComponent* dest);
     void onPreRender(RenderPipeline* pipeline);
-    void getAbsoluteRotationMatrix(ZSMATRIX4x4& m);
+    void getAbsoluteRotationMatrix(Mat4& m);
 
     void setTranslation(const ZSVECTOR3& new_translation);
     void setScale(const ZSVECTOR3& new_scale);

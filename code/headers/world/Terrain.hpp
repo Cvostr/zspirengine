@@ -16,7 +16,7 @@ typedef struct HeightmapGrass{
 
     ZSVECTOR2 scale;
     //Vector to store intanced transforms
-    std::vector<ZSMATRIX4x4> inst_transform;
+    std::vector<Mat4> inst_transform;
 
     HeightmapGrass(){
         diffuse_relpath = "@none";

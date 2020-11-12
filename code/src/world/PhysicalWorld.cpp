@@ -206,7 +206,7 @@ bool Engine::PhysicalProperty::updateCollisionShape(){
                 result = false;
                 break;
             }
-            shape = new btConvexHullShape(m->vertices_coord, m->vertices_num, sizeof (float) * 3);
+            shape = new btConvexHullShape(m->vertices_coord, m->mVerticesNum, sizeof (float) * 3);
             break;
         }
         case COLLIDER_TYPE::COLLIDER_TYPE_MESH:{
@@ -219,10 +219,10 @@ bool Engine::PhysicalProperty::updateCollisionShape(){
             float* vertices = m->vertices_coord;
             int* indices = reinterpret_cast<int*>(m->indices_arr);
 
-            btTriangleIndexVertexArray* va = new btTriangleIndexVertexArray(m->indices_num / 3,
+            btTriangleIndexVertexArray* va = new btTriangleIndexVertexArray(m->mIndicesNum / 3,
                                                                             indices,
                                                                             3 * sizeof (int),
-                                                                            m->vertices_num,
+                                                                            m->mVerticesNum,
                                                                             reinterpret_cast<btScalar*>(vertices),
                                                                             sizeof (ZSVECTOR3));
             shape = new btBvhTriangleMeshShape(va, false);

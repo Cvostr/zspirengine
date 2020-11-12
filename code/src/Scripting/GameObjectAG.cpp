@@ -11,7 +11,7 @@ void Engine::bindGameObjectSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "const string& getLabel()", asMETHOD(Engine::GameObject, getLabel), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "void setLabel(const string&in)", asMETHOD(Engine::GameObject, setLabel), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "ZPScript &getScriptClass(string)", asMETHOD(Engine::GameObject, getScriptObjectWithName), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "uint getChildrenNum()", asMETHOD(Engine::GameObject, getChildrenNum), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "uint64 getChildrenNum()", asMETHOD(Engine::GameObject, getChildrenNum), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "GameObject@ getChild(uint)", asMETHOD(Engine::GameObject, getChild), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "void addChild(GameObject@)", asMETHODPR(Engine::GameObject, addChildObject, (GameObject*, bool), void), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "void removeChild(GameObject@)", asMETHODPR(Engine::GameObject, removeChildObject, (GameObject*), void), asCALL_THISCALL);

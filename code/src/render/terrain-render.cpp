@@ -189,7 +189,7 @@ void Engine::TerrainProperty::DrawGrass(RenderPipeline* pipeline) {
                     //Avoid grass rendering
                     return;
                 //Send matrices to instanced buffer
-                pipeline->instancedTransformBuffer->writeData(0, entries * sizeof(ZSMATRIX4x4),
+                pipeline->instancedTransformBuffer->writeData(0, entries * sizeof(Mat4),
                     &grass->inst_transform[offset]);
                 //Draw grass instanced
                 Engine::getGrassMesh()->DrawInstanced(entries);

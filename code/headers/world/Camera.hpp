@@ -29,9 +29,9 @@ namespace Engine{
 
     class Camera{
         protected:
-            ZSMATRIX4x4 proj; //Calculated Projection matrix
-            ZSMATRIX4x4 ui_proj;
-            ZSMATRIX4x4 view; //Calculated View matrix
+            Mat4 proj; //Calculated Projection matrix
+            Mat4 ui_proj;
+            Mat4 view; //Calculated View matrix
 
             ZSCAMERAPROJECTIONTYPE proj_type;
 
@@ -75,9 +75,9 @@ namespace Engine{
             void startMoving();
             void stopMoving();
 
-            ZSMATRIX4x4 getViewMatrix();
-            ZSMATRIX4x4 getProjMatrix();
-            ZSMATRIX4x4 getUiProjMatrix();
+            Mat4 getViewMatrix();
+            Mat4 getProjMatrix();
+            Mat4 getUiProjMatrix();
             void updateTick(float deltaTime);
 
             Camera();

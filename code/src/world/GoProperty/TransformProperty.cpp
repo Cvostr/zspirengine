@@ -25,13 +25,13 @@ void Engine::TransformProperty::updateMatrix() {
     abs_rotation = this->rotation + p_rotation;
 
     //Calculate translation matrix
-    ZSMATRIX4x4 translation_mat = getTranslationMat(abs_translation);
+    Mat4 translation_mat = getTranslationMat(abs_translation);
     //Calculate scale matrix
-    ZSMATRIX4x4 scale_mat = getScaleMat(abs_scale);
+    Mat4 scale_mat = getScaleMat(abs_scale);
     //Calculate rotation matrix
-    ZSMATRIX4x4 rotation_mat1 = getIdentity();
+    Mat4 rotation_mat1 = getIdentity();
     getAbsoluteRotationMatrix(rotation_mat1);
-    ZSMATRIX4x4 rotation_mat = getRotationMat(abs_rotation);
+    Mat4 rotation_mat = getRotationMat(abs_rotation);
     //S * R * T
     this->transform_mat = scale_mat * rotation_mat * rotation_mat1 * translation_mat;
 
@@ -77,7 +77,7 @@ void Engine::TransformProperty::getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTO
     }
 }
 
-void Engine::TransformProperty::getAbsoluteRotationMatrix(ZSMATRIX4x4& m) {
+void Engine::TransformProperty::getAbsoluteRotationMatrix(Mat4& m) {
     GameObject* ptr = go_link.updLinkPtr(); //Pointer to object with this property
 
     if (ptr == nullptr) return;
@@ -86,7 +86,7 @@ void Engine::TransformProperty::getAbsoluteRotationMatrix(ZSMATRIX4x4& m) {
         GameObject* parent_p = ptr->mParent.ptr;
         TransformProperty* property = static_cast<TransformProperty*>(parent_p->getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM));
 
-        ZSMATRIX4x4 rotation_mat1 = getRotationMat(property->rotation, ptr->getTransformProperty()->translation);
+        Mat4 rotation_mat1 = getRotationMat(property->rotation, ptr->getTransformProperty()->translation);
         m = rotation_mat1 * m;
         property->getAbsoluteRotationMatrix(m);
     }
@@ -119,7 +119,7 @@ void Engine::TransformProperty::onPreRender(RenderPipeline* pipeline) {
     this->updateMatrix();
     //Send transform matrix to transform buffer
     pipeline->transformBuffer->bind();
-    pipeline->transformBuffer->writeData(sizeof(ZSMATRIX4x4) * 2, sizeof(ZSMATRIX4x4), &transform_mat);
+    pipeline->transformBuffer->writeData(sizeof(Mat4) * 2, sizeof(Mat4), &transform_mat);
 }
 
 void Engine::TransformProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {

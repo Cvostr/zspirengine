@@ -1,7 +1,7 @@
 #ifndef I_OGL
 #define I_OGL
 
-#include "../render/zs-mesh.h"
+#include "../render/Mesh.hpp"
 #include "../render/UniformBuffer.hpp"
 #include "../render/Shader.hpp"
 #include "../render/Texture.h"

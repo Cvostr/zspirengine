@@ -25,8 +25,8 @@ void Engine::_ogl_Mesh::Destroy() {
 }
 
 void Engine::_ogl_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num){
-    this->vertices_num = static_cast<int>(vertices_num);
-    this->indices_num = static_cast<int>(indices_num);
+    this->mVerticesNum = static_cast<int>(vertices_num);
+    this->mIndicesNum = static_cast<int>(indices_num);
 
     glBindVertexArray(this->meshVAO); //Bind vertex array
 
@@ -38,10 +38,11 @@ void Engine::_ogl_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, u
 
     setMeshOffsets();
 
+    mBoundingBox.CreateFromVertexArray(vertices, mVerticesNum);
 }
 void Engine::_ogl_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){
-    this->vertices_num = static_cast<int>(vertices_num);
-    this->indices_num = NO_INDICES;
+    this->mVerticesNum = static_cast<int>(vertices_num);
+    this->mIndicesNum = NO_INDICES;
 
     glBindVertexArray(this->meshVAO); //Bind vertex array
 
@@ -49,6 +50,8 @@ void Engine::_ogl_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_nu
     glBufferData(GL_ARRAY_BUFFER, vertices_num * sizeof(ZSVERTEX), vertices, GL_STATIC_DRAW); //send vertices to buffer
     //Bind mesh offsets
     setMeshOffsets();
+
+    mBoundingBox.CreateFromVertexArray(vertices, mVerticesNum);
 }
 
 void Engine::_ogl_Mesh::setMeshOffsets(){
@@ -87,31 +90,31 @@ void Engine::_ogl_Mesh::setMeshOffsets(){
 
 void Engine::_ogl_Mesh::Draw(){
     glBindVertexArray(this->meshVAO);
-    if(this->indices_num != NO_INDICES) //if object uses indices
+    if(this->mIndicesNum != NO_INDICES) //if object uses indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->meshEBO);
 
-    if (this->indices_num == NO_INDICES) {
+    if (this->mIndicesNum == NO_INDICES) {
         //Draw without indices
-        glDrawArrays(GL_TRIANGLES, 0, this->vertices_num);
+        glDrawArrays(GL_TRIANGLES, 0, this->mVerticesNum);
     }
     else {
         //Indexed draw
-        glDrawElements(GL_TRIANGLES, this->indices_num, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, this->mIndicesNum, GL_UNSIGNED_INT, nullptr);
     }
 }
 
 void Engine::_ogl_Mesh::DrawInstanced(unsigned int instances) {
     glBindVertexArray(this->meshVAO);
-    if (this->indices_num != NO_INDICES) //if object uses indices
+    if (this->mIndicesNum != NO_INDICES) //if object uses indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->meshEBO);
 
-    if (this->indices_num == NO_INDICES) {
+    if (this->mIndicesNum == NO_INDICES) {
         //Draw without indices
-        glDrawArraysInstanced(GL_TRIANGLES, 0, this->vertices_num, instances);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, this->mVerticesNum, instances);
     }
     else {
         //Indexed draw
-        glDrawElementsInstanced(GL_TRIANGLES, this->indices_num, GL_UNSIGNED_INT, nullptr, instances);
+        glDrawElementsInstanced(GL_TRIANGLES, this->mIndicesNum, GL_UNSIGNED_INT, nullptr, instances);
     }
 }
 
@@ -119,15 +122,15 @@ void Engine::_ogl_Mesh::DrawLines(){
 
     glBindVertexArray(this->meshVAO);
     glBindBuffer(GL_ARRAY_BUFFER, this->meshVBO);
-    if(this->indices_num != NO_INDICES) //if object uses indices
+    if(this->mIndicesNum != NO_INDICES) //if object uses indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->meshEBO);
 
-    if (this->indices_num == NO_INDICES) {
+    if (this->mIndicesNum == NO_INDICES) {
         //Draw without indices
-        glDrawArrays(GL_LINE_LOOP, 0, static_cast<int>(this->vertices_num));
+        glDrawArrays(GL_LINE_LOOP, 0, static_cast<int>(this->mVerticesNum));
     }
     else {
         //Indexed draw
-        glDrawElements(GL_LINE_LOOP, static_cast<int>(this->indices_num), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_LINE_LOOP, static_cast<int>(this->mVerticesNum), GL_UNSIGNED_INT, nullptr);
     }
 }

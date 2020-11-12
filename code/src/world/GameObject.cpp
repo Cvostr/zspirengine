@@ -235,10 +235,6 @@ bool Engine::GameObject::isActive() {
     return mActive && isParentActive;
 }
 
-unsigned int Engine::GameObject::getChildrenNum() {
-    return static_cast<unsigned int>(mChildren.size());
-}
-
 Engine::GameObject* Engine::GameObject::getChild(unsigned int index) {
     return mChildren[index].updLinkPtr();
 }
@@ -486,7 +482,6 @@ Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(const std::s
     return nullptr;
 }
 
-
 void Engine::GameObject::putToSnapshot(GameObjectSnapshot* snapshot) {
     //set base variables
     snapshot->props_num = 0;
@@ -531,6 +526,22 @@ void Engine::GameObject::setMeshSkinningRootNodeRecursively(GameObject* rootNode
     }
 }
 
+const BoundingBox3& Engine::GameObject::getBoundingBox() {
+    if (!hasMesh())
+        return BoundingBox3();
+
+    mBoundingBox = getPropertyPtr<MeshProperty>()->mesh_ptr->mesh_ptr->mBoundingBox;
+    mBoundingBox.ApplyTransform(getTransformProperty()->transform_mat);
+    
+    for (size_t i = 0; i < getChildrenNum(); i++) {
+        BoundingBox3 child_bb = getChild(i)->getBoundingBox();
+        mBoundingBox.Extend(child_bb);
+    }
+
+    return mBoundingBox;
+}
+
+
 void Engine::GameObjectSnapshot::clear() {
     //free array of children
     this->children.clear();
@@ -548,9 +559,4 @@ void Engine::GameObjectSnapshot::clear() {
     children_snapshots.clear(); //Free snapshot vector
     this->children.clear(); //Free link vector
 }
-
-Engine::GameObjectSnapshot::GameObjectSnapshot() {
-    props_num = 0;
-    scripts_num = 0;
-    obj_array_ind = 0;
-}
+Engine::GameObjectSnapshot::GameObjectSnapshot() : props_num(0), scripts_num(0), obj_array_ind(0) {}

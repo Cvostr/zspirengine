@@ -40,16 +40,14 @@ void ZS3M::SceneFileExport::write(std::string output_file){
         std::cout << "ZS3M: Writing Mesh " << mesh_ptr->mesh_label << std::endl;
         stream << "_MESH " << (mesh_ptr->mesh_label + '\0');
 
-        int vertexNum = mesh_ptr->vertices_num;
-        int indexNum = mesh_ptr->indices_num;
         unsigned int bonesNum = static_cast<unsigned int>(mesh_ptr->bones.size());
         //Write base numbers
-        stream.writeBinaryValue(&vertexNum);
-        stream.writeBinaryValue(&indexNum);
+        stream.writeBinaryValue(&mesh_ptr->mVerticesNum);
+        stream.writeBinaryValue(&mesh_ptr->mIndicesNum);
         stream.writeBinaryValue(&bonesNum);
         stream << "\n"; //Write divider
         //Write all vertices
-        for (unsigned int v_i = 0; v_i < static_cast<unsigned int>(vertexNum); v_i ++) {
+        for (unsigned int v_i = 0; v_i < static_cast<unsigned int>(mesh_ptr->mVerticesNum); v_i ++) {
             ZSVERTEX* v_ptr = &mesh_ptr->vertices_arr[v_i];
             //Write vertex vectors
             stream.write(reinterpret_cast<char*>(&v_ptr->pos), sizeof(float) * 3);
@@ -66,7 +64,7 @@ void ZS3M::SceneFileExport::write(std::string output_file){
                 stream.writeBinaryValue(&b_weight);
             }
         }
-        for(unsigned int ind_i = 0; ind_i < static_cast<unsigned int>(indexNum); ind_i ++){
+        for(unsigned int ind_i = 0; ind_i < static_cast<unsigned int>(mesh_ptr->mIndicesNum); ind_i ++){
             stream.writeBinaryValue(&mesh_ptr->indices_arr[ind_i]);
         }
         stream << "\n"; //Write divider
@@ -251,8 +249,8 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
 
             Engine::Mesh* newmesh = Engine::allocateMesh();
             newmesh->mesh_label = mesh_label;
-            newmesh->vertices_num = vertexNum;
-            newmesh->indices_num = indexNum;
+            newmesh->mVerticesNum = vertexNum;
+            newmesh->mIndicesNum = indexNum;
             //Allocate arrays for vectors
             newmesh->vertices_arr = new ZSVERTEX[static_cast<unsigned int>(vertexNum)];
             newmesh->indices_arr = new unsigned int[static_cast<unsigned int>(indexNum)];
@@ -273,6 +271,7 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
                 memcpy(reinterpret_cast<char*>(&v_ptr.bitangent), &buffer[cur_pos], sizeof(float) * 3);
                 cur_pos += sizeof(float) * 3;
                 readBinaryValue(&v_ptr.bones_num, &buffer[cur_pos], cur_pos);
+
                 //Read vertex bone data
                 for(unsigned int vb_i = 0; vb_i < 12; vb_i ++){
                     unsigned int* bone_id = &v_ptr.ids[vb_i];
@@ -298,7 +297,8 @@ void ZS3M::ImportedSceneFile::loadFromBuffer(char* buffer, unsigned int buf_size
             cur_pos += 1;
 
             newmesh->Init();
-            newmesh->setMeshData(newmesh->vertices_arr, newmesh->indices_arr, newmesh->vertices_num, newmesh->indices_num);
+            newmesh->setMeshData(newmesh->vertices_arr, newmesh->indices_arr, newmesh->mVerticesNum, newmesh->mIndicesNum);
+            //newmesh->mBoundingBox.CreateFromVertexArray(newmesh->vertices_arr, newmesh->mVerticesNum);
 
             delete[] newmesh->vertices_arr;
             delete[] newmesh->indices_arr;

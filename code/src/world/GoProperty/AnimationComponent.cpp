@@ -57,11 +57,11 @@ void Engine::AnimationProperty::onPreRender(RenderPipeline* pipeline) {
             }
         }
     }
-    ZSMATRIX4x4 identity_matrix = getIdentity();
+    Mat4 identity_matrix = getIdentity();
     updateNodeTransform(obj, identity_matrix);
 }
 
-void Engine::AnimationProperty::updateNodeTransform(GameObject* obj, ZSMATRIX4x4 parent) {
+void Engine::AnimationProperty::updateNodeTransform(GameObject* obj, Mat4 parent) {
 
     if (!obj) return;
     NodeProperty* prop = obj->getPropertyPtr<NodeProperty>();
@@ -74,9 +74,9 @@ void Engine::AnimationProperty::updateNodeTransform(GameObject* obj, ZSMATRIX4x4
         Engine::AnimationChannel* cha = this->anim_prop_ptr->animation_ptr->getChannelByNodeName(prop->node_label);
         //if channel is found
         if (cha) {
-            ZSMATRIX4x4 transl = transpose(getTranslationMat(prop->translation));
-            ZSMATRIX4x4 _sca = transpose(getScaleMat(prop->scale));
-            ZSMATRIX4x4 rot = (getRotationMat(prop->rotation));
+            Mat4 transl = transpose(getTranslationMat(prop->translation));
+            Mat4 _sca = transpose(getScaleMat(prop->scale));
+            Mat4 rot = (getRotationMat(prop->rotation));
             //Multiply all matrices
             prop->abs = transl * rot * _sca;
         }

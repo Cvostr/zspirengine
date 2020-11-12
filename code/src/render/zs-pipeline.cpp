@@ -55,23 +55,23 @@ Engine::RenderPipeline::RenderPipeline(){
     initShaders();
     //Allocate transform buffer
     this->transformBuffer = allocUniformBuffer();
-    transformBuffer->init(0, sizeof (ZSMATRIX4x4) * 3 + 16 * 2);
+    transformBuffer->init(0, sizeof (Mat4) * 3 + 16 * 2);
     //allocate lights buffer
     lightsBuffer = allocUniformBuffer();
     lightsBuffer->init(1, LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16 * 2);
     //Shadow uniform buffer
     shadowBuffer = allocUniformBuffer();
-    shadowBuffer->init(2, sizeof (ZSMATRIX4x4) * 4 + 16);
+    shadowBuffer->init(2, sizeof (Mat4) * 4 + 16);
     //Terrain uniform buffer
     terrainUniformBuffer = allocUniformBuffer();
     terrainUniformBuffer->init(3, 12 * 16 * 2 + 4 * 3);
     {
         //Skinning uniform buffer
         skinningUniformBuffer = allocUniformBuffer();
-        skinningUniformBuffer->init(4, sizeof (ZSMATRIX4x4) * MAX_MESH_BONES);
+        skinningUniformBuffer->init(4, sizeof (Mat4) * MAX_MESH_BONES);
         for(unsigned int i = 0; i < MAX_MESH_BONES; i ++){
-            ZSMATRIX4x4 m = getIdentity();
-            skinningUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * i, sizeof (ZSMATRIX4x4), &m);
+            Mat4 m = getIdentity();
+            skinningUniformBuffer->writeData(sizeof (Mat4) * i, sizeof (Mat4), &m);
         }
     }
     //Tile uniform buffer
@@ -79,18 +79,18 @@ Engine::RenderPipeline::RenderPipeline(){
     tileBuffer->init(5, 28);
     //Skybox uniform buffer
     skyboxTransformUniformBuffer = Engine::allocUniformBuffer();
-    skyboxTransformUniformBuffer->init(6, sizeof (ZSMATRIX4x4) * 2);
+    skyboxTransformUniformBuffer->init(6, sizeof (Mat4) * 2);
 
     uiUniformBuffer = Engine::allocUniformBuffer();
-    uiUniformBuffer->init(7, sizeof (ZSMATRIX4x4) * 2 + 16 + 16);
+    uiUniformBuffer->init(7, sizeof (Mat4) * 2 + 16 + 16);
 
     {
         instancedTransformBuffer = Engine::allocUniformBuffer();
-        instancedTransformBuffer->init(9, sizeof (ZSMATRIX4x4) * INSTANCED_RENDER_BUFFER_SIZE);
+        instancedTransformBuffer->init(9, sizeof (Mat4) * INSTANCED_RENDER_BUFFER_SIZE);
 
         for(unsigned int i = 0; i < INSTANCED_RENDER_BUFFER_SIZE; i ++){
-            ZSMATRIX4x4 m = getIdentity();
-            instancedTransformBuffer->writeData(sizeof (ZSMATRIX4x4) * i, sizeof (ZSMATRIX4x4), &m);
+            Mat4 m = getIdentity();
+            instancedTransformBuffer->writeData(sizeof (Mat4) * i, sizeof (Mat4), &m);
         }
     }
 
@@ -238,7 +238,7 @@ void Engine::RenderPipeline::render3D(Engine::Camera* cam){
     World* world_ptr = game_data->world;
     //Render shadows, first
     TryRenderShadows(cam);
-
+    this->cam = cam;
     {
         //Bind Geometry Buffer to make Deferred Shading
         gbuffer->bind();
@@ -324,6 +324,9 @@ void Engine::GameObject::processObject(RenderPipeline* pipeline) {
     //bool difts = isDistanceFits(pipeline->cam->getCameraViewCenterPos(), transform_prop->_last_translation, max_dist);
 
     //if(difts)
+
+   
+
     this->Draw(pipeline);
 
     for (unsigned int obj_i = 0; obj_i < this->mChildren.size(); obj_i++) {
@@ -350,7 +353,7 @@ void Engine::GameObject::setSkinningMatrices(RenderPipeline* pipeline) {
 
             Engine::GameObject* node = nullptr;
             GameObject* RootNode = mesh_prop->skinning_root_node;
-            ZSMATRIX4x4 rootNodeTransform;
+            Mat4 rootNodeTransform;
 
             if (RootNode != nullptr) {
                 //if RootNode is specified
@@ -362,10 +365,10 @@ void Engine::GameObject::setSkinningMatrices(RenderPipeline* pipeline) {
             if (node != nullptr) {
                 Engine::NodeProperty* nd = node->getPropertyPtr<Engine::NodeProperty>();
                 //Calculate result matrix
-                ZSMATRIX4x4 matrix = transpose(invert(rootNodeTransform) * nd->abs * b->offset);
+                Mat4 matrix = transpose(invert(rootNodeTransform) * nd->abs * b->offset);
                 //Send skinned matrix to skinning uniform buffer
                 pipeline->skinningUniformBuffer->bind();
-                pipeline->skinningUniformBuffer->writeData(sizeof(ZSMATRIX4x4) * bone_i, sizeof(ZSMATRIX4x4), &matrix);
+                pipeline->skinningUniformBuffer->writeData(sizeof(Mat4) * bone_i, sizeof(Mat4), &matrix);
             }
         }
     }
@@ -392,7 +395,7 @@ void Engine::GameObject::Draw(RenderPipeline* pipeline){    //On render pipeline
             MeshProperty* mesh_prop = getPropertyPtr<MeshProperty>();
             //set transform to camera buffer
             pipeline->transformBuffer->bind();
-            pipeline->transformBuffer->writeData(sizeof(ZSMATRIX4x4) * 2, sizeof(ZSMATRIX4x4), &transform_ptr->transform_mat);
+            pipeline->transformBuffer->writeData(sizeof(Mat4) * 2, sizeof(Mat4), &transform_ptr->transform_mat);
             //Send mesh skinning matrices
             setSkinningMatrices(pipeline);
             
@@ -431,7 +434,7 @@ void Engine::MaterialProperty::onRender(Engine::RenderPipeline* pipeline){
     }else
         shadowcast->setTexture();
 
-    pipeline->shadowBuffer->writeData(sizeof (ZSMATRIX4x4) * 4 + 4, 4, &recShadows);
+    pipeline->shadowBuffer->writeData(sizeof (Mat4) * 4 + 4, 4, &recShadows);
     //Apply matrerial to shader and textures
     material_ptr->applyMatToPipeline();
 }
@@ -491,23 +494,23 @@ void Engine::TileProperty::onRender(Engine::RenderPipeline* pipeline){
 
 void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
     transformBuffer->bind();
-    ZSMATRIX4x4 proj = cam_ptr->getProjMatrix();
-    ZSMATRIX4x4 view = cam_ptr->getViewMatrix();
+    Mat4 proj = cam_ptr->getProjMatrix();
+    Mat4 view = cam_ptr->getViewMatrix();
     ZSVECTOR3 cam_pos = cam_ptr->getCameraPosition();
-    transformBuffer->writeData(0, sizeof (ZSMATRIX4x4), &proj);
-    transformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &view);
-    transformBuffer->writeData(sizeof (ZSMATRIX4x4) * 3, sizeof(ZSVECTOR3), &cam_pos);
+    transformBuffer->writeData(0, sizeof (Mat4), &proj);
+    transformBuffer->writeData(sizeof (Mat4), sizeof (Mat4), &view);
+    transformBuffer->writeData(sizeof (Mat4) * 3, sizeof(ZSVECTOR3), &cam_pos);
     //Setting UI camera to UI buffer
     uiUniformBuffer->bind();
     proj = cam_ptr->getUiProjMatrix();
-    uiUniformBuffer->writeData(0, sizeof (ZSMATRIX4x4), &proj);
+    uiUniformBuffer->writeData(0, sizeof (Mat4), &proj);
     //Setting cameras to skybox shader
     proj = cam_ptr->getProjMatrix();
     view = cam_ptr->getViewMatrix();
     view = removeTranslationFromViewMat(view);
     skyboxTransformUniformBuffer->bind();
-    skyboxTransformUniformBuffer->writeData(0, sizeof (ZSMATRIX4x4), &proj);
-    skyboxTransformUniformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &view);
+    skyboxTransformUniformBuffer->writeData(0, sizeof (Mat4), &proj);
+    skyboxTransformUniformBuffer->writeData(sizeof (Mat4), sizeof (Mat4), &view);
 }
 
 void Engine::RenderPipeline::renderUI() {
@@ -532,16 +535,16 @@ void Engine::RenderPipeline::renderSprite(Engine::Texture* texture_sprite, int X
     uiUniformBuffer->bind();
 
     int _render_mode = 1;
-    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 , 4, &_render_mode);
+    uiUniformBuffer->writeData(sizeof (Mat4) * 2 , 4, &_render_mode);
     //Use texture at 0 slot
     texture_sprite->Use(0);
 
-    ZSMATRIX4x4 translation = getTranslationMat(static_cast<float>(X), static_cast<float>(Y), 0.0f);
-    ZSMATRIX4x4 scale = getScaleMat(static_cast<float>(scaleX), static_cast<float>(scaleY), 0.0f);
-    ZSMATRIX4x4 transform = scale * translation;
+    Mat4 translation = getTranslationMat(static_cast<float>(X), static_cast<float>(Y), 0.0f);
+    Mat4 scale = getScaleMat(static_cast<float>(scaleX), static_cast<float>(scaleY), 0.0f);
+    Mat4 transform = scale * translation;
 
     //Push glyph transform
-    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &transform);
+    uiUniformBuffer->writeData(sizeof (Mat4), sizeof (Mat4), &transform);
 
     Engine::getUiSpriteMesh2D()->Draw();
 }
@@ -556,21 +559,21 @@ void Engine::RenderPipeline::renderGlyph(unsigned int texture_id, int X, int Y, 
     uiUniformBuffer->bind();
     //tell shader, that we will render glyph
     int _render_mode = 2;
-    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 , 4, &_render_mode);
+    uiUniformBuffer->writeData(sizeof (Mat4) * 2 , 4, &_render_mode);
     //sending glyph color
-    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 16, 4, &color.gl_r);
-    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 4 + 16, 4, &color.gl_g);
-    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4) * 2 + 8 + 16, 4, &color.gl_b);
+    uiUniformBuffer->writeData(sizeof (Mat4) * 2 + 16, 4, &color.gl_r);
+    uiUniformBuffer->writeData(sizeof (Mat4) * 2 + 4 + 16, 4, &color.gl_g);
+    uiUniformBuffer->writeData(sizeof (Mat4) * 2 + 8 + 16, 4, &color.gl_b);
     //Use texture at 0 slot
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    ZSMATRIX4x4 translation = getTranslationMat(static_cast<float>(X), static_cast<float>(Y), 0.0f);
-    ZSMATRIX4x4 scale = getScaleMat(static_cast<float>(scaleX), static_cast<float>(scaleY), 0.0f);
-    ZSMATRIX4x4 transform = scale * translation;
+    Mat4 translation = getTranslationMat(static_cast<float>(X), static_cast<float>(Y), 0.0f);
+    Mat4 scale = getScaleMat(static_cast<float>(scaleX), static_cast<float>(scaleY), 0.0f);
+    Mat4 transform = scale * translation;
 
     //Push glyph transform
-    uiUniformBuffer->writeData(sizeof (ZSMATRIX4x4), sizeof (ZSMATRIX4x4), &transform);
+    uiUniformBuffer->writeData(sizeof (Mat4), sizeof (Mat4), &transform);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     Engine::getUiSpriteMesh2D()->Draw();

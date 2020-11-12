@@ -58,13 +58,13 @@ void Engine::Camera::setUp(const ZSVECTOR3& up){
     updateViewMat();
 }
 
-ZSMATRIX4x4 Engine::Camera::getViewMatrix(){
+Mat4 Engine::Camera::getViewMatrix(){
     return this->view;
 }
-ZSMATRIX4x4 Engine::Camera::getProjMatrix(){
+Mat4 Engine::Camera::getProjMatrix(){
     return this->proj;
 }
-ZSMATRIX4x4 Engine::Camera::getUiProjMatrix(){
+Mat4 Engine::Camera::getUiProjMatrix(){
     return this->ui_proj;
 }
 

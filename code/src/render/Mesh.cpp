@@ -1,4 +1,4 @@
-#include "../../headers/render/zs-mesh.h"
+#include "../../headers/render/Mesh.hpp"
 #include "../../headers/game.h"
 
 #include "../../headers/ogl/ogl.h"
@@ -287,70 +287,6 @@ Engine::Mesh* Engine::getSkyboxMesh(){
 }
 Engine::Mesh* Engine::getGrassMesh(){
     return grassMesh;
-
-}
-void Engine::Mesh::Init(){
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            static_cast<_ogl_Mesh*>(this)->Init();
-            break;
-        }
-        case VULKAN : {
-            static_cast<_vk_Mesh*>(this)->Init();
-            break;
-        }
-    }
-}
-
-void Engine::Mesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num) {
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            static_cast<_ogl_Mesh*>(this)->setMeshData(vertices, indices, vertices_num, indices_num);
-            break;
-        }
-        case VULKAN : {
-            static_cast<_vk_Mesh*>(this)->setMeshData(vertices, indices, vertices_num, indices_num);
-            break;
-        }
-    }
-}
-void Engine::Mesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num) {
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            static_cast<_ogl_Mesh*>(this)->setMeshData(vertices, vertices_num);
-            break;
-        }
-        case VULKAN : {
-            static_cast<_vk_Mesh*>(this)->setMeshData(vertices, vertices_num);
-            break;
-        }
-    }
-}
-
-void Engine::Mesh::Draw(){
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            static_cast<_ogl_Mesh*>(this)->Draw();
-            break;
-        }
-        case VULKAN : {
-            static_cast<_vk_Mesh*>(this)->Draw();
-            break;
-        }
-    }
-}
-
-void Engine::Mesh::DrawInstanced(unsigned int instances) {
-    switch (engine_ptr->engine_info->graphicsApi) {
-    case OGL32: {
-        static_cast<_ogl_Mesh*>(this)->DrawInstanced(instances);
-        break;
-    }
-    case VULKAN: {
-        static_cast<_vk_Mesh*>(this)->Draw();
-        break;
-    }
-    }
 }
 
 void Engine::Mesh::DrawLines(){
@@ -358,26 +294,8 @@ void Engine::Mesh::DrawLines(){
         static_cast<_ogl_Mesh*>(this)->DrawLines();
 }
 
-void Engine::Mesh::Destroy(){
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
-            static_cast<_ogl_Mesh*>(this)->Destroy();
-            break;
-        }
-        case VULKAN : {
-            static_cast<_vk_Mesh*>(this)->Destroy();
-            break;
-        }
-    }
-}
-
 bool Engine::Mesh::hasBones(){
     return !(bones.size() == 0);
-}
-
-Engine::Mesh::Mesh(){
-    this->vertices_num = 0;
-    this->indices_num = 0;
 }
 
 Engine::Mesh::~Mesh(){
@@ -388,7 +306,6 @@ Engine::Mesh::~Mesh(){
     if(indices_arr != nullptr)
         delete[] indices_arr;
 }
-
 
 Engine::Bone::Bone(std::string& name, unsigned int vertices){
     this->bone_name = name;

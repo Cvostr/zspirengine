@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../render/Math.hpp"
-#include "../render/zs-mesh.h"
+#include "../render/Mesh.hpp"
 #include "../render/Animation.hpp"
 #include <string>
 #include <vector>
@@ -14,7 +14,7 @@ public:
     //Node name string
     std::string node_label;
     //Transform matrix
-    ZSMATRIX4x4 node_transform;
+    Mat4 node_transform;
 
     ZSVECTOR3 node_translation;
     ZSVECTOR3 node_scaling;

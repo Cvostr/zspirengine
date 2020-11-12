@@ -149,6 +149,9 @@
     <ClCompile Include="code\src\engine\LocaleStringsFile.cpp" />
     <ClCompile Include="code\src\engine\resources.cpp" />
     <ClCompile Include="code\src\input\zs-input.cpp" />
+    <ClCompile Include="code\src\math\BB3.cpp" />
+    <ClCompile Include="code\src\math\Mat4.cpp" />
+    <ClCompile Include="code\src\math\Vec3.cpp" />
     <ClCompile Include="code\src\misc\GlyphManager.cpp" />
     <ClCompile Include="code\src\misc\KeyValueFile.cpp" />
     <ClCompile Include="code\src\misc\oal_manager.cpp" />
@@ -225,6 +228,14 @@
     <ClInclude Include="code\headers\engine\resources.h" />
     <ClInclude Include="code\headers\game.h" />
     <ClInclude Include="code\headers\input\zs-input.h" />
+    <ClInclude Include="code\headers\math\BB3.hpp" />
+    <ClInclude Include="code\headers\math\Mat4.hpp" />
+    <ClInclude Include="code\headers\math\Quat.hpp" />
+    <ClInclude Include="code\headers\math\RGBColor.hpp" />
+    <ClInclude Include="code\headers\math\Vec2.hpp" />
+    <ClInclude Include="code\headers\math\Vec3.hpp" />
+    <ClInclude Include="code\headers\math\Vec4.hpp" />
+    <ClInclude Include="code\headers\math\Vertex.hpp" />
     <ClInclude Include="code\headers\misc\GlyphManager.h" />
     <ClInclude Include="code\headers\misc\KeyValueFile.hpp" />
     <ClInclude Include="code\headers\misc\oal_manager.h" />
@@ -238,7 +249,7 @@
     <ClInclude Include="code\headers\render\Animation.hpp" />
     <ClInclude Include="code\headers\render\zs-materials.h" />
     <ClInclude Include="code\headers\render\Math.hpp" />
-    <ClInclude Include="code\headers\render\zs-mesh.h" />
+    <ClInclude Include="code\headers\render\Mesh.hpp" />
     <ClInclude Include="code\headers\render\zs-pipeline.h" />
     <ClInclude Include="code\headers\render\zs-screen-effect.h" />
     <ClInclude Include="code\headers\render\Shader.hpp" />

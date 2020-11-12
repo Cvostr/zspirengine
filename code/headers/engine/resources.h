@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "../render/Texture.h"
-#include "../render/zs-mesh.h"
+#include "../render/Mesh.hpp"
 #include "../render/zs-materials.h"
 #include "../render/Animation.hpp"
 #include "../misc/zs3m-master.h"

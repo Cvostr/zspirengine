@@ -1,7 +1,7 @@
 #ifndef VK_DATA_H
 #define VK_DATA_H
 
-#include "../render/zs-mesh.h"
+#include "../render/Mesh.hpp"
 #include "../render/UniformBuffer.hpp"
 #include "../render/Shader.hpp"
 #include "../render/Texture.h"

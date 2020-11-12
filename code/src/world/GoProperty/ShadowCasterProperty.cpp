@@ -8,7 +8,7 @@ Engine::ShadowCasterProperty::ShadowCasterProperty() {
     TextureWidth = 2048;
     TextureHeight = 2048;
 
-    shadow_bias = 0.005f;
+    mShadowBias = 0.005f;
     nearPlane = 1.0f;
     farPlane = 75.0f;
     projection_viewport = 20;
@@ -44,7 +44,7 @@ void Engine::ShadowCasterProperty::copyTo(Engine::IGameObjectComponent* dest) {
     ShadowCasterProperty* _dest = static_cast<ShadowCasterProperty*>(dest);
     _dest->farPlane = this->farPlane;
     _dest->nearPlane = this->nearPlane;
-    _dest->shadow_bias = this->shadow_bias;
+    _dest->mShadowBias = this->mShadowBias;
     _dest->TextureWidth = this->TextureWidth;
     _dest->TextureHeight = this->TextureHeight;
     _dest->projection_viewport = this->projection_viewport;
@@ -72,7 +72,7 @@ void Engine::ShadowCasterProperty::loadPropertyFromMemory(const char* data, Game
 
     readBinaryValue<int>(&TextureWidth, data + offset, offset);
     readBinaryValue<int>(&TextureHeight, data + offset, offset);
-    readBinaryValue<float>(&shadow_bias, data + offset, offset);
+    readBinaryValue<float>(&mShadowBias, data + offset, offset);
     readBinaryValue<float>(&nearPlane, data + offset, offset);
     readBinaryValue<float>(&farPlane, data + offset, offset);
     readBinaryValue<int>(&projection_viewport, data + offset, offset);
@@ -82,7 +82,7 @@ void Engine::ShadowCasterProperty::savePropertyToStream(ZsStream* stream, GameOb
     //write collider type
     stream->writeBinaryValue(&TextureWidth);
     stream->writeBinaryValue(&TextureHeight);
-    stream->writeBinaryValue(&shadow_bias);
+    stream->writeBinaryValue(&mShadowBias);
     stream->writeBinaryValue(&nearPlane);
     stream->writeBinaryValue(&farPlane);
     stream->writeBinaryValue(&projection_viewport);
@@ -141,11 +141,11 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pip
     //Bind shadow uniform buffer
     pipeline->shadowBuffer->bind();
     //Send BIAS value
-    pipeline->shadowBuffer->writeData(sizeof(ZSMATRIX4x4) * 4, 4, &shadow_bias);
+    pipeline->shadowBuffer->writeData(sizeof(Mat4) * 4, 4, &mShadowBias);
     //Send Width of shadow texture
-    pipeline->shadowBuffer->writeData(sizeof(ZSMATRIX4x4) * 4 + 8, 4, &this->TextureWidth);
+    pipeline->shadowBuffer->writeData(sizeof(Mat4) * 4 + 8, 4, &this->TextureWidth);
     //Send Height of shadow texture
-    pipeline->shadowBuffer->writeData(sizeof(ZSMATRIX4x4) * 4 + 12, 4, &this->TextureHeight);
+    pipeline->shadowBuffer->writeData(sizeof(Mat4) * 4 + 12, 4, &this->TextureHeight);
     //Use shadowmap shader to draw objects
     pipeline->getShadowmapShader()->Use();
 
@@ -153,17 +153,17 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pip
     //iterate over all cascades
     for (unsigned int i = 0; i < 3; i++) {
         ZSVECTOR3 cam_pos = cam->getCameraPosition() - cam->getCameraFrontVec() * 15 * (1.f + (float)i);
-        ZSMATRIX4x4 matview = matrixLookAt(cam_pos, cam_pos + light->direction * -1, ZSVECTOR3(0, 1, 0));
+        Mat4 matview = matrixLookAt(cam_pos, cam_pos + light->direction * -1, ZSVECTOR3(0, 1, 0));
 
         float w = projection_viewport * (1 + i) * 1.5f;
         this->LightProjectionMat = getOrthogonal(-w, w, -w, w, nearPlane, farPlane);
 
-        ZSMATRIX4x4 mat = matview * LightProjectionMat;
+        Mat4 mat = matview * LightProjectionMat;
 
         pipeline->shadowBuffer->bind();
-        pipeline->shadowBuffer->writeData(0, sizeof(ZSMATRIX4x4), &mat);
+        pipeline->shadowBuffer->writeData(0, sizeof(Mat4), &mat);
         uint64_t offset = (1 + uint64_t(i));
-        pipeline->shadowBuffer->writeData(sizeof(ZSMATRIX4x4) * offset, sizeof(ZSMATRIX4x4), &mat);
+        pipeline->shadowBuffer->writeData(sizeof(Mat4) * offset, sizeof(Mat4), &mat);
 
         glViewport(TextureWidth * i, 0, TextureWidth, TextureHeight);
         //Render to depth all scene

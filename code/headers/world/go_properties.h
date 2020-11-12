@@ -137,9 +137,9 @@ public:
     ZSVECTOR3 scale;
     ZSQUATERNION rotation;
     //Node transform from file
-    ZSMATRIX4x4 transform_mat;
+    Mat4 transform_mat;
     //Caclulated node transform
-    ZSMATRIX4x4 abs;
+    Mat4 abs;
 
     void copyTo(IGameObjectComponent* dest);
    // void addPropertyInterfaceToInspector();
@@ -159,15 +159,16 @@ public:
 class ShadowCasterProperty : public Engine::IGameObjectComponent {
 private:
     bool initialized;
+
     unsigned int shadowBuffer;
     unsigned int shadowDepthTexture;
 
-    ZSMATRIX4x4 LightProjectionMat;
-    ZSMATRIX4x4 LightViewMat[3];
+    Mat4 LightProjectionMat;
+    Mat4 LightViewMat[3];
 public:
     int TextureWidth;
     int TextureHeight;
-    float shadow_bias;
+    float mShadowBias;
     float nearPlane;
     float farPlane;
     int projection_viewport;
@@ -348,7 +349,7 @@ public:
     void setAnimationResource(Engine::AudioResource* anim);
 
     void updateAnimationPtr();
-    void updateNodeTransform(GameObject* obj, ZSMATRIX4x4 parent);
+    void updateNodeTransform(GameObject* obj, Mat4 parent);
 
     void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
     void loadPropertyFromMemory(const char* data, GameObject* obj);
