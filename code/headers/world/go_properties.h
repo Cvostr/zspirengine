@@ -160,18 +160,19 @@ class ShadowCasterProperty : public Engine::IGameObjectComponent {
 private:
     bool initialized;
 
-    unsigned int shadowBuffer;
-    unsigned int shadowDepthTexture;
+    unsigned int mShadowBuffer;
+    unsigned int mShadowDepthTexture;
 
     Mat4 LightProjectionMat;
     Mat4 LightViewMat[3];
 public:
-    int TextureWidth;
+    int TextureSize;
     int TextureHeight;
     float mShadowBias;
     float nearPlane;
     float farPlane;
     int projection_viewport;
+    int mCascadesNum;
 
     void addPropertyInterfaceToInspector();
     void onPreRender(Engine::RenderPipeline* pipeline);

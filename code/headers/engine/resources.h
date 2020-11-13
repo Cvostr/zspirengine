@@ -1,12 +1,11 @@
-#ifndef zs_resources
-#define zs_resources
+#pragma once
 
 #include <string>
 #include <vector>
 
 #include "../render/Texture.h"
 #include "../render/Mesh.hpp"
-#include "../render/zs-materials.h"
+#include "../render/Material.hpp"
 #include "../render/Animation.hpp"
 #include "../misc/zs3m-master.h"
 #include "../misc/oal_manager.h"
@@ -183,5 +182,3 @@ public:
 };
 
 }
-
-#endif

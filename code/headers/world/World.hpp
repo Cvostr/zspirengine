@@ -125,7 +125,7 @@ public:
     GameObject* getGameObjectByStrId(std::string id);
     GameObject* getGameObjectByLabel(const std::string& label);
     GameObject* getGameObjectByArrayIndex(unsigned int index);
-    GameObject* addObject(GameObject obj);
+    GameObject* addObject(const GameObject& obj);
     Engine::GameObject* newObject(); //Add new object to world
     void removeObj(Engine::GameObjectLink& link); //Remove object from world
     void removeObject(GameObject* obj); //Remove object from world
@@ -145,7 +145,7 @@ public:
 
     void trimObjectsList();
     int getFreeObjectSpaceIndex();
-    bool isObjectLabelUnique(std::string label); //Get amount of objects with this label
+    bool isObjectLabelUnique(const std::string& label); //Get amount of objects with this label
     void getAvailableNumObjLabel(std::string label, int* result);
 
     World();

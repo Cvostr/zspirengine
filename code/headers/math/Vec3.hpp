@@ -57,23 +57,11 @@ public:
 		return X == r.X && Y == r.Y && Z == r.Z;
 	}
 
-	ZSVECTOR3() {
-		X = 0;
-		Y = 0;
-		Z = 0;
-	}
+	ZSVECTOR3() : X(0), Y(0), Z(0) {}
 
-	ZSVECTOR3(float nx, float ny, float nz) {
-		X = nx;
-		Y = ny;
-		Z = nz;
-	}
+	ZSVECTOR3(float nx, float ny, float nz) : X(nx), Y(ny), Z(nz) {}
 
-	ZSVECTOR3(float v) {
-		X = v;
-		Y = v;
-		Z = v;
-	}
+	ZSVECTOR3(float v) : X(v), Y(v), Z(v) {}
 
 };
 

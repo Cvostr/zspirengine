@@ -87,11 +87,11 @@ Engine::IGameObjectComponent* Engine::allocProperty(PROPERTY_TYPE type){
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_RIGIDBODY:{
-            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::RigidbodyProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new Engine::RigidbodyProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_CHARACTER_CONTROLLER:{
-            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::CharacterControllerProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new Engine::CharacterControllerProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_TILE_GROUP:{
@@ -107,19 +107,19 @@ Engine::IGameObjectComponent* Engine::allocProperty(PROPERTY_TYPE type){
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_SKYBOX:{
-            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::SkyboxProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new Engine::SkyboxProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_SHADOWCASTER:{
-            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::ShadowCasterProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new Engine::ShadowCasterProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_TERRAIN:{
-            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::TerrainProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new Engine::TerrainProperty);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_TRIGGER: {
-            _ptr = static_cast<Engine::IGameObjectComponent*>(new Engine::TriggerProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new Engine::TriggerProperty);
             break;
         }
     }

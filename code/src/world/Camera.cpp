@@ -100,16 +100,15 @@ ZSVECTOR3 Engine::Camera::getCameraViewCenterPos(){
     return this->camera_pos;
 }
 
-Engine::Camera::Camera(){
+Engine::Camera::Camera() : camera_pos(0, 0, 0),
+                           camera_front(1, 0, 0),
+                           camera_up(0, 1, 0),
+                           proj_type(ZSCAMERA_PROJECTION_PERSPECTIVE),
+                           nearZ(0.1f),
+                           farZ(100.0f),
+                           FOV(45) {
 
-    camera_pos = ZSVECTOR3(0,0,0);
-    camera_front = ZSVECTOR3(1,0,0);
-    camera_up = ZSVECTOR3(0,1,0);
-
-    proj_type = ZSCAMERA_PROJECTION_PERSPECTIVE;
-    nearZ = 0.1f;
-    farZ = 100.0f;
-    FOV = 45;
+    
     viewport = ZSVIEWPORT(0,0, 640, 480);
     orthogonal_factor = 1.f;
 
@@ -122,7 +121,6 @@ Engine::Camera::Camera(){
 
 void Engine::Camera::updateTick(float deltaTime){
     if(!isMoving) return;
-
 
     if(getDistance(camera_pos, _dest_pos) < 6){
         camera_pos = _dest_pos;

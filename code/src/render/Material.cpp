@@ -1,4 +1,4 @@
-#include "../../headers/render/zs-materials.h"
+#include "../../headers/render/Material.hpp"
 
 MaterialShaderProperty::MaterialShaderProperty(){
     type = MATSHPROP_TYPE_NONE;

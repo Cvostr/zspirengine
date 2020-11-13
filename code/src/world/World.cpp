@@ -2,6 +2,8 @@
 #include "../../headers/world/go_properties.h"
 #include "../../headers/misc/misc.h"
 
+extern ZSGAME_DATA* game_data;
+
 Engine::World::World(){
     objects.reserve(MAX_OBJS);
 
@@ -46,7 +48,7 @@ Engine::GameObject* Engine::World::getGameObjectByArrayIndex(unsigned int index)
     return nullptr; //if we haven't found one
 }
 
-Engine::GameObject* Engine::World::addObject(GameObject obj){
+Engine::GameObject* Engine::World::addObject(const GameObject& obj){
     //Generating new object
     GameObject* newobj = new GameObject;
     *newobj = obj;
@@ -70,7 +72,10 @@ Engine::GameObject* Engine::World::addObject(GameObject obj){
 
 void Engine::World::removeObj(Engine::GameObjectLink& link) {
     Engine::GameObjectLink l = link;
-    l.updLinkPtr()->alive = false; //Mark object as dead
+    Engine::GameObject* ObjectPtr = l.updLinkPtr();
+    if (ObjectPtr == nullptr)
+        return;
+    ObjectPtr->alive = false; //Mark object as dead
     //Get amount of children
     size_t children_num = l.updLinkPtr()->mChildren.size();
 
@@ -339,6 +344,10 @@ void Engine::World::loadFromMemory(const char* bytes, unsigned int size, RenderS
         for (size_t chi_i = 0; chi_i < obj_ptr->mChildren.size(); chi_i++) { //Now iterate over all children
             GameObjectLink* child_ptr = &obj_ptr->mChildren[chi_i];
             GameObject* child_go_ptr = child_ptr->updLinkPtr();
+            if (child_go_ptr == nullptr) {
+                game_data->out_manager->spawnRuntimeError(RuntimeErrorType::RE_TYPE_SCENE_OPEN_ERROR);
+                continue;
+            }
             child_go_ptr->mParent = obj_ptr->getLinkToThisObject();
             child_go_ptr->hasParent = true;
         }
@@ -363,7 +372,7 @@ void Engine::World::call_onStop() {
     }
 }
 
-bool Engine::World::isObjectLabelUnique(std::string label) {
+bool Engine::World::isObjectLabelUnique(const std::string& label) {
     size_t objs_num = objects.size();
     int ret_amount = 0;
     for (size_t obj_it = 0; obj_it < objs_num; obj_it++) { //Iterate over all objs in scene

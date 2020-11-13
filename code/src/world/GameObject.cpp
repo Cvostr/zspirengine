@@ -466,7 +466,10 @@ Engine::GameObject* Engine::GameObject::getChildObjectWithNodeLabel(const std::s
     //Iterate over all children in current object
     for (unsigned int i = 0; i < this->mChildren.size(); i ++) {
         Engine::GameObjectLink* l = &this->mChildren[i];
-        Engine::NodeProperty* node_p = (l)->updLinkPtr()->getPropertyPtr<Engine::NodeProperty>();
+        Engine::GameObject* ChildPtr = l->updLinkPtr();
+        if (ChildPtr == nullptr)
+            continue;
+        Engine::NodeProperty* node_p = ChildPtr->getPropertyPtr<Engine::NodeProperty>();
         if (node_p == nullptr)
             continue;
         //if node's name match

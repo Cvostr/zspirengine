@@ -5,7 +5,7 @@ Engine::ShadowCasterProperty::ShadowCasterProperty() {
 
     initialized = false;
 
-    TextureWidth = 2048;
+    TextureSize = 2048;
     TextureHeight = 2048;
 
     mShadowBias = 0.005f;
@@ -13,8 +13,9 @@ Engine::ShadowCasterProperty::ShadowCasterProperty() {
     farPlane = 75.0f;
     projection_viewport = 20;
 
-    shadowBuffer = 0;
-    shadowDepthTexture = 0;
+    mShadowBuffer = 0;
+    mShadowDepthTexture = 0;
+    mCascadesNum = 3;
 }
 
 bool Engine::ShadowCasterProperty::isRenderAvailable() {
@@ -45,24 +46,26 @@ void Engine::ShadowCasterProperty::copyTo(Engine::IGameObjectComponent* dest) {
     _dest->farPlane = this->farPlane;
     _dest->nearPlane = this->nearPlane;
     _dest->mShadowBias = this->mShadowBias;
-    _dest->TextureWidth = this->TextureWidth;
+    _dest->TextureSize = this->TextureSize;
     _dest->TextureHeight = this->TextureHeight;
     _dest->projection_viewport = this->projection_viewport;
 }
 
 void Engine::ShadowCasterProperty::setTextureSize() {
-    glDeleteTextures(1, &this->shadowDepthTexture);
-    glDeleteFramebuffers(1, &shadowBuffer);
+    glDeleteTextures(1, &mShadowDepthTexture);
+    glDeleteFramebuffers(1, &mShadowBuffer);
 
     init();
 }
 
 void Engine::ShadowCasterProperty::setTexture() {
     glActiveTexture(GL_TEXTURE6);
-    glBindTexture(GL_TEXTURE_2D, this->shadowDepthTexture);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, this->mShadowDepthTexture);
 }
 
 void Engine::ShadowCasterProperty::onValueChanged() {
+    if (mCascadesNum > 5)
+        mCascadesNum = 5;
     //Update shadowmap texture
     setTextureSize();
 }
@@ -70,18 +73,18 @@ void Engine::ShadowCasterProperty::onValueChanged() {
 void Engine::ShadowCasterProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
 
-    readBinaryValue<int>(&TextureWidth, data + offset, offset);
-    readBinaryValue<int>(&TextureHeight, data + offset, offset);
-    readBinaryValue<float>(&mShadowBias, data + offset, offset);
-    readBinaryValue<float>(&nearPlane, data + offset, offset);
-    readBinaryValue<float>(&farPlane, data + offset, offset);
-    readBinaryValue<int>(&projection_viewport, data + offset, offset);
+    readBinaryValue(&TextureSize, data + offset, offset);
+    readBinaryValue(&mCascadesNum, data + offset, offset);
+    readBinaryValue(&mShadowBias, data + offset, offset);
+    readBinaryValue(&nearPlane, data + offset, offset);
+    readBinaryValue(&farPlane, data + offset, offset);
+    readBinaryValue(&projection_viewport, data + offset, offset);
 }
 
 void Engine::ShadowCasterProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     //write collider type
-    stream->writeBinaryValue(&TextureWidth);
-    stream->writeBinaryValue(&TextureHeight);
+    stream->writeBinaryValue(&TextureSize);
+    stream->writeBinaryValue(&mCascadesNum);
     stream->writeBinaryValue(&mShadowBias);
     stream->writeBinaryValue(&nearPlane);
     stream->writeBinaryValue(&farPlane);
@@ -93,26 +96,28 @@ void Engine::ShadowCasterProperty::onPreRender(Engine::RenderPipeline* pipeline)
 }
 
 void Engine::ShadowCasterProperty::init() {
-    glGenFramebuffers(1, &this->shadowBuffer);//Generate framebuffer for texture
-    glGenTextures(1, &this->shadowDepthTexture); //Generate texture
-
-    glBindTexture(GL_TEXTURE_2D, shadowDepthTexture);
-    //Configuring texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this->TextureWidth * 3, this->TextureHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
+    //Generate framebuffer for texture
+    glGenFramebuffers(1, &this->mShadowBuffer);
     //Binding framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, mShadowBuffer);
+    //Generate texture
+    glGenTextures(1, &this->mShadowDepthTexture); 
+    glBindTexture(GL_TEXTURE_2D_ARRAY, mShadowDepthTexture);
+    //Configuring texture
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, this->TextureSize, this->TextureSize, mCascadesNum, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+    
     //Connecting depth texture to framebuffer
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, this->shadowDepthTexture, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, this->mShadowDepthTexture, 0);
     //We won't render color
-    glDrawBuffer(false);
-    glReadBuffer(false);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
     //Unbind framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -120,8 +125,8 @@ void Engine::ShadowCasterProperty::init() {
 }
 
 void Engine::ShadowCasterProperty::onObjectDeleted() {
-    glViewport(0, 0, TextureWidth, TextureHeight);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer); //Bind framebuffer
+    glViewport(0, 0, TextureSize, TextureSize);
+    glBindFramebuffer(GL_FRAMEBUFFER, mShadowBuffer); //Bind framebuffer
     glClear(GL_DEPTH_BUFFER_BIT);
 }
 
@@ -133,7 +138,7 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pip
 
     Engine::LightsourceProperty* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceProperty>();
     //Change Framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer); //Bind framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, mShadowBuffer); //Bind framebuffer
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
@@ -141,34 +146,32 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pip
     //Bind shadow uniform buffer
     pipeline->shadowBuffer->bind();
     //Send BIAS value
-    pipeline->shadowBuffer->writeData(sizeof(Mat4) * 4, 4, &mShadowBias);
+    pipeline->shadowBuffer->writeData(0, sizeof(float), &mShadowBias);
     //Send Width of shadow texture
-    pipeline->shadowBuffer->writeData(sizeof(Mat4) * 4 + 8, 4, &this->TextureWidth);
-    //Send Height of shadow texture
-    pipeline->shadowBuffer->writeData(sizeof(Mat4) * 4 + 12, 4, &this->TextureHeight);
+    pipeline->shadowBuffer->writeData(sizeof(float), sizeof(int), &this->TextureSize);
     //Use shadowmap shader to draw objects
     pipeline->getShadowmapShader()->Use();
 
-    float dists[] = { 40, 70, 110 };
+    int dists[] = { 0, 40, 80, 120, 160 };
     //iterate over all cascades
-    for (unsigned int i = 0; i < 3; i++) {
-        ZSVECTOR3 cam_pos = cam->getCameraPosition() - cam->getCameraFrontVec() * 15 * (1.f + (float)i);
+    for (int i = 0; i < mCascadesNum; i++) {
+        ZSVECTOR3 cam_pos = cam->getCameraPosition() + cam->getCameraFrontVec() * static_cast<float>(dists[i]);
         Mat4 matview = matrixLookAt(cam_pos, cam_pos + light->direction * -1, ZSVECTOR3(0, 1, 0));
 
-        float w = projection_viewport * (1 + i) * 1.5f;
+        float w = static_cast<float>(35 * (1 + i));
         this->LightProjectionMat = getOrthogonal(-w, w, -w, w, nearPlane, farPlane);
 
         Mat4 mat = matview * LightProjectionMat;
 
         pipeline->shadowBuffer->bind();
-        pipeline->shadowBuffer->writeData(0, sizeof(Mat4), &mat);
-        uint64_t offset = (1 + uint64_t(i));
-        pipeline->shadowBuffer->writeData(sizeof(Mat4) * offset, sizeof(Mat4), &mat);
-
-        glViewport(TextureWidth * i, 0, TextureWidth, TextureHeight);
-        //Render to depth all scene
-        pipeline->renderDepth(this->go_link.world_ptr);
+        unsigned int offset = 16 + sizeof(Mat4) * i;
+        pipeline->shadowBuffer->writeData(offset, sizeof(Mat4), &mat);
+        unsigned int DistOffset = 336 + sizeof(int) * i;
+        pipeline->shadowBuffer->writeData(DistOffset, sizeof(int), &dists[i]);
     }
+    glViewport(0, 0, TextureSize, TextureSize);
+    //Render to depth all scene
+    pipeline->renderShadowDepth(this->go_link.world_ptr, mCascadesNum);
 
     glFrontFace(GL_CCW);
 }

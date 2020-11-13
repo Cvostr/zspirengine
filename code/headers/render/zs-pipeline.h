@@ -33,6 +33,8 @@ struct RenderSettings {
     GameObject* skybox_obj_ptr;
     GameObject* shadowcaster_obj_ptr;
         
+    unsigned int mShadowCascadesNum;
+
     void defaults();
     void resetPointers();
 
@@ -115,7 +117,7 @@ public:
     void render();
     void render2D();
     void render3D(Engine::Camera* cam);
-    void renderDepth(World* world_ptr);
+    void renderShadowDepth(World* world_ptr, unsigned int CascadesNum);
     void init();
     void updateWindowSize(int W, int H);
     void destroy();

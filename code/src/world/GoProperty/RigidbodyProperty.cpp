@@ -1,14 +1,12 @@
 #include "../../../headers/world/go_properties.h"
 
-Engine::RigidbodyProperty::RigidbodyProperty() {
+Engine::RigidbodyProperty::RigidbodyProperty() : gravity(0.f, -10.f, 0.f),
+                                                 linearVel(0.f, 0.f, 0.f){
 
     mass = 1.0f;
     created = false;
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_RIGIDBODY;
     coll_type = COLLIDER_TYPE::COLLIDER_TYPE_CUBE;
-
-    gravity = ZSVECTOR3(0.f, -10.f, 0.f);
-    linearVel = ZSVECTOR3(0.f, 0.f, 0.f);
 }
 
 void Engine::RigidbodyProperty::onStart() {

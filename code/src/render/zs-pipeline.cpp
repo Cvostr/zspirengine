@@ -11,6 +11,7 @@ extern ZSGAME_DATA* game_data;
 
 void Engine::RenderSettings::defaults(){
     ambient_light_color = ZSRGBCOLOR(255, 255, 255, 255);
+    mShadowCascadesNum = 3;
     resetPointers();
 }
 
@@ -41,7 +42,7 @@ void Engine::RenderPipeline::initShaders(){
         this->skybox_shader->compileFromFile("Shaders/skybox/skybox.vert", "Shaders/skybox/skybox.frag");
         this->terrain_shader->compileFromFile("Shaders/heightmap/heightmap.vert", "Shaders/heightmap/heightmap.frag");
         this->grass_shader->compileFromFile("Shaders/heightmap/grass.vert", "Shaders/heightmap/grass.frag");
-        this->shadowMap->compileFromFile("Shaders/shadowmap/shadowmap.vert", "Shaders/shadowmap/shadowmap.frag");
+        this->shadowMap->compileFromFile("Shaders/shadowmap/shadowmap.vert", "Shaders/shadowmap/shadowmap.frag", "Shaders/shadowmap/shadowmap.geom");
         this->final_shader->compileFromFile("Shaders/postprocess/final/final.vert", "Shaders/postprocess/final/final.frag");
 
         MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, 9);
@@ -61,7 +62,7 @@ Engine::RenderPipeline::RenderPipeline(){
     lightsBuffer->init(1, LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16 * 2);
     //Shadow uniform buffer
     shadowBuffer = allocUniformBuffer();
-    shadowBuffer->init(2, sizeof (Mat4) * 4 + 16);
+    shadowBuffer->init(2, 500);
     //Terrain uniform buffer
     terrainUniformBuffer = allocUniformBuffer();
     terrainUniformBuffer->init(3, 12 * 16 * 2 + 4 * 3);
@@ -301,7 +302,8 @@ void Engine::RenderPipeline::processObjects(World* world_ptr) {
     }
 }
 
-void Engine::RenderPipeline::renderDepth(World* world_ptr){
+void Engine::RenderPipeline::renderShadowDepth(World* world_ptr, unsigned int CascadesNum){
+    this->render_settings.mShadowCascadesNum = CascadesNum;
     World* _world_ptr = static_cast<World*>(world_ptr);
     current_state = PIPELINE_STATE::PIPELINE_STATE_SHADOWDEPTH;
     //Iterate over all objects in the world
@@ -316,16 +318,6 @@ void Engine::GameObject::processObject(RenderPipeline* pipeline) {
     //Call update on every property in objects
     if (pipeline->allowOnUpdate && pipeline->current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
         this->onUpdate(static_cast<int>(pipeline->deltaTime));
-
-    //Obtain camera viewport
-    //Engine::ZSVIEWPORT cam_viewport = pipeline->cam->getViewport();
-    //Distance limit
-    //int max_dist = static_cast<int>(cam_viewport.endX - cam_viewport.startX);
-    //bool difts = isDistanceFits(pipeline->cam->getCameraViewCenterPos(), transform_prop->_last_translation, max_dist);
-
-    //if(difts)
-
-   
 
     this->Draw(pipeline);
 
@@ -403,7 +395,7 @@ void Engine::GameObject::Draw(RenderPipeline* pipeline){    //On render pipeline
             bool castShadows = (hasTerrain()) ? getPropertyPtr<TerrainProperty>()->castShadows : mesh_prop->castShadows;
             //If castShadows is true, then render mesh to DepthBuffer
             if(castShadows)
-                DrawMesh(pipeline);
+                DrawMeshInstanced(pipeline, pipeline->getRenderSettings()->mShadowCascadesNum);
         }
     }
 }
@@ -419,7 +411,7 @@ void Engine::MaterialProperty::onRender(Engine::RenderPipeline* pipeline){
     Engine::ShadowCasterProperty* shadowcast = nullptr;
     if (pipeline->getRenderSettings()->shadowcaster_obj_ptr != nullptr) {
         shadowcast =
-            static_cast<Engine::GameObject*>(pipeline->getRenderSettings()->shadowcaster_obj_ptr)->getPropertyPtr<Engine::ShadowCasterProperty>();
+            pipeline->getRenderSettings()->shadowcaster_obj_ptr->getPropertyPtr<Engine::ShadowCasterProperty>();
         //Bind shadow uniform buffer
         pipeline->shadowBuffer->bind();
     }
@@ -434,7 +426,7 @@ void Engine::MaterialProperty::onRender(Engine::RenderPipeline* pipeline){
     }else
         shadowcast->setTexture();
 
-    pipeline->shadowBuffer->writeData(sizeof (Mat4) * 4 + 4, 4, &recShadows);
+    pipeline->shadowBuffer->writeData(8, sizeof(int), &recShadows);
     //Apply matrerial to shader and textures
     material_ptr->applyMatToPipeline();
 }

@@ -5,18 +5,9 @@ public:
 	float X;
 	float Y;
 
-	ZSVECTOR2() {
-		X = 0;
-		Y = 0;
-	}
-	ZSVECTOR2(float nx, float ny) {
-		X = nx;
-		Y = ny;
-	}
-	ZSVECTOR2(float v) {
-		X = v;
-		Y = v;
-	}
+	ZSVECTOR2() : X(0), Y(0) {}
+	ZSVECTOR2(float nx, float ny) : X(nx), Y(ny) {}
+	ZSVECTOR2(float v) : X(v), Y(v) {}
 
 };
 

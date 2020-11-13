@@ -13,19 +13,9 @@ public:
 		return ZSVECTOR3(X, Y, Z);
 	}
 
-	ZSVECTOR4() {
-		X = 0;
-		Y = 0;
-		Z = 0;
-		W = 0;
-	}
+	ZSVECTOR4() : X(0), Y(0), Z(0), W(0) {}
 
-	ZSVECTOR4(float x, float y, float z, float w) {
-		this->X = x;
-		this->Y = y;
-		this->Z = z;
-		this->W = w;
-	}
+	ZSVECTOR4(float x, float y, float z, float w) : X(x), Y(y), Z(z), W(w) {}
 
 	ZSVECTOR4(const ZSVECTOR3& v, float w) {
 		this->X = v.X;
@@ -34,11 +24,6 @@ public:
 		this->W = w;
 	}
 
-	ZSVECTOR4(float v) {
-		X = v;
-		Y = v;
-		Z = v;
-		W = v;
-	}
+	ZSVECTOR4(float v) : X(v), Y(v), Z(v), W(v) {}
 
 };
