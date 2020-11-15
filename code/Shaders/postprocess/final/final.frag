@@ -11,10 +11,11 @@ layout(binding = 1) uniform sampler2D ui_map;
 
 void main(){
 
-vec4 scene;
+vec4 scene = texture(scene_map, _UV);
+vec4 ui = texture(ui_map, _UV);
 
-	scene = texture(scene_map, _UV);
+vec3 result = scene.rgb * (1 - ui.a) + ui.rgb * (ui.a);
 
-FragColor = scene;
+FragColor = vec4(result, 1);
 
 }

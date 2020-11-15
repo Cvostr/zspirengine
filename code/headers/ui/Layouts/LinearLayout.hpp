@@ -14,7 +14,6 @@ namespace Engine {
 		LayoutOrientation Orientation;
 		void AddView(IView* View);
 		void RemoveView(IView* View);
-		void draw();
 		LinearLayout() : Orientation(ORIENTATION_HORIZONTAL) {
 			mType = LAYOUT_TYPE_LINEAR;
 		}

@@ -15,15 +15,8 @@ namespace Engine {
 		LayoutType mType;
 		virtual void AddView(IView* View){}
 		virtual void RemoveView(IView* View) {}
-		IView* GetPreviousObject(IView* View){
-			if (mViews.size() == 1 || mViews[0] == View) return nullptr;
-			tViewList::iterator it = mViews.begin();
-			for (; it != mViews.end(); it++) {
-				if (*it == View)
-					return *(it - 1);
-			}
-			return nullptr;
-		}
+		IView* GetPreviousObject(IView* View);
+		void draw();
 		ILayout() : mType(LAYOUT_TYPE_NONE) {}
 	protected:
 		tViewList mViews;

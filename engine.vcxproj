@@ -165,13 +165,13 @@
     <ClCompile Include="code\src\ogl\ogl_texture.cpp" />
     <ClCompile Include="code\src\ogl\ogl_uniform_buf.cpp" />
     <ClCompile Include="code\src\render\MatShaderProps.cpp" />
-    <ClCompile Include="code\src\render\terrain-render.cpp" />
+    <ClCompile Include="code\src\render\TerrainRender.cpp" />
     <ClCompile Include="code\src\render\Animation.cpp" />
     <ClCompile Include="code\src\render\Material.cpp" />
     <ClCompile Include="code\src\render\Math.cpp" />
     <ClCompile Include="code\src\render\Mesh.cpp" />
     <ClCompile Include="code\src\render\zs-pipeline.cpp" />
-    <ClCompile Include="code\src\render\zs-screen-effect.cpp" />
+    <ClCompile Include="code\src\render\Framebuffer.cpp" />
     <ClCompile Include="code\src\render\Shader.cpp" />
     <ClCompile Include="code\src\render\Texture.cpp" />
     <ClCompile Include="code\src\render\UniformBuffer.cpp" />
@@ -192,6 +192,7 @@
     <ClCompile Include="code\src\Scripting\Types\StdString.cpp" />
     <ClCompile Include="code\src\Scripting\ZPScriptClass.cpp" />
     <ClCompile Include="code\src\ui\Layouts\FreeLayout.cpp" />
+    <ClCompile Include="code\src\ui\Layouts\ILayout.cpp" />
     <ClCompile Include="code\src\ui\Layouts\LinearLayout.cpp" />
     <ClCompile Include="code\src\ui\View.cpp" />
     <ClCompile Include="code\src\ui\Widgets\Button.cpp" />
@@ -257,7 +258,7 @@
     <ClInclude Include="code\headers\render\Math.hpp" />
     <ClInclude Include="code\headers\render\Mesh.hpp" />
     <ClInclude Include="code\headers\render\zs-pipeline.h" />
-    <ClInclude Include="code\headers\render\zs-screen-effect.h" />
+    <ClInclude Include="code\headers\render\Framebuffer.hpp" />
     <ClInclude Include="code\headers\render\Shader.hpp" />
     <ClInclude Include="code\headers\render\Texture.h" />
     <ClInclude Include="code\headers\render\UniformBuffer.hpp" />

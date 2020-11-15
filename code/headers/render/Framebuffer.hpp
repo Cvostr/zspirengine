@@ -1,5 +1,4 @@
-#ifndef ZS_SCR_EFFECT_HPP
-#define ZS_SCR_EFFECT_HPP
+#pragma once
 
 #include "GL/glew.h"
 
@@ -32,14 +31,4 @@ namespace Engine {
         GLframebuffer(unsigned int width, unsigned int height, bool depth);
     };
 
-	class ScreenEffect {
-	private:
-		void bindFramebuffer();
-	public:
-
-		ScreenEffect();
-		~ScreenEffect();
-	};
 }
-
-#endif

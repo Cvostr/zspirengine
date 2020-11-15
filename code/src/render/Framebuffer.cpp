@@ -1,12 +1,4 @@
-#include "../../headers/render/zs-screen-effect.h"
-
-Engine::ScreenEffect::ScreenEffect() {
-
-}
-Engine::ScreenEffect::~ScreenEffect() {
-
-}
-
+#include "../../headers/render/Framebuffer.hpp"
 
 void Engine::GLframebuffer::bind() {
     glBindFramebuffer(GL_FRAMEBUFFER, fbuffer);

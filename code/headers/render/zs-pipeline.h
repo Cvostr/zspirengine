@@ -11,7 +11,7 @@
 #include "../world/Camera.hpp"
 #include "../../headers/engine/resources.h"
 #include <vector>
-#include "zs-screen-effect.h"
+#include "Framebuffer.hpp"
 #include "../ui/Layouts/ILayout.hpp"
 
 enum class PIPELINE_STATE {
