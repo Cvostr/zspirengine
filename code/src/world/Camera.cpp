@@ -1,5 +1,22 @@
 #include "../../headers/world/Camera.hpp"
 
+Engine::Camera::Camera() : camera_pos(0),
+                           camera_front(1, 0, 0),
+                           camera_up(0, 1, 0),
+                           proj_type(ZSCAMERA_PROJECTION_PERSPECTIVE),
+                           nearZ(0.1f),
+                           farZ(100.0f),
+                           FOV(45),
+                           orthogonal_factor(1.f),
+                           viewport(0, 0, 640, 480)
+{
+    updateProjectionMat();
+    updateViewMat();
+
+    isMoving = false;
+    isAlListenerCamera = false;
+}
+
 void Engine::Camera::setFOV(float FOV){
     this->FOV = FOV;
     updateProjectionMat();
@@ -98,25 +115,6 @@ ZSVECTOR3 Engine::Camera::getCameraViewCenterPos(){
         return result;
     }
     return this->camera_pos;
-}
-
-Engine::Camera::Camera() : camera_pos(0, 0, 0),
-                           camera_front(1, 0, 0),
-                           camera_up(0, 1, 0),
-                           proj_type(ZSCAMERA_PROJECTION_PERSPECTIVE),
-                           nearZ(0.1f),
-                           farZ(100.0f),
-                           FOV(45) {
-
-    
-    viewport = ZSVIEWPORT(0,0, 640, 480);
-    orthogonal_factor = 1.f;
-
-    updateProjectionMat();
-    updateViewMat();
-
-    isMoving = false;
-    isAlListenerCamera = false;
 }
 
 void Engine::Camera::updateTick(float deltaTime){

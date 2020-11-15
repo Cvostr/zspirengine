@@ -2,12 +2,12 @@
 
 extern ZSGAME_DATA* game_data;
 
-Engine::AnimationProperty::AnimationProperty() {
+Engine::AnimationProperty::AnimationProperty() : anim_label("@none"),
+                                                 anim_prop_ptr(nullptr),
+                                                 Playing(false),
+                                                 start_sec(0)
+{
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_ANIMATION;
-    this->anim_label = "@none";
-    anim_prop_ptr = nullptr;
-    Playing = false;
-    start_sec = 0;
 }
 
 void Engine::AnimationProperty::play() {
@@ -100,11 +100,6 @@ void Engine::AnimationProperty::copyTo(IGameObjectComponent* dest) {
     _dest->anim_prop_ptr = this->anim_prop_ptr;
 }
 
-void Engine::AnimationProperty::setAnimation(std::string anim) {
-    this->anim_label = anim;
-    updateAnimationPtr();
-}
-
 void Engine::AnimationProperty::setAnimationResource(Engine::AudioResource* anim) {
     this->anim_label = anim->resource_label;
     updateAnimationPtr();
@@ -127,7 +122,7 @@ void Engine::AnimationProperty::loadPropertyFromMemory(const char* data, GameObj
 }
 
 void Engine::AnimationProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
-    *stream << anim_label << '\0';
+    stream->writeString(anim_label);
 }
 
 void Engine::AnimationProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {

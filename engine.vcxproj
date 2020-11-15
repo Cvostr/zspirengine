@@ -103,6 +103,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,6 +152,7 @@
     <ClCompile Include="code\src\input\zs-input.cpp" />
     <ClCompile Include="code\src\math\BB3.cpp" />
     <ClCompile Include="code\src\math\Mat4.cpp" />
+    <ClCompile Include="code\src\math\Quat.cpp" />
     <ClCompile Include="code\src\math\Vec3.cpp" />
     <ClCompile Include="code\src\misc\GlyphManager.cpp" />
     <ClCompile Include="code\src\misc\KeyValueFile.cpp" />
@@ -187,9 +189,13 @@
     <ClCompile Include="code\src\Scripting\InputAG.cpp" />
     <ClCompile Include="code\src\Scripting\MathAG.cpp" />
     <ClCompile Include="code\src\Scripting\ResourcesAG.cpp" />
+    <ClCompile Include="code\src\Scripting\Types\StdString.cpp" />
     <ClCompile Include="code\src\Scripting\ZPScriptClass.cpp" />
-    <ClCompile Include="code\src\ui\zs-uibutton.cpp" />
-    <ClCompile Include="code\src\ui\zs-uiwidget.cpp" />
+    <ClCompile Include="code\src\ui\Layouts\FreeLayout.cpp" />
+    <ClCompile Include="code\src\ui\Layouts\LinearLayout.cpp" />
+    <ClCompile Include="code\src\ui\View.cpp" />
+    <ClCompile Include="code\src\ui\Widgets\Button.cpp" />
+    <ClCompile Include="code\src\ui\Widgets\Widget.cpp" />
     <ClCompile Include="code\src\vulkan\vk_mesh.cpp" />
     <ClCompile Include="code\src\vulkan\vk_shader.cpp" />
     <ClCompile Include="code\src\vulkan\vk_texture.cpp" />
@@ -258,9 +264,15 @@
     <ClInclude Include="code\headers\Scripting\AngelScript.hpp" />
     <ClInclude Include="code\headers\Scripting\AngelScriptMgr.h" />
     <ClInclude Include="code\headers\Scripting\FilesAG.hpp" />
+    <ClInclude Include="code\headers\Scripting\Types\StdString.hpp" />
     <ClInclude Include="code\headers\Scripting\ZPScriptClass.hpp" />
-    <ClInclude Include="code\headers\ui\zs-uibutton.h" />
-    <ClInclude Include="code\headers\ui\zs-uiwidget.h" />
+    <ClInclude Include="code\headers\ui\Layouts\FreeLayout.hpp" />
+    <ClInclude Include="code\headers\ui\Layouts\ILayout.hpp" />
+    <ClInclude Include="code\headers\ui\Layouts\LinearLayout.hpp" />
+    <ClInclude Include="code\headers\ui\UI.hpp" />
+    <ClInclude Include="code\headers\ui\View.hpp" />
+    <ClInclude Include="code\headers\ui\Widgets\Button.hpp" />
+    <ClInclude Include="code\headers\ui\Widgets\Widget.hpp" />
     <ClInclude Include="code\headers\vulkan\vk_data.h" />
     <ClInclude Include="code\headers\vulkan\zsvk_mem.h" />
     <ClInclude Include="code\headers\vulkan\zsvulkan.h" />

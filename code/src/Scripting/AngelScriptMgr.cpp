@@ -87,7 +87,7 @@ void AGScriptMgr::create_Engine() {
 	ag_engine = asCreateScriptEngine();
 
 	ag_engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
-	RegisterStdString(ag_engine);
+	Engine::RegisterStdString(ag_engine);
 	RegisterScriptHandle(ag_engine);
 	//Add base script class
 	RegisterInterface("ZPScript");

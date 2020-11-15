@@ -109,7 +109,6 @@ public:
     void onObjectDeleted();
     void copyTo(Engine::IGameObjectComponent* dest);
 
-    void setAudioFile(std::string relpath);
     void setAudioResource(Engine::AudioResource* res);
     void updateAudioPtr();
     void audio_start();
@@ -346,7 +345,7 @@ public:
 
     void play();
     void stop();
-    void setAnimation(std::string anim);
+
     void setAnimationResource(Engine::AudioResource* anim);
 
     void updateAnimationPtr();

@@ -65,10 +65,6 @@ void Engine::AudioSourceProperty::copyTo(Engine::IGameObjectComponent* dest) {
     _dest->buffer_ptr = this->buffer_ptr;
     //_dest->source.setAlBuffer(this->buffer_ptr);
 }
-void Engine::AudioSourceProperty::setAudioFile(std::string relpath) {
-    this->resource_relpath = relpath;
-    this->updateAudioPtr();
-}
 
 void Engine::AudioSourceProperty::setAudioResource(Engine::AudioResource* res) {
     this->buffer_ptr = res;

@@ -1,5 +1,14 @@
 #include "../../../headers/world/go_properties.h"
 
+Engine::LightsourceProperty::LightsourceProperty() : light_type(LIGHTSOURCE_TYPE::LIGHTSOURCE_TYPE_DIRECTIONAL),
+                                                     intensity(1.f),
+                                                     range(10.0f),
+                                                     spot_angle(12.5f)
+{
+    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_LIGHTSOURCE;
+}
+
+
 void Engine::LightsourceProperty::copyTo(Engine::IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't Lightsource, then exit
 
@@ -26,16 +35,6 @@ void Engine::LightsourceProperty::onPreRender(Engine::RenderPipeline* pipeline) 
         this->last_pos = transform_prop->abs_translation;
         this->last_rot = transform_prop->abs_rotation;
     }
-}
-
-Engine::LightsourceProperty::LightsourceProperty() {
-    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_LIGHTSOURCE;
-    active = true;
-    light_type = LIGHTSOURCE_TYPE::LIGHTSOURCE_TYPE_DIRECTIONAL; //base type is directional
-
-    intensity = 1.0f; //base light instensity is 1
-    range = 10.0f;
-    spot_angle = 12.5f;
 }
 
 void Engine::LightsourceProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {

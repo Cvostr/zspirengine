@@ -6,11 +6,12 @@ using namespace Engine;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
 
-GlobVarHandle::GlobVarHandle(int typeID) {
-	index = 0;
-	name = "";
-	address = nullptr;
-	value_ptr = nullptr;
+GlobVarHandle::GlobVarHandle(int typeID) : index(0),
+											name(""),
+											address(nullptr),
+											value_ptr(nullptr),
+											size(0)
+{
 	this->typeID = typeID;
 
 	switch (typeID) {

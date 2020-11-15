@@ -1,7 +1,7 @@
 #pragma once
 
 #include <angelscript/angelscript.h>
-#include <angelscript/scriptstdstring.h>
+#include "Types/StdString.hpp"
 #include <angelscript/scripthandle.h>
 #include <string>
 

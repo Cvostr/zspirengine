@@ -1,5 +1,4 @@
-#ifndef zs_pipeline
-#define zs_pipeline
+#pragma once
 
 #include "Shader.hpp"
 #include "Mesh.hpp"
@@ -13,6 +12,7 @@
 #include "../../headers/engine/resources.h"
 #include <vector>
 #include "zs-screen-effect.h"
+#include "../ui/Layouts/ILayout.hpp"
 
 enum class PIPELINE_STATE {
     PIPELINE_STATE_DEFAULT,
@@ -72,6 +72,8 @@ private:
 public:
     PIPELINE_STATE current_state;
 
+    ILayout* RootLayout;
+
     bool cullFaces; //if enabled, GL will cull faces
     bool allowOnUpdate;
 
@@ -129,5 +131,3 @@ public:
 };
 
 }
-
-#endif

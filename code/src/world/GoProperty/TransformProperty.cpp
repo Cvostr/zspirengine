@@ -1,8 +1,8 @@
 #include "../../../headers/world/go_properties.h"
 
-Engine::TransformProperty::TransformProperty() {
+Engine::TransformProperty::TransformProperty() : scale(1.f)
+{
     this->type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM;
-    this->scale = ZSVECTOR3(1.f, 1.f, 1.f);
 }
 
 void Engine::TransformProperty::updateMatrix() {

@@ -1,11 +1,8 @@
 #include "../../../headers/world/go_properties.h"
 
-Engine::NodeProperty::NodeProperty() {
+Engine::NodeProperty::NodeProperty() : scale (1.f)
+{
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_NODE;
-
-    scale = ZSVECTOR3(1.f, 1.f, 1.f);
-    translation = ZSVECTOR3(0.f, 0.f, 0.f);
-    rotation = ZSQUATERNION(0.f, 0.f, 0.f, 0.f);
 }
 
 void Engine::NodeProperty::copyTo(IGameObjectComponent* dest) {

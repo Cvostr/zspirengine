@@ -2,9 +2,8 @@
 
 extern ZSGAME_DATA* game_data;
 
-Engine::ZPScriptProperty::ZPScriptProperty() {
+Engine::ZPScriptProperty::ZPScriptProperty() : script(nullptr) {
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT;
-    script = nullptr;
     script_res = nullptr;
 }
 

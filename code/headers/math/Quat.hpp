@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #define REAL_NUM_EQ(x, y) (fabs((x) - (y)) < 0.000001f)
 
 class ZSQUATERNION {

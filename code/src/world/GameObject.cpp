@@ -2,9 +2,22 @@
 #include "../../headers/world/go_properties.h"
 #include "../../headers/misc/misc.h"
 
-Engine::GameObjectLink::GameObjectLink(){
-    ptr = nullptr;
-    world_ptr = nullptr;
+Engine::GameObjectLink::GameObjectLink() : ptr(nullptr),
+                                           world_ptr(nullptr)
+{}
+
+Engine::GameObject::GameObject() : array_index(0),
+                                   props_num(0),
+                                   scripts_num(0),
+                                   alive(true),
+                                   mActive(true),
+                                   hasParent(false),
+                                   IsStatic(false),
+                                   mWorld(nullptr)
+{
+    genRandomString(&this->str_id, 15); //Generate random string ID
+    mComponents[0] = nullptr;
+    mScripts[0] = nullptr;
 }
 
 Engine::GameObject* Engine::GameObjectLink::updLinkPtr(){
@@ -25,20 +38,6 @@ bool Engine::GameObjectLink::isEmpty(){
 
 void Engine::GameObjectLink::crack(){
     this->world_ptr = nullptr; //It will now pass isEmpty() check
-}
-
-Engine::GameObject::GameObject() : array_index(0),
-                                   props_num(0),
-                                   scripts_num(0),
-                                   alive(true),
-                                   mActive(true),
-                                   hasParent(false), 
-                                   IsStatic(false),
-                                   mWorld(nullptr){
-
-    genRandomString(&this->str_id, 15); //Generate random string ID
-    mComponents[0] = nullptr;
-    mScripts[0] = nullptr;
 }
 
 Engine::GameObject::~GameObject() {
@@ -562,4 +561,6 @@ void Engine::GameObjectSnapshot::clear() {
     children_snapshots.clear(); //Free snapshot vector
     this->children.clear(); //Free link vector
 }
-Engine::GameObjectSnapshot::GameObjectSnapshot() : props_num(0), scripts_num(0), obj_array_ind(0) {}
+Engine::GameObjectSnapshot::GameObjectSnapshot() : props_num(0),
+                                                   scripts_num(0),
+                                                   obj_array_ind(0) {}
