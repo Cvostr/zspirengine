@@ -1,5 +1,4 @@
-#ifndef zs_input
-#define zs_input
+#pragma once
 
 #include <SDL2/SDL.h>
 
@@ -30,5 +29,3 @@ namespace Input {
 
     void processEventsSDL(SDL_Event* event);
 }
-
-#endif

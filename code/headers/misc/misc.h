@@ -1,7 +1,9 @@
-#ifndef RANDOMG_H
-#define RANDOMG_H
+#pragma once 
+
 #include <string>
 #include <fstream>
+#include <cstring>
+
 void genRandomString(std::string* result, unsigned int len);
 void readString(std::string& str, const char* data, unsigned int& offset);
 void readLine(std::string& str, const char* data, unsigned int& offset);
@@ -23,7 +25,3 @@ public:
 
 	void writeString(std::string str);
 };
-
-
-
-#endif // RANDOMG_H

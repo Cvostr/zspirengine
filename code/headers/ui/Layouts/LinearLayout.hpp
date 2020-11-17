@@ -12,8 +12,6 @@ namespace Engine {
 	class LinearLayout : public ILayout {
 	public:
 		LayoutOrientation Orientation;
-		void AddView(IView* View);
-		void RemoveView(IView* View);
 		LinearLayout() : Orientation(ORIENTATION_HORIZONTAL) {
 			mType = LAYOUT_TYPE_LINEAR;
 		}

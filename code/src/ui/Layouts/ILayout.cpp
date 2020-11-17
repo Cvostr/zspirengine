@@ -1,4 +1,5 @@
 #include "../../../headers/ui/Layouts/ILayout.hpp"
+#include <algorithm>
 
 using namespace Engine;
 
@@ -18,4 +19,13 @@ void ILayout::draw() {
 		IView* View = *it;
 		View->draw();
 	}
+}
+
+void ILayout::AddView(IView* View) {
+	mViews.push_back(View);
+	View->mParent = this;
+}
+void ILayout::RemoveView(IView* View) {
+	std::remove(mViews.begin(), mViews.end(), View);
+	mViews.pop_back();
 }

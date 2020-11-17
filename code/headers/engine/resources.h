@@ -16,8 +16,6 @@
 #include "../ogl/ogl.h"
 #include "../vulkan/vk_data.h"
 
-
-
 enum RESOURCE_TYPE {RESOURCE_TYPE_NONE,
                     RESOURCE_TYPE_TEXTURE,
                     RESOURCE_TYPE_MESH,

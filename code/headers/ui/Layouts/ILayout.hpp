@@ -13,8 +13,8 @@ namespace Engine {
 	class ILayout : public IView {
 	public:
 		LayoutType mType;
-		virtual void AddView(IView* View){}
-		virtual void RemoveView(IView* View) {}
+		void AddView(IView* View);
+		void RemoveView(IView* View);
 		IView* GetPreviousObject(IView* View);
 		void draw();
 		ILayout() : mType(LAYOUT_TYPE_NONE) {}

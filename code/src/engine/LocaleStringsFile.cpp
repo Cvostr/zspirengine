@@ -1,6 +1,7 @@
 #include "../../headers/engine/LocaleStringsFile.h"
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 using namespace ZSPIRE;
 using namespace std;

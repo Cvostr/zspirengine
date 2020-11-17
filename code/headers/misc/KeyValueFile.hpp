@@ -1,5 +1,4 @@
-#ifndef FILES_AG_HPP
-#define FILES_AG_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -52,5 +51,3 @@ namespace Engine {
 		~KeyValueFile();
 	};
 }
-
-#endif

@@ -39,10 +39,10 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
         //OpenGL 4.2
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
         SDL_WIN_MODE = SDL_WINDOW_OPENGL; //Set window mode to OpenGL
 
-        std::cout << "OpenGL version : 4.2 core" << std::endl;
+        std::cout << "OpenGL version : 4.3 core" << std::endl;
        
         SDL_DisplayMode current;
         SDL_GetCurrentDisplayMode(0, &current);

@@ -148,7 +148,7 @@
     <ClCompile Include="code\src\engine\EngineComponent.cpp" />
     <ClCompile Include="code\src\engine\loader.cpp" />
     <ClCompile Include="code\src\engine\LocaleStringsFile.cpp" />
-    <ClCompile Include="code\src\engine\resources.cpp" />
+    <ClCompile Include="code\src\engine\Resources.cpp" />
     <ClCompile Include="code\src\input\zs-input.cpp" />
     <ClCompile Include="code\src\math\BB3.cpp" />
     <ClCompile Include="code\src\math\Mat4.cpp" />

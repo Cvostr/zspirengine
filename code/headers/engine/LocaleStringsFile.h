@@ -1,5 +1,4 @@
-#ifndef LOCALE_STRINGS_FILE
-#define LOCALE_STRINGS_FILE
+#pragma once
 
 #include <string>
 #include <vector>
@@ -56,5 +55,3 @@ namespace ZSPIRE {
 		~LocaleStringsFile();
 	};
 }
-
-#endif
