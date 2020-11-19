@@ -1,8 +1,9 @@
-#include "../../headers/engine/loader.h"
+#include "../../headers/engine/BackgroundLoader.hpp"
 #include <thread>
 #include <list>
 #include <fstream>
 #include <iostream>
+#include "../../headers/threading/Mutex.hpp"
 
 #define LOADER_QUEUE_SIZE 300
 
@@ -10,6 +11,7 @@ static bool loader_thread_working = true;
 static std::string blob_root_directory;
 Engine::Loader::LoadRequest* requests[LOADER_QUEUE_SIZE];
 int queue_length = 0;
+static Engine::Mutex LoaderMutex;
 
 void _LDR_load(Engine::Loader::LoadRequest* req){
     std::cout << "Loading resource " << req->file_path << std::endl;
@@ -44,11 +46,14 @@ void loop(){
     while(loader_thread_working){
         //If there are some queues in pool
         if(queue_length > 0){
-            std::cout << "Loading ";
+            //Lock mutex in this thread
+            LoaderMutex.Lock();
             //Obtain pointer to LoadRequest
             Engine::Loader::LoadRequest* req = requests[LOADER_QUEUE_SIZE - queue_length];
             //Reduce requests pool amount
             queue_length--;
+            //unlock thread
+            LoaderMutex.Release();
             //Load resource by request
             _LDR_load(req);
         }
@@ -72,9 +77,10 @@ void Engine::Loader::stop(){
 }
 
 void Engine::Loader::queryLoadingRequest(LoadRequest* req){
-    //loader_loop
+    LoaderMutex.Lock();
     requests[LOADER_QUEUE_SIZE - 1 - (queue_length)] = req;
     queue_length++;
+    LoaderMutex.Release();
 }
 
 void Engine::Loader::loadImmideately(LoadRequest* req, std::string* absolute_path){

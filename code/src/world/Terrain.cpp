@@ -3,19 +3,20 @@
 #include <iostream>
 #include <GL/glew.h>
 
-TerrainData::TerrainData(){
-    GrassDensity = 1.0f;
-    W = 0; H = 0;
-    created = false;
-    hasHeightmapChanged = false;
-    hasPaintingChanged = false;
-    hasPhysicShapeChanged = false;
-    shape = nullptr;
-    data = nullptr;
+TerrainData::TerrainData() : 
+    GrassDensity(1.0f),
+    W(0),
+    H(0),
+    created(false),
+    hasHeightmapChanged(false),
+    hasPaintingChanged(false),
+    hasPhysicShapeChanged(false),
 
-    vertices = nullptr;
-    indices = nullptr;
-}
+    vertices(nullptr),
+    indices(nullptr),
+
+    shape(nullptr),
+    data(nullptr) {}
 
 bool TerrainData::isCreated() {
     return created;

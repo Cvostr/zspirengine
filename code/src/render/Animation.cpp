@@ -1,12 +1,12 @@
 #include "../../headers/render/Animation.hpp"
 #include <cassert>
 
-Engine::Animation::Animation(){
-    NumChannels = 0;
-    TPS = 0;
-    duration = 0;
-    channels = nullptr;
-}
+Engine::Animation::Animation() :
+    NumChannels(0),
+    TPS(0),
+    channels(nullptr),
+    duration(0) {}
+
 Engine::Animation::~Animation(){
     delete[] this->channels;
 }

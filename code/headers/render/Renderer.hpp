@@ -72,8 +72,6 @@ private:
 public:
     PIPELINE_STATE current_state;
 
-    ILayout* RootLayout;
-
     bool cullFaces; //if enabled, GL will cull faces
     bool allowOnUpdate;
 

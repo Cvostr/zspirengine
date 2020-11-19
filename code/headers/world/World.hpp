@@ -10,7 +10,7 @@
 #include "Camera.hpp"
 
 #include "Physics.h"
-#include "../render/zs-pipeline.h"
+#include "../render/Renderer.hpp"
 
 #include "../Scripting/AngelScriptMgr.h"
 #include "../Scripting/ZPScriptClass.hpp"

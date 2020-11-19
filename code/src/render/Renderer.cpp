@@ -1,4 +1,4 @@
-#include "../../headers/render/zs-pipeline.h"
+#include "../../headers/render/Renderer.hpp"
 #include "../../headers/engine.h"
 #include "../../headers/game.h"
 #include "../../headers/world/go_properties.h"
@@ -520,7 +520,7 @@ void Engine::RenderPipeline::renderUI() {
     f[9] = static_cast<int>(L'l');
     f[10] = static_cast<int>(L'd');
     c->DrawString(f, 11, ZSVECTOR2(10,10));
-    //RootLayout->draw();
+    game_data->ui_manager->DrawRootLayout();
 }
 
 void Engine::RenderPipeline::renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY){

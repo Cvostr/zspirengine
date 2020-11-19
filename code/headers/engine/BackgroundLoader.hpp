@@ -1,6 +1,4 @@
-#ifndef LOADER_H
-#define LOADER_H
-
+#pragma once
 #include <string>
 
 namespace Engine {
@@ -28,4 +26,3 @@ namespace Engine {
         void setBlobRootDirectory(std::string& dir);
     }
 }
-#endif // LOADER_H

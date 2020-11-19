@@ -1,5 +1,5 @@
 #include "../../headers/world/Terrain.hpp"
-#include "../../headers/render/zs-pipeline.h"
+#include "../../headers/render/Renderer.hpp"
 #include "../../headers/world/go_properties.h"
 #include <GL/glew.h>
 

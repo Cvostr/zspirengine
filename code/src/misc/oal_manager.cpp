@@ -258,6 +258,14 @@ Engine::SoundBuffer::SoundBuffer(){
 
 }
 
+
+Engine::SoundSource::SoundSource() {
+    source_gain = 1.0f;
+    source_pitch = 1.0f;
+
+    Init();
+}
+
 void Engine::SoundSource::Init(){
     alGenSources(1, &this->al_source_id);
 

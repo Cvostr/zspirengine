@@ -3,27 +3,26 @@
 extern ZSGAME_DATA* game_data;
 extern ZSpireEngine* engine_ptr;
 
-Engine::TerrainProperty::TerrainProperty(){
+Engine::TerrainProperty::TerrainProperty() :
+    Width(500),
+    Length(500),
+    MaxHeight(500),
+
+    range(15),
+    editHeight(5),
+    edit_mode(1),
+    textureid(1),
+    vegetableid(1),
+
+    castShadows(true),
+    textures_size(0),
+    grassType_size(0),
+
+    rigidBody(nullptr),
+    terrainUniformBuffer(nullptr),
+    transformBuffer(nullptr)
+{
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TERRAIN;
-
-    this->Width = 500;
-    this->Length = 500;
-    this->MaxHeight = 500;
-    
-    castShadows = true;
-    textures_size = 0;
-    grassType_size = 0;
-
-    this->range = 15;
-    this->editHeight = 5;
-    this->textureid = 1;
-    this->vegetableid = 1;
-
-    edit_mode = 1;
-
-    rigidBody = nullptr;
-    terrainUniformBuffer = nullptr;
-    transformBuffer = nullptr;
 }
 
 Engine::TerrainProperty::~TerrainProperty() {

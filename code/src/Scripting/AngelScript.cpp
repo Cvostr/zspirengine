@@ -72,26 +72,30 @@ void GlobVarHandle::copyValue(void* src, void* dest) {
 	}
 }
 
-bool AGScript::compileFromResource(Engine::ScriptResource* res) {
-	int result = 0;
-	unsigned int scr_file_offset = 0;
+bool AGScript::AddScriptFile(Engine::ScriptResource* res, CScriptBuilder& Builder) {
 	const char* script_str = res->script_content.c_str();
+	unsigned int scr_file_offset = 0;
+	int result = builder.AddSectionFromMemory(res->rel_path.c_str(), script_str, res->size);
 	std::string line;
-	
-	//Add main script
-	result = builder.AddSectionFromMemory(res->rel_path.c_str(), script_str, res->size);
 	//read first script line
 	readLine(line, script_str, scr_file_offset);
+	bool Result = true;
 	while (startsWith(line, "//use")) {
 		const char* dep_str_c = line.c_str() + 6;
 		std::string dep_str = std::string(dep_str_c);
 		dep_str.pop_back();
-		Engine::ScriptResource* _res = game_data->resources->getScriptByLabel(dep_str);
-		readLine(line, script_str, scr_file_offset);
+		Engine::ScriptResource* DependencyRes = game_data->resources->getScriptByLabel(dep_str);
 		//include dependency
-		result = builder.AddSectionFromMemory(dep_str_c, _res->script_content.c_str(), res->size);
+		Result = AddScriptFile(DependencyRes, Builder);
 	}
+	return Result;
+}
 
+bool AGScript::compileFromResource(Engine::ScriptResource* res) {
+	int result = 0;
+	//Add to compile file and its dependencies
+	AddScriptFile(res, builder);
+	//Build Script
 	result = builder.BuildModule();
 	if (result < 0) {
 		hasErrors = true;

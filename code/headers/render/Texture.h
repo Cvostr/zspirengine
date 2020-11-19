@@ -1,8 +1,7 @@
-#ifndef zs_texture
-#define zs_texture
+#pragma once
 
 #include <string>
-#include "../engine/loader.h"
+#include "../engine/BackgroundLoader.hpp"
 
 #define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
 #define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
@@ -59,5 +58,3 @@ namespace Engine {
     Texture* allocTexture();
     Texture3D* allocTexture3D();
 }
-
-#endif

@@ -2,17 +2,12 @@
 
 extern ZSGAME_DATA* game_data;
 
-Engine::AudioSourceProperty::AudioSourceProperty() {
+Engine::AudioSourceProperty::AudioSourceProperty() :
+    buffer_ptr(nullptr),
+    resource_relpath("@none"),
+    isPlaySheduled(false)
+{
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_AUDSOURCE;
-
-    buffer_ptr = nullptr;
-    this->resource_relpath = "@none";
-    isPlaySheduled = false;
-
-    this->source.source_gain = 1.0f;
-    this->source.source_pitch = 1.0f;
-
-    source.Init();
 }
 
 void Engine::AudioSourceProperty::onValueChanged() {

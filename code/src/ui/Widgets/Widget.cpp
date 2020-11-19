@@ -18,11 +18,14 @@ bool Engine::IWidget::isHoveredByMouse(){
     Input::MouseState mstate = Input::getMouseState();
     mstate.mouseY = engine_ptr->window_info->Height - mstate.mouseY;
 
+    unsigned int uiMouseX = static_cast<unsigned int>(mstate.mouseX);
+    unsigned int uiMouseY = static_cast<unsigned int>(mstate.mouseY);
+
     ViewSize Size;
     ViewPosition Pos;
     __GetTransform(Size, Pos);
 
-    if(Pos.posX < mstate.mouseX && Pos.posY < mstate.mouseY && Pos.posX + Size.WIDTH > mstate.mouseX && Pos.posY + Size.HEIGHT > mstate.mouseY)
+    if(Pos.posX < uiMouseX && Pos.posY < uiMouseY && Pos.posX + Size.WIDTH > uiMouseX && Pos.posY + Size.HEIGHT > uiMouseY)
         return true;
 
     return false;

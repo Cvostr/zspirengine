@@ -10,7 +10,7 @@
 #include "../misc/zs3m-master.h"
 #include "../misc/oal_manager.h"
 #include "../misc/GlyphManager.h"
-#include "loader.h"
+#include "BackgroundLoader.hpp"
 #include "EngineComponent.h"
 
 #include "../ogl/ogl.h"

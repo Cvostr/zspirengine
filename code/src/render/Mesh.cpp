@@ -307,14 +307,13 @@ Engine::Mesh::~Mesh(){
         delete[] indices_arr;
 }
 
-Engine::Bone::Bone(std::string& name, unsigned int vertices){
-    this->bone_name = name;
-    this->vertices_affected = vertices;
-}
-Engine::Bone::Bone(std::string& name){
-    this->bone_name = name;
-    vertices_affected = 0;
-}
+Engine::Bone::Bone(std::string& name, unsigned int vertices) : 
+    bone_name(name),
+    vertices_affected(vertices) {}
+
+Engine::Bone::Bone(std::string& name) : 
+    bone_name(name),
+    vertices_affected(0) {}
 
 void Engine::processTangentSpace(ZSVERTEX* vert_array, unsigned int* indices_array, int indices_num){
     for(int ind_i = 0; ind_i < indices_num ; ind_i += 3){

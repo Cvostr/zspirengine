@@ -1,5 +1,4 @@
-#ifndef ANGEL_SCRIPT_HPP
-#define ANGEL_SCRIPT_HPP
+#pragma once
 
 #include <angelscript/angelscript.h>
 #include <angelscript/scriptbuilder.h>
@@ -69,7 +68,9 @@ namespace Engine{
         void* getGlobalVariableAddr(unsigned int index);
         void getGlobalVariable(unsigned int index, const char** name, const char** _namespace, int* typeID);
         
+        bool AddScriptFile(Engine::ScriptResource* res, CScriptBuilder& Builder);
         bool compileFromResource(Engine::ScriptResource* res);
+        
         bool hasCompilerErrors();
 
         void onStart();
@@ -85,5 +86,3 @@ namespace Engine{
 
     
 }
-
-#endif

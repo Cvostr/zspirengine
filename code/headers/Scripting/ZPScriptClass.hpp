@@ -1,5 +1,4 @@
-#ifndef zpscript_class
-#define zpscript_class
+#pragma once
 
 #include <angelscript/angelscript.h>
 #include <string>
@@ -17,5 +16,3 @@ public:
 asITypeInfo* getZSPScript(void* mgr);
 void bindAgClass(std::string script_text, void* mgr);
 void call_func(asIScriptGeneric* gen);
-
-#endif

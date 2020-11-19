@@ -2,10 +2,11 @@
 #define zs_GAME
 
 #include "world/World.hpp"
-#include "render/zs-pipeline.h"
+#include "render/Renderer.hpp"
 #include "engine/resources.h"
 #include "misc/output.hpp"
 #include "Scripting/AngelScriptMgr.h"
+#include "ui/UiManager.hpp"
 
 typedef struct ZSGAME_DATA{
     //Pointer to resource manager
@@ -18,6 +19,8 @@ typedef struct ZSGAME_DATA{
     GlyphManager* glyph_manager;
     Engine::AGScriptMgr* script_manager;
     Engine::OutputManager* out_manager;
+    //Pointer to ui manager
+    Engine::UiManager* ui_manager;
     //TRUE, if this struct was created by editor
     bool isEditor; 
 
@@ -29,6 +32,7 @@ typedef struct ZSGAME_DATA{
         isEditor = false;
         script_manager = nullptr;
         out_manager = nullptr;
+        ui_manager = nullptr;
     }
 }ZSGAME_DATA;
 

@@ -35,6 +35,8 @@ private:
     unsigned int al_source_id;
 public:
 
+    SoundSource();
+
     ZSVECTOR3 source_pos; //Position of audio source
     float source_gain;
     float source_pitch;

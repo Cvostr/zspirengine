@@ -1,11 +1,11 @@
-#ifndef OUTPUT_HPP
-#define OUTPUT_HPP
+#pragma once
 
 #include "../engine/EngineComponent.h"
 #include <string>
 #include <vector>
 
 enum class LogEntryType {
+	LE_TYPE_NONE,
 	LE_TYPE_ENGINE_MESSAGE,
 	LE_TYPE_SCRIPT_MESSAGE,
 	LE_TYPE_SCRIPT_ERROR
@@ -32,9 +32,9 @@ typedef struct LogEntry {
 
 	std::string message;
 
-	LogEntry() {
-		error_type = ScriptErrorType::SE_TYPE_NONE;
-	}
+	LogEntry() :
+		error_type(ScriptErrorType::SE_TYPE_NONE),
+		log_type(LogEntryType::LE_TYPE_NONE) {}
 
 }LogEntry;
 
@@ -57,4 +57,3 @@ namespace Engine {
 		OutputManager();
 	};
 }
-#endif

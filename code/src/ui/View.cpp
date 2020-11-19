@@ -3,6 +3,20 @@
 #include "../../headers/ui/Layouts/ILayout.hpp"
 #include "../../headers/ui/Layouts/LinearLayout.hpp"
 
+#include "../../headers/game.h"
+
+extern ZSGAME_DATA* game_data;
+
+Engine::IView::IView() : 
+	mParent(nullptr)
+{
+	game_data->ui_manager->AddView(this);
+}
+
+Engine::IView::~IView() {
+	game_data->ui_manager->RemoveView(this);
+}
+
 void Engine::IView::resize(unsigned int Width, unsigned int Height) {
 	this->size = ViewSize(Width, Height);
 }

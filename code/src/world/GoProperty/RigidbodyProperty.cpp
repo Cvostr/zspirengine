@@ -1,7 +1,9 @@
 #include "../../../headers/world/go_properties.h"
 
-Engine::RigidbodyProperty::RigidbodyProperty() : gravity(0.f, -10.f, 0.f),
-                                                 linearVel(0.f, 0.f, 0.f){
+Engine::RigidbodyProperty::RigidbodyProperty() : 
+    gravity(0.f, -10.f, 0.f),                               
+    linearVel(0.f, 0.f, 0.f)
+{
 
     mass = 1.0f;
     created = false;

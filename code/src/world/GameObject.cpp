@@ -530,7 +530,7 @@ void Engine::GameObject::setMeshSkinningRootNodeRecursively(GameObject* rootNode
 
 const BoundingBox3& Engine::GameObject::getBoundingBox() {
     if (!hasMesh())
-        return BoundingBox3();
+        return mBoundingBox;
 
     mBoundingBox = getPropertyPtr<MeshProperty>()->mesh_ptr->mesh_ptr->mBoundingBox;
     mBoundingBox.ApplyTransform(getTransformProperty()->transform_mat);

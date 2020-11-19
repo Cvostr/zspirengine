@@ -146,7 +146,6 @@
   <ItemGroup>
     <ClCompile Include="code\src\engine.cpp" />
     <ClCompile Include="code\src\engine\EngineComponent.cpp" />
-    <ClCompile Include="code\src\engine\loader.cpp" />
     <ClCompile Include="code\src\engine\LocaleStringsFile.cpp" />
     <ClCompile Include="code\src\engine\Resources.cpp" />
     <ClCompile Include="code\src\input\zs-input.cpp" />
@@ -170,13 +169,14 @@
     <ClCompile Include="code\src\render\Material.cpp" />
     <ClCompile Include="code\src\render\Math.cpp" />
     <ClCompile Include="code\src\render\Mesh.cpp" />
-    <ClCompile Include="code\src\render\zs-pipeline.cpp" />
+    <ClCompile Include="code\src\render\Renderer.cpp" />
     <ClCompile Include="code\src\render\Framebuffer.cpp" />
     <ClCompile Include="code\src\render\Shader.cpp" />
     <ClCompile Include="code\src\render\Texture.cpp" />
     <ClCompile Include="code\src\render\UniformBuffer.cpp" />
     <ClCompile Include="code\src\resources\AnimationResource.cpp" />
     <ClCompile Include="code\src\resources\AudioResource.cpp" />
+    <ClCompile Include="code\src\resources\BackgroundLoader.cpp" />
     <ClCompile Include="code\src\resources\GlyphResource.cpp" />
     <ClCompile Include="code\src\resources\MaterialResource.cpp" />
     <ClCompile Include="code\src\resources\MeshResource.cpp" />
@@ -189,11 +189,15 @@
     <ClCompile Include="code\src\Scripting\InputAG.cpp" />
     <ClCompile Include="code\src\Scripting\MathAG.cpp" />
     <ClCompile Include="code\src\Scripting\ResourcesAG.cpp" />
+    <ClCompile Include="code\src\Scripting\Types\ASFile.cpp" />
     <ClCompile Include="code\src\Scripting\Types\StdString.cpp" />
     <ClCompile Include="code\src\Scripting\ZPScriptClass.cpp" />
+    <ClCompile Include="code\src\threading\Mutex.cpp" />
+    <ClCompile Include="code\src\threading\Thread.cpp" />
     <ClCompile Include="code\src\ui\Layouts\FreeLayout.cpp" />
     <ClCompile Include="code\src\ui\Layouts\ILayout.cpp" />
     <ClCompile Include="code\src\ui\Layouts\LinearLayout.cpp" />
+    <ClCompile Include="code\src\ui\UiManager.cpp" />
     <ClCompile Include="code\src\ui\View.cpp" />
     <ClCompile Include="code\src\ui\Widgets\Button.cpp" />
     <ClCompile Include="code\src\ui\Widgets\Widget.cpp" />
@@ -230,9 +234,10 @@
     <ClInclude Include="code\headers\engine.h" />
     <ClInclude Include="code\headers\engine\EngineComponent.h" />
     <ClInclude Include="code\headers\engine\engine_window.h" />
-    <ClInclude Include="code\headers\engine\loader.h" />
+    <ClInclude Include="code\headers\engine\BackgroundLoader.hpp" />
     <ClInclude Include="code\headers\engine\LocaleStringsFile.h" />
     <ClInclude Include="code\headers\engine\resources.h" />
+    <ClInclude Include="code\headers\engine_types.h" />
     <ClInclude Include="code\headers\game.h" />
     <ClInclude Include="code\headers\input\zs-input.h" />
     <ClInclude Include="code\headers\math\BB3.hpp" />
@@ -257,7 +262,7 @@
     <ClInclude Include="code\headers\render\Material.hpp" />
     <ClInclude Include="code\headers\render\Math.hpp" />
     <ClInclude Include="code\headers\render\Mesh.hpp" />
-    <ClInclude Include="code\headers\render\zs-pipeline.h" />
+    <ClInclude Include="code\headers\render\Renderer.hpp" />
     <ClInclude Include="code\headers\render\Framebuffer.hpp" />
     <ClInclude Include="code\headers\render\Shader.hpp" />
     <ClInclude Include="code\headers\render\Texture.h" />
@@ -265,12 +270,16 @@
     <ClInclude Include="code\headers\Scripting\AngelScript.hpp" />
     <ClInclude Include="code\headers\Scripting\AngelScriptMgr.h" />
     <ClInclude Include="code\headers\Scripting\FilesAG.hpp" />
+    <ClInclude Include="code\headers\Scripting\Types\ASFile.hpp" />
     <ClInclude Include="code\headers\Scripting\Types\StdString.hpp" />
     <ClInclude Include="code\headers\Scripting\ZPScriptClass.hpp" />
+    <ClInclude Include="code\headers\threading\Mutex.hpp" />
+    <ClInclude Include="code\headers\threading\Thread.hpp" />
     <ClInclude Include="code\headers\ui\Layouts\FreeLayout.hpp" />
     <ClInclude Include="code\headers\ui\Layouts\ILayout.hpp" />
     <ClInclude Include="code\headers\ui\Layouts\LinearLayout.hpp" />
     <ClInclude Include="code\headers\ui\UI.hpp" />
+    <ClInclude Include="code\headers\ui\UiManager.hpp" />
     <ClInclude Include="code\headers\ui\View.hpp" />
     <ClInclude Include="code\headers\ui\Widgets\Button.hpp" />
     <ClInclude Include="code\headers\ui\Widgets\Widget.hpp" />

@@ -2,6 +2,7 @@
 
 #include <angelscript/angelscript.h>
 #include "Types/StdString.hpp"
+#include "Types/ASFile.hpp"
 #include <angelscript/scripthandle.h>
 #include <string>
 

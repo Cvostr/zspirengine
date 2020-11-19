@@ -2,11 +2,11 @@
 
 extern ZSGAME_DATA* game_data;
 
-Engine::MaterialProperty::MaterialProperty() {
+Engine::MaterialProperty::MaterialProperty() :
+    receiveShadows(true),
+    material_ptr(nullptr)
+{
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_MATERIAL;
-
-    receiveShadows = true;
-    this->material_ptr = nullptr;
 }
 
 void Engine::MaterialProperty::copyTo(Engine::IGameObjectComponent* dest) {

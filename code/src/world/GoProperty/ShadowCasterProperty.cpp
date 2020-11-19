@@ -1,21 +1,21 @@
 #include "../../../headers/world/go_properties.h"
 
-Engine::ShadowCasterProperty::ShadowCasterProperty() {
+Engine::ShadowCasterProperty::ShadowCasterProperty() :
+    TextureSize(2048),
+    TextureHeight(2048),
+
+    mShadowBias(0.005f),
+    nearPlane(1.0f),
+    farPlane(75.0f),
+    projection_viewport(20),
+
+    mShadowBuffer(0),
+    mShadowDepthTexture(0),
+    mCascadesNum(3),
+
+    initialized(false)
+{
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_SHADOWCASTER;
-
-    initialized = false;
-
-    TextureSize = 2048;
-    TextureHeight = 2048;
-
-    mShadowBias = 0.005f;
-    nearPlane = 1.0f;
-    farPlane = 75.0f;
-    projection_viewport = 20;
-
-    mShadowBuffer = 0;
-    mShadowDepthTexture = 0;
-    mCascadesNum = 3;
 }
 
 bool Engine::ShadowCasterProperty::isRenderAvailable() {

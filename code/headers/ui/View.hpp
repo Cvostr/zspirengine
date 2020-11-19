@@ -57,8 +57,8 @@ namespace Engine {
 
 		IView* mParent;
 
-		IView() : mParent(nullptr) {}
-		virtual ~IView() {}
+        IView();
+        virtual ~IView();
 		virtual void draw(){}
 
     protected:

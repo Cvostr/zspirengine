@@ -1,5 +1,5 @@
 #include "../headers/engine.h"
-#include "../headers/engine/loader.h"
+#include "../headers/engine/BackgroundLoader.hpp"
 #include "../headers/game.h"
 #include <GL/glew.h>
 #include <iostream>
@@ -117,6 +117,8 @@ void ZSpireEngine::loadGame(){
 
     game_data->out_manager = new Engine::OutputManager;
     game_data->out_manager->consoleLogWorking = true;
+
+    game_data->ui_manager = new Engine::UiManager;
 
     game_data->world = new Engine::World();
 
