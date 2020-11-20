@@ -42,9 +42,12 @@ void Engine::MaterialProperty::loadPropertyFromMemory(const char* data, GameObje
     //Read material path
     readString(material_path, data, offset);
     //get material by label
-    material_ptr = game_data->resources->getMaterialByLabel(material_path)->material; //find it and process
+    MaterialResource* mat_resource = game_data->resources->getMaterialByLabel(material_path);
+    if (mat_resource == nullptr)
+        return;
+    material_ptr = mat_resource->material; //find it and process
     //Read receiveShadows boolean
-    readBinaryValue<bool>(&receiveShadows, data + offset, offset);
+    readBinaryValue(&receiveShadows, data + offset, offset);
     this->group_label = material_ptr->group_ptr->groupCaption;
 }
 

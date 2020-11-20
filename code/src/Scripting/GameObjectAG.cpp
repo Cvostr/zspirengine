@@ -30,12 +30,13 @@ void Engine::bindWorldSDK(AGScriptMgr* mgr) {
 }
 
 void Engine::bindGameObjectPropertiesSDK(AGScriptMgr* mgr) {
-	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(TRANSFORM_PROP_TYPE_NAME) + "@ transform()", asMETHOD(Engine::GameObject, getPropertyPtr<TransformProperty>), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(LIGHTSOURCE_PROP_TYPE_NAME) + "@ light()", asMETHOD(Engine::GameObject, getPropertyPtr<LightsourceProperty>), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(AUDSOURCE_PROP_TYPE_NAME) + "@ audio()", asMETHOD(Engine::GameObject, getPropertyPtr<AudioSourceProperty>), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(CHAR_CTRL_PROP_TYPE_NAME) + "@ char_ctrl()", asMETHOD(Engine::GameObject, getPropertyPtr<CharacterControllerProperty>), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(ANIM_PROP_TYPE_NAME) + "@ anim()", asMETHOD(Engine::GameObject, getPropertyPtr<AnimationProperty>), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(MESH_PROP_TYPE_NAME) + "@ mesh()", asMETHOD(Engine::GameObject, getPropertyPtr<MeshProperty>), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(MAT_PROP_TYPE_NAME) + "@ material()", asMETHOD(Engine::GameObject, getPropertyPtr<MaterialProperty>), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(RIGIDBODY_PROP_TYPE_NAME) + "@ rigidbody()", asMETHOD(Engine::GameObject, getPropertyPtr<RigidbodyProperty>), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(TRANSFORM_PROP_TYPE_NAME) + "@ transform()", asFUNCTION(ASGetPropertyPtr<TransformProperty>), asCALL_CDECL_OBJFIRST);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(LIGHTSOURCE_PROP_TYPE_NAME) + "@ light()", asFUNCTION(ASGetPropertyPtr<LightsourceProperty>), asCALL_CDECL_OBJFIRST);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(AUDSOURCE_PROP_TYPE_NAME) + "@ audio()", asFUNCTION(ASGetPropertyPtr<AudioSourceProperty>), asCALL_CDECL_OBJFIRST);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(CHAR_CTRL_PROP_TYPE_NAME) + "@ character()", asFUNCTION(ASGetPropertyPtr<CharacterControllerProperty>), asCALL_CDECL_OBJFIRST);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(ANIM_PROP_TYPE_NAME) + "@ anim()", asFUNCTION(ASGetPropertyPtr<AnimationProperty>), asCALL_CDECL_OBJFIRST);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(MESH_PROP_TYPE_NAME) + "@ mesh()", asFUNCTION(ASGetPropertyPtr<MeshProperty>), asCALL_CDECL_OBJFIRST);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(MAT_PROP_TYPE_NAME) + "@ material()", asFUNCTION(ASGetPropertyPtr<MaterialProperty>), asCALL_CDECL_OBJFIRST);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(RIGIDBODY_PROP_TYPE_NAME) + "@ rigidbody()", asFUNCTION(ASGetPropertyPtr<RigidbodyProperty>), asCALL_CDECL_OBJFIRST);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(COLLIDER_PROP_TYPE_NAME) + "@ collider()", asFUNCTION(ASGetPropertyPtr<ColliderProperty>), asCALL_CDECL_OBJFIRST);
 }

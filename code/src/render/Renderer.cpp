@@ -62,7 +62,7 @@ Engine::RenderPipeline::RenderPipeline(){
     lightsBuffer->init(1, LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16 * 2);
     //Shadow uniform buffer
     shadowBuffer = allocUniformBuffer();
-    shadowBuffer->init(2, 500);
+    shadowBuffer->init(2, 432);
     //Terrain uniform buffer
     terrainUniformBuffer = allocUniformBuffer();
     terrainUniformBuffer->init(3, 12 * 16 * 2 + 4 * 3);
@@ -506,7 +506,7 @@ void Engine::RenderPipeline::updateShadersCameraInfo(Engine::Camera* cam_ptr){
 }
 
 void Engine::RenderPipeline::renderUI() {
-    GlyphFontContainer* c = game_data->resources->getFontByLabel("LiberationMono-Regular.ttf")->font_ptr;
+    GlyphFontContainer* c = game_data->resources->getFontByLabel("LiberationMono-Regular")->font_ptr;
     int f[12];
     f[0] = static_cast<int>(L'H');
     f[1] = static_cast<int>(L'e');

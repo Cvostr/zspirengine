@@ -3,10 +3,11 @@
 
 extern ZSGAME_DATA* game_data;
 
-Engine::IGameObjectComponent::IGameObjectComponent(){
-    type = PROPERTY_TYPE::GO_PROPERTY_TYPE_NONE;
-    active = true;
-    mWorld = nullptr;
+Engine::IGameObjectComponent::IGameObjectComponent() :
+    type(PROPERTY_TYPE::GO_PROPERTY_TYPE_NONE),
+    active(true),
+    mWorld(nullptr)
+{
 }
 void Engine::IGameObjectComponent::setActive(bool active){
     this->active = active;

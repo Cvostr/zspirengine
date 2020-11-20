@@ -2,7 +2,6 @@
 
 Engine::ShadowCasterProperty::ShadowCasterProperty() :
     TextureSize(2048),
-    TextureHeight(2048),
 
     mShadowBias(0.005f),
     nearPlane(1.0f),
@@ -47,15 +46,18 @@ void Engine::ShadowCasterProperty::copyTo(Engine::IGameObjectComponent* dest) {
     _dest->nearPlane = this->nearPlane;
     _dest->mShadowBias = this->mShadowBias;
     _dest->TextureSize = this->TextureSize;
-    _dest->TextureHeight = this->TextureHeight;
+    _dest->mCascadesNum = this->mCascadesNum;
     _dest->projection_viewport = this->projection_viewport;
 }
 
-void Engine::ShadowCasterProperty::setTextureSize() {
-    glDeleteTextures(1, &mShadowDepthTexture);
-    glDeleteFramebuffers(1, &mShadowBuffer);
+void Engine::ShadowCasterProperty::setTextureSize(int TextureSize) {
+    this->TextureSize = TextureSize;
+    reinitialize();
+}
 
-    init();
+void Engine::ShadowCasterProperty::SetCascadesAmount(int CascadesNum) {
+    this->mCascadesNum = CascadesNum;
+    reinitialize();
 }
 
 void Engine::ShadowCasterProperty::setTexture() {
@@ -64,10 +66,9 @@ void Engine::ShadowCasterProperty::setTexture() {
 }
 
 void Engine::ShadowCasterProperty::onValueChanged() {
-    if (mCascadesNum > 5)
-        mCascadesNum = 5;
-    //Update shadowmap texture
-    setTextureSize();
+    if (mCascadesNum > 6)
+        mCascadesNum = 6;
+    reinitialize();
 }
 
 void Engine::ShadowCasterProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
@@ -93,6 +94,13 @@ void Engine::ShadowCasterProperty::savePropertyToStream(ZsStream* stream, GameOb
 
 void Engine::ShadowCasterProperty::onPreRender(Engine::RenderPipeline* pipeline) {
     pipeline->getRenderSettings()->shadowcaster_obj_ptr = this->go_link.updLinkPtr();
+}
+
+void Engine::ShadowCasterProperty::reinitialize() {
+    glDeleteTextures(1, &mShadowDepthTexture);
+    glDeleteFramebuffers(1, &mShadowBuffer);
+    //Reinitialize texture
+    init();
 }
 
 void Engine::ShadowCasterProperty::init() {
@@ -149,6 +157,8 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pip
     pipeline->shadowBuffer->writeData(0, sizeof(float), &mShadowBias);
     //Send Width of shadow texture
     pipeline->shadowBuffer->writeData(sizeof(float), sizeof(int), &this->TextureSize);
+    //Send number of cascades of shadow texture
+    pipeline->shadowBuffer->writeData(12, sizeof(int), &this->mCascadesNum);
     //Use shadowmap shader to draw objects
     pipeline->getShadowmapShader()->Use();
 
@@ -166,7 +176,7 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pip
         pipeline->shadowBuffer->bind();
         unsigned int offset = 16 + sizeof(Mat4) * i;
         pipeline->shadowBuffer->writeData(offset, sizeof(Mat4), &mat);
-        unsigned int DistOffset = 336 + sizeof(int) * i;
+        unsigned int DistOffset = 400 + sizeof(int) * i;
         pipeline->shadowBuffer->writeData(DistOffset, sizeof(int), &dists[i]);
     }
     glViewport(0, 0, TextureSize, TextureSize);
@@ -174,4 +184,11 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pip
     pipeline->renderShadowDepth(this->go_link.world_ptr, mCascadesNum);
 
     glFrontFace(GL_CCW);
+}
+
+void Engine::ShadowCasterProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    mgr->RegisterObjectType(SHADOWCAST_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+
+    mgr->RegisterObjectMethod(SHADOWCAST_PROP_TYPE_NAME, "void SetTextureSize(int)", asMETHOD(ShadowCasterProperty, setTextureSize), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(SHADOWCAST_PROP_TYPE_NAME, "void SetCascadesAmount(int)", asMETHOD(ShadowCasterProperty, SetCascadesAmount), asCALL_THISCALL);
 }

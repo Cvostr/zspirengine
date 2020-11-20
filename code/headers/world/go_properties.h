@@ -164,9 +164,10 @@ private:
 
     Mat4 LightProjectionMat;
     Mat4 LightViewMat[3];
+
+    void reinitialize();
 public:
     int TextureSize;
-    int TextureHeight;
     float mShadowBias;
     float nearPlane;
     float farPlane;
@@ -181,11 +182,14 @@ public:
     void onObjectDeleted();
     void Draw(Engine::Camera* cam, RenderPipeline* pipeline);
     void setTexture();
-    void setTextureSize();
+    void setTextureSize(int TextureSize);
+    void SetCascadesAmount(int CascadesNum);
     bool isRenderAvailable();
+
     //function to read shadowcaster property from memory
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);
+    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     ShadowCasterProperty();
 };
@@ -252,6 +256,7 @@ public:
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);
+    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
     ColliderProperty();
 };

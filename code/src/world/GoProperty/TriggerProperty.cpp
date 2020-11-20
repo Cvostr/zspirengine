@@ -2,11 +2,12 @@
 
 #define MAX_TRIGGER_OBJS_SIZE 11
 
-Engine::TriggerProperty::TriggerProperty() {
+Engine::TriggerProperty::TriggerProperty() :
+    m_ghost(nullptr)
+{
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TRIGGER;
     coll_type = COLLIDER_TYPE::COLLIDER_TYPE_CUBE;
     created = false;
-    m_ghost = nullptr;
 
     this->_array = new SmArray<int>(MAX_TRIGGER_OBJS_SIZE);
 }

@@ -51,7 +51,7 @@ void Engine::TextureResource::Release() {
 Engine::TextureResource* Engine::ResourceManager::getTextureByLabel(std::string label) {
     for (unsigned int res = 0; res < this->resources.size(); res++) {
         ZsResource* resource_ptr = this->resources[res];
-        if (resource_ptr->resource_type == RESOURCE_TYPE_TEXTURE && resource_ptr->rel_path.compare(label) == 0)
+        if (resource_ptr->resource_type == RESOURCE_TYPE_TEXTURE && resource_ptr->resource_label.compare(label) == 0)
             return static_cast<TextureResource*>(resource_ptr);
     }
     return nullptr;

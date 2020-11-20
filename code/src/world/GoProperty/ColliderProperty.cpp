@@ -69,3 +69,9 @@ void Engine::ColliderProperty::savePropertyToStream(ZsStream* stream, GameObject
         stream->writeBinaryValue(&transform_offset.Z);
     }
 }
+
+void Engine::ColliderProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    mgr->RegisterObjectType(COLLIDER_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+
+    mgr->RegisterObjectProperty(COLLIDER_PROP_TYPE_NAME, "float mass", offsetof(ColliderProperty, mass));
+}

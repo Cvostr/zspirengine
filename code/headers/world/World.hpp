@@ -330,4 +330,10 @@ public:
     TransformProperty();
 };
 IGameObjectComponent* allocProperty(PROPERTY_TYPE type);
+
+template <typename T>
+T* ASGetPropertyPtr(GameObject* Obj) {
+    return Obj->getPropertyPtr<T>();
+}
+
 }

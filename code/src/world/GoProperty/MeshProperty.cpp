@@ -2,16 +2,14 @@
 
 extern ZSGAME_DATA* game_data;
 
-Engine::MeshProperty::MeshProperty() {
+Engine::MeshProperty::MeshProperty() :
+    mesh_ptr(nullptr),
+    castShadows(true),
+    resource_relpath("@none"),
+    rootNodeStr("@none"),
+    skinning_root_node(nullptr)
+{
     this->type = PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH;
-    mesh_ptr = nullptr;
-
-    castShadows = true;
-
-    this->skinning_root_node = nullptr;
-
-    this->resource_relpath = "@none";
-    this->rootNodeStr = "@none";
 }
 void Engine::MeshProperty::copyTo(IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't transform

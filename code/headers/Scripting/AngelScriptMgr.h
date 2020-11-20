@@ -36,6 +36,8 @@
 #define MESH_PROP_TYPE_NAME "Mesh"
 #define MAT_PROP_TYPE_NAME "Material"
 #define RIGIDBODY_PROP_TYPE_NAME "Rigidbody"
+#define COLLIDER_PROP_TYPE_NAME "Collider"
+#define SHADOWCAST_PROP_TYPE_NAME "ShadowCaster"
 
 namespace Engine {
     class AGScriptMgr {
@@ -103,4 +105,6 @@ namespace Engine {
     static T* new_as_ref_T(T* ptr) {
         return new T;
     }
+
+ 
 }

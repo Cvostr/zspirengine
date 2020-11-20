@@ -107,6 +107,8 @@ void AGScriptMgr::create_Engine() {
 	bindGameObjectPropertySDK<MeshProperty>(this, MESH_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<MaterialProperty>(this, MAT_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<RigidbodyProperty>(this, RIGIDBODY_PROP_TYPE_NAME);
+	bindGameObjectPropertySDK<ColliderProperty>(this, COLLIDER_PROP_TYPE_NAME);
+	bindGameObjectPropertySDK<ShadowCasterProperty>(this, SHADOWCAST_PROP_TYPE_NAME);
 
 	bindGameObjectPropertiesSDK(this);
 

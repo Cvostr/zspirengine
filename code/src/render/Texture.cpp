@@ -89,6 +89,7 @@ Engine::Texture::~Texture(){
 }
 
 bool Engine::Texture3D::pushTexture(int index, std::string path){
+    //return false;
     if(index > 5 || path.compare("@none") == 0) return false;
 
     this->units[index].path = path;
@@ -103,9 +104,11 @@ bool Engine::Texture3D::pushTexture(int index, std::string path){
         this->units[index].req->file_path = texture->blob_path;
     }
     else {
+        TextureResource* texture = game_data->resources->getTextureByLabel(path);
+
         //We are in editor
         this->units[index].req->size = 0;
-        this->units[index].req->file_path = path;
+        this->units[index].req->file_path = texture->rel_path;
         this->units[index].req->offset = 0;
     }
     //Load binary file multithreaded
