@@ -3,7 +3,7 @@
 
 #include "world/World.hpp"
 #include "render/Renderer.hpp"
-#include "engine/resources.h"
+#include "engine/Resources.hpp"
 #include "misc/output.hpp"
 #include "Scripting/AngelScriptMgr.h"
 #include "ui/UiManager.hpp"

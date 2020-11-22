@@ -5,7 +5,7 @@
 
 #include "../world/World.hpp"
 #include "AngelScriptMgr.h"
-#include "../engine/resources.h"
+#include "../engine/Resources.hpp"
 #include <string>
 #include <cstdint>
 #include <iostream>

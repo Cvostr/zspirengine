@@ -1,6 +1,8 @@
 #include "../../../headers/Scripting/Types/StdString.hpp"
 #include "assert.h"
 #include <sstream> 
+#include <string>
+#include "string.h"
 
 using namespace std;
 

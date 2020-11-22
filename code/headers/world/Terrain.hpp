@@ -4,7 +4,7 @@
 
 #include "../render/Texture.h"
 #include "../render/Math.hpp"
-#include "../engine/resources.h"
+#include "../engine/Resources.hpp"
 
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h>

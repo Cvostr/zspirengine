@@ -1,4 +1,4 @@
-#include "../../headers/engine/resources.h"
+#include "../../headers/engine/Resources.hpp"
 
 Engine::MeshResource::MeshResource() {
     this->resource_type = RESOURCE_TYPE_MESH;

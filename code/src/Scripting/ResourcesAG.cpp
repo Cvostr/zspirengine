@@ -1,5 +1,5 @@
 #include "../../headers/Scripting/AngelScriptMgr.h"
-#include "../../headers/engine/resources.h"
+#include "../../headers/engine/Resources.hpp"
 #include "../../headers/game.h"
 
 //Hack to support resources
@@ -17,6 +17,7 @@ void Engine::bindResourceManagerSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(RESOURCEMAN_TYPE_NAME, std::string(AUDRESOURCE_TYPE_NAME) + "@ getAudio(string)", asMETHOD(Engine::ResourceManager, getAudioByLabel), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(RESOURCEMAN_TYPE_NAME, std::string(ANIMRESOURCE_TYPE_NAME) + "@ getAnimation(string)", asMETHOD(Engine::ResourceManager, getAnimationByLabel), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(RESOURCEMAN_TYPE_NAME, std::string(MATRESOURCE_TYPE_NAME) + "@ getMaterial(string)", asMETHOD(Engine::ResourceManager, getMaterialByLabel), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(RESOURCEMAN_TYPE_NAME, std::string(FONTRESOURCE_TYPE_NAME) + "@ getFont(string)", asMETHOD(Engine::ResourceManager, getFontByLabel), asCALL_THISCALL);
 	//register global var to acess all resources
 	mgr->RegisterGlobalFunction(std::string(RESOURCEMAN_TYPE_NAME) + "@ getResources()", asFUNCTION(getResourcesMgr), asCALL_CDECL);
 }
@@ -34,4 +35,5 @@ void Engine::bindResourcesSDK(AGScriptMgr* mgr) {
 	bindResourceSDK(AUDRESOURCE_TYPE_NAME, mgr);
 	bindResourceSDK(ANIMRESOURCE_TYPE_NAME, mgr);
 	bindResourceSDK(MATRESOURCE_TYPE_NAME, mgr);
+	bindResourceSDK(FONTRESOURCE_TYPE_NAME, mgr);
 }

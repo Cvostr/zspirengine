@@ -16,6 +16,8 @@ void readBinaryValue(T* out, const char* data, unsigned int& offset) {
 
 bool startsWith(std::string& s, std::string m);
 
+void RemoveExtension(std::string& str);
+
 class ZsStream : public std::ofstream {
 public:
 	template <typename T>

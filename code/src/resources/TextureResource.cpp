@@ -1,8 +1,9 @@
-#include "../../headers/engine/resources.h"
+#include "../../headers/engine/Resources.hpp"
 
-Engine::TextureResource::TextureResource() {
+Engine::TextureResource::TextureResource() :
+    texture_ptr(nullptr)
+{
     this->resource_type = RESOURCE_TYPE_TEXTURE;
-    texture_ptr = nullptr;
 }
 
 Engine::TextureResource::~TextureResource() {

@@ -51,6 +51,7 @@ public:
     
     void onValueChanged();
     void addPropertyInterfaceToInspector();
+    void SetupScript();
     void onStart();
     void onStop();
     void onUpdate(float deltaTime); //calls update in scripts

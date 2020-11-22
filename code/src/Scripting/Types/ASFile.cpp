@@ -90,9 +90,11 @@ int CScriptFile::Open(const std::string& filename, const std::string& mode)
 	m += "b";
 
 	// Open the file
-	// MSVC 8.0 / 2005 introduced new functions 
-	// Marmalade doesn't use these, even though it uses the MSVC compiler
+#ifdef _WIN32
 	fopen_s(&file, myFilename.c_str(), m.c_str());
+#else
+	file = fopen(myFilename.c_str(), m.c_str());
+#endif
 
 	if (file == 0)
 		return -1;

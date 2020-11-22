@@ -1,4 +1,4 @@
-#include "../../headers/engine/resources.h"
+#include "../../headers/engine/Resources.hpp"
 #include "../../headers/game.h"
 
 extern ZSGAME_DATA* game_data;

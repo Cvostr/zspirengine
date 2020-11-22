@@ -87,6 +87,7 @@ bool AGScript::AddScriptFile(Engine::ScriptResource* res, CScriptBuilder& Builde
 		Engine::ScriptResource* DependencyRes = game_data->resources->getScriptByLabel(dep_str);
 		//include dependency
 		Result = AddScriptFile(DependencyRes, Builder);
+		readLine(line, script_str, scr_file_offset);
 	}
 	return Result;
 }
@@ -110,8 +111,7 @@ void AGScript::onStart() {
 
 	if (hasErrors == true)
 		return;
-	//fill pointer with main class
-	obtainScriptMainClass();
+
 	
 	//Obtain Start() function
 	asIScriptFunction* func = getFuncOnMainClass("void Start()");
@@ -236,6 +236,9 @@ void AGScript::obtainScriptModule() {
 }
 
 void AGScript::obtainScriptMainClass() {
+	if (hasErrors == true)
+		return;
+
 	int result = 0;
 	obtainScriptModule();
 	//Obtain class with interface ZPScript

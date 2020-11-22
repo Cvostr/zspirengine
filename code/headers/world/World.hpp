@@ -4,7 +4,7 @@
 #include <vector>
 #include <fstream>
 
-#include "../engine/resources.h"
+#include "../engine/Resources.hpp"
 #include "../misc/misc.h"
 #include "../misc/SmArray.hpp"
 #include "Camera.hpp"
@@ -13,7 +13,6 @@
 #include "../render/Renderer.hpp"
 
 #include "../Scripting/AngelScriptMgr.h"
-#include "../Scripting/ZPScriptClass.hpp"
 
 #include "../math/BB3.hpp"
 
@@ -163,7 +162,7 @@ public:
     std::string* getLabelPtr();
 
     bool mActive; //if true, object will be active in scene
-    bool alive; //false, if object was remove
+    bool mAlive; //false, if object was remove
     bool hasParent;
     bool IsStatic;
 
@@ -322,8 +321,8 @@ public:
     //Editor stuff
     void onValueChanged();
     void addPropertyInterfaceToInspector();
-    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
+    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);
 

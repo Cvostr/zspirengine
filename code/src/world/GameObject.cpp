@@ -9,7 +9,7 @@ Engine::GameObjectLink::GameObjectLink() : ptr(nullptr),
 Engine::GameObject::GameObject() : array_index(0),
                                    props_num(0),
                                    scripts_num(0),
-                                   alive(true),
+                                   mAlive(true),
                                    mActive(true),
                                    hasParent(false),
                                    IsStatic(false),
@@ -133,7 +133,7 @@ asIScriptObject* Engine::GameObject::getScriptObjectWithName(const std::string& 
     for (unsigned int script_i = 0; script_i < scripts_num; script_i++) {
         ZPScriptProperty* script = static_cast<ZPScriptProperty*>(mScripts[script_i]);
         if (script->getScript()->getClassName().compare(name) == 0) {
-            //script->getScript()->getMainClassPtr()->AddRef();
+            script->getScript()->getMainClassPtr()->AddRef();
             return script->getScript()->getMainClassPtr();
         }
     }
@@ -273,6 +273,11 @@ void Engine::GameObject::onStart() {
         if (!mComponents[i]->active) continue; //if property is inactive, then skip it
         mComponents[i]->onStart(); //and call onStart on each property
     }
+    for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
+        if (!mScripts[i]->active) continue; //if script is inactive, then skip it
+        //fill pointer with main class
+        mScripts[i]->SetupScript();
+    }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
         if (!mScripts[i]->active) continue; //if script is inactive, then skip it
@@ -355,7 +360,7 @@ void Engine::GameObject::onTriggerExit(GameObject* obj) {
 
 void Engine::GameObject::copyTo(GameObject* dest){
     dest->array_index = this->array_index;
-    dest->alive = this->alive;
+    dest->mAlive = this->mAlive;
     dest->mActive = this->mActive;
     dest->hasParent = this->hasParent;
     dest->mParent = this->mParent;
@@ -373,7 +378,7 @@ void Engine::GameObject::clearAll(){
     //Clear vector of children
     mChildren.clear();
     hasParent = false;
-    alive = false;
+    mAlive = false;
     mActive = false;
 }
 

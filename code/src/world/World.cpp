@@ -28,7 +28,7 @@ Engine::GameObject* Engine::World::getGameObjectByLabel(const std::string& label
     size_t objs_num = objects.size();
     for(size_t obj_it = 0; obj_it < objs_num; obj_it ++){ //Iterate over all objs in scene
         GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
-        if(!obj_ptr->alive) continue;
+        if(!obj_ptr->mAlive) continue;
         if (obj_ptr->getLabelProperty() == nullptr)
             continue;
         if(obj_ptr->getLabelProperty()->label.compare(label) == 0) //if labels are same
@@ -41,7 +41,7 @@ Engine::GameObject* Engine::World::getGameObjectByArrayIndex(unsigned int index)
     size_t objs_num = objects.size();
     for (size_t obj_it = 0; obj_it < objs_num; obj_it++) { //Iterate over all objs in scene
         GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
-        if (!obj_ptr->alive) continue;
+        if (!obj_ptr->mAlive) continue;
         if (obj_ptr->array_index == index) //if labels are same
             return obj_ptr; //Return founded object
     }
@@ -75,7 +75,7 @@ void Engine::World::removeObj(Engine::GameObjectLink& link) {
     Engine::GameObject* ObjectPtr = l.updLinkPtr();
     if (ObjectPtr == nullptr)
         return;
-    ObjectPtr->alive = false; //Mark object as dead
+    ObjectPtr->mAlive = false; //Mark object as dead
     //Get amount of children
     size_t children_num = l.updLinkPtr()->mChildren.size();
 
@@ -121,7 +121,7 @@ Engine::GameObject* Engine::World::newObject() {
 
 void Engine::World::trimObjectsList(){
     for (size_t i = 0; i < objects.size(); i ++) { //Iterating over all objects
-        if(objects[i]->alive == false){ //If object marked as deleted
+        if(objects[i]->mAlive == false){ //If object marked as deleted
             delete objects[i];
             for (size_t obj_i = i + 1; obj_i < objects.size(); obj_i ++) { //Iterate over all next chidren
                 objects[obj_i - 1] = objects[obj_i]; //Move it to previous place
@@ -378,7 +378,7 @@ bool Engine::World::isObjectLabelUnique(const std::string& label) {
     for (size_t obj_it = 0; obj_it < objs_num; obj_it++) { //Iterate over all objs in scene
         Engine::GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
         //if object was destroyed
-        if (!obj_ptr->alive) continue;
+        if (!obj_ptr->mAlive) continue;
         if (obj_ptr->getLabelPtr()->compare(label) == 0) {
             ret_amount += 1;
             if (ret_amount > 1) return false;
@@ -393,7 +393,7 @@ void Engine::World::getAvailableNumObjLabel(std::string label, int* result) {
     bool hasEqualName = false; //true if we already have this obj
     for (unsigned int obj_it = 0; obj_it < objs_num; obj_it++) { //Iterate over all objs in scene
         Engine::GameObject* obj_ptr = this->objects[obj_it]; //Get pointer to checking object
-        if (!obj_ptr->alive) continue;
+        if (!obj_ptr->mAlive) continue;
         if (obj_ptr->getLabelPtr()->compare(tocheck_str) == 0) //If label on object is same
             hasEqualName = true; //Then we founded equal name
     }
@@ -406,7 +406,7 @@ int Engine::World::getFreeObjectSpaceIndex() {
     size_t index_to_push = objects.size(); //Set free index to objects amount
     size_t objects_num = objects.size();
     for (unsigned int objs_i = 0; objs_i < objects_num; objs_i++) {
-        if (objects[objs_i]->alive == false) { //if object deleted
+        if (objects[objs_i]->mAlive == false) { //if object deleted
             index_to_push = objs_i; //set free index to index of deleted object
             break;
         }
@@ -483,9 +483,9 @@ Engine::GameObject* Engine::World::addObjectsFromPrefab(char* data, unsigned int
         std::string label = mObjects[obj_i].getLabel();
         int add_num = 0; //Declaration of addititonal integer
         getAvailableNumObjLabel(label, &add_num);
-
-        *mObjects[obj_i].getLabelPtr() += std::to_string(add_num); //Set new label to object
-
+        //Set new label to object
+        *mObjects[obj_i].getLabelPtr() += std::to_string(add_num); 
+        //Spawn new object
         Engine::GameObject* newObjPtr = this->addObject(mObjects[obj_i]);
     }
     Engine::GameObject* object = this->getGameObjectByStrId(mObjects[0].str_id);

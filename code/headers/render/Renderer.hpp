@@ -9,7 +9,7 @@
 #include "SDL2/SDL.h"
 #include "GL/glew.h"
 #include "../world/Camera.hpp"
-#include "../../headers/engine/resources.h"
+#include "../../headers/engine/Resources.hpp"
 #include <vector>
 #include "Framebuffer.hpp"
 #include "../ui/Layouts/ILayout.hpp"

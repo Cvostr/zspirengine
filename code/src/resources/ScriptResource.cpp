@@ -1,10 +1,11 @@
-#include "../../headers/engine/resources.h"
+#include "../../headers/engine/Resources.hpp"
 #include "../../headers/game.h"
-#include "../../headers/Scripting/ZPScriptClass.hpp"
 
 extern ZSGAME_DATA* game_data;
 
-Engine::ScriptResource::ScriptResource() {
+Engine::ScriptResource::ScriptResource() :
+    hasError(false)
+{
     this->resource_type = RESOURCE_TYPE_SCRIPT;
     loadInstantly = true;
 }

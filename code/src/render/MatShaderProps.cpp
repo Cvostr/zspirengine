@@ -3,7 +3,7 @@
 #include <iostream>
 #include <GL/glew.h>
 #include "../../headers/game.h"
-#include "../../headers/engine/resources.h"
+#include "../../headers/engine/Resources.hpp"
 
 Material* default3dmat;
 Material* defaultTerrainMat;

@@ -312,7 +312,7 @@ void Engine::RenderPipeline::renderShadowDepth(World* world_ptr, unsigned int Ca
 }
 
 void Engine::GameObject::processObject(RenderPipeline* pipeline) {
-    if (alive == false || mActive == false) return;
+    if (mAlive == false || mActive == false) return;
 
     Engine::TransformProperty* transform_prop = this->getTransformProperty();
     //Call update on every property in objects

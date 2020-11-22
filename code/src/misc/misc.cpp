@@ -41,6 +41,13 @@ void readLine(std::string& str, const char* data, unsigned int& offset) {
     offset++;
 }
 
+void RemoveExtension(std::string& str) {
+    while (str[str.size() - 1] != '.') {
+        str.pop_back();
+    }
+    str.pop_back();
+}
+
 void skipSpaces(const char* data, unsigned int& offset) {
     while (data[offset] == ' ' || data[offset] == '\n') {
         offset++;

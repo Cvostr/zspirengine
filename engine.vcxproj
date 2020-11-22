@@ -148,6 +148,7 @@
     <ClCompile Include="code\src\engine.cpp" />
     <ClCompile Include="code\src\engine\EngineComponent.cpp" />
     <ClCompile Include="code\src\engine\LocaleStringsFile.cpp" />
+    <ClCompile Include="code\src\engine\Logger.cpp" />
     <ClCompile Include="code\src\engine\Resources.cpp" />
     <ClCompile Include="code\src\input\zs-input.cpp" />
     <ClCompile Include="code\src\math\BB3.cpp" />
@@ -192,7 +193,6 @@
     <ClCompile Include="code\src\Scripting\ResourcesAG.cpp" />
     <ClCompile Include="code\src\Scripting\Types\ASFile.cpp" />
     <ClCompile Include="code\src\Scripting\Types\StdString.cpp" />
-    <ClCompile Include="code\src\Scripting\ZPScriptClass.cpp" />
     <ClCompile Include="code\src\threading\Mutex.cpp" />
     <ClCompile Include="code\src\threading\Thread.cpp" />
     <ClCompile Include="code\src\ui\Layouts\FreeLayout.cpp" />
@@ -237,7 +237,8 @@
     <ClInclude Include="code\headers\engine\engine_window.h" />
     <ClInclude Include="code\headers\engine\BackgroundLoader.hpp" />
     <ClInclude Include="code\headers\engine\LocaleStringsFile.h" />
-    <ClInclude Include="code\headers\engine\resources.h" />
+    <ClInclude Include="code\headers\engine\Logger.hpp" />
+    <ClInclude Include="code\headers\engine\Resources.hpp" />
     <ClInclude Include="code\headers\engine_types.h" />
     <ClInclude Include="code\headers\game.h" />
     <ClInclude Include="code\headers\input\zs-input.h" />
@@ -273,7 +274,6 @@
     <ClInclude Include="code\headers\Scripting\FilesAG.hpp" />
     <ClInclude Include="code\headers\Scripting\Types\ASFile.hpp" />
     <ClInclude Include="code\headers\Scripting\Types\StdString.hpp" />
-    <ClInclude Include="code\headers\Scripting\ZPScriptClass.hpp" />
     <ClInclude Include="code\headers\threading\Mutex.hpp" />
     <ClInclude Include="code\headers\threading\Thread.hpp" />
     <ClInclude Include="code\headers\ui\Layouts\FreeLayout.hpp" />

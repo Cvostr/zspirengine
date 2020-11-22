@@ -15,27 +15,34 @@ Engine::AGScript* Engine::ZPScriptProperty::getScript() {
 	return script;
 }
 
-void Engine::ZPScriptProperty::onStart() {
-    if (script_res != nullptr) {
-        script = new AGScript(game_data->script_manager, go_link.updLinkPtr(), script_res->rel_path);
-        script->compileFromResource(this->script_res);
+void Engine::ZPScriptProperty::SetupScript() {
+	if (script_res != nullptr) {
+		script = new AGScript(game_data->script_manager, go_link.updLinkPtr(), script_res->resource_label);
+		script->compileFromResource(this->script_res);
 		script->obtainScriptModule();
 		//if script contains errors, then stop further activity 
 		if (script->hasCompilerErrors())
 			return;
 
 		//Write global variables
-		if(vars.size() > 0) {
+		if (vars.size() > 0) {
 			//Send all global data to script
 			for (unsigned int v_i = 0; v_i < vars.size(); v_i++) {
 				vars[v_i]->address = script->getGlobalVariableAddr(v_i);
 				vars[v_i]->applyValue();
 			}
 		}
-		//call onStart() inside script
-        script->onStart(); 
+			//fill pointer with main class
+		script->obtainScriptMainClass();
+	}
+}
 
-		
+void Engine::ZPScriptProperty::onStart() {
+    if (script_res != nullptr) {
+
+		if (script->hasCompilerErrors())
+			return;
+        script->onStart(); 
     }
 }
 

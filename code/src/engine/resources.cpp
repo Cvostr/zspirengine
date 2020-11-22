@@ -1,23 +1,23 @@
-#include "../../headers/engine/resources.h"
+#include "../../headers/engine/Resources.hpp"
 #include <fstream>
 #include <iostream>
 #include "../../headers/engine.h"
 #include "../../headers/game.h"
 #include "../../headers/misc/misc.h"
-#include "../../headers/Scripting/ZPScriptClass.hpp"
 
 extern ZSpireEngine* engine_ptr;
 extern Material* default3dmat;
 extern Material* defaultTerrainMat;
 extern ZSGAME_DATA* game_data;
 
-Engine::ZsResource::ZsResource(){
-    this->resource_type = RESOURCE_TYPE_NONE;
-    this->resource_state = RESOURCE_STATE::STATE_NOT_LOADED;
-    size = 0;
-    offset = 0;
-    loadInstantly = false;
-}
+Engine::ZsResource::ZsResource():
+    resource_type(RESOURCE_TYPE_NONE),
+    resource_state(RESOURCE_STATE::STATE_NOT_LOADED),
+    size(0),
+    offset(0),
+    loadInstantly(false),
+    request(nullptr)
+{}
 
 Engine::ZsResource::~ZsResource(){
 
@@ -177,9 +177,11 @@ void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int
             readString(resource.resource_label, data, iter);
             //read blob path
             readString(resource.blob_path, data, iter);
-            //Read file ccordinates
+            //Read file cordinates
             readBinaryValue(&resource.offset, data + iter, iter);
+            //read file size
             readBinaryValue(&resource.size, data + iter, iter);
+            //read resource type
             readBinaryValue(&resource.resource_type, data + iter, iter);
             iter++;
 
