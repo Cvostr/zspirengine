@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 
-#include "vulkan/zsvulkan.h"
+#include "vulkan/ZSVulkanInstance.hpp"
 #include "engine/EngineComponent.h"
 #include "engine/engine_window.h"
 #include "engine_types.h"
@@ -16,9 +16,9 @@ private:
     float deltaTime;
     bool gameRuns;
 
-    SDL_Window* window;
-    SDL_GLContext glcontext;
-    ZsVulkan vkcontext;
+    SDL_Window* mWindow;
+    SDL_GLContext mGLContext;
+    ZsVulkanInstance mVkInstance;
 
     std::vector<IEngineComponent*> components;
 public:

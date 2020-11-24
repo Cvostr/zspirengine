@@ -23,7 +23,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
     this->engine_info = info;
     this->window_info = win;
 
-    if(info->createWindow == true){ //we have to init window
+    if (info->createWindow == true) { //we have to init window
         std::cout << "Opening SDL2 window" << std::endl;
         if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) //Trying to init SDL
         {
@@ -31,32 +31,37 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
         }
 
         unsigned int SDL_WIN_MODE = 0;
-       
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-        //OpenGL 4.2
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-        SDL_WIN_MODE = SDL_WINDOW_OPENGL; //Set window mode to OpenGL
+        if (info->graphicsApi == OGL32){
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+            SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+            SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+            //OpenGL 4.3
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+            SDL_WIN_MODE = SDL_WINDOW_OPENGL; //Set window mode to OpenGL
+            std::cout << "OpenGL version : 4.3 core" << std::endl;
+        } else if (info->graphicsApi == VULKAN) {
+            SDL_WIN_MODE = SDL_WINDOW_VULKAN;
+        }
 
-        std::cout << "OpenGL version : 4.3 core" << std::endl;
-       
         SDL_DisplayMode current;
         SDL_GetCurrentDisplayMode(0, &current);
 
-        this->window = SDL_CreateWindow(win->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, win->Width, win->Height, SDL_WIN_MODE); //Create window
-
-            this->glcontext = SDL_GL_CreateContext(window);
+        this->mWindow = SDL_CreateWindow(win->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, win->Width, win->Height, SDL_WIN_MODE); //Create window
+        if (info->graphicsApi == VULKAN) {
+            mVkInstance.init(false, desc->app_label.c_str(), desc->app_version, mWindow);
+        }
+        else if (info->graphicsApi == OGL32) {
+            this->mGLContext = SDL_GL_CreateContext(mWindow);
             glViewport(0, 0, win->Width, win->Height);
 
             glewExperimental = GL_TRUE;
-            if(glewInit() != GLEW_OK) std::cout << "GLEW initialize failed" << std::endl; else {
+            if (glewInit() != GLEW_OK) std::cout << "GLEW initialize failed" << std::endl; else {
                 std::cout << "GLEW initialize sucessful" << std::endl;
             }
-
+        }
         
         //initialize OpenAL sound system
         Engine::SFX::initAL();
@@ -65,7 +70,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
 }
 
 SDL_Window* ZSpireEngine::getWindowSDL(){
-    return this->window;
+    return this->mWindow;
 }
 
 void* ZSpireEngine::getGameDataPtr(){
@@ -87,14 +92,14 @@ void ZSpireEngine::updateDeltaTime(float deltaTime){
 }
 
 void ZSpireEngine::updateResolution(int W, int H){
-    SDL_SetWindowSize(this->window, W, H);
+    SDL_SetWindowSize(this->mWindow, W, H);
     for(unsigned int i = 0; i < components.size(); i ++){
         components[i]->updateWindowSize(W, H);
     }
 }
 
 void ZSpireEngine::setWindowMode(unsigned int mode){
-    SDL_SetWindowFullscreen(this->window, mode);
+    SDL_SetWindowFullscreen(this->mWindow, mode);
 }
 
 void ZSpireEngine::loadGame(){
@@ -184,7 +189,7 @@ void ZSpireEngine::loadGame(){
         Input::clearMouseState();
         Input::clearPressedKeys();
 
-        SDL_GL_SwapWindow(window); //Send rendered frame
+        SDL_GL_SwapWindow(mWindow); //Send rendered frame
 
     }
     game_data->world->clear(); //clear world
@@ -193,8 +198,8 @@ void ZSpireEngine::loadGame(){
     //Destroys all created managers
     destroyAllManagers();
     delete game_data;
-    SDL_DestroyWindow(window); //Destroy SDL and opengl
-    SDL_GL_DeleteContext(glcontext);
+    SDL_DestroyWindow(mWindow); //Destroy SDL and opengl
+    SDL_GL_DeleteContext(mGLContext);
 
 }
 

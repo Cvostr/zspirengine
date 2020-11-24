@@ -30,7 +30,7 @@ namespace ZSPIRE {
 	class LocaleStringsFile {
 	private:
 
-		bool readFileHeader(char* data);
+		bool readFileHeader(const char* data);
 
 		unsigned int StringsCount;
 		unsigned int langsCount;

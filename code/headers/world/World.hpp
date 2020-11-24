@@ -248,6 +248,7 @@ public:
 
     bool hasMesh(); //Check if gameobject has mesh property and mesh inside
     bool hasTerrain(); //Check if gameobject has terrain inside
+    bool hasLightsource();
 
     void DrawMesh(RenderPipeline* pipeline);
     void DrawMeshInstanced(RenderPipeline* pipeline, unsigned int inst_num);

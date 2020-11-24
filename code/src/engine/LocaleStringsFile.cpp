@@ -2,21 +2,24 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include "../../headers/misc/misc.h"
 
 using namespace ZSPIRE;
 using namespace std;
 
-LocaleStringsFile::LocaleStringsFile(char* data) {
-	StringsCount = 0;
-	langsCount = 0;
-	selected_lang_code = LANG_ALL;
+LocaleStringsFile::LocaleStringsFile(char* data) :
+	StringsCount(0),
+	langsCount(0),
+	selected_lang_code(LANG_ALL)
+{
 	//Read from buffer
 	readFileHeader(data);
 }
-LocaleStringsFile::LocaleStringsFile(char* data, unsigned int lang_code) {
-	StringsCount = 0;
-	langsCount = 0;
-	this->selected_lang_code = lang_code;
+LocaleStringsFile::LocaleStringsFile(char* data, unsigned int lang_code) :
+	StringsCount(0),
+	langsCount(0),
+	selected_lang_code(lang_code)
+{
 	//Read from buffer
 	readFileHeader(data);
 }
@@ -39,7 +42,7 @@ LocaleStringsFile::LocaleStringsFile(std::string file_path) {
 LocaleStringsFile::~LocaleStringsFile() {
 
 }
-bool LocaleStringsFile::readFileHeader(char* data) {
+bool LocaleStringsFile::readFileHeader(const char* data) {
 	char header[25];
 	header[24] = '\0';
 	//Read header
@@ -47,37 +50,29 @@ bool LocaleStringsFile::readFileHeader(char* data) {
 	if (strcmp(header, "ZSLOCALIZEDSTRINGSBINARY")) {
 		return false;
 	}
+	unsigned int offset = 25;
 	//Read Stats
-	memcpy(&this->StringsCount, data + 25, sizeof(unsigned int));
-	memcpy(&this->langsCount, data + 29, sizeof(unsigned int));
+	readBinaryValue(&this->StringsCount, data + offset, offset);
+	readBinaryValue(&this->langsCount, data + offset, offset);
 	//Read lang codes
-	unsigned int offset = 33;
 	for (unsigned int lang_i = 0; lang_i < langsCount; lang_i++) {
-		memcpy(&lang_codes[lang_i], data + offset, sizeof(unsigned int));
-		offset += sizeof(unsigned int);
+		readBinaryValue(&lang_codes[lang_i], data + offset, offset);
 	}
 	//Write all strings
 	for (unsigned int str_i = 0; str_i < StringsCount; str_i++) {
 		LocString str;
 		//Read string ID
-		while (data[offset] != '\0') {
-			str.str_ID.push_back(data[offset]);
-			offset += 1;
-		}
-		offset += 1;
+		readString(str.str_ID, data, offset);
 		//Read integer Id
-		memcpy(&str.ID, data + offset, sizeof(unsigned int));
-		offset += sizeof(unsigned int);
+		readBinaryValue(&str.ID, data + offset, offset);
 		//Read string in all languages
 		for (unsigned int lang_i = 0; lang_i < langsCount; lang_i++) {
 			//Read ID of language
 			unsigned int lang_code = 0;
-			memcpy(&lang_code, data + offset, sizeof(unsigned int));
-			offset += sizeof(unsigned int);
+			readBinaryValue(&lang_code, data + offset, offset);
 			//Read string size
 			unsigned int str_size = 0;
-			memcpy(&str_size, data + offset, sizeof(unsigned int));
-			offset += sizeof(unsigned int);
+			readBinaryValue(&str_size, data + offset, offset);
 			if (this->selected_lang_code == LANG_ALL || lang_code == this->selected_lang_code) {
 				//Read localized string
 				for (unsigned int c_i = 0; c_i < str_size; c_i++) {

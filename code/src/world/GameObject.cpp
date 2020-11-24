@@ -421,6 +421,10 @@ bool Engine::GameObject::hasTerrain(){
     return false;
 }
 
+bool Engine::GameObject::hasLightsource() {
+    return getPropertyPtr<LightsourceProperty>() != nullptr;
+}
+
 void Engine::GameObject::DrawMesh(RenderPipeline* pipeline) {
     Engine::MeshProperty* mesh_prop = static_cast<Engine::MeshProperty*>(this->getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH));
     Engine::TerrainProperty* terrain_prop = getPropertyPtr<Engine::TerrainProperty>();

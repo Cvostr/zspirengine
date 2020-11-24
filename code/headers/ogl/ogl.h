@@ -37,6 +37,7 @@ public:
     void Init();
     //Loads texture from buffer
     bool LoadDDSTextureFromBuffer(unsigned char* data);
+    bool LoadPNGTextureFromBuffer(unsigned char* data, int size);
     //Use in rendering pipeline
     void Use(int slot);
     void Destroy();

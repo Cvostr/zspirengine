@@ -1,4 +1,4 @@
-#include "../../headers/engine/resources.h"
+#include "../../headers/engine/Resources.hpp"
 
 Engine::AnimationResource::AnimationResource() {
     this->resource_type = RESOURCE_TYPE_ANIMATION;

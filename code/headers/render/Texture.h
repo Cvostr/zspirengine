@@ -27,8 +27,10 @@ namespace Engine {
         virtual void Init(){}
 		//Loads texture from buffer
         virtual bool LoadDDSTextureFromBuffer(unsigned char* data) { return false; }
+        virtual bool LoadPNGTextureFromBuffer(unsigned char* data, int size) { return false; }
 		//Loads texture from file
         bool LoadDDSTextureFromFile(const char* path);
+        bool LoadPNGTextureFromFile(const char* path);
 		//Use in rendering pipeline
         virtual void Use(int slot){}
         virtual void Destroy(){}

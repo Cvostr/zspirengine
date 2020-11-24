@@ -206,8 +206,7 @@
     <ClCompile Include="code\src\vulkan\vk_shader.cpp" />
     <ClCompile Include="code\src\vulkan\vk_texture.cpp" />
     <ClCompile Include="code\src\vulkan\vk_uniform_buf.cpp" />
-    <ClCompile Include="code\src\vulkan\zsvk_mem.cpp" />
-    <ClCompile Include="code\src\vulkan\zsvulkan.cpp" />
+    <ClCompile Include="code\src\vulkan\ZSVulkanInstance.cpp" />
     <ClCompile Include="code\src\world\GameObject.cpp" />
     <ClCompile Include="code\src\world\GoProperty\AnimationComponent.cpp" />
     <ClCompile Include="code\src\world\GoProperty\AudioSourceProperty.cpp" />
@@ -285,8 +284,7 @@
     <ClInclude Include="code\headers\ui\Widgets\Button.hpp" />
     <ClInclude Include="code\headers\ui\Widgets\Widget.hpp" />
     <ClInclude Include="code\headers\vulkan\vk_data.h" />
-    <ClInclude Include="code\headers\vulkan\zsvk_mem.h" />
-    <ClInclude Include="code\headers\vulkan\zsvulkan.h" />
+    <ClInclude Include="code\headers\vulkan\ZSVulkanInstance.hpp" />
     <ClInclude Include="code\headers\world\go_properties.h" />
     <ClInclude Include="code\headers\world\Physics.h" />
     <ClInclude Include="code\headers\world\Terrain.hpp" />

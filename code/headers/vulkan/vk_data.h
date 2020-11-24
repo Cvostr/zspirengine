@@ -5,7 +5,7 @@
 #include "../render/UniformBuffer.hpp"
 #include "../render/Shader.hpp"
 #include "../render/Texture.h"
-#include "../vulkan/zsvulkan.h"
+#include "../vulkan/ZSVulkanInstance.hpp"
 
 namespace Engine{
 
@@ -67,7 +67,7 @@ class _vk_Shader : public Engine::Shader{
 private:
 
 public:
-    ZsVkPipeline* pipeline;
+    //ZsVkPipeline* pipeline;
 
     VkShaderModule vertexShader;
     VkShaderModule fragmentShader;

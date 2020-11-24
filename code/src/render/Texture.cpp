@@ -80,6 +80,24 @@ bool Engine::Texture::LoadDDSTextureFromFile(const char* path){
     return true;
 }
 
+bool Engine::Texture::LoadPNGTextureFromFile(const char* path) {
+    std::ifstream stream(path, std::ios_base::binary | std::ios_base::ate);
+
+    if (stream.fail()) { //Opening file stream failed, no file
+        //std::cout << "TEXTURE: FATAL: Error opening file stream! Perhaps, file " << path << " is missing!" << std::endl;
+        return false;
+    }
+    unsigned int size = static_cast<unsigned int>(stream.tellg());
+    stream.seekg(0);
+
+    char* data = new char[size];
+    stream.read(data, size);
+    LoadPNGTextureFromBuffer((unsigned char*)data, size);
+    delete[] data;
+    stream.close();
+
+    return true;
+}
 
 Engine::Texture::Texture(){
 
