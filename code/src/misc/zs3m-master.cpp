@@ -491,10 +491,10 @@ void ZS3M::ImportedAnimationFile::loadFromBuffer(char* buffer, unsigned int size
             readBinaryValue(&chan->rotationKeysNum, &buffer[byte_offset], byte_offset);
 
             //Allocate pos vectors and time intervals array
-            chan->pos = new ZSVECTOR3[chan->posKeysNum];
+            chan->pos = new Vec3[chan->posKeysNum];
             chan->posTimes = new double[chan->posKeysNum];
             //Allocate scale vectors and time intervals array
-            chan->scale = new ZSVECTOR3[chan->scaleKeysNum];
+            chan->scale = new Vec3[chan->scaleKeysNum];
             chan->scaleTimes = new double[chan->scaleKeysNum];
             //Allocate rotation vectors and time intervals array
             chan->rot = new ZSQUATERNION[chan->rotationKeysNum];

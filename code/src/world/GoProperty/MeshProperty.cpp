@@ -29,7 +29,7 @@ void Engine::MeshProperty::setMeshResource(MeshResource* resource) {
     updateMeshPtr();
 }
 
-void Engine::MeshProperty::onRender(Engine::RenderPipeline* pipeline) {
+void Engine::MeshProperty::onRender(Engine::Renderer* pipeline) {
     if (this->skinning_root_node == nullptr && mesh_ptr->mesh_ptr->hasBones())
         skinning_root_node = go_link.world_ptr->getGameObjectByLabel(this->rootNodeStr);
 }

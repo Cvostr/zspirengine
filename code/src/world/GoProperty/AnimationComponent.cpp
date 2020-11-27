@@ -25,7 +25,7 @@ void Engine::AnimationProperty::stop() {
     Playing = false;
 }
 
-void Engine::AnimationProperty::onPreRender(RenderPipeline* pipeline) {
+void Engine::AnimationProperty::onPreRender(Renderer* pipeline) {
     GameObject* obj = go_link.updLinkPtr();
 
     Engine::Animation* anim_prop_ptr = nullptr;

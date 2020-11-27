@@ -11,11 +11,11 @@ Engine::Animation::~Animation(){
     delete[] this->channels;
 }
 
-Engine::AnimationChannel::AnimationChannel(){
-    this->posKeysNum = 0;
-    this->rotationKeysNum = 0;
-    this->scaleKeysNum = 0;
-
+Engine::AnimationChannel::AnimationChannel() :
+    posKeysNum(0),
+    rotationKeysNum(0),
+    scaleKeysNum(0)
+{
     //Set all pointers to nullptr
     rotTimes = nullptr;
     scaleTimes = nullptr;
@@ -75,28 +75,28 @@ unsigned int Engine::AnimationChannel::getRotationIndex(double Time){
     return 0;
 }
 
-ZSVECTOR3 Engine::AnimationChannel::getPostitionInterpolated(double Time){
+Vec3 Engine::AnimationChannel::getPostitionInterpolated(double Time){
     unsigned int index1 = getPositionIndex(Time);
     unsigned int index2 = index1 + 1;
 
     double delta = Time - posTimes[index1];
     delta /= anim_ptr->TPS;
 
-    ZSVECTOR3 v1 = pos[index1];
-    ZSVECTOR3 v2 = pos[index2];
+    Vec3 v1 = pos[index1];
+    Vec3 v2 = pos[index2];
 
     return lerp(v1, v2, static_cast<float>(delta));
 }
 
-ZSVECTOR3 Engine::AnimationChannel::getScaleInterpolated(double Time){
+Vec3 Engine::AnimationChannel::getScaleInterpolated(double Time){
     unsigned int index1 = getScaleIndex(Time);
     unsigned int index2 = index1 + 1;
 
     double delta = Time - scaleTimes[index1];
     delta /= anim_ptr->TPS;
 
-    ZSVECTOR3 v1 = scale[index1];
-    ZSVECTOR3 v2 = scale[index2];
+    Vec3 v1 = scale[index1];
+    Vec3 v2 = scale[index2];
 
     return lerp(v1, v2, static_cast<float>(delta));
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "World.hpp"
-#include "../misc/oal_manager.h"
+#include "../audio/SoundSource.hpp"
 #include "../game.h"
 #include "Terrain.hpp"
 #include "../Scripting/AngelScript.hpp"
@@ -26,7 +26,7 @@ public:
 
     void updateMeshPtr(); //Updates pointer according to resource_relpath
     void copyTo(IGameObjectComponent* dest);
-    void onRender(Engine::RenderPipeline* pipeline);
+    void onRender(Engine::Renderer* pipeline);
     void setMeshResource(MeshResource* resource);
 
     //EDITOR STUFF
@@ -86,7 +86,7 @@ public:
 
     void addPropertyInterfaceToInspector();
     void copyTo(Engine::IGameObjectComponent* dest);
-    void onPreRender(Engine::RenderPipeline* pipeline);
+    void onPreRender(Engine::Renderer* pipeline);
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);
     void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
@@ -151,8 +151,8 @@ public:
 
 class SkyboxProperty : public Engine::IGameObjectComponent {
 public:
-    void onPreRender(Engine::RenderPipeline* pipeline);
-    void DrawSky(RenderPipeline* pipeline);
+    void onPreRender(Engine::Renderer* pipeline);
+    void DrawSky(Renderer* pipeline);
     SkyboxProperty();
 };
 
@@ -176,12 +176,12 @@ public:
     int mCascadesNum;
 
     void addPropertyInterfaceToInspector();
-    void onPreRender(Engine::RenderPipeline* pipeline);
+    void onPreRender(Engine::Renderer* pipeline);
     void copyTo(Engine::IGameObjectComponent* dest);
     void onValueChanged();
     void init();
     void onObjectDeleted();
-    void Draw(Engine::Camera* cam, RenderPipeline* pipeline);
+    void Draw(Engine::Camera* cam, Renderer* pipeline);
     void setTexture();
     void setTextureSize(int TextureSize);
     void SetCascadesAmount(int CascadesNum);
@@ -212,7 +212,7 @@ public:
     void addPropertyInterfaceToInspector();
     void onValueChanged();
     void copyTo(Engine::IGameObjectComponent* dest);
-    void onRender(Engine::RenderPipeline* pipeline);
+    void onRender(Engine::Renderer* pipeline);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
@@ -345,7 +345,7 @@ public:
     std::string anim_label;
 
     void addPropertyInterfaceToInspector();
-    void onPreRender(Engine::RenderPipeline* pipeline);
+    void onPreRender(Engine::Renderer* pipeline);
     void onValueChanged();
     void copyTo(Engine::IGameObjectComponent* dest);
 
@@ -392,10 +392,10 @@ public:
     int vegetableid;
 
     void addPropertyInterfaceToInspector();
-    void onRender(Engine::RenderPipeline* pipeline);
+    void onRender(Engine::Renderer* pipeline);
 
-    void DrawMesh(RenderPipeline* pipeline);
-    void DrawGrass(RenderPipeline* pipeline);
+    void DrawMesh(Renderer* pipeline);
+    void DrawGrass(Renderer* pipeline);
     void onValueChanged();
     void onAddToObject();
     void copyTo(Engine::IGameObjectComponent* dest);

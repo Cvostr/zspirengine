@@ -93,7 +93,7 @@ public:
     void updTexturePtr();
     void copyTo(Engine::IGameObjectComponent* dest);
     void onUpdate(float deltaTime);
-    void onRender(Engine::RenderPipeline* pipeline);
+    void onRender(Engine::Renderer* pipeline);
 
     void playAnim();
     void stopAnim();

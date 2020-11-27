@@ -3,8 +3,8 @@
 #include "../headers/game.h"
 #include <GL/glew.h>
 #include <iostream>
-#include "../headers/misc/oal_manager.h"
 #include "../headers/input/zs-input.h"
+#include "../headers/ogl/GLRenderer.hpp"
 
 ZSpireEngine* engine_ptr;
 ZSGAME_DATA* game_data;
@@ -51,7 +51,11 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
 
         this->mWindow = SDL_CreateWindow(win->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, win->Width, win->Height, SDL_WIN_MODE); //Create window
         if (info->graphicsApi == VULKAN) {
-            mVkInstance.init(false, desc->app_label.c_str(), desc->app_version, mWindow);
+            mVkInstance = new Engine::ZSVulkanInstance;
+            mVkInstance->init(false, desc->app_label.c_str(), desc->app_version, mWindow);
+            mVkDevice = CreatePrimaryDevice(mVkInstance);
+            mVkSwapChain = new Engine::ZSVulkanSwapChain;
+            mVkSwapChain->initSwapchain(mVkDevice, mVkInstance, win->Width, win->Height);
         }
         else if (info->graphicsApi == OGL32) {
             this->mGLContext = SDL_GL_CreateContext(mWindow);
@@ -64,7 +68,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
         }
         
         //initialize OpenAL sound system
-        Engine::SFX::initAL();
+        //Engine::SFX::initAL();
 
     }
 }
@@ -80,7 +84,7 @@ void* ZSpireEngine::getGameDataPtr(){
 void ZSpireEngine::startManager(IEngineComponent* component){
     component->setDpMetrics(this->window_info->Width, this->window_info->Height);
     component->game_desc_ptr = this->desc;
-    component->init();
+    component->OnCreate();
     this->components.push_back(component);
 }
 void ZSpireEngine::updateDeltaTime(float deltaTime){
@@ -94,7 +98,7 @@ void ZSpireEngine::updateDeltaTime(float deltaTime){
 void ZSpireEngine::updateResolution(int W, int H){
     SDL_SetWindowSize(this->mWindow, W, H);
     for(unsigned int i = 0; i < components.size(); i ++){
-        components[i]->updateWindowSize(W, H);
+        components[i]->OnUpdateWindowSize(W, H);
     }
 }
 
@@ -108,7 +112,7 @@ void ZSpireEngine::loadGame(){
     game_data = new ZSGAME_DATA;
     this->zsgame_ptr = static_cast<void*>(game_data);
     //Allocate pipeline and start it as manager
-    game_data->pipeline = new Engine::RenderPipeline;
+    game_data->pipeline = new Engine::GLRenderer;
     startManager(game_data->pipeline);
     //Allocate resource manager
     game_data->resources = new Engine::ResourceManager;
@@ -124,6 +128,9 @@ void ZSpireEngine::loadGame(){
     game_data->out_manager->consoleLogWorking = true;
 
     game_data->ui_manager = new Engine::UiManager;
+
+    game_data->oal_manager = new Engine::OALManager;
+    game_data->oal_manager->initAL();
 
     game_data->world = new Engine::World();
 
@@ -194,7 +201,6 @@ void ZSpireEngine::loadGame(){
     }
     game_data->world->clear(); //clear world
     Engine::Loader::stop();
-    Engine::SFX::destroyAL();
     //Destroys all created managers
     destroyAllManagers();
     delete game_data;

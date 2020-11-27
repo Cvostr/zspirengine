@@ -9,51 +9,32 @@ MaterialShaderPropertyConf::MaterialShaderPropertyConf(){
     type = MATSHPROP_TYPE_NONE;
 }
 
-//Integer stuff
-IntegerMaterialShaderProperty::IntegerMaterialShaderProperty(){
-    type = MATSHPROP_TYPE_INTEGER;
-}
 IntegerMtShPropConf::IntegerMtShPropConf(){
     type = MATSHPROP_TYPE_INTEGER;
     value = 0;
 }
-//Float stuff
-FloatMaterialShaderProperty::FloatMaterialShaderProperty(){
-    type = MATSHPROP_TYPE_FLOAT;
-}
+
 FloatMtShPropConf::FloatMtShPropConf(){
     type = MATSHPROP_TYPE_FLOAT;
     value = 0.0f;
 }
-//Float3 stuff
-Float3MaterialShaderProperty::Float3MaterialShaderProperty(){
-    type = MATSHPROP_TYPE_FVEC3;
-}
+
 Float3MtShPropConf::Float3MtShPropConf(){
     type = MATSHPROP_TYPE_FVEC3;
-    value = ZSVECTOR3(0.0f, 0.0f, 0.0f);
+    value = Vec3(0.0f, 0.0f, 0.0f);
 }
-//Float2 stuff
-Float2MaterialShaderProperty::Float2MaterialShaderProperty(){
-    type = MATSHPROP_TYPE_FVEC2;
-}
+
 Float2MtShPropConf::Float2MtShPropConf(){
     type = MATSHPROP_TYPE_FVEC2;
     value = ZSVECTOR2(0.0f, 0.0f);
 }
-//Int2 stuff
-Int2MaterialShaderProperty::Int2MaterialShaderProperty(){
-    type = MATSHPROP_TYPE_IVEC2;
-}
+
 Int2MtShPropConf::Int2MtShPropConf(){
     type = MATSHPROP_TYPE_IVEC2;
     value[0] = 0;
     value[1] = 0;
 }
-//Color stuff
-ColorMaterialShaderProperty::ColorMaterialShaderProperty(){
-    type = MATSHPROP_TYPE_COLOR;
-}
+
 ColorMtShPropConf::ColorMtShPropConf(){
     type = MATSHPROP_TYPE_COLOR;
 }
@@ -93,32 +74,14 @@ MaterialShaderProperty* MtShProps::allocateProperty(int type){
             _ptr = static_cast<MaterialShaderProperty*>(new TextureMaterialShaderProperty); //Allocation of transform in heap
             break;
         }
-        case MATSHPROP_TYPE_INTEGER:{ //If type is transfrom
-            _ptr = static_cast<MaterialShaderProperty*>(new IntegerMaterialShaderProperty); //Allocation of transform in heap
-            break;
-        }
-        case MATSHPROP_TYPE_FLOAT:{ //If type is transfrom
-            _ptr = static_cast<MaterialShaderProperty*>(new FloatMaterialShaderProperty); //Allocation of transform in heap
-            break;
-        }
-        case MATSHPROP_TYPE_FVEC3:{ //If type is transfrom
-            _ptr = static_cast<MaterialShaderProperty*>(new Float3MaterialShaderProperty); //Allocation of transform in heap
-            break;
-        }
-        case MATSHPROP_TYPE_FVEC2:{ //If type is transfrom
-            _ptr = static_cast<MaterialShaderProperty*>(new Float2MaterialShaderProperty); //Allocation of transform in heap
-            break;
-        }
-        case MATSHPROP_TYPE_COLOR:{ //If type is transfrom
-            _ptr = static_cast<MaterialShaderProperty*>(new ColorMaterialShaderProperty); //Allocation of transform in heap
-            break;
-        }
+        
         case MATSHPROP_TYPE_TEXTURE3:{ //If type is transfrom
             _ptr = static_cast<MaterialShaderProperty*>(new Texture3MaterialShaderProperty); //Allocation of transform in heap
             break;
         }
-        case MATSHPROP_TYPE_IVEC2:{ //If type is transfrom
-            _ptr = static_cast<MaterialShaderProperty*>(new Int2MaterialShaderProperty); //Allocation of transform in heap
+        default:{ //If type is transfrom
+            _ptr = new MaterialShaderProperty; //Allocation of transform in heap
+            _ptr->type = (MATSHPROP_TYPE)type;
             break;
         }
 

@@ -8,7 +8,7 @@
 #include "../render/Material.hpp"
 #include "../render/Animation.hpp"
 #include "../misc/zs3m-master.h"
-#include "../misc/oal_manager.h"
+#include "../audio/SoundSource.hpp"
 #include "../misc/GlyphManager.h"
 #include "BackgroundLoader.hpp"
 #include "EngineComponent.h"

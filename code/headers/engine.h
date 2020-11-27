@@ -4,6 +4,9 @@
 #include <SDL2/SDL.h>
 
 #include "vulkan/ZSVulkanInstance.hpp"
+#include "vulkan/ZSVulkanDevice.hpp"
+#include "vulkan/ZSVulkanSwapchain.hpp"
+
 #include "engine/EngineComponent.h"
 #include "engine/engine_window.h"
 #include "engine_types.h"
@@ -18,7 +21,10 @@ private:
 
     SDL_Window* mWindow;
     SDL_GLContext mGLContext;
-    ZsVulkanInstance mVkInstance;
+
+    Engine::ZSVulkanInstance* mVkInstance;
+    Engine::ZSVulkanDevice* mVkDevice;
+    Engine::ZSVulkanSwapChain* mVkSwapChain;
 
     std::vector<IEngineComponent*> components;
 public:

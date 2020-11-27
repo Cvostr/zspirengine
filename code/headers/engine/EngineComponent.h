@@ -26,8 +26,8 @@ public:
     void setDpMetrics(int W, int H);
     void setProjectStructPtr(Project* ptr);
 
-    virtual void init();
-    virtual void updateWindowSize(int W, int H);
+    virtual void OnCreate();
+    virtual void OnUpdateWindowSize(int W, int H);
 
     IEngineComponent();
     virtual ~IEngineComponent();

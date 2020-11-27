@@ -7,7 +7,7 @@
 #include <stb/stb_image.h>
 
 void Engine::_ogl_Texture::Init() {
-    glGenTextures(1, &this->TEXTURE_ID); //Initializing texture in GL
+    glCreateTextures(GL_TEXTURE_2D, 1, &TEXTURE_ID);
     glBindTexture(GL_TEXTURE_2D, this->TEXTURE_ID); //We now working with this texture
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -25,17 +25,50 @@ Engine::_ogl_Texture::~_ogl_Texture(){
 }
 
 void Engine::_ogl_Texture::Use(int slot) {
-    glActiveTexture(GL_TEXTURE0 + slot); //Activating texture slot
-    glBindTexture(GL_TEXTURE_2D, this->TEXTURE_ID); //Sending texture to activated slot
+    glBindTextureUnit(slot, TEXTURE_ID);
 }
 
 void Engine::_ogl_Texture::Destroy() {
-
     glDeleteTextures(1, &this->TEXTURE_ID);
 
 #ifdef ZS_LOG
     std::cout << "TEXTURE: realease sucess!" << std::endl;
 #endif
+}
+
+bool Engine::_ogl_Texture::LoadTextureFromBufferUByte(unsigned char* data, int Width, int Height, TextureFormat format) {
+    Init();
+
+    GLint gl_format = 0;
+
+    switch (format) {
+    case TextureFormat::FORMAT_R:
+        gl_format = GL_R;
+        break;
+    case TextureFormat::FORMAT_RG:
+        gl_format = GL_RG;
+        break;
+    case TextureFormat::FORMAT_RGB:
+        gl_format = GL_RGB;
+        break;
+    case TextureFormat::FORMAT_RGBA:
+        gl_format = GL_RGBA;
+        break;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, this->TEXTURE_ID);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        gl_format,
+        Width,
+        Height,
+        0,
+        gl_format,
+        GL_UNSIGNED_BYTE,
+        data
+    );
+    return true;
 }
 
 bool Engine::_ogl_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
@@ -119,8 +152,7 @@ bool Engine::_ogl_Texture::LoadPNGTextureFromBuffer(unsigned char* data, int siz
 }
 
 void Engine::_ogl_Texture3D::Init(){
-    glGenTextures(1, &this->TEXTURE_ID);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, this->TEXTURE_ID);
+    glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &TEXTURE_ID);
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -184,8 +216,7 @@ bool Engine::_ogl_Texture3D::pushTextureBuffer(int index, unsigned char* data){
 
 //Use in rendering pipeline
 void Engine::_ogl_Texture3D::Use(int slot){
-    glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, TEXTURE_ID);
+    glBindTextureUnit(slot, TEXTURE_ID);
 }
 void Engine::_ogl_Texture3D::Destroy(){
     glDeleteTextures(1, &TEXTURE_ID);

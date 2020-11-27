@@ -127,16 +127,16 @@ Mat4 invert(const Mat4& mat) {
     return result;
 }
 
-Mat4 matrixLookAt(const ZSVECTOR3& eye, const ZSVECTOR3& center, const ZSVECTOR3& up)
+Mat4 matrixLookAt(const Vec3& eye, const Vec3& center, const Vec3& up)
 {
     Mat4 out;
 
-    ZSVECTOR3 f = ZSVECTOR3(center.X - eye.X, center.Y - eye.Y, center.Z - eye.Z);
+    Vec3 f = Vec3(center.X - eye.X, center.Y - eye.Y, center.Z - eye.Z);
     f.Normalize();
 
-    ZSVECTOR3 u;
+    Vec3 u;
 
-    ZSVECTOR3 s = vCross(f, up);
+    Vec3 s = vCross(f, up);
     s.Normalize();
     u = vCross(s, f);
 
@@ -203,7 +203,7 @@ Mat4 getScaleMat(float scaleX, float scaleY, float scaleZ) {
     return mat;
 }
 
-Mat4 getScaleMat(const ZSVECTOR3& scale) {
+Mat4 getScaleMat(const Vec3& scale) {
     return getScaleMat(scale.X, scale.Y, scale.Z);
 }
 
@@ -219,7 +219,7 @@ Mat4 getTranslationMat(float trX, float trY, float trZ) {
     return mat;
 }
 
-Mat4 getTranslationMat(const ZSVECTOR3& translation) {
+Mat4 getTranslationMat(const Vec3& translation) {
     return getTranslationMat(translation.X, translation.Y, translation.Z);
 }
 
@@ -272,11 +272,11 @@ Mat4 getRotationMat(float thetaX, float thetaY, float thetaZ) {
     return result;
 }
 
-Mat4 getRotationMat(const ZSVECTOR3& rotation) {
+Mat4 getRotationMat(const Vec3& rotation) {
     return getRotationMat(rotation.X, rotation.Y, rotation.Z);
 }
 
-Mat4 getRotationMat(const ZSVECTOR3& rotation, const ZSVECTOR3& center) {
+Mat4 getRotationMat(const Vec3& rotation, const Vec3& center) {
     Mat4 result = getTranslationMat(center);
     result = result * getRotationMat(rotation);
     result = result * getTranslationMat(center * -1);

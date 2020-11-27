@@ -1,5 +1,4 @@
-#ifndef matshaderprops
-#define matshaderprops
+#pragma once
 
 #include "Texture.h"
 #include "Shader.hpp"
@@ -35,6 +34,7 @@ public:
 
     MaterialShaderPropertyConf();
 };
+
 
 class MtShaderPropertiesGroup{
 public:
@@ -88,7 +88,7 @@ namespace MtShProps {
 
     MtShaderPropertiesGroup* genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
                                                  Engine::Shader* heightmap,
-                                                 unsigned int uniform_buf_id_took);
+        Engine::Shader* water);
     MtShaderPropertiesGroup* getDefaultMtShGroup();
 
     void addMtShaderPropertyGroup(MtShaderPropertiesGroup* group);
@@ -105,50 +105,14 @@ namespace MtShProps {
 class TextureMaterialShaderProperty : public MaterialShaderProperty{
 public:
     int slotToBind; //Slot to texture
-    std::string ToggleUniform; //Uniform to set to 1
 
     TextureMaterialShaderProperty();
 };
-class IntegerMaterialShaderProperty : public MaterialShaderProperty{
-public:
-    std::string integerUniform;
-    //Construct
-    IntegerMaterialShaderProperty();
-};
-class FloatMaterialShaderProperty : public MaterialShaderProperty{
-public:
-    std::string floatUniform;
-    //Construct
-    FloatMaterialShaderProperty();
-};
-class Float3MaterialShaderProperty : public MaterialShaderProperty{
-public:
-    std::string floatUniform;
-    //Construct
-    Float3MaterialShaderProperty();
-};
-class Float2MaterialShaderProperty : public MaterialShaderProperty{
-public:
-    std::string floatUniform;
-    //Construct
-    Float2MaterialShaderProperty();
-};
-class Int2MaterialShaderProperty : public MaterialShaderProperty{
-public:
-    std::string floatUniform;
-    //Construct
-    Int2MaterialShaderProperty();
-};
-class ColorMaterialShaderProperty : public MaterialShaderProperty{
-public:
-    std::string colorUniform;
 
-    ColorMaterialShaderProperty();
-};
 class Texture3MaterialShaderProperty : public MaterialShaderProperty{
 public:
     int slotToBind; //Slot to texture
-    std::string ToggleUniform; //Uniform to set to 1
+    //std::string ToggleUniform; //Uniform to set to 1
 
     Texture3MaterialShaderProperty();
 };
@@ -161,6 +125,7 @@ public:
 
     TextureMtShPropConf();
 };
+
 class IntegerMtShPropConf : public MaterialShaderPropertyConf{
 public:
     int value;
@@ -175,7 +140,7 @@ public:
 };
 class Float3MtShPropConf : public MaterialShaderPropertyConf{
 public:
-    ZSVECTOR3 value;
+    Vec3 value;
     //Construct
     Float3MtShPropConf();
 };
@@ -204,4 +169,3 @@ public:
 
      Texture3MtShPropConf();
 };
-#endif

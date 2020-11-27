@@ -33,7 +33,7 @@ MtShaderPropertiesGroup::MtShaderPropertiesGroup(Engine::Shader* shader, const c
     this->UB_ConnectID = UB_ConnectID;
     //First of all, tell shader uniform buffer point
     //Get Index of buffer
-    shader->setUniformBufferBinding(UB_CAPTION, UB_ConnectID);
+    //shader->setUniformBufferBinding(UB_CAPTION, UB_ConnectID);
 
     //Generate uniform buffer
     this->UB_ID = Engine::allocUniformBuffer();
@@ -44,82 +44,114 @@ MtShaderPropertiesGroup::MtShaderPropertiesGroup(Engine::Shader* shader, const c
 }
 
 void MtShaderPropertiesGroup::setUB_Data(unsigned int offset, unsigned int size, void* data){
-    this->UB_ID->bind();
+
     this->UB_ID->writeData(offset, size, data);
 }
 
 MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
                                                         Engine::Shader* heightmap,
-                                                        unsigned int uniform_buf_id_took){
+                                                        Engine::Shader* water){
 
-    MtShaderPropertiesGroup* default_group = new MtShaderPropertiesGroup(shader3d, "Default3d", uniform_buf_id_took + 1, 60);
-    default_group->acceptShadows = true;
-    default_group->str_path = "@default";
-    default_group->groupCaption = "Default 3D";
+    MtShaderPropertiesGroup* default_group = new MtShaderPropertiesGroup(shader3d, "Default3d", 50, 48);
+    {
+        default_group->acceptShadows = true;
+        default_group->str_path = "@default";
+        default_group->groupCaption = "Default 3D";
 
-    ColorMaterialShaderProperty* diff_color_prop =
-            static_cast<ColorMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_COLOR));
-    diff_color_prop->prop_caption = "Color"; //Set caption in Inspector
-    diff_color_prop->prop_identifier = "c_diffuse"; //Identifier to save
-    diff_color_prop->colorUniform = "diffuse_color";
-    diff_color_prop->start_offset = 0;
+        MaterialShaderProperty* diff_color_prop = (default_group->addProperty(MATSHPROP_TYPE_COLOR));
+        diff_color_prop->prop_caption = "Color"; //Set caption in Inspector
+        diff_color_prop->prop_identifier = "c_diffuse"; //Identifier to save
+        diff_color_prop->start_offset = 0;
 
-    TextureMaterialShaderProperty* diff_texture_prop =
+        TextureMaterialShaderProperty* diff_texture_prop =
+                static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
+        diff_texture_prop->slotToBind = 0;
+        diff_texture_prop->prop_caption = "Diffuse"; //Set caption in Inspector
+        diff_texture_prop->prop_identifier = "t_diffuse"; //Identifier to save
+        diff_texture_prop->start_offset = 12;
+
+        TextureMaterialShaderProperty* normal_texture_prop =
+                static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
+        normal_texture_prop->slotToBind = 1;
+        normal_texture_prop->prop_caption = "Normal";
+        normal_texture_prop->prop_identifier = "t_normal"; //Identifier to save
+        normal_texture_prop->start_offset = 16;
+
+        TextureMaterialShaderProperty* specular_texture_prop =
+                static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
+        specular_texture_prop->slotToBind = 2;
+        specular_texture_prop->prop_caption = "Specular";
+        specular_texture_prop->prop_identifier = "t_specular"; //Identifier to save
+        specular_texture_prop->start_offset = 20;
+
+
+        TextureMaterialShaderProperty* height_texture_prop =
+                static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
+        height_texture_prop->slotToBind = 3;
+        height_texture_prop->prop_caption = "Height";
+        height_texture_prop->prop_identifier = "t_height"; //Identifier to save
+        height_texture_prop->start_offset = 24;
+
+        TextureMaterialShaderProperty* ao_texture_prop =
             static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
-    diff_texture_prop->slotToBind = 0;
-    diff_texture_prop->prop_caption = "Diffuse"; //Set caption in Inspector
-    diff_texture_prop->ToggleUniform = "hasDiffuseMap";
-    diff_texture_prop->prop_identifier = "t_diffuse"; //Identifier to save
-    diff_texture_prop->start_offset = 12;
+        ao_texture_prop->slotToBind = 4;
+        ao_texture_prop->prop_caption = "Amb Occlusion";
+        ao_texture_prop->prop_identifier = "t_occlusion"; //Identifier to save
+        ao_texture_prop->start_offset = 28;
 
-    TextureMaterialShaderProperty* normal_texture_prop =
-            static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
-    normal_texture_prop->slotToBind = 1;
-    normal_texture_prop->prop_caption = "Normal";
-    normal_texture_prop->ToggleUniform = "hasNormalMap";
-    normal_texture_prop->prop_identifier = "t_normal"; //Identifier to save
-    normal_texture_prop->start_offset = 16;
+        MaterialShaderProperty* shininess_factor_prop = default_group->addProperty(MATSHPROP_TYPE_FLOAT);
+        shininess_factor_prop->prop_caption = "Shininess";
+        shininess_factor_prop->prop_identifier = "f_shininess"; //Identifier to save
+        shininess_factor_prop->start_offset = 32;
 
-    TextureMaterialShaderProperty* specular_texture_prop =
-            static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
-    specular_texture_prop->slotToBind = 2;
-    specular_texture_prop->prop_caption = "Specular";
-    specular_texture_prop->ToggleUniform = "hasSpecularMap";
-    specular_texture_prop->prop_identifier = "t_specular"; //Identifier to save
-    specular_texture_prop->start_offset = 20;
+        MaterialShaderProperty* uv_factor_prop = default_group->addProperty(MATSHPROP_TYPE_IVEC2);
+        uv_factor_prop->prop_caption = "UV repeat";
+        uv_factor_prop->prop_identifier = "i_uv_repeat"; //Identifier to save
+        uv_factor_prop->start_offset = 36;
 
+        MtShProps::addMtShaderPropertyGroup(default_group);
+    }
+    {
 
-    TextureMaterialShaderProperty* height_texture_prop =
-            static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
-    height_texture_prop->slotToBind = 3;
-    height_texture_prop->prop_caption = "Height";
-    height_texture_prop->ToggleUniform = "hasHeightMap";
-    height_texture_prop->prop_identifier = "t_height"; //Identifier to save
-    height_texture_prop->start_offset = 24;
+        //Water
+        MtShaderPropertiesGroup* water_group = new MtShaderPropertiesGroup(water, "WaterData", 51, 32);
+        water_group->acceptShadows = true;
+        water_group->str_path = "@basewater";
+        water_group->groupCaption = "Water";
 
-    TextureMaterialShaderProperty* ao_texture_prop =
-        static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
-    ao_texture_prop->slotToBind = 4;
-    ao_texture_prop->prop_caption = "Amb Occlusion";
-    ao_texture_prop->ToggleUniform = "hasAoMap";
-    ao_texture_prop->prop_identifier = "t_occlusion"; //Identifier to save
-    ao_texture_prop->start_offset = 28;
+        TextureMaterialShaderProperty* reflection_texture_prop =
+            static_cast<TextureMaterialShaderProperty*>(water_group->addProperty(MATSHPROP_TYPE_TEXTURE));
+        reflection_texture_prop->slotToBind = 0;
+        reflection_texture_prop->prop_caption = "Reflection"; //Set caption in Inspector
+        reflection_texture_prop->prop_identifier = "t_reflection"; //Identifier to save
+        reflection_texture_prop->start_offset = 0;
 
-    FloatMaterialShaderProperty* shininess_factor_prop =
-            static_cast<FloatMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_FLOAT));
-    shininess_factor_prop->floatUniform = "material_shininess";
-    shininess_factor_prop->prop_caption = "Shininess";
-    shininess_factor_prop->prop_identifier = "f_shininess"; //Identifier to save
-    shininess_factor_prop->start_offset = 32;
+        TextureMaterialShaderProperty* refraction_texture_prop =
+            static_cast<TextureMaterialShaderProperty*>(water_group->addProperty(MATSHPROP_TYPE_TEXTURE));
+        refraction_texture_prop->slotToBind = 1;
+        refraction_texture_prop->prop_caption = "Refraction"; //Set caption in Inspector
+        refraction_texture_prop->prop_identifier = "t_refraction"; //Identifier to save
+        refraction_texture_prop->start_offset = 4;
 
-    Int2MaterialShaderProperty* uv_factor_prop =
-            static_cast<Int2MaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_IVEC2));
-    uv_factor_prop->floatUniform = "uv_repeat";
-    uv_factor_prop->prop_caption = "UV repeat";
-    uv_factor_prop->prop_identifier = "i_uv_repeat"; //Identifier to save
-    uv_factor_prop->start_offset = 36;
+        TextureMaterialShaderProperty* distortion_texture_prop =
+            static_cast<TextureMaterialShaderProperty*>(water_group->addProperty(MATSHPROP_TYPE_TEXTURE));
+        distortion_texture_prop->slotToBind = 2;
+        distortion_texture_prop->prop_caption = "Distortion"; //Set caption in Inspector
+        distortion_texture_prop->prop_identifier = "t_distortion"; //Identifier to save
+        distortion_texture_prop->start_offset = 8;
 
-    MtShProps::addMtShaderPropertyGroup(default_group);
+        MaterialShaderProperty* distortion_factor_prop = (water_group->addProperty(MATSHPROP_TYPE_FLOAT));
+        distortion_factor_prop->prop_caption = "Distort factor";
+        distortion_factor_prop->prop_identifier = "f_distfactor"; //Identifier to save
+        distortion_factor_prop->start_offset = 12;
+
+        MaterialShaderProperty* diff_color_prop = (water_group->addProperty(MATSHPROP_TYPE_COLOR));
+        diff_color_prop->prop_caption = "Color"; //Set caption in Inspector
+        diff_color_prop->prop_identifier = "c_diffuse"; //Identifier to save
+        diff_color_prop->start_offset = 16;
+
+        MtShProps::addMtShaderPropertyGroup(water_group);
+    }
 
 //Default skybox material
     MtShaderPropertiesGroup* default_sky_group = new MtShaderPropertiesGroup(skybox, "", 0, 0);
@@ -129,7 +161,6 @@ MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d
             static_cast<Texture3MaterialShaderProperty*>(default_sky_group->addProperty(MATSHPROP_TYPE_TEXTURE3));
     sky_texture->slotToBind = 0;
     sky_texture->prop_caption = "Sky";
-    sky_texture->ToggleUniform = "hasSpecularMap";
     sky_texture->prop_identifier = "skytexture3"; //Identifier to save
 
     MtShProps::addMtShaderPropertyGroup(default_sky_group);
@@ -411,7 +442,7 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
 
                             break;
                         }
-                   }
+                    }
                 }
             }
         }
@@ -451,8 +482,9 @@ void Material::applyMatToPipeline(){
     if(shader == nullptr)
         return;
     shader->Use();
+    if(group_ptr->UB_ID != nullptr)
+        group_ptr->UB_ID->bind();
     //iterate over all properties, send them all!
-    unsigned int offset = 0;
     for(unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i ++){
         MaterialShaderProperty* prop_ptr = group_ptr->properties[prop_i];
         MaterialShaderPropertyConf* conf_ptr = confs[prop_i];
@@ -479,83 +511,64 @@ void Material::applyMatToPipeline(){
                     Engine::TextureResource* tex_ptr = static_cast<Engine::TextureResource*>(texture_conf->texture);
                     tex_ptr->Use(texture_p->slotToBind);
                 }
-
-                offset = texture_p->start_offset;
-                group_ptr->setUB_Data(offset, 4, &db);
+                //Set texture state
+                group_ptr->setUB_Data(texture_p->start_offset, 4, &db);
 
                 break;
             }
             case MATSHPROP_TYPE_FLOAT:{
-                //Cast pointer
-                FloatMaterialShaderProperty* float_p = static_cast<FloatMaterialShaderProperty*>(prop_ptr);
                 FloatMtShPropConf* float_conf = static_cast<FloatMtShPropConf*>(conf_ptr);
 
-                offset = float_p->start_offset;
                 //set float to buffer
-                group_ptr->setUB_Data(offset, 4, &float_conf->value);
+                group_ptr->setUB_Data(prop_ptr->start_offset, 4, &float_conf->value);
 
                 break;
             }
             case MATSHPROP_TYPE_INTEGER:{
-                //Cast pointer
-                IntegerMaterialShaderProperty* int_p = static_cast<IntegerMaterialShaderProperty*>(prop_ptr);
                 IntegerMtShPropConf* int_conf = static_cast<IntegerMtShPropConf*>(conf_ptr);
 
-                offset = int_p->start_offset;
                 //set integer to buffer
-                group_ptr->setUB_Data(offset, 4, &int_conf->value);
+                group_ptr->setUB_Data(prop_ptr->start_offset, 4, &int_conf->value);
 
                 break;
             }
             case MATSHPROP_TYPE_COLOR:{
-                //Cast pointer
-                ColorMaterialShaderProperty* color_p = static_cast<ColorMaterialShaderProperty*>(prop_ptr);
                 ColorMtShPropConf* color_conf = static_cast<ColorMtShPropConf*>(conf_ptr);
 
                 color_conf->color.updateGL();
 
-                offset = color_p->start_offset;
                 //Write color to buffer
-                group_ptr->setUB_Data(offset, 4, &color_conf->color.gl_r);
-                group_ptr->setUB_Data(offset + 4, 4, &color_conf->color.gl_g);
-                group_ptr->setUB_Data(offset + 8, 4, &color_conf->color.gl_b);
+                group_ptr->setUB_Data(prop_ptr->start_offset, 4, &color_conf->color.gl_r);
+                group_ptr->setUB_Data(prop_ptr->start_offset + 4, 4, &color_conf->color.gl_g);
+                group_ptr->setUB_Data(prop_ptr->start_offset + 8, 4, &color_conf->color.gl_b);
 
 
                 break;
             }
             case MATSHPROP_TYPE_FVEC3:{
-                //Cast pointer
-                Float3MaterialShaderProperty* fvec3_p = static_cast<Float3MaterialShaderProperty*>(prop_ptr);
                 Float3MtShPropConf* fvec3_conf = static_cast<Float3MtShPropConf*>(conf_ptr);
 
-                offset = fvec3_p->start_offset;
                 //Write vec3 to buffer
-                group_ptr->setUB_Data(offset, 4, &fvec3_conf->value.X);
-                group_ptr->setUB_Data(offset + 4, 4, &fvec3_conf->value.Y);
-                group_ptr->setUB_Data(offset + 8, 4, &fvec3_conf->value.Z);
+                group_ptr->setUB_Data(prop_ptr->start_offset, 4, &fvec3_conf->value.X);
+                group_ptr->setUB_Data(prop_ptr->start_offset + 4, 4, &fvec3_conf->value.Y);
+                group_ptr->setUB_Data(prop_ptr->start_offset + 8, 4, &fvec3_conf->value.Z);
 
                 break;
             }
             case MATSHPROP_TYPE_FVEC2:{
-                //Cast pointer
-                Float2MaterialShaderProperty* fvec2_p = static_cast<Float2MaterialShaderProperty*>(prop_ptr);
                 Float2MtShPropConf* fvec2_conf = static_cast<Float2MtShPropConf*>(conf_ptr);
 
-                offset = fvec2_p->start_offset;
                 //Write vec2 to buffer
-                group_ptr->setUB_Data(offset, 4, &fvec2_conf->value.X);
-                group_ptr->setUB_Data(offset + 4, 4, &fvec2_conf->value.Y);
+                group_ptr->setUB_Data(prop_ptr->start_offset, 4, &fvec2_conf->value.X);
+                group_ptr->setUB_Data(prop_ptr->start_offset + 4, 4, &fvec2_conf->value.Y);
                 break;
             }
             case MATSHPROP_TYPE_IVEC2:{
-                //Cast pointer
-                Int2MaterialShaderProperty* ivec2_p = static_cast<Int2MaterialShaderProperty*>(prop_ptr);
                 Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
 
-                offset = ivec2_p->start_offset;
                 //Write vec2 to buffer
-                group_ptr->setUB_Data(offset, 4, &ivec2_conf->value[0]);
-                group_ptr->setUB_Data(offset + 4, 4, &ivec2_conf->value[1]);
+                group_ptr->setUB_Data(prop_ptr->start_offset, 4, &ivec2_conf->value[0]);
+                group_ptr->setUB_Data(prop_ptr->start_offset + 4, 4, &ivec2_conf->value[1]);
                 break;
             }
             case MATSHPROP_TYPE_TEXTURE3:{

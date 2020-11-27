@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../render/Math.hpp"
-#include "../misc/oal_manager.h"
+#include "../audio/SoundSource.hpp"
 
 enum ZSCAMERAPROJECTIONTYPE {ZSCAMERA_PROJECTION_NONE,
                             ZSCAMERA_PROJECTION_ORTHOGONAL,

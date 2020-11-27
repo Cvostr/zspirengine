@@ -115,7 +115,7 @@ void Engine::TransformProperty::copyTo(IGameObjectComponent* dest) {
     _dest->transform_mat = transform_mat;
 }
 
-void Engine::TransformProperty::onPreRender(RenderPipeline* pipeline) {
+void Engine::TransformProperty::onPreRender(Renderer* pipeline) {
     this->updateMatrix();
     //Send transform matrix to transform buffer
     pipeline->transformBuffer->bind();

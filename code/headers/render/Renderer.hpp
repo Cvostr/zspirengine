@@ -23,8 +23,6 @@ enum class PIPELINE_STATE {
 
 namespace Engine{
 
-UniformBuffer* allocUniformBuffer();
-
 class GameObject;
 
 struct RenderSettings {
@@ -46,7 +44,7 @@ struct RenderSettings {
 class LightsourceProperty;
 class World;
 
-class RenderPipeline : public IEngineComponent {
+class Renderer : public IEngineComponent {
 protected:
     //Vector to store lights
     std::vector<LightsourceProperty*> lights_ptr;
@@ -68,7 +66,7 @@ protected:
 
     void create_G_Buffer(unsigned int width, unsigned int height);
 private:
-    void initShaders();
+    virtual void InitShaders(){}
 public:
     PIPELINE_STATE current_state;
 
@@ -84,6 +82,7 @@ public:
     Engine::Shader* shadowMap;
     Engine::Shader* ui_shader;
     Engine::Shader* final_shader;
+    Engine::Shader* water_shader;
 
     UniformBuffer* transformBuffer; //0
     UniformBuffer* lightsBuffer;    //1
@@ -115,17 +114,20 @@ public:
     void renderGlyph(unsigned int texture_id, int X, int Y, int scaleX, int scaleY, ZSRGBCOLOR color);
 
     void render();
-    void render2D();
-    void render3D(Engine::Camera* cam);
+    virtual void render2D(){}
+    virtual void render3D(Engine::Camera* cam){}
     void renderShadowDepth(World* world_ptr, unsigned int CascadesNum);
-    void init();
-    void updateWindowSize(int W, int H);
+
+    void OnCreate();
+    virtual void initManager(){}
+
+    void OnUpdateWindowSize(int W, int H);
     void destroy();
 
     Engine::Camera* cam;
 
-    RenderPipeline();
-    ~RenderPipeline();
+    Renderer();
+    ~Renderer();
 };
 
 }

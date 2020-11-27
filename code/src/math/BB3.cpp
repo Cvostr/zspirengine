@@ -19,11 +19,11 @@ void BoundingBox3::Extend(const BoundingBox3& Box) {
 }
 
 void BoundingBox3::PrepareForExtend() {
-	mMin = ZSVECTOR3(MAX_DIST);
-	mMax = ZSVECTOR3(-MAX_DIST);
+	mMin = Vec3(MAX_DIST);
+	mMax = Vec3(-MAX_DIST);
 }
 
-void BoundingBox3::Extend(const ZSVECTOR3& Vec) {
+void BoundingBox3::Extend(const Vec3& Vec) {
 	if (mMin.X > Vec.X) mMin.X = Vec.X;
 	if (mMin.Y > Vec.Y) mMin.Y = Vec.Y;
 	if (mMin.Z > Vec.Z) mMin.Z = Vec.Z;
@@ -42,7 +42,7 @@ bool BoundingBox3::IsIntersects(const BoundingBox3& Box) {
 	}
 	return true;
 }
-ZSVECTOR3 BoundingBox3::GetCenter() {
+Vec3 BoundingBox3::GetCenter() {
 	return (mMin + mMax) * 0.5f;
 }
 
@@ -53,20 +53,20 @@ void BoundingBox3::CreateFromVertexArray(ZSVERTEX* Array, unsigned int VertexCou
 	}
 }
 
-void BoundingBox3::ApplyTransform(const ZSVECTOR3& pos, const ZSVECTOR3& scale, const ZSVECTOR3& rot) {
+void BoundingBox3::ApplyTransform(const Vec3& pos, const Vec3& scale, const Vec3& rot) {
 
 }
 
 void BoundingBox3::ApplyTransform(const Mat4& Transform) {
-	ZSVECTOR3 corners[8];
+	Vec3 corners[8];
 	corners[0] = mMin;
-	corners[1] = ZSVECTOR3(mMin.X, mMax.Y, mMin.Z);
-	corners[2] = ZSVECTOR3(mMin.X, mMax.Y, mMax.Z);
-	corners[3] = ZSVECTOR3(mMin.X, mMin.Y, mMax.Z);
-	corners[4] = ZSVECTOR3(mMax.X, mMin.Y, mMin.Z);
-	corners[5] = ZSVECTOR3(mMax.X, mMax.Y, mMin.Z);
+	corners[1] = Vec3(mMin.X, mMax.Y, mMin.Z);
+	corners[2] = Vec3(mMin.X, mMax.Y, mMax.Z);
+	corners[3] = Vec3(mMin.X, mMin.Y, mMax.Z);
+	corners[4] = Vec3(mMax.X, mMin.Y, mMin.Z);
+	corners[5] = Vec3(mMax.X, mMax.Y, mMin.Z);
 	corners[6] = mMax;			   		  
-	corners[7] = ZSVECTOR3(mMax.X, mMin.Y, mMax.Z);
+	corners[7] = Vec3(mMax.X, mMin.Y, mMax.Z);
 
 	PrepareForExtend();
 	for (int i = 0; i < 8; i++) {

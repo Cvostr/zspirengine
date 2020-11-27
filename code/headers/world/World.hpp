@@ -89,8 +89,8 @@ public:
     virtual void onStop(){}
     //Virtual func to define property behaviour each frame
     virtual void onUpdate(float deltaTime){}
-    virtual void onPreRender(RenderPipeline* pipeline = nullptr){}
-    virtual void onRender(RenderPipeline* pipeline = nullptr){}
+    virtual void onPreRender(Renderer* pipeline = nullptr){}
+    virtual void onRender(Renderer* pipeline = nullptr){}
     virtual void onAddToObject(){}
     virtual void onObjectDeleted(){}
     virtual void loadPropertyFromMemory(const char* data, GameObject* obj);
@@ -105,6 +105,16 @@ public:
 
     IGameObjectComponent();
     virtual ~IGameObjectComponent();
+};
+
+class WorldSnapshot {
+public:
+    std::vector<Engine::GameObject> objects;
+    std::vector<Engine::IGameObjectComponent*> props;
+    std::vector<Engine::IGameObjectComponent*> scripts;
+
+    WorldSnapshot();
+    void clear();
 };
 
 class World{
@@ -146,6 +156,9 @@ public:
     int getFreeObjectSpaceIndex();
     bool isObjectLabelUnique(const std::string& label); //Get amount of objects with this label
     void getAvailableNumObjLabel(std::string label, int* result);
+
+    void putToShapshot(WorldSnapshot* snapshot);
+
 
     World();
     ~World();
@@ -231,13 +244,13 @@ public:
 
     GameObjectLink getLinkToThisObject();
     void copyTo(GameObject* dest);
-    void processObject(RenderPipeline* pipeline); //On render pipeline wish to work with object
-    void Draw(RenderPipeline* pipeline); //On render pipeline wish to draw the object
+    void processObject(Renderer* pipeline); //On render pipeline wish to work with object
+    void Draw(Renderer* pipeline); //On render pipeline wish to draw the object
     void onStart(); //calls onStart() on all properties
     void onStop(); //calls onStop() on all properties
     void onUpdate(int deltaTime); //calls onUpdate on all properties
-    void onPreRender(RenderPipeline* pipeline); //calls onPreRender on all properties
-    void onRender(RenderPipeline* pipeline); //calls onRender on all properties
+    void onPreRender(Renderer* pipeline); //calls onPreRender on all properties
+    void onRender(Renderer* pipeline); //calls onRender on all properties
     void onTrigger(GameObject* obj);
     void onTriggerEnter(GameObject* obj);
     void onTriggerExit(GameObject* obj);
@@ -250,9 +263,9 @@ public:
     bool hasTerrain(); //Check if gameobject has terrain inside
     bool hasLightsource();
 
-    void DrawMesh(RenderPipeline* pipeline);
-    void DrawMeshInstanced(RenderPipeline* pipeline, unsigned int inst_num);
-    void setSkinningMatrices(RenderPipeline* pipeline);
+    void DrawMesh(Renderer* pipeline);
+    void DrawMeshInstanced(Renderer* pipeline, unsigned int inst_num);
+    void setSkinningMatrices(Renderer* pipeline);
 
     //---------------------FOR EDITOR USE--------------------------------------------------------
     void pick(); //Mark object and its children picked
@@ -313,7 +326,7 @@ public:
     void updateMatrix();
     void getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r);
     void copyTo(IGameObjectComponent* dest);
-    void onPreRender(RenderPipeline* pipeline);
+    void onPreRender(Renderer* pipeline);
     void getAbsoluteRotationMatrix(Mat4& m);
 
     void setTranslation(const ZSVECTOR3& new_translation);

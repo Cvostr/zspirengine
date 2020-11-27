@@ -145,6 +145,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="code\src\audio\OALManager.cpp" />
+    <ClCompile Include="code\src\audio\SoundBuffer.cpp" />
+    <ClCompile Include="code\src\audio\SoundSource.cpp" />
     <ClCompile Include="code\src\engine.cpp" />
     <ClCompile Include="code\src\engine\EngineComponent.cpp" />
     <ClCompile Include="code\src\engine\LocaleStringsFile.cpp" />
@@ -157,10 +160,10 @@
     <ClCompile Include="code\src\math\Vec3.cpp" />
     <ClCompile Include="code\src\misc\GlyphManager.cpp" />
     <ClCompile Include="code\src\misc\KeyValueFile.cpp" />
-    <ClCompile Include="code\src\misc\oal_manager.cpp" />
     <ClCompile Include="code\src\misc\output.cpp" />
     <ClCompile Include="code\src\misc\misc.cpp" />
     <ClCompile Include="code\src\misc\zs3m-master.cpp" />
+    <ClCompile Include="code\src\ogl\GLRenderer.cpp" />
     <ClCompile Include="code\src\ogl\ogl_mesh.cpp" />
     <ClCompile Include="code\src\ogl\ogl_shader.cpp" />
     <ClCompile Include="code\src\ogl\ogl_texture.cpp" />
@@ -206,7 +209,9 @@
     <ClCompile Include="code\src\vulkan\vk_shader.cpp" />
     <ClCompile Include="code\src\vulkan\vk_texture.cpp" />
     <ClCompile Include="code\src\vulkan\vk_uniform_buf.cpp" />
+    <ClCompile Include="code\src\vulkan\ZSVulkanDevice.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanInstance.cpp" />
+    <ClCompile Include="code\src\vulkan\ZSVulkanSwapchain.cpp" />
     <ClCompile Include="code\src\world\GameObject.cpp" />
     <ClCompile Include="code\src\world\GoProperty\AnimationComponent.cpp" />
     <ClCompile Include="code\src\world\GoProperty\AudioSourceProperty.cpp" />
@@ -231,6 +236,9 @@
     <ClCompile Include="code\src\world\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="code\headers\audio\OALManager.hpp" />
+    <ClInclude Include="code\headers\audio\SoundBuffer.hpp" />
+    <ClInclude Include="code\headers\audio\SoundSource.hpp" />
     <ClInclude Include="code\headers\engine.h" />
     <ClInclude Include="code\headers\engine\EngineComponent.h" />
     <ClInclude Include="code\headers\engine\engine_window.h" />
@@ -251,12 +259,12 @@
     <ClInclude Include="code\headers\math\Vertex.hpp" />
     <ClInclude Include="code\headers\misc\GlyphManager.h" />
     <ClInclude Include="code\headers\misc\KeyValueFile.hpp" />
-    <ClInclude Include="code\headers\misc\oal_manager.h" />
     <ClInclude Include="code\headers\misc\output.hpp" />
     <ClInclude Include="code\headers\misc\misc.h" />
     <ClInclude Include="code\headers\misc\RefCounter.hpp" />
     <ClInclude Include="code\headers\misc\SmArray.hpp" />
     <ClInclude Include="code\headers\misc\zs3m-master.h" />
+    <ClInclude Include="code\headers\ogl\GLRenderer.hpp" />
     <ClInclude Include="code\headers\ogl\ogl.h" />
     <ClInclude Include="code\headers\render\screen_effects\gauss_blur.h" />
     <ClInclude Include="code\headers\render\Animation.hpp" />
@@ -284,7 +292,9 @@
     <ClInclude Include="code\headers\ui\Widgets\Button.hpp" />
     <ClInclude Include="code\headers\ui\Widgets\Widget.hpp" />
     <ClInclude Include="code\headers\vulkan\vk_data.h" />
+    <ClInclude Include="code\headers\vulkan\ZSVulkanDevice.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanInstance.hpp" />
+    <ClInclude Include="code\headers\vulkan\ZSVulkanSwapchain.hpp" />
     <ClInclude Include="code\headers\world\go_properties.h" />
     <ClInclude Include="code\headers\world\Physics.h" />
     <ClInclude Include="code\headers\world\Terrain.hpp" />

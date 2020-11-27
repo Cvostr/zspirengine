@@ -12,132 +12,132 @@ extern ZSpireEngine* engine_ptr;
 
 static ZSVERTEX plane_verts[] = {
     // positions              // texture coords
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f, 0.0f),		ZSVECTOR2(1.0f, 1.0f)),   // top right
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f, 0.0f),		ZSVECTOR2(1.0f, 0.0f)),   // bottom right
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f, 0.0f),		ZSVECTOR2(0.0f, 0.0f)),   // bottom left
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f, 0.0f),		ZSVECTOR2(0.0f, 1.0f))   // top left
+    ZSVERTEX(Vec3(1.0f,  1.0f, 0.0f),		ZSVECTOR2(1.0f, 1.0f)),   // top right
+    ZSVERTEX(Vec3(1.0f, -1.0f, 0.0f),		ZSVECTOR2(1.0f, 0.0f)),   // bottom right
+    ZSVERTEX(Vec3(-1.0f, -1.0f, 0.0f),		ZSVECTOR2(0.0f, 0.0f)),   // bottom left
+    ZSVERTEX(Vec3(-1.0f,  1.0f, 0.0f),		ZSVECTOR2(0.0f, 1.0f))   // top left
 };
 
 static ZSVERTEX ui_sprite_vertices[] = {
     // positions // texture coords
-    ZSVERTEX(ZSVECTOR3(1.0f, 1.0f, 0.0f), ZSVECTOR2(1.0f, 0.0f)), // top right
-    ZSVERTEX(ZSVECTOR3(1.0f, 0.0f, 0.0f), ZSVECTOR2(1.0f, 1.0f)), // bottom right
-    ZSVERTEX(ZSVECTOR3(0.0f, 0.0f, 0.0f), ZSVECTOR2(0.0f, 1.0f)), // bottom left
-    ZSVERTEX(ZSVECTOR3(0.0f, 1.0f, 0.0f), ZSVECTOR2(0.0f, 0.0f)) // top left
+    ZSVERTEX(Vec3(1.0f, 1.0f, 0.0f), ZSVECTOR2(1.0f, 0.0f)), // top right
+    ZSVERTEX(Vec3(1.0f, 0.0f, 0.0f), ZSVECTOR2(1.0f, 1.0f)), // bottom right
+    ZSVERTEX(Vec3(0.0f, 0.0f, 0.0f), ZSVECTOR2(0.0f, 1.0f)), // bottom left
+    ZSVERTEX(Vec3(0.0f, 1.0f, 0.0f), ZSVECTOR2(0.0f, 0.0f)) // top left
 };
 
 static ZSVERTEX iso_tile_vertices[] = {
     // positions              // texture coords
-    ZSVERTEX(ZSVECTOR3(0.0f,  1.0f, 0.0f),		ZSVECTOR2(0.5f, 1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f, 0.1f, 0.0f),		ZSVECTOR2(1.0f, 0.55f)),
-    ZSVERTEX(ZSVECTOR3(1.0f, -0.1f, 0.0f),		ZSVECTOR2(1.0f, 0.45f)),
-    ZSVERTEX(ZSVECTOR3(0.0f,  -1.0f, 0.0f),		ZSVECTOR2(0.5f, 0.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f,  -0.1f, 0.0f),	ZSVECTOR2(0.0f, 0.45f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f,  0.1f, 0.0f),	ZSVECTOR2(0.0f, 0.55f))   // top left
+    ZSVERTEX(Vec3(0.0f,  1.0f, 0.0f),		ZSVECTOR2(0.5f, 1.0f)),
+    ZSVERTEX(Vec3(1.0f, 0.1f, 0.0f),		ZSVECTOR2(1.0f, 0.55f)),
+    ZSVERTEX(Vec3(1.0f, -0.1f, 0.0f),		ZSVECTOR2(1.0f, 0.45f)),
+    ZSVERTEX(Vec3(0.0f,  -1.0f, 0.0f),		ZSVECTOR2(0.5f, 0.0f)),
+    ZSVERTEX(Vec3(-1.0f,  -0.1f, 0.0f),	ZSVECTOR2(0.0f, 0.45f)),
+    ZSVERTEX(Vec3(-1.0f,  0.1f, 0.0f),	ZSVECTOR2(0.0f, 0.55f))   // top left
 };
 
 static ZSVERTEX cube_vertices[] = {
     // back face
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // bottom-left
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // top-right
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f, -1.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // bottom-right
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // top-right
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // bottom-left
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // top-left
+    ZSVERTEX(Vec3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 0.0f), Vec3(0.0f,  0.0f, -1.0f)), // bottom-left
+    ZSVERTEX(Vec3(1.0f,  1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), Vec3(0.0f,  0.0f, -1.0f)), // top-right
+    ZSVERTEX(Vec3(1.0f, -1.0f, -1.0f), ZSVECTOR2(1.0f, 0.0f), Vec3(0.0f,  0.0f, -1.0f)), // bottom-right
+    ZSVERTEX(Vec3(1.0f,  1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), Vec3(0.0f,  0.0f, -1.0f)), // top-right
+    ZSVERTEX(Vec3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 0.0f), Vec3(0.0f,  0.0f, -1.0f)), // bottom-left
+    ZSVERTEX(Vec3(-1.0f,  1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), Vec3(0.0f,  0.0f, -1.0f)), // top-left
     // front face
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f,  1.0f)), // bottom-left
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f,  1.0f)), // bottom-right
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f,  1.0f)), // top-right
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f,  1.0f)), // top-right
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f,  1.0f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f,  1.0f)), // top-left
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f,  1.0f)), // bottom-left
+    ZSVERTEX(Vec3(-1.0f, -1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), Vec3(0.0f,  0.0f,  1.0f)), // bottom-left
+    ZSVERTEX(Vec3(1.0f, -1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), Vec3(0.0f,  0.0f,  1.0f)), // bottom-right
+    ZSVERTEX(Vec3(1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 1.0f), Vec3(0.0f,  0.0f,  1.0f)), // top-right
+    ZSVERTEX(Vec3(1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 1.0f), Vec3(0.0f,  0.0f,  1.0f)), // top-right
+    ZSVERTEX(Vec3(-1.0f,  1.0f,  1.0f), ZSVECTOR2(0.0f, 1.0f), Vec3(0.0f,  0.0f,  1.0f)), // top-left
+    ZSVERTEX(Vec3(-1.0f, -1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), Vec3(0.0f,  0.0f,  1.0f)), // bottom-left
     // left face
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(-1.0f,  0.0f,  0.0f)), // top-right
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(-1.0f,  0.0f,  0.0f)), // top-left
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(-1.0f,  0.0f,  0.0f)), // bottom-left
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(-1.0f,  0.0f,  0.0f)), // bottom-left
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(-1.0f,  0.0f,  0.0f)), // bottom-right
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(-1.0f,  0.0f,  0.0f)), // top-right
+    ZSVERTEX(Vec3(-1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), Vec3(-1.0f,  0.0f,  0.0f)), // top-right
+    ZSVERTEX(Vec3(-1.0f,  1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), Vec3(-1.0f,  0.0f,  0.0f)), // top-left
+    ZSVERTEX(Vec3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), Vec3(-1.0f,  0.0f,  0.0f)), // bottom-left
+    ZSVERTEX(Vec3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), Vec3(-1.0f,  0.0f,  0.0f)), // bottom-left
+    ZSVERTEX(Vec3(-1.0f, -1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), Vec3(-1.0f,  0.0f,  0.0f)), // bottom-right
+    ZSVERTEX(Vec3(-1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), Vec3(-1.0f,  0.0f,  0.0f)), // top-right
     // right face
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(1.0f,  0.0f,  0.0f)), // top-left
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(1.0f,  0.0f,  0.0f)), // bottom-right
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(1.0f,  0.0f,  0.0f)), // top-right
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(1.0f,  0.0f,  0.0f)), // bottom-right
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(1.0f,  0.0f,  0.0f)), // top-left
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(1.0f,  0.0f,  0.0f)), // bottom-left
+    ZSVERTEX(Vec3(1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), Vec3(1.0f,  0.0f,  0.0f)), // top-left
+    ZSVERTEX(Vec3(1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), Vec3(1.0f,  0.0f,  0.0f)), // bottom-right
+    ZSVERTEX(Vec3(1.0f,  1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), Vec3(1.0f,  0.0f,  0.0f)), // top-right
+    ZSVERTEX(Vec3(1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), Vec3(1.0f,  0.0f,  0.0f)), // bottom-right
+    ZSVERTEX(Vec3(1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), Vec3(1.0f,  0.0f,  0.0f)), // top-left
+    ZSVERTEX(Vec3(1.0f, -1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), Vec3(1.0f,  0.0f,  0.0f)), // bottom-left
     // bottom face
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(0.0f, -1.0f,  0.0f)), // top-right
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(0.0f, -1.0f,  0.0f)), // top-left
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(0.0f, -1.0f,  0.0f)), // bottom-left
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(0.0f, -1.0f,  0.0f)), // bottom-left
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3( 0.0f, -1.0f,  0.0f)), // bottom-right
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(0.0f, -1.0f,  0.0f)), // top-right
+    ZSVERTEX(Vec3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), Vec3(0.0f, -1.0f,  0.0f)), // top-right
+    ZSVERTEX(Vec3(1.0f, -1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), Vec3(0.0f, -1.0f,  0.0f)), // top-left
+    ZSVERTEX(Vec3(1.0f, -1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), Vec3(0.0f, -1.0f,  0.0f)), // bottom-left
+    ZSVERTEX(Vec3(1.0f, -1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), Vec3(0.0f, -1.0f,  0.0f)), // bottom-left
+    ZSVERTEX(Vec3(-1.0f, -1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), Vec3( 0.0f, -1.0f,  0.0f)), // bottom-right
+    ZSVERTEX(Vec3(-1.0f, -1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), Vec3(0.0f, -1.0f,  0.0f)), // top-right
     // top face
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(0.0f,  1.0f,  0.0f)), // top-left
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f , 1.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(0.0f,  1.0f,  0.0f)), // bottom-right
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(0.0f,  1.0f,  0.0f)), // top-right
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(0.0f,  1.0f,  0.0f)), // bottom-right
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(0.0f,  1.0f,  0.0f)), // top-left
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(0.0f,  1.0f,  0.0f))  // bottom-left
+    ZSVERTEX(Vec3(-1.0f,  1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), Vec3(0.0f,  1.0f,  0.0f)), // top-left
+    ZSVERTEX(Vec3(1.0f,  1.0f , 1.0f), ZSVECTOR2(1.0f, 0.0f), Vec3(0.0f,  1.0f,  0.0f)), // bottom-right
+    ZSVERTEX(Vec3(1.0f,  1.0f, -1.0f), ZSVECTOR2(1.0f, 1.0f), Vec3(0.0f,  1.0f,  0.0f)), // top-right
+    ZSVERTEX(Vec3(1.0f,  1.0f,  1.0f), ZSVECTOR2(1.0f, 0.0f), Vec3(0.0f,  1.0f,  0.0f)), // bottom-right
+    ZSVERTEX(Vec3(-1.0f,  1.0f, -1.0f), ZSVECTOR2(0.0f, 1.0f), Vec3(0.0f,  1.0f,  0.0f)), // top-left
+    ZSVERTEX(Vec3(-1.0f,  1.0f,  1.0f), ZSVECTOR2(0.0f, 0.0f), Vec3(0.0f,  1.0f,  0.0f))  // bottom-left
 };
 
 static ZSVERTEX skyboxVertices[] = {
     // positions
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f, -1.0f)),
+    ZSVERTEX(Vec3(-1.0f,  1.0f, -1.0f)),
+    ZSVERTEX(Vec3(-1.0f, -1.0f, -1.0f)),
+    ZSVERTEX(Vec3(1.0f, -1.0f, -1.0f)),
+    ZSVERTEX(Vec3(1.0f, -1.0f, -1.0f)),
+    ZSVERTEX(Vec3(1.0f,  1.0f, -1.0f)),
+    ZSVERTEX(Vec3(-1.0f,  1.0f, -1.0f)),
 
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f,  1.0f)),
+    ZSVERTEX(Vec3(-1.0f, -1.0f,  1.0f)),
+    ZSVERTEX(Vec3(-1.0f, -1.0f, -1.0f)),
+    ZSVERTEX(Vec3(-1.0f,  1.0f, -1.0f)),
+    ZSVERTEX(Vec3(-1.0f,  1.0f, -1.0f)),
+    ZSVERTEX(Vec3(-1.0f,  1.0f,  1.0f)),
+    ZSVERTEX(Vec3(-1.0f, -1.0f,  1.0f)),
 
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f, -1.0f)),
+    ZSVERTEX(Vec3(1.0f, -1.0f, -1.0f)),
+    ZSVERTEX(Vec3(1.0f, -1.0f,  1.0f)),
+    ZSVERTEX(Vec3(1.0f,  1.0f,  1.0f)),
+    ZSVERTEX(Vec3(1.0f,  1.0f,  1.0f)),
+    ZSVERTEX(Vec3(1.0f,  1.0f, -1.0f)),
+    ZSVERTEX(Vec3(1.0f, -1.0f, -1.0f)),
 
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f,  1.0f)),
+    ZSVERTEX(Vec3(-1.0f, -1.0f,  1.0f)),
+    ZSVERTEX(Vec3(-1.0f,  1.0f,  1.0f)),
+    ZSVERTEX(Vec3(1.0f,  1.0f,  1.0f)),
+    ZSVERTEX(Vec3(1.0f,  1.0f,  1.0f)),
+    ZSVERTEX(Vec3(1.0f, -1.0f,  1.0f)),
+    ZSVERTEX(Vec3(-1.0f, -1.0f,  1.0f)),
 
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f,  1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f,  1.0f, -1.0f)),
+    ZSVERTEX(Vec3(-1.0f,  1.0f, -1.0f)),
+    ZSVERTEX(Vec3(1.0f,  1.0f, -1.0f)),
+    ZSVERTEX(Vec3(1.0f,  1.0f,  1.0f)),
+    ZSVERTEX(Vec3(1.0f,  1.0f,  1.0f)),
+    ZSVERTEX(Vec3(-1.0f,  1.0f,  1.0f)),
+    ZSVERTEX(Vec3(-1.0f,  1.0f, -1.0f)),
 
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f, -1.0f)),
-    ZSVERTEX(ZSVECTOR3(-1.0f, -1.0f,  1.0f)),
-    ZSVERTEX(ZSVECTOR3(1.0f, -1.0f,  1.0f))
+    ZSVERTEX(Vec3(-1.0f, -1.0f, -1.0f)),
+    ZSVERTEX(Vec3(-1.0f, -1.0f,  1.0f)),
+    ZSVERTEX(Vec3(1.0f, -1.0f, -1.0f)),
+    ZSVERTEX(Vec3(1.0f, -1.0f, -1.0f)),
+    ZSVERTEX(Vec3(-1.0f, -1.0f,  1.0f)),
+    ZSVERTEX(Vec3(1.0f, -1.0f,  1.0f))
 };
 
 
 static ZSVERTEX grass_vertices[] = {
     // back face
-    ZSVERTEX(ZSVECTOR3(-0.5f, 0.0f, 0.0f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // bottom-left
-    ZSVERTEX(ZSVECTOR3(0.5f, 0.0f, 0.0f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // top-right
-    ZSVERTEX(ZSVECTOR3(0.5f, 0.5f, 0.0f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // bottom-right
-    ZSVERTEX(ZSVECTOR3(-0.5f, 0.5f, 0.0f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // top-right
+    ZSVERTEX(Vec3(-0.5f, 0.0f, 0.0f), ZSVECTOR2(0.0f, 1.0f), Vec3(0.0f,  0.0f, -1.0f)), // bottom-left
+    ZSVERTEX(Vec3(0.5f, 0.0f, 0.0f), ZSVECTOR2(1.0f, 1.0f), Vec3(0.0f,  0.0f, -1.0f)), // top-right
+    ZSVERTEX(Vec3(0.5f, 0.5f, 0.0f), ZSVECTOR2(1.0f, 0.0f), Vec3(0.0f,  0.0f, -1.0f)), // bottom-right
+    ZSVERTEX(Vec3(-0.5f, 0.5f, 0.0f), ZSVECTOR2(0.0f, 0.0f), Vec3(0.0f,  0.0f, -1.0f)), // top-right
 
-    ZSVERTEX(ZSVECTOR3(0.0f, 0.0f, 0.5f), ZSVECTOR2(1.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // bottom-left
-    ZSVERTEX(ZSVECTOR3(0.0f, 0.0f, -0.5f), ZSVECTOR2(0.0f, 1.0f), ZSVECTOR3(0.0f,  0.0f, -1.0f)), // top-left
-    ZSVERTEX(ZSVECTOR3(0.0f, 0.5f, 0.5f), ZSVECTOR2(1.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f,  1.0f)), // bottom-left
-    ZSVERTEX(ZSVECTOR3(0.0f, 0.5f, -0.5f), ZSVECTOR2(0.0f, 0.0f), ZSVECTOR3(0.0f,  0.0f,  1.0f)), // bottom-right
+    ZSVERTEX(Vec3(0.0f, 0.0f, 0.5f), ZSVECTOR2(1.0f, 1.0f), Vec3(0.0f,  0.0f, -1.0f)), // bottom-left
+    ZSVERTEX(Vec3(0.0f, 0.0f, -0.5f), ZSVECTOR2(0.0f, 1.0f), Vec3(0.0f,  0.0f, -1.0f)), // top-left
+    ZSVERTEX(Vec3(0.0f, 0.5f, 0.5f), ZSVECTOR2(1.0f, 0.0f), Vec3(0.0f,  0.0f,  1.0f)), // bottom-left
+    ZSVERTEX(Vec3(0.0f, 0.5f, -0.5f), ZSVECTOR2(0.0f, 0.0f), Vec3(0.0f,  0.0f,  1.0f)), // bottom-right
 
 };
 
@@ -205,13 +205,13 @@ void Engine::setupDefaultMeshes() {
             // vertex position (x, y, z)
             x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
             y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
-            v.pos = ZSVECTOR3(x, y, z);
+            v.pos = Vec3(x, y, z);
 
             // normalized vertex normal (nx, ny, nz)
             nx = x * lengthInv;
             ny = y * lengthInv;
             nz = z * lengthInv;
-            v.normal = ZSVECTOR3(nx, ny, nz);
+            v.normal = Vec3(nx, ny, nz);
 
             // vertex tex coord (s, t) range between [0, 1]
             s = static_cast<float>(j) / SPHERE_SECTORS;
@@ -321,8 +321,8 @@ void Engine::processTangentSpace(ZSVERTEX* vert_array, unsigned int* indices_arr
         ZSVERTEX v2 = vert_array[indices_array[ind_i + 1]];
         ZSVERTEX v3 = vert_array[indices_array[ind_i + 2]];
 
-        ZSVECTOR3 edge1 = v2.pos - v1.pos;
-        ZSVECTOR3 edge2 = v3.pos - v1.pos;
+        Vec3 edge1 = v2.pos - v1.pos;
+        Vec3 edge2 = v3.pos - v1.pos;
         ZSVECTOR2 deltaUV1 = v2.uv - v1.uv;
         ZSVECTOR2 deltaUV2 = v3.uv - v1.uv;
 
@@ -351,8 +351,8 @@ void Engine::processTangentSpace(ZSVERTEX* vert_array, int vertices_num){
         ZSVERTEX v2 = vert_array[v_i + 1];
         ZSVERTEX v3 = vert_array[v_i + 2];
 
-        ZSVECTOR3 edge1 = v2.pos - v1.pos;
-        ZSVECTOR3 edge2 = v3.pos - v1.pos;
+        Vec3 edge1 = v2.pos - v1.pos;
+        Vec3 edge2 = v3.pos - v1.pos;
         ZSVECTOR2 deltaUV1 = v2.uv - v1.uv;
         ZSVECTOR2 deltaUV2 = v3.uv - v1.uv;
 

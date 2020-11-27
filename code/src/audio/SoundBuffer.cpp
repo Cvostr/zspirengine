@@ -1,73 +1,17 @@
+#include "../../headers/audio/SoundBuffer.hpp"
+
 #include <AL/al.h>
 #include <AL/alc.h>
-
-#include <iostream>
 #include <fstream>
 
-#include "../../headers/misc/oal_manager.h"
+#include "../../headers/engine/Logger.hpp"
 
-static ALCdevice* al_device;
-static ALCcontext* al_context;
-
-bool Engine::SFX::initAL() {
-    al_device = alcOpenDevice(nullptr);
-	if (!al_device) {
-		std::cout << "AL: Can't initialize OpenAL device" << std::endl;
-		return false;
-	}
-
-    al_context = alcCreateContext(al_device, nullptr);
-
-	if (!al_context) {
-		std::cout << "AL: Can't initialize OpenAL device context" << std::endl;
-		return false;
-	}
-
-	alcMakeContextCurrent(al_context);
-
-    if (alGetError() != AL_NO_ERROR)
-    {
-        fprintf(stderr, "Can't initialize");
-    }
-
-	std::cout << "AL: OpenAL successfully initialized!" << std::endl;
-	//Set default parameters
-	setListenerPos(ZSVECTOR3(0.0f, 0.0f, 0.0f));
-    setListenerOri(ZSVECTOR3(0.0f, 0.0f, 1.0f), ZSVECTOR3(0.0f, 1.0f, 0.0f));
-    setListenerVelocity(ZSVECTOR3(0.0f, 0.0f, 0.0f));
-    Engine::SFX::setListenerVolume(1.0f);
-
-	return true;
-}
-
-void Engine::SFX::setListenerPos(ZSVECTOR3 pos) {
-    alListener3f(AL_POSITION, pos.X, pos.Y, pos.Z);
-}
-void Engine::SFX::setListenerOri(ZSVECTOR3 front, ZSVECTOR3 up) {
-    ALfloat listenerOri[] = { front.X, front.Y, front.Z, up.X, up.Y, up.Z};
-    alListenerfv(AL_ORIENTATION, listenerOri);
-}
-
-void Engine::SFX::setListenerVolume(float value){
-	alListenerf(AL_GAIN, value);
-}
-
-void Engine::SFX::setListenerVelocity(ZSVECTOR3 velocity){
-    alListener3f(AL_VELOCITY, velocity.X, velocity.Y, velocity.Z);
-}
-
-void Engine::SFX::destroyAL(){
-    alcMakeContextCurrent(nullptr);
-	alcDestroyContext(al_context);
-	alcCloseDevice(al_device);
-}
-
-void Engine::SoundBuffer::Init(){
+void Engine::SoundBuffer::Init() {
     alGenBuffers(1, &this->al_buffer_id);
 }
 
-bool Engine::SoundBuffer::loadBufferWAV(unsigned char* buffer){
-    //std::cout << "Loading WAVE sound file " << file_path << std::endl;
+bool Engine::SoundBuffer::loadBufferWAV(unsigned char* buffer) {
+    //Logger::Log(LogType::LOG_TYPE_INFO) << "Loading WAVE sound file " << file_path << std::endl;
 
     Init();
 
@@ -112,16 +56,16 @@ bool Engine::SoundBuffer::loadBufferWAV(unsigned char* buffer){
     }
     if (!format)
     {
-        std::cout << "Incompatible format (" << channels << ", " << bits << ") :(" << std::endl;
+        Logger::Log(LogType::LOG_TYPE_ERROR) << "Incompatible format (" << channels << ", " << bits << ")\n";
         return false;
     }
 
     int start_offset = 35;
 
     //read 4 bytes, until "data" header found
-    while(buffer[start_offset] != 'd' || buffer[start_offset + 1] != 'a' || buffer[start_offset + 2] != 't' || buffer[ start_offset + 3] != 'a')
+    while (buffer[start_offset] != 'd' || buffer[start_offset + 1] != 'a' || buffer[start_offset + 2] != 't' || buffer[start_offset + 3] != 'a')
         start_offset += 1;
-        //Read size
+    //Read size
     start_offset += 4;
     //Calculate size
     int _size = buffer[start_offset + 3] << 24; //Getting size, 32 bit value
@@ -136,7 +80,7 @@ bool Engine::SoundBuffer::loadBufferWAV(unsigned char* buffer){
     int err = alGetError();
     if (err != AL_NO_ERROR)
     {
-        std::cout << "Error loading " << err << std::endl;
+        Logger::Log(LogType::LOG_TYPE_ERROR) << "Error loading " << err << "\n";
         return false;
     }
 
@@ -144,8 +88,8 @@ bool Engine::SoundBuffer::loadBufferWAV(unsigned char* buffer){
 }
 
 
-bool Engine::SoundBuffer::loadFileWAV(const char* file_path){
-    std::cout << "Loading WAVE sound file " << file_path << std::endl;
+bool Engine::SoundBuffer::loadFileWAV(const char* file_path) {
+    Logger::Log(LogType::LOG_TYPE_INFO) << "Loading WAVE sound file " << file_path << "\n";
 
     Init();
     unsigned int freq;
@@ -170,14 +114,14 @@ bool Engine::SoundBuffer::loadFileWAV(const char* file_path){
     audio_stream.read(reinterpret_cast<char*>(data_buffer), 8);
     if (data_buffer[0] != 'f' || data_buffer[1] != 'm' || data_buffer[2] != 't' || data_buffer[3] != ' ')
     {
-        delete [] data_buffer; //Free heap
+        delete[] data_buffer; //Free heap
         audio_stream.close();
         return false;
     }
     audio_stream.read(reinterpret_cast<char*>(data_buffer), 2);
     if (data_buffer[1] != 0 || data_buffer[0] != 1)
     {
-        delete [] data_buffer; //Free heap
+        delete[] data_buffer; //Free heap
         audio_stream.close();
         fprintf(stderr, "Not PCM :(\n"); //Close stream
         return false;
@@ -215,13 +159,13 @@ bool Engine::SoundBuffer::loadFileWAV(const char* file_path){
     }
     if (!format)
     {
-        delete [] data_buffer; //Free heap
+        delete[] data_buffer; //Free heap
         audio_stream.close();
-        std::cout << "Incompatible format (" << channels << ", " << bits << ") :(" << std::endl;
+        Logger::Log(LogType::LOG_TYPE_ERROR) << "Incompatible format (" << channels << ", " << bits << ")\n";
         return false;
     }
     //read 4 bytes, until "data" header found
-    while(data_buffer[0] != 'd' || data_buffer[1] != 'a' || data_buffer[2] != 't' || data_buffer[3] != 'a')
+    while (data_buffer[0] != 'd' || data_buffer[1] != 'a' || data_buffer[2] != 't' || data_buffer[3] != 'a')
         audio_stream.read(reinterpret_cast<char*>(data_buffer), 4);
     //Read size
     audio_stream.read(reinterpret_cast<char*>(data_buffer), 4);
@@ -237,74 +181,23 @@ bool Engine::SoundBuffer::loadFileWAV(const char* file_path){
     int err = alGetError();
     if (err != AL_NO_ERROR)
     {
-        std::cout << "Error loading " << err << std::endl;
-        delete [] data_buffer; //Free heap
+        Logger::Log(LogType::LOG_TYPE_INFO) << "Error loading " << err << "\n";
+        delete[] data_buffer; //Free heap
         audio_stream.close();
         return false;
     }
 
-    delete [] data_buffer; //Free heap
+    delete[] data_buffer; //Free heap
     audio_stream.close();
     return true;
 }
 
-void Engine::SoundBuffer::Destroy(){
+void Engine::SoundBuffer::Destroy() {
     alDeleteBuffers(1, &this->al_buffer_id);
 }
-unsigned int Engine::SoundBuffer::getBufferIdAL(){
+unsigned int Engine::SoundBuffer::getBufferIdAL() {
     return this->al_buffer_id;
 }
-Engine::SoundBuffer::SoundBuffer(){
+Engine::SoundBuffer::SoundBuffer() {
 
-}
-
-
-Engine::SoundSource::SoundSource() {
-    source_gain = 1.0f;
-    source_pitch = 1.0f;
-
-    Init();
-}
-
-void Engine::SoundSource::Init(){
-    alGenSources(1, &this->al_source_id);
-
-    int err = alGetError();
-    if (err != AL_NO_ERROR)
-    {
-        std::cout <<  "Error creating source " << err << std::endl;
-
-    }
-}
-void Engine::SoundSource::Destroy(){
-    alDeleteSources(1, &this->al_source_id);
-}
-void Engine::SoundSource::apply_settings(){
-    alSource3f(al_source_id, AL_POSITION, this->source_pos.X, this->source_pos.Y, this->source_pos.Z);
-    alSourcef(al_source_id, AL_GAIN, this->source_gain);
-    alSourcef(al_source_id, AL_PITCH, this->source_pitch);
-    alSourcei(al_source_id, AL_LOOPING, static_cast<int>(this->looped));
-    setVelocity(ZSVECTOR3(0.0f, 0.0f, 0.0f));
-}
-void Engine::SoundSource::setPosition(ZSVECTOR3 pos){
-    this->source_pos = pos;
-    alSource3f(al_source_id, AL_POSITION, pos.X, pos.Y, pos.Z);
-}
-
-void Engine::SoundSource::setVelocity(ZSVECTOR3 vel){
-    alSource3f(al_source_id, AL_VELOCITY, vel.X, vel.Y, vel.Z);
-}
-
-void Engine::SoundSource::play(){
-    alSourcePlay(this->al_source_id);
-}
-void Engine::SoundSource::stop(){
-    alSourceStop(this->al_source_id);
-}
-void Engine::SoundSource::pause(){
-    alSourcePause(this->al_source_id);
-}
-void Engine::SoundSource::setAlBuffer(SoundBuffer* buffer){
-    stop();
-    alSourcei(al_source_id, AL_BUFFER, static_cast<ALint>(buffer->getBufferIdAL()));
 }

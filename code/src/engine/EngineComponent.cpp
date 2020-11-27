@@ -1,6 +1,9 @@
 #include "../../headers/engine/EngineComponent.h"
 
-IEngineComponent::IEngineComponent(){
+IEngineComponent::IEngineComponent():
+    WIDTH(0),
+    HEIGHT(0)
+{
 
 }
 
@@ -17,10 +20,10 @@ void IEngineComponent::setProjectStructPtr(Project* ptr){
     this->project_struct_ptr = ptr;
 }
 
-void IEngineComponent::init(){
+void IEngineComponent::OnCreate(){
 
 }
 
-void IEngineComponent::updateWindowSize(int W, int H){
+void IEngineComponent::OnUpdateWindowSize(int W, int H){
 
 }

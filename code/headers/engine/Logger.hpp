@@ -2,6 +2,8 @@
 
 #include <string>
 #include <type_traits>
+#include <stdio.h>
+#include <iostream>
 
 namespace Engine {
 
@@ -29,8 +31,16 @@ namespace Engine {
 
 		template <typename T>
 		OpLogger& operator<<(T var) {
+			if (std::is_same<T, const char*>::value || std::is_same<T, char*>::value) {
+				printf("%s", (const char*)var);
+			}
 			if (std::is_same<T, std::string>::value) {
-				Logger::Log((std::string)var, LogType::LOG_TYPE_NONE);
+				//std::string Str = var;
+				//printf("%s", Str.c_str());
+				std::cout << var;
+			}
+			if (std::is_same<T, int>::value) {
+				printf("%i", (int)var);
 			}
 			return *this;
 		}

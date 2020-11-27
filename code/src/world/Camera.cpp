@@ -1,4 +1,7 @@
 #include "../../headers/world/Camera.hpp"
+#include "../../headers/game.h"
+
+extern ZSGAME_DATA* game_data;
 
 Engine::Camera::Camera() : camera_pos(0),
                            camera_front(1, 0, 0),
@@ -11,7 +14,7 @@ Engine::Camera::Camera() : camera_pos(0),
                            viewport(0, 0, 640, 480)
 {
     updateProjectionMat();
-    updateViewMat();
+    //updateViewMat();
 
     isMoving = false;
     isAlListenerCamera = false;
@@ -53,8 +56,8 @@ void Engine::Camera::updateProjectionMat(){
 
 void Engine::Camera::updateViewMat(){
     if(isAlListenerCamera){
-        Engine::SFX::setListenerPos(camera_pos);
-        Engine::SFX::setListenerOri(camera_front, camera_up);
+        game_data->oal_manager->setListenerPos(camera_pos);
+        game_data->oal_manager->setListenerOri(camera_front, camera_up);
     }
     view = matrixLookAt(camera_pos, (camera_pos + camera_front), camera_up);
 }

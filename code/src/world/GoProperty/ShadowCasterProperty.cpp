@@ -92,7 +92,7 @@ void Engine::ShadowCasterProperty::savePropertyToStream(ZsStream* stream, GameOb
     stream->writeBinaryValue(&projection_viewport);
 }
 
-void Engine::ShadowCasterProperty::onPreRender(Engine::RenderPipeline* pipeline) {
+void Engine::ShadowCasterProperty::onPreRender(Engine::Renderer* pipeline) {
     pipeline->getRenderSettings()->shadowcaster_obj_ptr = this->go_link.updLinkPtr();
 }
 
@@ -138,7 +138,7 @@ void Engine::ShadowCasterProperty::onObjectDeleted() {
     glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, RenderPipeline* pipeline) {
+void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, Renderer* pipeline) {
     if (!isRenderAvailable()) {
         onObjectDeleted();
         return;

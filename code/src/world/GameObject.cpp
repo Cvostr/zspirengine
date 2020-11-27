@@ -309,14 +309,14 @@ void Engine::GameObject::onUpdate(int deltaTime){   //calls onUpdate on all prop
     }
 }
 
-void Engine::GameObject::onPreRender(Engine::RenderPipeline* pipeline){ //calls onPreRender on all properties
+void Engine::GameObject::onPreRender(Engine::Renderer* pipeline){ //calls onPreRender on all properties
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
         if(!mComponents[i]->active) continue; //if property is inactive, then skip it
         mComponents[i]->onPreRender(pipeline); //and call onUpdate on each property
     }
 }
 
-void Engine::GameObject::onRender(RenderPipeline* pipeline){
+void Engine::GameObject::onRender(Renderer* pipeline){
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
         if(!mComponents[i]->active) continue; //if property is inactive, then skip it
         mComponents[i]->onRender(pipeline); //and call onUpdate on each property
@@ -425,7 +425,7 @@ bool Engine::GameObject::hasLightsource() {
     return getPropertyPtr<LightsourceProperty>() != nullptr;
 }
 
-void Engine::GameObject::DrawMesh(RenderPipeline* pipeline) {
+void Engine::GameObject::DrawMesh(Renderer* pipeline) {
     Engine::MeshProperty* mesh_prop = static_cast<Engine::MeshProperty*>(this->getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH));
     Engine::TerrainProperty* terrain_prop = getPropertyPtr<Engine::TerrainProperty>();
     //Draw default mesh
@@ -433,7 +433,7 @@ void Engine::GameObject::DrawMesh(RenderPipeline* pipeline) {
     if (terrain_prop != nullptr) terrain_prop->DrawMesh(pipeline);
 }
 
-void Engine::GameObject::DrawMeshInstanced(RenderPipeline* pipeline, unsigned int inst_num) {
+void Engine::GameObject::DrawMeshInstanced(Renderer* pipeline, unsigned int inst_num) {
     Engine::MeshProperty* mesh_prop = static_cast<Engine::MeshProperty*>(this->getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH));
     Engine::TerrainProperty* terrain_prop = getPropertyPtr<Engine::TerrainProperty>();
     //Draw default mesh

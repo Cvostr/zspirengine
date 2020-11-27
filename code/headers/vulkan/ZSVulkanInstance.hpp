@@ -7,34 +7,27 @@
 
 #include "../engine/engine_window.h"
 
-class ZsVulkanInstance{
-private:
-    VkDebugUtilsMessengerEXT debugMessenger;
+namespace Engine {
 
-    SDL_Window* window_ptr;
+    class ZSVulkanInstance {
+    private:
+        VkDebugUtilsMessengerEXT debugMessenger;
 
-    VkInstance instance;
+        SDL_Window* window_ptr;
 
-    std::vector<VkExtensionProperties> inst_extensions;
-    std::vector<VkPhysicalDevice> phys_devices_list;
-    std::vector<VkPhysicalDeviceProperties> phys_devices_props;
+        VkInstance mInstance;
 
-    VkPhysicalDevice selected_device;
-    VkDevice logicalDevice; //logical device, created from physical device
+        std::vector<VkExtensionProperties> inst_extensions;
 
-    //ZsVkFamilyIndices q_f_indices; //stores queue indices
-    VkQueue graphicsQueue; //queue of logical device
-    VkQueue presentQueue; //queue to present
+        VkSurfaceKHR mSurface;
 
+    public:
+        bool init(bool validate, const char* app_name, int app_ver, SDL_Window* window);
 
-public:
-    bool init(bool validate, const char* app_name, int app_ver, SDL_Window* window);
-    bool initDevice(bool validate);
+        VkInstance GetInstance() { return mInstance; }
+        VkSurfaceKHR GetSurface() { return mSurface; }
 
-    VkDevice getVkDevice();
-    VkPhysicalDevice getPhysicalDevice();
-    VkQueue getGraphicsQueue();
-    VkQueue getPresentQueue();
+        ZSVulkanInstance();
+    };
 
-    ZsVulkanInstance();
-};
+}

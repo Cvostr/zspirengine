@@ -20,6 +20,14 @@ typedef struct Texture3D_Unit{
 }Texture3D_Unit;
 
 namespace Engine {
+
+    enum TextureFormat {
+        FORMAT_R,
+        FORMAT_RG,
+        FORMAT_RGB,
+        FORMAT_RGBA
+    };
+
 	class Texture {
 	public:
 
@@ -28,6 +36,7 @@ namespace Engine {
 		//Loads texture from buffer
         virtual bool LoadDDSTextureFromBuffer(unsigned char* data) { return false; }
         virtual bool LoadPNGTextureFromBuffer(unsigned char* data, int size) { return false; }
+        virtual bool LoadTextureFromBufferUByte(unsigned char* data, int Width, int Height, TextureFormat format) { return false; }
 		//Loads texture from file
         bool LoadDDSTextureFromFile(const char* path);
         bool LoadPNGTextureFromFile(const char* path);

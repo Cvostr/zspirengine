@@ -22,7 +22,7 @@ void Engine::LightsourceProperty::copyTo(Engine::IGameObjectComponent* dest) {
     _dest->light_type = light_type;
 }
 
-void Engine::LightsourceProperty::onPreRender(Engine::RenderPipeline* pipeline) {
+void Engine::LightsourceProperty::onPreRender(Engine::Renderer* pipeline) {
     Engine::TransformProperty* transform_prop = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
 
     pipeline->addLight(this); //put light pointer to vector

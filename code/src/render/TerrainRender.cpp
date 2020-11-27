@@ -146,14 +146,14 @@ void TerrainData::generateGLMesh() {
     created = true;
 }
 
-void Engine::TerrainProperty::DrawMesh(RenderPipeline* pipeline) {
+void Engine::TerrainProperty::DrawMesh(Renderer* pipeline) {
     //Draw terrain mesh
     data.Draw(false);
     //Draw Grass
     DrawGrass(pipeline);
 }
 
-void Engine::TerrainProperty::DrawGrass(RenderPipeline* pipeline) {
+void Engine::TerrainProperty::DrawGrass(Renderer* pipeline) {
     if (pipeline->current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT) {
         //Use grass shader
         pipeline->grass_shader->Use();
@@ -199,7 +199,7 @@ void Engine::TerrainProperty::DrawGrass(RenderPipeline* pipeline) {
     }
 }
 
-void Engine::TerrainProperty::onRender(Engine::RenderPipeline* pipeline) {
+void Engine::TerrainProperty::onRender(Engine::Renderer* pipeline) {
     terrainUniformBuffer = pipeline->terrainUniformBuffer;
     transformBuffer = pipeline->transformBuffer;
 
