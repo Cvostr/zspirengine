@@ -9,6 +9,7 @@ namespace Engine {
 
 	class KV_RECORD {
 	public:
+		size_t _typeid;
 		std::string key;
 	};
 
@@ -16,6 +17,10 @@ namespace Engine {
 	class KV : public KV_RECORD {
 	public:
 		T value;
+
+		KV() {
+			_typeid = typeid(T).hash_code();
+		}
 	};
 
 	class KeyValueFile {
@@ -33,6 +38,7 @@ namespace Engine {
 
 			if (rec == nullptr) {
 				rec = new KV<T>();
+				rec->key = key;
 			}
 			//Assign value
 			rec->value = value;
@@ -41,7 +47,7 @@ namespace Engine {
 		}
 		template <typename T>
 		T getValue(std::string key) {
-			KV<T>* rec = findRecordByKey(key);
+			KV<T>* rec = static_cast<KV<T>*>(findRecordByKey(key));
 			return rec->value;
 		}
 
@@ -50,4 +56,27 @@ namespace Engine {
 		KeyValueFile();
 		~KeyValueFile();
 	};
+
+	template<typename T>
+	KV<T>* CastKV(KV_RECORD* record) {
+		return static_cast<KV<T>*>(record);
+	}
+
+	template<typename T>
+	T GetValue(KV_RECORD* record) {
+		KV<T>* kvint = CastKV<T>(record);
+		T value = kvint->value;
+		return value;
+	}
+
+	template <typename T>
+	T ASGetValue(KeyValueFile* Obj, std::string key) {
+		return Obj->getValue<T>(key);
+	}
+
+	template <typename T>
+	void ASSetValue(KeyValueFile* Obj, std::string key, T value) {
+		return Obj->setValue<T>(key, value);
+	}
 }
+

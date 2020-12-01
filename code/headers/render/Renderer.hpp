@@ -11,7 +11,7 @@
 #include "../world/Camera.hpp"
 #include "../../headers/engine/Resources.hpp"
 #include <vector>
-#include "Framebuffer.hpp"
+#include "../render/Framebuffer.hpp"
 #include "../ui/Layouts/ILayout.hpp"
 
 enum class PIPELINE_STATE {
@@ -50,21 +50,15 @@ protected:
     std::vector<LightsourceProperty*> lights_ptr;
     RenderSettings render_settings;
 
-    GLframebuffer* gbuffer;
-    GLframebuffer* df_light_buffer;
-    GLframebuffer* ui_buffer;
+    Framebuffer* gbuffer;
+    Framebuffer* df_light_buffer;
+    Framebuffer* ui_buffer;
 
     void setLightsToBuffer();
     void updateShadersCameraInfo(Engine::Camera* cam_ptr);
+    
 
-    void setClearColor(float r, float g, float b, float a);
-    void setBlendingState(bool blend);
-    void setDepthState(bool depth);
-    void setFaceCullState(bool face_cull);
-    void setFullscreenViewport(unsigned int Width, unsigned int Height);
-    void ClearFBufferGL(bool clearColor, bool clearDepth);
-
-    void create_G_Buffer(unsigned int width, unsigned int height);
+    
 private:
     virtual void InitShaders(){}
 public:
@@ -111,7 +105,7 @@ public:
 
     void renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY);
     void renderSprite(Engine::TextureResource* texture_sprite, int X, int Y, int scaleX, int scaleY);
-    void renderGlyph(unsigned int texture_id, int X, int Y, int scaleX, int scaleY, ZSRGBCOLOR color);
+    void renderGlyph(Engine::Texture* glyph, int X, int Y, int scaleX, int scaleY, ZSRGBCOLOR color);
 
     void render();
     virtual void render2D(){}
@@ -121,7 +115,7 @@ public:
     void OnCreate();
     virtual void initManager(){}
 
-    void OnUpdateWindowSize(int W, int H);
+   
     void destroy();
 
     Engine::Camera* cam;

@@ -5,6 +5,7 @@
 #include <string>
 #include <GL/glew.h>
 #include <vector>
+#include "GpuObject.hpp"
 
 #define NO_INDICES 0
 #define MAX_MESH_BONES 200
@@ -23,9 +24,8 @@ namespace Engine {
         Bone(std::string& name);
     };
 
-    class Mesh {
+    class Mesh : public GpuObject {
     public:
-        bool alive; //Non destroyed
         std::string mesh_label;
 
         int mVerticesNum;
@@ -46,10 +46,14 @@ namespace Engine {
         virtual void Init(){}
         virtual void setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num){}
         virtual void setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){}
+        virtual void setMeshData(void* vertices, int vertSize, unsigned int vertices_num) {}
+        virtual void setMeshData(void* vertices, int vertSize, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num) {}
         virtual void Draw(){}
         virtual void DrawInstanced(unsigned int instances){}
         virtual void DrawLines();
         virtual void Destroy(){}
+        virtual void _glVertexAttribPointer(int index, int elems_count, int format, int normalized, int structSize, void* offset){}
+        virtual void _glVertexAttribIPointer(int index, int elems_count, int format, int structSize, void* offset) {}
 
         Mesh() : mVerticesNum(0), mIndicesNum(0){}
         virtual ~Mesh();

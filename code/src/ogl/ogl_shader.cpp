@@ -87,6 +87,8 @@ bool Engine::_ogl_Shader::compileFromFile(std::string VSpath, std::string FSpath
     return compileFromStr(vs_data, fs_data, gs_data);
 }
 bool Engine::_ogl_Shader::compileFromStr(const char* _VS, const char* _FS, const char* _GS) {
+    if (mCreated)
+        return false;
     this->mShaderID = glCreateProgram();
     unsigned int VS = glCreateShader(GL_VERTEX_SHADER);
     unsigned int FS = glCreateShader(GL_FRAGMENT_SHADER);
@@ -123,7 +125,7 @@ bool Engine::_ogl_Shader::compileFromStr(const char* _VS, const char* _FS, const
     if (_GS != nullptr) 
         glDeleteShader(GS);
 
-    this->isCreated = true; //Shader created & compiled now
+    this->mCreated = true; //Shader created & compiled now
     return true;
 }
 
@@ -132,12 +134,12 @@ void Engine::_ogl_Shader::setUniformBufferBinding(const char* UB_NAME, unsigned 
     glUniformBlockBinding(this->mShaderID, SBI, binding);
 }
 void Engine::_ogl_Shader::Destroy(){
-    if (isCreated) {
+    if (mCreated) {
         glDeleteProgram(this->mShaderID);
-        isCreated = false;
+        mCreated = false;
     }
 }
 void Engine::_ogl_Shader::Use(){
-    if (isCreated)
+    if (mCreated)
         glUseProgram(this->mShaderID);
 }

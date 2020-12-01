@@ -576,7 +576,7 @@ void Material::applyMatToPipeline(){
                 Texture3MaterialShaderProperty* texture_p = static_cast<Texture3MaterialShaderProperty*>(prop_ptr);
                 Texture3MtShPropConf* texture_conf = static_cast<Texture3MtShPropConf*>(conf_ptr);
                 //Check, is texture already created
-                if(!texture_conf->texture3D->created){
+                if(!texture_conf->texture3D->mCreated){
                     //If not created, create OpenGL instance
                     texture_conf->texture3D->Init();
 
@@ -584,7 +584,7 @@ void Material::applyMatToPipeline(){
                         texture_conf->texture3D->pushTexture(i, texture_conf->texture_str[i]);
                     }
                     //Change Flag state
-                    texture_conf->texture3D->created = true;
+                    texture_conf->texture3D->mCreated = true;
                     texture_conf->texture3D->Use(texture_p->slotToBind);
                 }else{
                     //3D texture already created, Use it

@@ -6,6 +6,7 @@ extern ZSGAME_DATA* game_data;
 
 Engine::GLRenderer::GLRenderer() {
     InitShaders();
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
 void Engine::GLRenderer::InitShaders() {
@@ -28,6 +29,22 @@ void Engine::GLRenderer::InitShaders() {
     }
 }
 
+void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int height) {
+    gbuffer = new GLframebuffer(width, height, true);
+    ((GLframebuffer*)gbuffer)->addTexture(GL_RGBA8, GL_RGBA); //Diffuse map
+    ((GLframebuffer*)gbuffer)->addTexture(GL_RGB16F, GL_RGB); //Normal map
+    ((GLframebuffer*)gbuffer)->addTexture(GL_RGB16F, GL_RGB); //Position map
+    ((GLframebuffer*)gbuffer)->addTexture(GL_RGBA, GL_RGBA); //Transparent map
+    ((GLframebuffer*)gbuffer)->addTexture(GL_RGBA, GL_RGBA); //Masks map
+
+    df_light_buffer = new GLframebuffer(width, height, false);
+    ((GLframebuffer*)df_light_buffer)->addTexture(GL_RGBA, GL_RGBA); //Diffuse map
+    ((GLframebuffer*)df_light_buffer)->addTexture(GL_RGB, GL_RGB); //Bloom map
+
+    ui_buffer = new GLframebuffer(width, height, false);
+    ((GLframebuffer*)ui_buffer)->addTexture(GL_RGBA, GL_RGBA); //UI Diffuse map
+}
+
 void Engine::GLRenderer::initManager() {
     setDepthState(true);
 
@@ -41,7 +58,7 @@ void Engine::GLRenderer::initManager() {
     }
     //if we use opengl, then create GBUFFER in GL commands
     if (this->game_desc_ptr->game_perspective == PERSP_3D) {
-        create_G_Buffer(this->WIDTH, this->HEIGHT);
+        create_G_Buffer_GL(this->WIDTH, this->HEIGHT);
     }
 }
 
@@ -52,7 +69,7 @@ void Engine::GLRenderer::render2D() {
     if (engine_ptr->engine_info->graphicsApi == OGL32) {
         setClearColor(0, 0, 0, 1);
         ClearFBufferGL(true, true);
-        glEnable(GL_BLEND); //Disable blending to render Skybox and shadows
+        setBlendingState(true); //Disable blending to render Skybox and shadows
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         setFullscreenViewport(this->WIDTH, this->HEIGHT);
         setDepthState(true);
@@ -68,7 +85,7 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
     this->cam = cam;
     {
         //Bind Geometry Buffer to make Deferred Shading
-        gbuffer->bind();
+        ((GLframebuffer*)gbuffer)->bind();
         setClearColor(0, 0, 0, 1);
         ClearFBufferGL(true, true);
         {
@@ -88,19 +105,19 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
 
     //Process Deffered lights
     {
-        df_light_buffer->bind();
+        ((GLframebuffer*)df_light_buffer)->bind();
         ClearFBufferGL(true, false); //Clear screen
         //Disable depth rendering to draw plane correctly
         setDepthState(false);
         setFaceCullState(false);
-        gbuffer->bindTextures(10); //Bind gBuffer textures
+        ((GLframebuffer*)gbuffer)->bindTextures(10); //Bind gBuffer textures
         deffered_light->Use(); //use deffered shader
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
     }
 
     //Render ALL UI
     {
-        ui_buffer->bind();
+        ((GLframebuffer*)ui_buffer)->bind();
         setClearColor(0, 0, 0, 0);
         ClearFBufferGL(true, false); //Clear screen 
         setDepthState(false);
@@ -112,9 +129,52 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
     //Draw result into main buffer
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        df_light_buffer->bindTextures(0);
-        ui_buffer->bindTextures(1);
+        ((GLframebuffer*)df_light_buffer)->bindTextures(0);
+        ((GLframebuffer*)ui_buffer)->bindTextures(1);
         final_shader->Use();
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
     }
+}
+
+void Engine::GLRenderer::OnUpdateWindowSize(int W, int H) {
+    setFullscreenViewport(W, H);
+    delete gbuffer;
+    create_G_Buffer_GL(W, H);
+}
+
+void Engine::GLRenderer::setFullscreenViewport(unsigned int Width, unsigned int Height) {
+    glViewport(0, 0, Width, Height);
+}
+
+void Engine::GLRenderer::ClearFBufferGL(bool clearColor, bool clearDepth) {
+    GLbitfield clearMask = 0;
+    if (clearColor)
+        clearMask |= GL_COLOR_BUFFER_BIT;
+    if (clearDepth)
+        clearMask |= GL_DEPTH_BUFFER_BIT;
+
+    glClear(clearMask);
+}
+
+void Engine::GLRenderer::setClearColor(float r, float g, float b, float a) {
+    glClearColor(r, g, b, a);
+}
+
+void Engine::GLRenderer::setBlendingState(bool blend) {
+    if (blend)
+        glEnable(GL_BLEND);
+    else
+        glDisable(GL_BLEND);
+}
+void Engine::GLRenderer::setDepthState(bool depth) {
+    if (depth)
+        glEnable(GL_DEPTH_TEST);
+    else
+        glDisable(GL_DEPTH_TEST);
+}
+void Engine::GLRenderer::setFaceCullState(bool face_cull) {
+    if (face_cull)
+        glEnable(GL_CULL_FACE);
+    else
+        glDisable(GL_CULL_FACE);
 }

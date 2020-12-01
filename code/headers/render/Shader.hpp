@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Math.hpp"
-
+#include "GpuObject.hpp"
 #include <vulkan/vulkan.hpp>
 #include "../engine.h"
 
@@ -9,9 +9,7 @@
 
 namespace Engine {
 
-	class Shader {
-	protected:
-        bool isCreated;
+	class Shader : public GpuObject {
 	public:
 
         virtual bool compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath = "") { return false; }
@@ -20,7 +18,7 @@ namespace Engine {
         virtual void Use(){}
         virtual void Destroy(){}
 
-        Shader() : isCreated(false) { //Construct to set isCreated var to false
+        Shader() { //Construct to set isCreated var to false
         
         }
         virtual ~Shader() {

@@ -1,8 +1,10 @@
-#ifndef ZSUNIFORMBUFFER_H
-#define ZSUNIFORMBUFFER_H
+#pragma once
+
+#include "GpuObject.hpp"
+
 namespace Engine {
 
-class UniformBuffer{
+class UniformBuffer : public GpuObject {
 public:
     virtual void init(unsigned int slot, unsigned int size) {}
     virtual void bind() {}
@@ -17,4 +19,3 @@ public:
 UniformBuffer* allocUniformBuffer();
 
 }
-#endif // ZSUNIFORMBUFFER_H

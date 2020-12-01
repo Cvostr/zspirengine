@@ -67,13 +67,15 @@ class _vk_Shader : public Engine::Shader{
 private:
 
 public:
-    //ZsVkPipeline* pipeline;
 
     VkShaderModule vertexShader;
     VkShaderModule fragmentShader;
+    VkShaderModule geometryShader;
 
-    bool readBinaryShaderFile(std::string path, char* result, size_t* size);
-    bool compileFromFile(std::string VSpath, std::string FSpath);
+    bool readBinaryShaderFile(std::string path, char** result, size_t& size);
+
+    bool compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath = "");
+    
     void Use();
     void Destroy();
 

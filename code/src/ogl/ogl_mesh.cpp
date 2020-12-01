@@ -10,18 +10,21 @@ Engine::_ogl_Mesh::~_ogl_Mesh(){
 }
 
 void Engine::_ogl_Mesh::Init() {
-    glGenVertexArrays(1, &this->meshVAO);
-    glGenBuffers(1, &this->meshVBO);
-    glGenBuffers(1, &this->meshEBO);
+    if (!mCreated) {
+        glGenVertexArrays(1, &this->meshVAO);
+        glGenBuffers(1, &this->meshVBO);
+        glGenBuffers(1, &this->meshEBO);
+        mCreated = true;
+    }
 }
 
 void Engine::_ogl_Mesh::Destroy() {
-    this->alive = false;
-
-    glDeleteVertexArrays(1, &this->meshVAO); //Removevertex arrays
-    glDeleteBuffers(1, &this->meshVBO); //Remove vertex buffer
-    glDeleteBuffers(1, &this->meshEBO); //Remove index buffer
-
+    if (mCreated) {
+        glDeleteVertexArrays(1, &this->meshVAO); //Removevertex arrays
+        glDeleteBuffers(1, &this->meshVBO); //Remove vertex buffer
+        glDeleteBuffers(1, &this->meshEBO); //Remove index buffer
+        mCreated = false;
+    }
 }
 
 void Engine::_ogl_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num){
@@ -54,38 +57,58 @@ void Engine::_ogl_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_nu
     mBoundingBox.CreateFromVertexArray(vertices, mVerticesNum);
 }
 
+void Engine::_ogl_Mesh::setMeshData(void* vertices, int vertSize, unsigned int vertices_num) {
+
+}
+void Engine::_ogl_Mesh::setMeshData(void* vertices, int vertSize, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num) {
+    this->mVerticesNum = static_cast<int>(vertices_num);
+    this->mIndicesNum = static_cast<int>(indices_num);
+
+    glBindVertexArray(this->meshVAO); //Bind vertex array
+
+    glBindBuffer(GL_ARRAY_BUFFER, this->meshVBO); //Bind vertex buffer
+    glBufferData(GL_ARRAY_BUFFER, vertSize * vertices_num, vertices, GL_STATIC_DRAW); //send vertices to buffer
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->meshEBO); //Bind index buffer
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<unsigned int>(indices_num) * sizeof(unsigned int), indices, GL_STATIC_DRAW); //Send indices to buffer
+
+    //mBoundingBox.CreateFromVertexArray(vertices, mVerticesNum);
+}
+
+void Engine::_ogl_Mesh::_glVertexAttribPointer(int index, int elems_count, int format, int normalized, int structSize, void* offset) {
+    glVertexAttribPointer(index, elems_count, format, normalized, structSize, offset);
+    glEnableVertexAttribArray(index);
+}
+
+void Engine::_ogl_Mesh::_glVertexAttribIPointer(int index, int elems_count, int format, int structSize, void* offset) {
+    glVertexAttribIPointer(index, elems_count, format, structSize, offset);
+    glEnableVertexAttribArray(index);
+}
+
 void Engine::_ogl_Mesh::setMeshOffsets(){
     //Vertex pos 3 floats
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), nullptr);
-    glEnableVertexAttribArray(0);
+    _glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), nullptr);
     //Vertex UV 2 floats
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 3));
-    glEnableVertexAttribArray(1);
+    _glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 3));
     //Vertex Normals 3 floats
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 5));
-    glEnableVertexAttribArray(2);
+    _glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 5));
     //Vertex Tangents 3 floats
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 8));
-    glEnableVertexAttribArray(3);
+    _glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 8));
     //Vertex Bitangents 3 floats
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 11));
-    glEnableVertexAttribArray(4);
+    _glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 11));
 
     for(unsigned int i = 0; i < MAX_BONE_PER_VERTEX / 4; i ++){
         //Skinning data
-        glVertexAttribIPointer(5 + i, 4, GL_UNSIGNED_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * (14 + i * 4)));
-        glEnableVertexAttribArray(5 + i);
+        _glVertexAttribIPointer(5 + i, 4, GL_UNSIGNED_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * (14 + i * 4)));
     }
 
     for(unsigned int i = 0; i < MAX_BONE_PER_VERTEX / 4; i ++){
         //Weights
-        glVertexAttribPointer(8 + i, 4, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * (26 + i * 4)));
-        glEnableVertexAttribArray(8 + i);
+        _glVertexAttribPointer(8 + i, 4, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * (26 + i * 4)));
     }
 
     //Bones num
-    glVertexAttribIPointer(11, 1, GL_UNSIGNED_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 38));
-    glEnableVertexAttribArray(11);
+    _glVertexAttribIPointer(11, 1, GL_UNSIGNED_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 38));
 }
 
 void Engine::_ogl_Mesh::Draw(){

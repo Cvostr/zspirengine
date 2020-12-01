@@ -8,6 +8,7 @@
 #include "Scripting/AngelScriptMgr.h"
 #include "ui/UiManager.hpp"
 #include "audio/OALManager.hpp"
+#include "vulkan/ZSVulkan.hpp"
 
 typedef struct ZSGAME_DATA{
     //Pointer to resource manager
@@ -23,6 +24,7 @@ typedef struct ZSGAME_DATA{
     //Pointer to ui manager
     Engine::UiManager* ui_manager;
     Engine::OALManager* oal_manager;
+    Engine::ZSVulkan* vk_main;
     //TRUE, if this struct was created by editor
     bool isEditor; 
 
@@ -36,6 +38,7 @@ typedef struct ZSGAME_DATA{
         out_manager = nullptr;
         ui_manager = nullptr;
         oal_manager = nullptr;
+        vk_main = nullptr;
     }
 }ZSGAME_DATA;
 

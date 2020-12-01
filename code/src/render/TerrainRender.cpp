@@ -3,47 +3,17 @@
 #include "../../headers/world/go_properties.h"
 #include <GL/glew.h>
 
-void TerrainMeshGL::generate() {
-    glGenVertexArrays(1, &this->VAO);
-    glGenBuffers(1, &this->VBO);
-    glGenBuffers(1, &this->EBO);
-}
-void TerrainMeshGL::destroy() {
-    glDeleteVertexArrays(1, &this->VAO);
-    glDeleteBuffers(1, &this->VBO);
-    glDeleteBuffers(1, &this->EBO);
-}
-
 void TerrainData::initGL() {
-    meshGL.generate();
-
-    glGenTextures(1, &this->painting.texture_mask1);
-    glBindTexture(GL_TEXTURE_2D, this->painting.texture_mask1);
-    // Set texture options
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glGenTextures(1, &this->painting.texture_mask2);
-    glBindTexture(GL_TEXTURE_2D, this->painting.texture_mask2);
-    // Set texture options
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glGenTextures(1, &this->painting.texture_mask3);
-    glBindTexture(GL_TEXTURE_2D, this->painting.texture_mask3);
-    // Set texture options
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    meshGL = Engine::allocateMesh();
+    meshGL->Init();
 }
 
 void TerrainData::destroyGL() {
-    meshGL.destroy();
+    meshGL->Destroy();
+
+    this->painting.texture_mask1->Destroy();
+    this->painting.texture_mask2->Destroy();
+    this->painting.texture_mask3->Destroy();
 }
 
 void TerrainData::Draw(bool picking) {
@@ -51,84 +21,34 @@ void TerrainData::Draw(bool picking) {
     if (!created) return;
     //small optimization in terrain painting
     if (!picking) {
-        glActiveTexture(GL_TEXTURE24);
-        glBindTexture(GL_TEXTURE_2D, painting.texture_mask1);
-        glActiveTexture(GL_TEXTURE25);
-        glBindTexture(GL_TEXTURE_2D, painting.texture_mask2);
-        glActiveTexture(GL_TEXTURE26);
-        glBindTexture(GL_TEXTURE_2D, painting.texture_mask3);
+        painting.texture_mask1->Use(24);
+        painting.texture_mask1->Use(25);
+        painting.texture_mask1->Use(26);
     }
-    glBindVertexArray(meshGL.VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshGL.EBO);
-    glBindBuffer(GL_ARRAY_BUFFER, meshGL.VBO);
-    glDrawElements(GL_TRIANGLES, (W - 1) * (H - 1) * 2 * 3, GL_UNSIGNED_INT, nullptr);
+    
+    meshGL->Draw();
 }
 
 void TerrainData::updateTextureBuffersGL() {
     //Create texture masks texture
-    glBindTexture(GL_TEXTURE_2D, this->painting.texture_mask1);
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_RGBA,
-        static_cast<int>(W),
-        static_cast<int>(H),
-        0,
-        GL_RGBA,
-        GL_UNSIGNED_BYTE,
-        painting._texture
-    );
-    glBindTexture(GL_TEXTURE_2D, this->painting.texture_mask2);
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_RGBA,
-        static_cast<int>(W),
-        static_cast<int>(H),
-        0,
-        GL_RGBA,
-        GL_UNSIGNED_BYTE,
-        painting._texture1
-    );
-    glBindTexture(GL_TEXTURE_2D, this->painting.texture_mask3);
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_RGBA,
-        static_cast<int>(W),
-        static_cast<int>(H),
-        0,
-        GL_RGBA,
-        GL_UNSIGNED_BYTE,
-        painting._texture2
-    );
-
+    painting.texture_mask1->LoadTextureFromBufferUByte(painting._texture, static_cast<int>(W), static_cast<int>(H), Engine::TextureFormat::FORMAT_RGBA);
+    painting.texture_mask2->LoadTextureFromBufferUByte(painting._texture1, static_cast<int>(W), static_cast<int>(H), Engine::TextureFormat::FORMAT_RGBA);
+    painting.texture_mask3->LoadTextureFromBufferUByte(painting._texture2, static_cast<int>(W), static_cast<int>(H), Engine::TextureFormat::FORMAT_RGBA);
 }
 
 void TerrainData::updateGeometryBuffersGL() {
-    glBindVertexArray(meshGL.VAO); //Bind vertex array
-    glBindBuffer(GL_ARRAY_BUFFER, meshGL.VBO); //Bind vertex buffer
-    glBufferData(GL_ARRAY_BUFFER, static_cast<int>(W * H)* static_cast<int>(sizeof(HeightmapVertex)), vertices, GL_STATIC_DRAW); //send vertices to buffer
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshGL.EBO); //Bind index buffer
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<unsigned int>((W - 1) * (H - 1) * 2 * 3) * sizeof(unsigned int), indices, GL_STATIC_DRAW); //Send indices to buffer
-
+    
+    meshGL->setMeshData((void*)vertices, (int)sizeof(HeightmapVertex), indices, (unsigned int)(W * H),  (W - 1) * (H - 1) * 2 * 3);
     //Vertex pos 3 floats
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(HeightmapVertex), nullptr);
-    glEnableVertexAttribArray(0);
+    meshGL->_glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(HeightmapVertex), nullptr);
     //Vertex UV 2 floats
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(HeightmapVertex), reinterpret_cast<void*>(sizeof(float) * 3));
-    glEnableVertexAttribArray(1);
+    meshGL->_glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(HeightmapVertex), reinterpret_cast<void*>(sizeof(float) * 3));
     //Vertex Normals 3 floats
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(HeightmapVertex), reinterpret_cast<void*>(sizeof(float) * 5));
-    glEnableVertexAttribArray(2);
+    meshGL->_glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(HeightmapVertex), reinterpret_cast<void*>(sizeof(float) * 5));
     //Vertex Tangent 3 floats
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(HeightmapVertex), reinterpret_cast<void*>(sizeof(float) * 8));
-    glEnableVertexAttribArray(3);
+    meshGL->_glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(HeightmapVertex), reinterpret_cast<void*>(sizeof(float) * 8));
     //Vertex BiTangent 3 floats
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(HeightmapVertex), reinterpret_cast<void*>(sizeof(float) * 11));
-    glEnableVertexAttribArray(4);
-
+    meshGL->_glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(HeightmapVertex), reinterpret_cast<void*>(sizeof(float) * 11));
 }
 
 void TerrainData::generateGLMesh() {

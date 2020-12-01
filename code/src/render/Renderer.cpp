@@ -99,22 +99,6 @@ void Engine::Renderer::OnCreate(){
     initManager();
 }
 
-void Engine::Renderer::create_G_Buffer(unsigned int width, unsigned int height) {
-    gbuffer = new GLframebuffer(width, height, true);
-    gbuffer->addTexture(GL_RGBA8, GL_RGBA); //Diffuse map
-    gbuffer->addTexture(GL_RGB16F, GL_RGB); //Normal map
-    gbuffer->addTexture(GL_RGB16F, GL_RGB); //Position map
-    gbuffer->addTexture(GL_RGBA, GL_RGBA); //Transparent map
-    gbuffer->addTexture(GL_RGBA, GL_RGBA); //Masks map
-
-    df_light_buffer = new GLframebuffer(width, height, false);
-    df_light_buffer->addTexture(GL_RGBA, GL_RGBA); //Diffuse map
-    df_light_buffer->addTexture(GL_RGB, GL_RGB); //Bloom map
-
-    ui_buffer = new GLframebuffer(width, height, false);
-    ui_buffer->addTexture(GL_RGBA, GL_RGBA); //UI Diffuse map
-}
-
 void Engine::Renderer::destroy(){
     if(engine_ptr->desc->game_perspective == PERSP_2D){
         this->tileBuffer->Destroy();
@@ -453,7 +437,7 @@ void Engine::Renderer::renderSprite(Engine::TextureResource* texture_sprite, int
     renderSprite(texture_sprite->texture_ptr, X, Y, scaleX, scaleY);
 }
 
-void Engine::Renderer::renderGlyph(unsigned int texture_id, int X, int Y, int scaleX, int scaleY, ZSRGBCOLOR color){
+void Engine::Renderer::renderGlyph(Engine::Texture* glyph, int X, int Y, int scaleX, int scaleY, ZSRGBCOLOR color){
     this->ui_shader->Use();
     uiUniformBuffer->bind();
     //tell shader, that we will render glyph
@@ -464,8 +448,8 @@ void Engine::Renderer::renderGlyph(unsigned int texture_id, int X, int Y, int sc
     uiUniformBuffer->writeData(sizeof (Mat4) * 2 + 4 + 16, 4, &color.gl_g);
     uiUniformBuffer->writeData(sizeof (Mat4) * 2 + 8 + 16, 4, &color.gl_b);
     //Use texture at 0 slot
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glyph->Use(0);
+
 
     Mat4 translation = getTranslationMat(static_cast<float>(X), static_cast<float>(Y), 0.0f);
     Mat4 scale = getScaleMat(static_cast<float>(scaleX), static_cast<float>(scaleY), 0.0f);
@@ -473,7 +457,6 @@ void Engine::Renderer::renderGlyph(unsigned int texture_id, int X, int Y, int sc
 
     //Push glyph transform
     uiUniformBuffer->writeData(sizeof (Mat4), sizeof (Mat4), &transform);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     Engine::getUiSpriteMesh2D()->Draw();
 }
@@ -499,50 +482,8 @@ void Engine::Renderer::removeLights(){
     this->lights_ptr.clear();
 }
 
-void Engine::Renderer::OnUpdateWindowSize(int W, int H){
-     setFullscreenViewport(W, H);
-     delete gbuffer;
-     create_G_Buffer(W, H);
-}
-
 Engine::RenderSettings* Engine::Renderer::getRenderSettings(){
     return &this->render_settings;
-}
-
-void Engine::Renderer::setBlendingState(bool blend) {
-    if(blend)
-        glEnable(GL_BLEND);
-    else
-        glDisable(GL_BLEND);
-}
-void Engine::Renderer::setDepthState(bool depth) {
-    if (depth)
-        glEnable(GL_DEPTH_TEST);
-    else
-        glDisable(GL_DEPTH_TEST);
-}
-void Engine::Renderer::setFaceCullState(bool face_cull) {
-    if (face_cull)
-        glEnable(GL_CULL_FACE);
-    else
-        glDisable(GL_CULL_FACE);
-}
-void Engine::Renderer::setFullscreenViewport(unsigned int Width, unsigned int Height) {
-    glViewport(0, 0, Width, Height);
-}
-
-void Engine::Renderer::ClearFBufferGL(bool clearColor, bool clearDepth) {
-    GLbitfield clearMask = 0;
-    if (clearColor)
-        clearMask |= GL_COLOR_BUFFER_BIT;
-    if (clearDepth)
-        clearMask |= GL_DEPTH_BUFFER_BIT;
-
-    glClear(clearMask);
-}
-
-void Engine::Renderer::setClearColor(float r, float g, float b, float a) {
-    glClearColor(r, g, b, a);
 }
 
 void Engine::Renderer::TryRenderShadows(Engine::Camera* cam) {

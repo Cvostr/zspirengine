@@ -23,7 +23,6 @@ Engine::_vk_Texture::~_vk_Texture(){
 }
 
 
-
 void Engine::_vk_Texture3D::Init(){
 
 }

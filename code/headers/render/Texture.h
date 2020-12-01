@@ -2,6 +2,7 @@
 
 #include <string>
 #include "../engine/BackgroundLoader.hpp"
+#include "GpuObject.hpp"
 
 #define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
 #define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
@@ -28,7 +29,7 @@ namespace Engine {
         FORMAT_RGBA
     };
 
-	class Texture {
+	class Texture : public GpuObject{
 	public:
 
 		//Only for OGL : initialize texture in GL
@@ -42,16 +43,13 @@ namespace Engine {
         bool LoadPNGTextureFromFile(const char* path);
 		//Use in rendering pipeline
         virtual void Use(int slot){}
-        virtual void Destroy(){}
 
         Texture();
         virtual ~Texture();
 	};
 
-    class Texture3D{
+    class Texture3D : public GpuObject {
     public:
-
-        bool created;
 
         Texture3D_Unit units[6];
 

@@ -142,7 +142,7 @@ bool Engine::Texture3D::pushTexture(int index, std::string path){
 
 
 Engine::Texture3D::Texture3D(){
-    created = false;
+    mCreated = false;
 }
 Engine::Texture3D::~Texture3D(){
 

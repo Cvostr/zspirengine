@@ -5,6 +5,7 @@
 #include <iostream>
 #include "../headers/input/zs-input.h"
 #include "../headers/ogl/GLRenderer.hpp"
+#include "../headers/vulkan/VKRenderer.hpp"
 
 ZSpireEngine* engine_ptr;
 ZSGAME_DATA* game_data;
@@ -16,7 +17,7 @@ ZSpireEngine::ZSpireEngine(){
 ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win, ZSGAME_DESC* desc)
 {
     engine_ptr = this;
-
+    game_data = new ZSGAME_DATA;
     std::cout << "ZSPIRE Engine v0.1" << std::endl;
     //Store info structures
     this->desc = desc;
@@ -51,11 +52,17 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
 
         this->mWindow = SDL_CreateWindow(win->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, win->Width, win->Height, SDL_WIN_MODE); //Create window
         if (info->graphicsApi == VULKAN) {
-            mVkInstance = new Engine::ZSVulkanInstance;
-            mVkInstance->init(false, desc->app_label.c_str(), desc->app_version, mWindow);
-            mVkDevice = CreatePrimaryDevice(mVkInstance);
-            mVkSwapChain = new Engine::ZSVulkanSwapChain;
-            mVkSwapChain->initSwapchain(mVkDevice, mVkInstance, win->Width, win->Height);
+            game_data->vk_main = new Engine::ZSVulkan;
+
+            game_data->vk_main->mInstance = new Engine::ZSVulkanInstance;
+            game_data->vk_main->mInstance->init(false, desc->app_label.c_str(), desc->app_version, mWindow);
+            game_data->vk_main->mDevice = CreatePrimaryDevice(game_data->vk_main->mInstance);
+            game_data->vk_main->mSwapChain = new Engine::ZSVulkanSwapChain;
+            game_data->vk_main->mSwapChain->initSwapchain(game_data->vk_main->mDevice,
+                                                          game_data->vk_main->mInstance, 
+                                                          win->Width, win->Height);
+            game_data->vk_main->mVMA = new Engine::ZSVMA(game_data->vk_main->mInstance,
+                                                         game_data->vk_main->mDevice);
         }
         else if (info->graphicsApi == OGL32) {
             this->mGLContext = SDL_GL_CreateContext(mWindow);
@@ -66,10 +73,6 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
                 std::cout << "GLEW initialize sucessful" << std::endl;
             }
         }
-        
-        //initialize OpenAL sound system
-        //Engine::SFX::initAL();
-
     }
 }
 
@@ -109,10 +112,12 @@ void ZSpireEngine::setWindowMode(unsigned int mode){
 void ZSpireEngine::loadGame(){
     gameRuns = true;
 
-    game_data = new ZSGAME_DATA;
     this->zsgame_ptr = static_cast<void*>(game_data);
     //Allocate pipeline and start it as manager
-    game_data->pipeline = new Engine::GLRenderer;
+    if(engine_info->graphicsApi == VULKAN)
+        game_data->pipeline = new Engine::VKRenderer;
+    else
+        game_data->pipeline = new Engine::GLRenderer;
     startManager(game_data->pipeline);
     //Allocate resource manager
     game_data->resources = new Engine::ResourceManager;

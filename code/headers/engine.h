@@ -38,6 +38,8 @@ public:
     SDL_Window* getWindowSDL();
     void* getGameDataPtr();
 
+    Engine::ZSVulkanDevice* GetDevice() { return mVkDevice; }
+
     void startManager(IEngineComponent* component);
     void updateDeltaTime(float deltaTime);
     void updateResolution(int W, int H);

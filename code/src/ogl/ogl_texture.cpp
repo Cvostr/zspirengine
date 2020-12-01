@@ -7,6 +7,10 @@
 #include <stb/stb_image.h>
 
 void Engine::_ogl_Texture::Init() {
+    if (mCreated) {
+        return;
+    }
+
     glCreateTextures(GL_TEXTURE_2D, 1, &TEXTURE_ID);
     glBindTexture(GL_TEXTURE_2D, this->TEXTURE_ID); //We now working with this texture
 
@@ -14,10 +18,12 @@ void Engine::_ogl_Texture::Init() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+    mCreated = true;
 }
 
 Engine::_ogl_Texture::_ogl_Texture() {
-
+    mCreated = false;
 }
 
 Engine::_ogl_Texture::~_ogl_Texture(){
@@ -30,10 +36,7 @@ void Engine::_ogl_Texture::Use(int slot) {
 
 void Engine::_ogl_Texture::Destroy() {
     glDeleteTextures(1, &this->TEXTURE_ID);
-
-#ifdef ZS_LOG
-    std::cout << "TEXTURE: realease sucess!" << std::endl;
-#endif
+    mCreated = false;
 }
 
 bool Engine::_ogl_Texture::LoadTextureFromBufferUByte(unsigned char* data, int Width, int Height, TextureFormat format) {
@@ -43,7 +46,7 @@ bool Engine::_ogl_Texture::LoadTextureFromBufferUByte(unsigned char* data, int W
 
     switch (format) {
     case TextureFormat::FORMAT_R:
-        gl_format = GL_R;
+        gl_format = GL_RED;
         break;
     case TextureFormat::FORMAT_RG:
         gl_format = GL_RG;

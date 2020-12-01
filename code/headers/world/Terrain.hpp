@@ -2,6 +2,7 @@
 
 #define TERRAIN_TEXTURES_AMOUNT 12
 
+#include "../render/Mesh.hpp"
 #include "../render/Texture.h"
 #include "../render/Math.hpp"
 #include "../engine/Resources.hpp"
@@ -65,9 +66,9 @@ typedef struct HeightmapTexturePair{
 
 typedef struct TerrainPainting{
     //OpenGL texture IDs of texture masks
-    unsigned int texture_mask1;
-    unsigned int texture_mask2;
-    unsigned int texture_mask3;
+    Engine::Texture* texture_mask1;
+    Engine::Texture* texture_mask2;
+    Engine::Texture* texture_mask3;
     //Memory for paintings
     unsigned char* _texture;
     unsigned char* _texture1;
@@ -78,9 +79,9 @@ typedef struct TerrainPainting{
         _texture1 = nullptr;
         _texture2 = nullptr;
 
-        texture_mask1 = 0;
-        texture_mask2 = 0;
-        texture_mask3 = 0;
+        texture_mask1 = Engine::allocTexture();
+        texture_mask2 = Engine::allocTexture();
+        texture_mask3 = Engine::allocTexture();
     }
 
     void freeMem() {
@@ -90,22 +91,13 @@ typedef struct TerrainPainting{
     }
 }TerrainPainting;
 
-struct TerrainMeshGL {
-    unsigned int VAO;
-    unsigned int VBO;
-    unsigned int EBO;
-
-    void generate();
-    void destroy();
-};
-
 class TerrainData{
 private:
     bool created;
     //Stores IDs for paintings and memory
     TerrainPainting painting;
     //Stores Opengl mesh variables
-    TerrainMeshGL meshGL;
+    Engine::Mesh* meshGL;
     //Array for vertex data to GL
     HeightmapVertex* vertices;
     //Array for indices

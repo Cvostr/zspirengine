@@ -1,5 +1,7 @@
 #include "../../headers/vulkan/vk_data.h"
+#include "../../headers/game.h"
 
+extern ZSGAME_DATA* game_data;
 
 Engine::_vk_Mesh::_vk_Mesh(){
 
@@ -34,13 +36,9 @@ void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, un
     indexBufferCreateInf.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
     indexBufferCreateInf.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    //VkResult vertex_result = vkCreateBuffer(vulkan_ptr->getVkDevice(), &vertexBufferCreateInf, nullptr, &this->vertexBuffer);
-    //VkResult index_result = vkCreateBuffer(vulkan_ptr->getVkDevice(), &indexBufferCreateInf, nullptr, &this->indexBuffer);
-
-    //VkMemoryRequirements req;
-    //vkGetBufferMemoryRequirements(vulkan_ptr->getVkDevice(), vertexBuffer, &req);
-
-    //VkPhysicalDeviceMemoryProperties props = getPhysDeviceMemoryProps();
+    //Allocate buffer
+    game_data->vk_main->mVMA->allocate(vertexBufferCreateInf, &this->vertexBuffer);
+    game_data->vk_main->mVMA->allocate(indexBufferCreateInf, &this->indexBuffer);
 }
 void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){
     VkBufferCreateInfo vertexBufferCreateInf;
@@ -51,8 +49,8 @@ void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num
     vertexBufferCreateInf.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
     vertexBufferCreateInf.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    //VkResult vertex_result = vkCreateBuffer(vulkan_ptr->getVkDevice(), &vertexBufferCreateInf, nullptr, &this->vertexBuffer);
-
+    //Allocate buffer
+    game_data->vk_main->mVMA->allocate(vertexBufferCreateInf, &this->vertexBuffer);
 }
 void Engine::_vk_Mesh::Draw(){
 

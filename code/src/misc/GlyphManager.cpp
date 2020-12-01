@@ -9,10 +9,11 @@ extern ZSGAME_DATA* game_data;
 GlyphManager::GlyphManager(){
     if (FT_Init_FreeType(&this->mFtlib))
         std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+
 }
 
 CharacterGlyph::CharacterGlyph(){
-
+    texture = Engine::allocTexture();
 }
 
 FT_Library GlyphManager::getFreetypeLibraryInstance(){
@@ -80,25 +81,10 @@ void GlyphFontContainer::loadGlyph(unsigned int index){
         character->texture_buffer[i] = font->glyph->bitmap.buffer[i];
     }
 
-    glGenTextures(1, &character->gl_texture_id);
-    glBindTexture(GL_TEXTURE_2D, character->gl_texture_id);
-
-    glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RED,
-            static_cast<int>(font->glyph->bitmap.width),
-            static_cast<int>(font->glyph->bitmap.rows),
-            0,
-            GL_RED,
-            GL_UNSIGNED_BYTE,
-            font->glyph->bitmap.buffer
-        );
-    // Set texture options
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    character->texture->LoadTextureFromBufferUByte(font->glyph->bitmap.buffer,
+        static_cast<int>(font->glyph->bitmap.width),
+        static_cast<int>(font->glyph->bitmap.rows),
+        Engine::TextureFormat::FORMAT_R);
 
     this->characters.insert(std::pair<unsigned int, CharacterGlyph*>(index, character));
 }
@@ -107,7 +93,7 @@ void GlyphFontContainer::DrawChar(int _char, ZSVECTOR2 pos, unsigned int* char_l
     CharacterGlyph* glyph = this->characters.at(static_cast<unsigned int>(_char));
     *char_length = static_cast<unsigned int>(glyph->glyph_bearing.X + glyph->glyph_size.X);
 
-    game_data->pipeline->renderGlyph(glyph->gl_texture_id, static_cast<int>(pos.X), static_cast<int>(pos.Y - (glyph->glyph_size.Y - glyph->glyph_bearing.Y)), static_cast<int>(glyph->glyph_size.X), static_cast<int>(glyph->glyph_size.Y), color);
+    game_data->pipeline->renderGlyph(glyph->texture, static_cast<int>(pos.X), static_cast<int>(pos.Y - (glyph->glyph_size.Y - glyph->glyph_bearing.Y)), static_cast<int>(glyph->glyph_size.X), static_cast<int>(glyph->glyph_size.Y), color);
 }
 void GlyphFontContainer::DrawString(int* string, unsigned int len, ZSVECTOR2 pos, ZSRGBCOLOR color){
     unsigned int xpos_offset = static_cast<unsigned int>(pos.X);
