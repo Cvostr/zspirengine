@@ -11,7 +11,7 @@ extern ZSGAME_DATA* game_data;
 Engine::Texture* Engine::allocTexture(){
     Engine::Texture* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
+        case OGL: {
             result = new _ogl_Texture;
             break;
         }
@@ -26,7 +26,7 @@ Engine::Texture* Engine::allocTexture(){
 Engine::Texture3D* Engine::allocTexture3D(){
     Engine::Texture3D* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
+        case OGL: {
             result = new _ogl_Texture3D;
             break;
         }
@@ -41,10 +41,6 @@ Engine::Texture3D* Engine::allocTexture3D(){
 
 //Loads texture from file
 bool Engine::Texture::LoadDDSTextureFromFile(const char* path){
-
-#ifdef ZS_LOG
-    std::cout << "TEXTURE: Loading texture from file : " << path << std::endl;
-#endif
 
     std::ifstream texture_stream;
     texture_stream.open(path, std::ifstream::binary | std::ifstream::ate);
@@ -142,7 +138,7 @@ bool Engine::Texture3D::pushTexture(int index, std::string path){
 
 
 Engine::Texture3D::Texture3D(){
-    mCreated = false;
+
 }
 Engine::Texture3D::~Texture3D(){
 

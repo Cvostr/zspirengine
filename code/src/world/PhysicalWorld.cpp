@@ -48,7 +48,7 @@ void PhysicalWorld::removeCollisionObjFromWorld(btCollisionObject* body) {
     this->physic_world->removeCollisionObject(body);
 }
 
-void PhysicalWorld::rayTest(ZSVECTOR3 pos, ZSVECTOR3 dir, btCollisionWorld::RayResultCallback& callback) {
+void PhysicalWorld::rayTest(Vec3 pos, Vec3 dir, btCollisionWorld::RayResultCallback& callback) {
     btVector3 bvpos = btVector3(pos.X, pos.Y, pos.Z);
     btVector3 bvdir = btVector3(dir.X, dir.Y, dir.Z);
     physic_world->rayTest(bvpos, bvdir, callback);
@@ -75,8 +75,8 @@ Engine::PhysicalProperty::PhysicalProperty(){
     rigidBody = nullptr;
     shape = nullptr;
     //Set base values to custom transform vectors
-    transform_offset = ZSVECTOR3(0.f, 0.f, 0.f);
-    cust_size = ZSVECTOR3(1.f, 1.f, 1.f);
+    transform_offset = Vec3(0.f, 0.f, 0.f);
+    cust_size = Vec3(1.f, 1.f, 1.f);
 
     coll_type = COLLIDER_TYPE::COLLIDER_TYPE_BOX;
     mass = 0;
@@ -125,7 +125,7 @@ bool Engine::PhysicalProperty::init(){
 void Engine::TriggerProperty::initGhost() {
     Engine::TransformProperty* transform = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
 
-    ZSVECTOR3 pos = transform->abs_translation;
+    Vec3 pos = transform->abs_translation;
     //if uninitialized
     if (!updateCollisionShape())
         return;
@@ -150,8 +150,8 @@ void Engine::TriggerProperty::initGhost() {
 btTransform Engine::PhysicalProperty::getBtTransform() {
     Engine::TransformProperty* transform = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
 
-    ZSVECTOR3 pos = transform->abs_translation;
-    ZSVECTOR3 rot = transform->abs_rotation;
+    Vec3 pos = transform->abs_translation;
+    Vec3 rot = transform->abs_rotation;
 
     btTransform startTransform;
     startTransform.setIdentity();
@@ -173,7 +173,7 @@ bool Engine::PhysicalProperty::updateCollisionShape(){
     Engine::MeshProperty* mesh = this->go_link.updLinkPtr()->getPropertyPtr<Engine::MeshProperty>();
     Engine::Mesh* m = mesh->mesh_ptr->mesh_ptr;
 
-    ZSVECTOR3 scale = transform->abs_scale;
+    Vec3 scale = transform->abs_scale;
     //if size is overrided
     if(isCustomPhysicalSize){
         scale = cust_size;
@@ -224,7 +224,7 @@ bool Engine::PhysicalProperty::updateCollisionShape(){
                                                                             3 * sizeof (int),
                                                                             m->mVerticesNum,
                                                                             reinterpret_cast<btScalar*>(vertices),
-                                                                            sizeof (ZSVECTOR3));
+                                                                            sizeof (Vec3));
             shape = new btBvhTriangleMeshShape(va, false);
             break;
         }

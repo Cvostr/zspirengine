@@ -95,9 +95,9 @@ void TerrainData::updateGeometryBuffers(bool full_rebuild){
     for(int y = 0; y < H; y ++){
         for(int x = 0; x < W; x ++){
             //Set vertex height
-            vertices[x * H + y].pos = ZSVECTOR3(static_cast<float>(x), data[x * H + y].height, static_cast<float>(y));
+            vertices[x * H + y].pos = Vec3(static_cast<float>(x), data[x * H + y].height, static_cast<float>(y));
             //Calculate vertex texture UV
-            vertices[x * H + y].uv = ZSVECTOR2(static_cast<float>(x) / W, static_cast<float>(y) / H);
+            vertices[x * H + y].uv = Vec2(static_cast<float>(x) / W, static_cast<float>(y) / H);
         }
     }
     if (full_rebuild) {
@@ -143,9 +143,10 @@ bool TerrainData::loadFromFile(const char* file_path){
 }
 
 bool TerrainData::loadFromMemory(const char* bytes) {
+    unsigned int offset = 0;
     //Read sizes
-    memcpy(&this->W, bytes, sizeof(int));
-    memcpy(&this->H, bytes + 0x4, sizeof(int));
+    readBinaryValue(&this->W, bytes + offset, offset);
+    readBinaryValue(&this->H, bytes + offset, offset);
     //Check, if sizes are correct
     if (W < 1 || H < 1) {
         return false;
@@ -153,26 +154,22 @@ bool TerrainData::loadFromMemory(const char* bytes) {
     //allocate memory
     alloc(W, H);
     //read all terrain points
-    int offset = 0x8;
     for (int i = 0; i < W * H; i++) {
         //Read height
-        memcpy(&data[i].height, bytes + offset, sizeof(float));
-        offset += sizeof(float);
+        readBinaryValue(&data[i].height, bytes + offset, offset);
         //Iterate over all textures
         for (int tex_factor = 0; tex_factor < TERRAIN_TEXTURES_AMOUNT; tex_factor++) {
             //Read texture factor
-            memcpy(&data[i].texture_factors[tex_factor], bytes + offset, sizeof(unsigned char));
-            offset += sizeof(unsigned char);
+            readBinaryValue(&data[i].texture_factors[tex_factor], bytes + offset, offset);
         }
         //Read grass ID
-        memcpy(&data[i].grass, bytes + offset, sizeof(int));
-        offset += sizeof(int);
+        readBinaryValue(&data[i].grass, bytes + offset, offset);
     }
     return true;
 }
 
 void TerrainData::initPhysics(){
-    ZSVECTOR3* vertex_pos = &vertices[0].pos;
+    Vec3* vertex_pos = &vertices[0].pos;
     //Check vertices array
     if (vertex_pos == nullptr)
         //if no vertices, then exit function
@@ -207,8 +204,8 @@ void TerrainData::updateGrassBuffers() {
             //if grass exist there
             if (texel_ptr->grass > 0) {
                 HeightmapGrass* grass = &this->grass[static_cast<unsigned int>(texel_ptr->grass - 1)];
-                ZSVECTOR3 pos = ZSVECTOR3(texelZ, texel_ptr->height, texelX);
-                Mat4 m = getScaleMat(ZSVECTOR3(grass->scale.X, grass->scale.Y, grass->scale.X)) * getTranslationMat(pos);
+                Vec3 pos = Vec3(texelZ, texel_ptr->height, texelX);
+                Mat4 m = getScaleMat(Vec3(grass->scale.X, grass->scale.Y, grass->scale.X)) * getTranslationMat(pos);
                 grass->inst_transform.push_back(m);
             }
         }
@@ -232,21 +229,21 @@ void TerrainData::processNormalsTangentSpace(HeightmapVertex* vert_array, unsign
         HeightmapVertex* v2 = &vert_array[indices_array[ind_i + 1]];
         HeightmapVertex* v3 = &vert_array[indices_array[ind_i + 2]];
         //Poses of other vertices of triangle
-        ZSVECTOR3 v12 = v1->pos - v2->pos;
-        ZSVECTOR3 v13 = v1->pos - v3->pos;
+        Vec3 v12 = v1->pos - v2->pos;
+        Vec3 v13 = v1->pos - v3->pos;
         //Calculate normal
         v1->normal = vCross(v12, v13);
         //Normalize vector
         v1->normal.Normalize();
         //--------------Calculate Tangent 
-        ZSVECTOR3 edge1 = v2->pos - v1->pos;
-        ZSVECTOR3 edge2 = v3->pos - v1->pos;
-        ZSVECTOR2 deltaUV1 = v2->uv - v1->uv;
-        ZSVECTOR2 deltaUV2 = v3->uv - v1->uv;
+        Vec3 edge1 = v2->pos - v1->pos;
+        Vec3 edge2 = v3->pos - v1->pos;
+        Vec2 deltaUV1 = v2->uv - v1->uv;
+        Vec2 deltaUV2 = v3->uv - v1->uv;
 
         float f = 1.0f / (deltaUV1.X * deltaUV2.Y - deltaUV2.X * deltaUV1.Y);
 
-        ZSVECTOR3 tangent, bitangent;
+        Vec3 tangent, bitangent;
         tangent.X = f * (deltaUV2.Y * edge1.X - deltaUV1.Y * edge2.X);
         tangent.Y = f * (deltaUV2.Y * edge1.Y - deltaUV1.Y * edge2.Y);
         tangent.Z = f * (deltaUV2.Y * edge1.Z - deltaUV1.Y * edge2.Z);

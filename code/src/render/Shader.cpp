@@ -16,7 +16,7 @@ extern ZSpireEngine* engine_ptr;
 Engine::Shader* Engine::allocShader(){
     Engine::Shader* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
+        case OGL: {
             result = new _ogl_Shader;
             break;
         }

@@ -4,7 +4,7 @@
 #include <string>
 #include <cstdint>
 
-enum ZSGAPI {OGL32, VULKAN};
+enum ZSGAPI {OGL, VULKAN};
 enum ZSPERSPECTIVE {PERSP_3D = 3, PERSP_2D = 2};
 
 typedef struct ZSENGINE_CREATE_INFO{

@@ -41,14 +41,14 @@ void Engine::RigidbodyProperty::onUpdate(float deltaTime) {
         rotY = rotY / ZS_PI * 180.0f;
         rotZ = rotZ / ZS_PI * 180.0f;
 
-        if (transform->translation != ZSVECTOR3(curX, curY, curZ))
-            transform->translation = ZSVECTOR3(curX, curY, curZ);
-        if (transform->rotation != ZSVECTOR3(rotX, rotY, -rotZ))
-            transform->rotation = ZSVECTOR3(rotX, rotY, -rotZ);
+        if (transform->translation != Vec3(curX, curY, curZ))
+            transform->translation = Vec3(curX, curY, curZ);
+        if (transform->rotation != Vec3(rotX, rotY, -rotZ))
+            transform->rotation = Vec3(rotX, rotY, -rotZ);
     }
 }
 
-void Engine::RigidbodyProperty::setLinearVelocity(ZSVECTOR3& lvel) {
+void Engine::RigidbodyProperty::setLinearVelocity(Vec3& lvel) {
     if (!created) return;
     this->linearVel = lvel;
     this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
@@ -73,11 +73,11 @@ void Engine::RigidbodyProperty::onValueChanged() {
     this->rigidBody->setCollisionShape(shape);
 }
 
-void Engine::RigidbodyProperty::applyCentralImpulse(ZSVECTOR3& imp) {
+void Engine::RigidbodyProperty::applyCentralImpulse(Vec3& imp) {
     if (!created) return;
     rigidBody->applyCentralImpulse(btVector3(imp.X, imp.Y, imp.Z));
 }
-void Engine::RigidbodyProperty::applyCentralForce(ZSVECTOR3& v) {
+void Engine::RigidbodyProperty::applyCentralForce(Vec3& v) {
     if (!created) return;
     rigidBody->applyCentralForce(btVector3(v.X, v.Y, v.Z));
 }

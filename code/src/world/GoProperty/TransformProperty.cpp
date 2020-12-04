@@ -7,9 +7,9 @@ Engine::TransformProperty::TransformProperty() : scale(1.f)
 
 void Engine::TransformProperty::updateMatrix() {
     //Variables to store
-    ZSVECTOR3 p_translation = ZSVECTOR3(0, 0, 0);
-    ZSVECTOR3 p_scale = ZSVECTOR3(1, 1, 1);
-    ZSVECTOR3 p_rotation = ZSVECTOR3(0, 0, 0);
+    Vec3 p_translation = Vec3(0, 0, 0);
+    Vec3 p_scale = Vec3(1, 1, 1);
+    Vec3 p_rotation = Vec3(0, 0, 0);
 
     GameObject* ptr = go_link.updLinkPtr(); //Pointer to object with this property
     if (ptr != nullptr && ptr->hasParent) { //if object exist and dependent
@@ -63,7 +63,7 @@ void Engine::TransformProperty::onValueChanged() {
 
     }
 }
-void Engine::TransformProperty::getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r) {
+void Engine::TransformProperty::getAbsoluteParentTransform(Vec3& t, Vec3& s, Vec3& r) {
     GameObject* ptr = go_link.updLinkPtr(); //Pointer to object with this property
 
     t = t + this->translation;
@@ -92,15 +92,15 @@ void Engine::TransformProperty::getAbsoluteRotationMatrix(Mat4& m) {
     }
 }
 
-void Engine::TransformProperty::setTranslation(const ZSVECTOR3& new_translation) {
+void Engine::TransformProperty::setTranslation(const Vec3& new_translation) {
     this->translation = new_translation;
     this->onValueChanged();
 }
-void Engine::TransformProperty::setScale(const ZSVECTOR3& new_scale) {
+void Engine::TransformProperty::setScale(const Vec3& new_scale) {
     this->scale = new_scale;
     this->onValueChanged();
 }
-void Engine::TransformProperty::setRotation(const ZSVECTOR3& new_rotation) {
+void Engine::TransformProperty::setRotation(const Vec3& new_rotation) {
     this->rotation = new_rotation;
     this->onValueChanged();
 }

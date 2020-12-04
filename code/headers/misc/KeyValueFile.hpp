@@ -39,11 +39,10 @@ namespace Engine {
 			if (rec == nullptr) {
 				rec = new KV<T>();
 				rec->key = key;
+				records.push_back(rec);
 			}
 			//Assign value
 			rec->value = value;
-
-			records.push_back(rec);
 		}
 		template <typename T>
 		T getValue(std::string key) {
@@ -51,7 +50,7 @@ namespace Engine {
 			return rec->value;
 		}
 
-		void saveAll();
+		void SaveAll();
 
 		KeyValueFile();
 		~KeyValueFile();

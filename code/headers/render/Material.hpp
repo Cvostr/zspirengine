@@ -146,7 +146,7 @@ public:
 };
 class Float2MtShPropConf : public MaterialShaderPropertyConf{
 public:
-    ZSVECTOR2 value;
+    Vec2 value;
     //Construct
     Float2MtShPropConf();
 };

@@ -1,19 +1,19 @@
 #pragma once
 
-class ZSVECTOR2 {
+class Vec2 {
 public:
 	float X;
 	float Y;
 
-	ZSVECTOR2() : X(0), Y(0) {}
-	ZSVECTOR2(float nx, float ny) : X(nx), Y(ny) {}
-	ZSVECTOR2(float v) : X(v), Y(v) {}
+	Vec2() : X(0), Y(0) {}
+	Vec2(float nx, float ny) : X(nx), Y(ny) {}
+	Vec2(float v) : X(v), Y(v) {}
 
 };
 
-inline ZSVECTOR2 operator-(const ZSVECTOR2& l, const ZSVECTOR2& r)
+inline Vec2 operator-(const Vec2& l, const Vec2& r)
 {
-	ZSVECTOR2 Ret(l.X - r.X, l.Y - r.Y);
+	Vec2 Ret(l.X - r.X, l.Y - r.Y);
 
 	return Ret;
 }

@@ -4,8 +4,8 @@ Engine::CharacterControllerProperty::CharacterControllerProperty() {
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_CHARACTER_CONTROLLER;
     created = false;
 
-    gravity = ZSVECTOR3(0.f, -10.f, 0.f);
-    linearVel = ZSVECTOR3(0.f, -10.f, 0.f);
+    gravity = Vec3(0.f, -10.f, 0.f);
+    linearVel = Vec3(0.f, -10.f, 0.f);
 
     mass = 10;
 
@@ -13,7 +13,7 @@ Engine::CharacterControllerProperty::CharacterControllerProperty() {
     height = 1.f;
 }
 
-void Engine::CharacterControllerProperty::setLinearVelocity(ZSVECTOR3 lvel) {
+void Engine::CharacterControllerProperty::setLinearVelocity(Vec3 lvel) {
     if (!created) return;
     this->linearVel = lvel;
     this->rigidBody->setLinearVelocity(btVector3(linearVel.X, linearVel.Y, linearVel.Z));
@@ -60,11 +60,11 @@ void Engine::CharacterControllerProperty::onUpdate(float deltaTime) {
     float curY = current_pos.getY() - transform_offset.Y;
     float curZ = current_pos.getZ() - transform_offset.Z;
 
-    if (transform->translation != ZSVECTOR3(curX, curY, curZ))
-        transform->translation = ZSVECTOR3(curX, curY, curZ);
+    if (transform->translation != Vec3(curX, curY, curZ))
+        transform->translation = Vec3(curX, curY, curZ);
 
-    ZSVECTOR3 pos = ZSVECTOR3(current_pos.getX(), current_pos.getY(), current_pos.getZ());
-    ZSVECTOR3 target = pos + ZSVECTOR3(0.f, (-height ) * 1.2f, 0.f);
+    Vec3 pos = Vec3(current_pos.getX(), current_pos.getY(), current_pos.getZ());
+    Vec3 target = pos + Vec3(0.f, (-height ) * 1.2f, 0.f);
 
     ClosestNotMe result(rigidBody);
     go_link.world_ptr->physical_world->rayTest(pos, target, result);
@@ -80,8 +80,8 @@ void Engine::CharacterControllerProperty::onUpdate(float deltaTime) {
 void Engine::CharacterControllerProperty::onStart() {
     Engine::TransformProperty* transform = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
 
-    ZSVECTOR3 scale = transform->abs_scale;
-    ZSVECTOR3 pos = transform->abs_translation;
+    Vec3 scale = transform->abs_scale;
+    Vec3 pos = transform->abs_translation;
     //if Custom Physical Size is checked
     if (isCustomPhysicalSize) {
         scale = cust_size;

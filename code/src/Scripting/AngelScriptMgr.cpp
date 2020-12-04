@@ -37,7 +37,7 @@ void printToConsole(asIScriptGeneric* gen)
 				break;
 			}
 			case AG_VECTOR3: {
-				ZSVECTOR3* vec = static_cast<ZSVECTOR3*>(ref);
+				Vec3* vec = static_cast<Vec3*>(ref);
 				out += "(" + std::to_string(vec->X) + ", " + std::to_string(vec->Y) + ", " + std::to_string(vec->Z) + ")";
 				break;
 			}

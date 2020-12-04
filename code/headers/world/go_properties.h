@@ -74,10 +74,10 @@ class LightsourceProperty : public Engine::IGameObjectComponent {
 public:
     LIGHTSOURCE_TYPE light_type; //type of lightsource
 
-    ZSVECTOR3 direction; //direction for directional & spotlight in quats
+    Vec3 direction; //direction for directional & spotlight in quats
     //To compare differences
-    ZSVECTOR3 last_pos; //transform* last position
-    ZSVECTOR3 last_rot; //transform* last rotation
+    Vec3 last_pos; //transform* last position
+    Vec3 last_rot; //transform* last rotation
 
     ZSRGBCOLOR color; //Color of light
     float intensity; //Light's intensity
@@ -102,7 +102,7 @@ public:
     Engine::AudioResource* buffer_ptr;
     Engine::SoundSource source;
 
-    ZSVECTOR3 last_pos;
+    Vec3 last_pos;
 
     void addPropertyInterfaceToInspector();
     void onValueChanged(); //Update soud buffer pointer and send source props
@@ -133,8 +133,8 @@ class NodeProperty : public IGameObjectComponent {
 public:
     std::string node_label;
 
-    ZSVECTOR3 translation;
-    ZSVECTOR3 scale;
+    Vec3 translation;
+    Vec3 scale;
     ZSQUATERNION rotation;
     //Node transform from file
     Mat4 transform_mat;
@@ -230,8 +230,8 @@ protected:
     btTransform getBtTransform();
 public:
     bool isCustomPhysicalSize;
-    ZSVECTOR3 cust_size;
-    ZSVECTOR3 transform_offset;
+    Vec3 cust_size;
+    Vec3 transform_offset;
 
     bool created;
     btRigidBody* rigidBody;
@@ -264,9 +264,9 @@ public:
 
 class RigidbodyProperty : public Engine::PhysicalProperty{
 public:
-    ZSVECTOR3 gravity;
-    ZSVECTOR3 linearVel;
-    ZSVECTOR3 angularVel;
+    Vec3 gravity;
+    Vec3 linearVel;
+    Vec3 angularVel;
 
     void addPropertyInterfaceToInspector();
     void onUpdate(float deltaTime);
@@ -275,9 +275,9 @@ public:
     void onValueChanged();
     void onObjectDeleted(); //unregister in world
 
-    void setLinearVelocity(ZSVECTOR3& lvel);
-    void applyCentralImpulse(ZSVECTOR3& imp);
-    void applyCentralForce(ZSVECTOR3& v);
+    void setLinearVelocity(Vec3& lvel);
+    void applyCentralImpulse(Vec3& imp);
+    void applyCentralForce(Vec3& v);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);
@@ -293,16 +293,16 @@ public:
     float width;
     float height;
 
-    ZSVECTOR3 gravity;
-    ZSVECTOR3 linearVel;
-    ZSVECTOR3 angularVel;
+    Vec3 gravity;
+    Vec3 linearVel;
+    Vec3 angularVel;
 
     void addPropertyInterfaceToInspector();
     void copyTo(Engine::IGameObjectComponent* dest);
     void onUpdate(float deltaTime);
     void onStart();
 
-    void setLinearVelocity(ZSVECTOR3 lvel);
+    void setLinearVelocity(Vec3 lvel);
 
     bool isOnGround();
     void jump(float height);

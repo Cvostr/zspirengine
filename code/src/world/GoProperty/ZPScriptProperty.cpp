@@ -34,6 +34,7 @@ void Engine::ZPScriptProperty::SetupScript() {
 		}
 			//fill pointer with main class
 		script->obtainScriptMainClass();
+		script->CallConstructor();
 	}
 }
 

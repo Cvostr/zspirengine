@@ -11,8 +11,8 @@ namespace Engine {
         TextureResource* default_sprite;
         TextureResource* hovered_sprite;
 
-        ZSVECTOR3 text_color;
-        ZSVECTOR3 text_color_hovered;
+        Vec3 text_color;
+        Vec3 text_color_hovered;
 
         ViewSize size;
 

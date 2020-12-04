@@ -89,17 +89,17 @@ void GlyphFontContainer::loadGlyph(unsigned int index){
     this->characters.insert(std::pair<unsigned int, CharacterGlyph*>(index, character));
 }
 
-void GlyphFontContainer::DrawChar(int _char, ZSVECTOR2 pos, unsigned int* char_length, ZSRGBCOLOR color){
+void GlyphFontContainer::DrawChar(int _char, Vec2 pos, unsigned int* char_length, ZSRGBCOLOR color){
     CharacterGlyph* glyph = this->characters.at(static_cast<unsigned int>(_char));
     *char_length = static_cast<unsigned int>(glyph->glyph_bearing.X + glyph->glyph_size.X);
 
     game_data->pipeline->renderGlyph(glyph->texture, static_cast<int>(pos.X), static_cast<int>(pos.Y - (glyph->glyph_size.Y - glyph->glyph_bearing.Y)), static_cast<int>(glyph->glyph_size.X), static_cast<int>(glyph->glyph_size.Y), color);
 }
-void GlyphFontContainer::DrawString(int* string, unsigned int len, ZSVECTOR2 pos, ZSRGBCOLOR color){
+void GlyphFontContainer::DrawString(int* string, unsigned int len, Vec2 pos, ZSRGBCOLOR color){
     unsigned int xpos_offset = static_cast<unsigned int>(pos.X);
     for(unsigned int i = 0; i < len; i ++){
         unsigned int char_len = 0;
-        DrawChar(string[i], ZSVECTOR2(static_cast<float>(xpos_offset), pos.Y), &char_len, color);
+        DrawChar(string[i], Vec2(static_cast<float>(xpos_offset), pos.Y), &char_len, color);
         xpos_offset += char_len;
     }
 }

@@ -84,7 +84,14 @@ bool Engine::_ogl_Shader::compileFromFile(std::string VSpath, std::string FSpath
     if(!GSpath.empty())
         readShaderFile(GSpath.c_str(), &gs_data, size);
 
-    return compileFromStr(vs_data, fs_data, gs_data);
+    bool Result = compileFromStr(vs_data, fs_data, gs_data);
+
+    delete[] vs_data;
+    delete[] fs_data;
+    if (!GSpath.empty())
+        delete[] gs_data;
+
+    return Result;
 }
 bool Engine::_ogl_Shader::compileFromStr(const char* _VS, const char* _FS, const char* _GS) {
     if (mCreated)
@@ -96,22 +103,18 @@ bool Engine::_ogl_Shader::compileFromStr(const char* _VS, const char* _FS, const
     if(_GS != nullptr)
         GS = glCreateShader(GL_GEOMETRY_SHADER);
 
-    const GLchar* vs = _VS;
-    const GLchar* fs = _FS;
-    const GLchar* gs = _GS;
-
-    glShaderSource(VS, 1, &vs, nullptr); //Setting shader code text on vs
+    glShaderSource(VS, 1, &_VS, nullptr); //Setting shader code text on vs
     glCompileShader(VS); //Compile VS shader code
     GLcheckCompileErrors(VS, "VERTEX", "VSpath"); //Check vertex errors
     glAttachShader(this->mShaderID, VS);
 
-    glShaderSource(FS, 1, &fs, nullptr); //Setting shader code text on fs
+    glShaderSource(FS, 1, &_FS, nullptr); //Setting shader code text on fs
     glCompileShader(FS); //Compile FS shader code
     GLcheckCompileErrors(FS, "FRAGMENT", "FSpath"); //Check fragment compile errors
     glAttachShader(this->mShaderID, FS);
     
     if(_GS != nullptr){
-        glShaderSource(GS, 1, &gs, nullptr); //Setting shader code text on gs
+        glShaderSource(GS, 1, &_GS, nullptr); //Setting shader code text on gs
         glCompileShader(GS); //Compile GS shader code
         GLcheckCompileErrors(GS, "Geometry", "GSpath"); //Check fragment compile errors
         glAttachShader(this->mShaderID, GS);
@@ -126,6 +129,36 @@ bool Engine::_ogl_Shader::compileFromStr(const char* _VS, const char* _FS, const
         glDeleteShader(GS);
 
     this->mCreated = true; //Shader created & compiled now
+    return true;
+}
+
+bool Engine::_ogl_Shader::compileComputeFromFile(std::string CSpath) {
+
+    GLchar* cs_data = nullptr;
+
+    size_t size;
+
+    readShaderFile(CSpath.c_str(), &cs_data, size);
+
+    bool Result = compileComputeFromStr(cs_data);
+    delete[] cs_data;
+    return Result;
+}
+bool Engine::_ogl_Shader::compileComputeFromStr(const char* _CS) {
+    if (mCreated)
+        return false;
+
+    this->mShaderID = glCreateProgram();
+    unsigned int CShader = glCreateShader(GL_COMPUTE_SHADER);
+
+    glShaderSource(CShader, 1, &_CS, nullptr); //Setting shader code text on cs
+    glCompileShader(CShader); //Compile CS shader code
+    GLcheckCompileErrors(CShader, "Compute", "CSpath"); //Check fragment compile errors
+    glAttachShader(mShaderID, CShader);
+    glLinkProgram(mShaderID);
+
+    glDeleteShader(CShader);
+
     return true;
 }
 

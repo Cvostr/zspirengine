@@ -73,6 +73,7 @@ namespace Engine{
         
         bool hasCompilerErrors();
 
+        void CallConstructor();
         void onStart();
         void onStop();
         void onUpdate();

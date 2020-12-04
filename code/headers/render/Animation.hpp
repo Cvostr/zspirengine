@@ -36,8 +36,8 @@ public:
     //Number of rotation keys in animation channel
     unsigned int rotationKeysNum;
 
-    ZSVECTOR3* pos;
-    ZSVECTOR3* scale;
+    Vec3* pos;
+    Vec3* scale;
     ZSQUATERNION* rot;
 
     double* posTimes;
@@ -48,8 +48,8 @@ public:
     unsigned int getScaleIndex(double Time);
     unsigned int getRotationIndex(double Time);
 
-    ZSVECTOR3 getPostitionInterpolated(double Time);
-    ZSVECTOR3 getScaleInterpolated(double Time);
+    Vec3 getPostitionInterpolated(double Time);
+    Vec3 getScaleInterpolated(double Time);
     ZSQUATERNION getRotationInterpolated(double Time);
 
     AnimationChannel();

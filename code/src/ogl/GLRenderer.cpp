@@ -66,7 +66,7 @@ void Engine::GLRenderer::initManager() {
 void Engine::GLRenderer::render2D() {
     World* world_ptr = game_data->world;
 
-    if (engine_ptr->engine_info->graphicsApi == OGL32) {
+    if (engine_ptr->engine_info->graphicsApi == OGL) {
         setClearColor(0, 0, 0, 1);
         ClearFBufferGL(true, true);
         setBlendingState(true); //Disable blending to render Skybox and shadows

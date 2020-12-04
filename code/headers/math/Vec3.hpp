@@ -114,5 +114,3 @@ float getDistance(const Vec3& p1, const Vec3& p2);
 Vec3 _getDirection(float pitch, float yaw, float roll);
 float vDot(const Vec3& v1, const Vec3& v2);
 bool isDistanceFits(const Vec3& pos1, const Vec3& pos2, float max_dist);
-
-typedef Vec3 ZSVECTOR3;

@@ -15,7 +15,7 @@ typedef struct HeightmapGrass{
     std::string diffuse_relpath;
     Engine::TextureResource* diffuse;
 
-    ZSVECTOR2 scale;
+    Vec2 scale;
     //Vector to store intanced transforms
     std::vector<Mat4> inst_transform;
 
@@ -23,7 +23,7 @@ typedef struct HeightmapGrass{
         diffuse_relpath = "@none";
         diffuse = nullptr;
 
-        scale = ZSVECTOR2(2.f, 2.f);
+        scale = Vec2(2.f, 2.f);
     }
 
 }HeightmapGrass;
@@ -42,11 +42,11 @@ typedef struct HeightmapTexel{
 }HeightmapTexel;
 
 typedef struct HeightmapVertex{
-    ZSVECTOR3 pos;
-    ZSVECTOR2 uv;
-    ZSVECTOR3 normal;
-    ZSVECTOR3 tangent;
-    ZSVECTOR3 bitangent;
+    Vec3 pos;
+    Vec2 uv;
+    Vec3 normal;
+    Vec3 tangent;
+    Vec3 bitangent;
 }HeightmapVertex;
 
 typedef struct HeightmapTexturePair{

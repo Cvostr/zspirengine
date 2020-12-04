@@ -165,8 +165,8 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, Renderer* pipeline)
     int dists[] = { 0, 40, 90, 130, 170, 210 };
     //iterate over all cascades
     for (int i = 0; i < mCascadesNum; i++) {
-        ZSVECTOR3 cam_pos = cam->getCameraPosition() + cam->getCameraFrontVec() * static_cast<float>(dists[i]);
-        Mat4 matview = matrixLookAt(cam_pos, cam_pos + light->direction * -1, ZSVECTOR3(0, 1, 0));
+        Vec3 cam_pos = cam->getCameraPosition() + cam->getCameraFrontVec() * static_cast<float>(dists[i]);
+        Mat4 matview = matrixLookAt(cam_pos, cam_pos + light->direction * -1, Vec3(0, 1, 0));
 
         float w = static_cast<float>(40 * (1 + i));
         this->LightProjectionMat = getOrthogonal(-w, w, -w, w, nearPlane, farPlane);

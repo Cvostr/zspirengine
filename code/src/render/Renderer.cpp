@@ -409,7 +409,7 @@ void Engine::Renderer::renderUI() {
     f[8] = static_cast<int>(L'r');
     f[9] = static_cast<int>(L'l');
     f[10] = static_cast<int>(L'd');
-    c->DrawString(f, 11, ZSVECTOR2(10,10));
+    c->DrawString(f, 11, Vec2(10,10));
     game_data->ui_manager->DrawRootLayout();
 }
 

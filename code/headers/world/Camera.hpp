@@ -38,9 +38,9 @@ namespace Engine{
             bool isMoving;
 
         public:
-            ZSVECTOR3 camera_pos; //Camera position vector
-            ZSVECTOR3 camera_up; //Camera up direction vector
-            ZSVECTOR3 camera_front; //Camera front direction vector
+            Vec3 camera_pos; //Camera position vector
+            Vec3 camera_up; //Camera up direction vector
+            Vec3 camera_front; //Camera front direction vector
 
             float FOV; //Field of view
             float nearZ; //Nearest Z occlusion plane
@@ -50,22 +50,22 @@ namespace Engine{
             ZSVIEWPORT viewport;
 
             bool isAlListenerCamera;
-            ZSVECTOR3 _dest_pos;
+            Vec3 _dest_pos;
 
-            ZSVECTOR3 getCameraPosition();
-            ZSVECTOR3 getCameraUpVec();
-            ZSVECTOR3 getCameraRightVec();
-            ZSVECTOR3 getCameraFrontVec();
+            Vec3 getCameraPosition();
+            Vec3 getCameraUpVec();
+            Vec3 getCameraRightVec();
+            Vec3 getCameraFrontVec();
 
-            ZSVECTOR3 getCameraViewCenterPos();
+            Vec3 getCameraViewCenterPos();
             ZSVIEWPORT getViewport();
 
             void updateProjectionMat();
             void updateViewMat();
 
-            void setPosition(const ZSVECTOR3& pos);
-            void setFront(const ZSVECTOR3& front);
-            void setUp(const ZSVECTOR3& up);
+            void setPosition(const Vec3& pos);
+            void setFront(const Vec3& front);
+            void setUp(const Vec3& up);
 
             void setFOV(float FOV);
             void setZplanes(float nearZ, float farZ);

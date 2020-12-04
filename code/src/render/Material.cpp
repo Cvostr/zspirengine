@@ -26,7 +26,7 @@ Float3MtShPropConf::Float3MtShPropConf(){
 
 Float2MtShPropConf::Float2MtShPropConf(){
     type = MATSHPROP_TYPE_FVEC2;
-    value = ZSVECTOR2(0.0f, 0.0f);
+    value = Vec2(0.0f, 0.0f);
 }
 
 Int2MtShPropConf::Int2MtShPropConf(){

@@ -156,9 +156,9 @@ void Engine::GameObject::addChildObject(GameObject* obj, bool updTransform) {
     //Check, If both objects have Transform property
     if (updTransform && Pobj_transform != nullptr && Cobj_transform != nullptr) { //If both objects have mesh property
         //if so, then add parent transform to child
-        ZSVECTOR3 p_translation = ZSVECTOR3(0, 0, 0);
-        ZSVECTOR3 p_scale = ZSVECTOR3(1, 1, 1);
-        ZSVECTOR3 p_rotation = ZSVECTOR3(0, 0, 0);
+        Vec3 p_translation = Vec3(0, 0, 0);
+        Vec3 p_scale = Vec3(1, 1, 1);
+        Vec3 p_rotation = Vec3(0, 0, 0);
         //get absolute transform of parent
         Pobj_transform->getAbsoluteParentTransform(p_translation, p_scale, p_rotation); //Collecting transforms
         //Add parent transform to child
@@ -190,9 +190,9 @@ void Engine::GameObject::removeChildObject(GameObject* obj) {
             //Check, If both objects have Transform property
             if (Pobj_transform != nullptr && Cobj_transform != nullptr) {
                 //if so, then add parent transform to child
-                ZSVECTOR3 p_translation = ZSVECTOR3(0, 0, 0);
-                ZSVECTOR3 p_scale = ZSVECTOR3(1, 1, 1);
-                ZSVECTOR3 p_rotation = ZSVECTOR3(0, 0, 0);
+                Vec3 p_translation = Vec3(0, 0, 0);
+                Vec3 p_scale = Vec3(1, 1, 1);
+                Vec3 p_rotation = Vec3(0, 0, 0);
                 //get absolute transform of parent
                 Pobj_transform->getAbsoluteParentTransform(p_translation, p_scale, p_rotation);
                 //Add parent transform to child
@@ -279,6 +279,7 @@ void Engine::GameObject::onStart() {
         mScripts[i]->SetupScript();
     }
     //Work with scripts
+    //Call OnStart() on each script
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
         if (!mScripts[i]->active) continue; //if script is inactive, then skip it
         mScripts[i]->onStart(); //and call onStart on each script

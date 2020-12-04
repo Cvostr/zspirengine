@@ -17,9 +17,9 @@ class CharacterGlyph{
 private:
 
 public:
-    ZSVECTOR2 glyph_size;
-    ZSVECTOR2 glyph_bearing;
-    ZSVECTOR2 glyph_advance;
+    Vec2 glyph_size;
+    Vec2 glyph_bearing;
+    Vec2 glyph_advance;
 
     Engine::Texture* texture;
     unsigned char* texture_buffer;
@@ -39,8 +39,8 @@ public:
     void loadGlyphs();
     void loadGlyph(unsigned int index);
 
-    void DrawChar(int _char, ZSVECTOR2 pos, unsigned int* char_length, ZSRGBCOLOR color);
-    void DrawString(int* string, unsigned int len, ZSVECTOR2 pos, ZSRGBCOLOR color = ZSRGBCOLOR(255,255,255));
+    void DrawChar(int _char, Vec2 pos, unsigned int* char_length, ZSRGBCOLOR color);
+    void DrawString(int* string, unsigned int len, Vec2 pos, ZSRGBCOLOR color = ZSRGBCOLOR(255,255,255));
 };
 
 class GlyphManager : public IEngineComponent {

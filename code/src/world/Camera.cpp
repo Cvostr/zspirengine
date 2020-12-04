@@ -62,18 +62,18 @@ void Engine::Camera::updateViewMat(){
     view = matrixLookAt(camera_pos, (camera_pos + camera_front), camera_up);
 }
 
-void Engine::Camera::setPosition(const ZSVECTOR3& pos){
+void Engine::Camera::setPosition(const Vec3& pos){
 
     this->camera_pos = pos;
     updateViewMat();
 }
 
-void Engine::Camera::setFront(const ZSVECTOR3& front){
+void Engine::Camera::setFront(const Vec3& front){
     this->camera_front = front;
     updateViewMat();
 }
 
-void Engine::Camera::setUp(const ZSVECTOR3& up){
+void Engine::Camera::setUp(const Vec3& up){
     this->camera_up = up;
     updateViewMat();
 }
@@ -92,29 +92,29 @@ Engine::ZSVIEWPORT Engine::Camera::getViewport(){
     return viewport;
 }
 
-ZSVECTOR3 Engine::Camera::getCameraPosition() {
+Vec3 Engine::Camera::getCameraPosition() {
     return this->camera_pos;
 }
 
-ZSVECTOR3 Engine::Camera::getCameraFrontVec(){
+Vec3 Engine::Camera::getCameraFrontVec(){
     return this->camera_front;
 }
 
-ZSVECTOR3 Engine::Camera::getCameraRightVec(){
+Vec3 Engine::Camera::getCameraRightVec(){
     return vCross(camera_front, camera_up);
 }
 
-ZSVECTOR3 Engine::Camera::getCameraUpVec(){
+Vec3 Engine::Camera::getCameraUpVec(){
     return camera_up;
 }
 
-ZSVECTOR3 Engine::Camera::getCameraViewCenterPos(){
+Vec3 Engine::Camera::getCameraViewCenterPos(){
     if(this->proj_type == ZSCAMERA_PROJECTION_ORTHOGONAL){
 
         int viewport_y = static_cast<int>(viewport.endY - viewport.startY) / 2;
         int viewport_x = (viewport.endX - viewport.startX) / 2;
         viewport_x *= -1;
-        ZSVECTOR3 result = camera_pos + ZSVECTOR3(static_cast<float>(viewport_x), static_cast<float>(viewport_y), 0);
+        Vec3 result = camera_pos + Vec3(static_cast<float>(viewport_x), static_cast<float>(viewport_y), 0);
         return result;
     }
     return this->camera_pos;
@@ -128,10 +128,10 @@ void Engine::Camera::updateTick(float deltaTime){
         updateViewMat();
         isMoving = false;
     }else{
-        ZSVECTOR3 delta = camera_pos - _dest_pos;
+        Vec3 delta = camera_pos - _dest_pos;
         float dist = getDistance(camera_pos, _dest_pos);
 
-        ZSVECTOR3 toMove = delta / dist;
+        Vec3 toMove = delta / dist;
         toMove = toMove * (deltaTime) - (10 / dist);
         camera_pos = camera_pos - toMove;
         updateViewMat();
@@ -144,7 +144,7 @@ void Engine::Camera::startMoving(){
         int viewport_size_x = static_cast<int>(viewport.endX) - static_cast<int>(viewport.startX);
         int viewport_size_y = static_cast<int>(viewport.endY) - static_cast<int>(viewport.startY);
         viewport_size_y *= -1;
-        ZSVECTOR3 to_add = ZSVECTOR3(static_cast<float>(viewport_size_x) / 2.f, static_cast<float>(viewport_size_y) / 2.f, 0);
+        Vec3 to_add = Vec3(static_cast<float>(viewport_size_x) / 2.f, static_cast<float>(viewport_size_y) / 2.f, 0);
         _dest_pos = _dest_pos + to_add;
     }
 

@@ -16,8 +16,8 @@ public:
     //Transform matrix
     Mat4 node_transform;
 
-    ZSVECTOR3 node_translation;
-    ZSVECTOR3 node_scaling;
+    Vec3 node_translation;
+    Vec3 node_scaling;
     ZSQUATERNION node_rotation;
 
     std::vector<std::string> child_node_labels;

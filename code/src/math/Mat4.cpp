@@ -12,8 +12,8 @@ Mat4 getIdentity() {
     return Ret;
 }
 
-ZSVECTOR4 matrixVecMM(const Mat4& l, const ZSVECTOR4& r) {
-    ZSVECTOR4 Ret;
+Vec4 matrixVecMM(const Mat4& l, const Vec4& r) {
+    Vec4 Ret;
     
     Ret.X = r.X * l.m[0][0] + r.Y * l.m[0][1] + r.Z * l.m[0][2] + r.W * l.m[0][3];
     Ret.Y = r.X * l.m[1][0] + r.Y * l.m[1][1] + r.Z * l.m[1][2] + r.W * l.m[1][3];
@@ -121,8 +121,8 @@ Mat4 invert(const Mat4& mat) {
     float A43 = -determinant(mat.m[0][0], mat.m[0][1], mat.m[0][3], mat.m[1][0], mat.m[1][1], mat.m[1][3], mat.m[2][0], mat.m[2][1], mat.m[2][3]);
     float A44 = +determinant(mat.m[0][0], mat.m[0][1], mat.m[0][2], mat.m[1][0], mat.m[1][1], mat.m[1][2], mat.m[2][0], mat.m[2][1], mat.m[2][2]);
 
-    Mat4 result = Mat4(ZSVECTOR4(A11, A21, A31, A41), ZSVECTOR4(A12, A22, A32, A42), ZSVECTOR4(A13, A23, A33, A43),
-        ZSVECTOR4(A14, A24, A34, A44));
+    Mat4 result = Mat4(Vec4(A11, A21, A31, A41), Vec4(A12, A22, A32, A42), Vec4(A13, A23, A33, A43),
+        Vec4(A14, A24, A34, A44));
     result = result * _determinant;
     return result;
 }
@@ -295,9 +295,9 @@ Mat4 getRotationMat(const ZSQUATERNION& quat) {
     float wz = quat.W * quat.Z;
 
     // This calculation would be a lot more complicated for non-unit length quaternions // Note: The constructor of Matrix4 expects the Matrix in column-major format like expected by // OpenGL
-    Mat4 rot = Mat4(ZSVECTOR4(1.0f - 2.0f * (y2 + z2), 2.0f * (xy - wz), 2.0f * (xz + wy), 0.0f), ZSVECTOR4(2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz - wx), 0.0f)
-        , ZSVECTOR4(2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f),
-        ZSVECTOR4(0.0f, 0.0f, 0.0f, 1.0f));
+    Mat4 rot = Mat4(Vec4(1.0f - 2.0f * (y2 + z2), 2.0f * (xy - wz), 2.0f * (xz + wy), 0.0f), Vec4(2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz - wx), 0.0f)
+        , Vec4(2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f),
+        Vec4(0.0f, 0.0f, 0.0f, 1.0f));
     return rot;
 }
 

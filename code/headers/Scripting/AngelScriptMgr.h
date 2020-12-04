@@ -28,7 +28,7 @@
 #define MOUSE_STATE_NAME "MouseState"
 
 #define FILE_STREAM_OBJ "File"
-#define KV_FILE_OBJ "KeyValFile"
+#define KV_FILE_OBJ "KeyValueFile"
 
 #define TRANSFORM_PROP_TYPE_NAME "Transform"
 #define LIGHTSOURCE_PROP_TYPE_NAME "LightSource"

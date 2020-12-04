@@ -315,23 +315,23 @@ class TransformProperty : public IGameObjectComponent {
 public:
     Mat4 transform_mat;
 
-    ZSVECTOR3 translation;
-    ZSVECTOR3 scale;
-    ZSVECTOR3 rotation;
+    Vec3 translation;
+    Vec3 scale;
+    Vec3 rotation;
 
-    ZSVECTOR3 abs_translation;
-    ZSVECTOR3 abs_scale;
-    ZSVECTOR3 abs_rotation;
+    Vec3 abs_translation;
+    Vec3 abs_scale;
+    Vec3 abs_rotation;
 
     void updateMatrix();
-    void getAbsoluteParentTransform(ZSVECTOR3& t, ZSVECTOR3& s, ZSVECTOR3& r);
+    void getAbsoluteParentTransform(Vec3& t, Vec3& s, Vec3& r);
     void copyTo(IGameObjectComponent* dest);
     void onPreRender(Renderer* pipeline);
     void getAbsoluteRotationMatrix(Mat4& m);
 
-    void setTranslation(const ZSVECTOR3& new_translation);
-    void setScale(const ZSVECTOR3& new_scale);
-    void setRotation(const ZSVECTOR3& new_rotation);
+    void setTranslation(const Vec3& new_translation);
+    void setScale(const Vec3& new_scale);
+    void setRotation(const Vec3& new_rotation);
     //Editor stuff
     void onValueChanged();
     void addPropertyInterfaceToInspector();

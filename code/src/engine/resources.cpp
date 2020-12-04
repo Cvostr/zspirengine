@@ -277,7 +277,7 @@ unsigned int Engine::ResourceManager::getResourcesSize(){
 Engine::Mesh* Engine::allocateMesh(unsigned int size){
     Engine::Mesh* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
+        case OGL: {
             result = new _ogl_Mesh[size];
             break;
         }
@@ -292,7 +292,7 @@ Engine::Mesh* Engine::allocateMesh(unsigned int size){
 Engine::Mesh* Engine::allocateMesh(){
     Engine::Mesh* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
+        case OGL: {
             result = new _ogl_Mesh;
             break;
         }

@@ -19,7 +19,7 @@ Engine::UniformBuffer::~UniformBuffer(){
 Engine::UniformBuffer* Engine::allocUniformBuffer(){
     Engine::UniformBuffer* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){
-        case OGL32 : {
+        case OGL: {
             result = new _ogl_UniformBuffer;
             break;
         }

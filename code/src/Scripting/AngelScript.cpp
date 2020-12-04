@@ -28,8 +28,8 @@ GlobVarHandle::GlobVarHandle(int typeID) : index(0),
 		value_ptr = malloc(size);
 		break;
 	case AG_VECTOR3:
-		size = sizeof(ZSVECTOR3);
-		value_ptr = new ZSVECTOR3;
+		size = sizeof(Vec3);
+		value_ptr = new Vec3;
 		break;
 	case AG_RGB_COLOR:
 		size = sizeof(ZSRGBCOLOR);
@@ -186,6 +186,23 @@ void AGScript::onTrigger(Engine::GameObject* obj) {
 	}
 }
 
+void AGScript::CallConstructor() {
+	int result = 0;
+	//Get pointer to class contructor
+	std::string construct_str = this->ClassName + " @" + this->ClassName + "(GameObject@)";
+	asIScriptFunction* factory = main_class->GetFactoryByDecl(construct_str.c_str());
+	//Allocate class by Constructor
+	{
+		engine->getAgScriptContext()->Prepare(factory);
+		if (obj != nullptr)
+			engine->getAgScriptContext()->SetArgObject(0, obj);
+		result = engine->getAgScriptContext()->Execute();
+	}
+	//Get returned created class
+	mainClass_obj = *(asIScriptObject**)engine->getAgScriptContext()->GetAddressOfReturnValue();
+	mainClass_obj->AddRef();
+}
+
 void AGScript::onTriggerEnter(Engine::GameObject* obj) {
 	if (hasErrors == true)
 		return;
@@ -244,19 +261,6 @@ void AGScript::obtainScriptMainClass() {
 	//Obtain class with interface ZPScript
 	main_class = getClassWithInterface("ZPScript");	
 	ClassName = main_class->GetName();
-	//Get pointer to class contructor
-	std::string construct_str = this->ClassName + " @" + this->ClassName + "(GameObject@)";
-	asIScriptFunction* factory = main_class->GetFactoryByDecl(construct_str.c_str());
-	//Allocate class by Constructor
-	{
-		engine->getAgScriptContext()->Prepare(factory);
-		if(obj != nullptr)
-			engine->getAgScriptContext()->SetArgObject(0, obj);
-		result = engine->getAgScriptContext()->Execute();
-	}
-	//Get returned created class
-	mainClass_obj = *(asIScriptObject**)engine->getAgScriptContext()->GetAddressOfReturnValue();
-	mainClass_obj->AddRef();
 }
 
 asITypeInfo* AGScript::getClassWithInterface(std::string class_name) {

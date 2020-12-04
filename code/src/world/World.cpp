@@ -162,9 +162,9 @@ Engine::GameObject* Engine::World::dublicateObject(GameObject* original, bool pa
 
     if(original->hasParent){ //if original has parent
         TransformProperty* transform = new_obj->getTransformProperty();
-        ZSVECTOR3 p_translation = ZSVECTOR3(0,0,0);
-        ZSVECTOR3 p_scale = ZSVECTOR3(1,1,1);
-        ZSVECTOR3 p_rotation = ZSVECTOR3(0,0,0);
+        Vec3 p_translation = Vec3(0,0,0);
+        Vec3 p_scale = Vec3(1,1,1);
+        Vec3 p_rotation = Vec3(0,0,0);
         original->mParent.ptr->getTransformProperty()->getAbsoluteParentTransform(p_translation, p_scale, p_rotation);
         transform->translation = transform->translation + p_translation;
         transform->scale = transform->scale * p_scale;

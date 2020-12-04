@@ -32,7 +32,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
         }
 
         unsigned int SDL_WIN_MODE = 0;
-        if (info->graphicsApi == OGL32){
+        if (info->graphicsApi == OGL){
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
             SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -64,7 +64,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
             game_data->vk_main->mVMA = new Engine::ZSVMA(game_data->vk_main->mInstance,
                                                          game_data->vk_main->mDevice);
         }
-        else if (info->graphicsApi == OGL32) {
+        else if (info->graphicsApi == OGL) {
             this->mGLContext = SDL_GL_CreateContext(mWindow);
             glViewport(0, 0, win->Width, win->Height);
 
@@ -144,14 +144,14 @@ void ZSpireEngine::loadGame(){
         case PERSP_2D:{ //2D project
 
             game_data->world->getCameraPtr()->setProjectionType(ZSCAMERA_PROJECTION_ORTHOGONAL);
-            game_data->world->getCameraPtr()->setPosition(ZSVECTOR3(0,0,0));
-            game_data->world->getCameraPtr()->setFront(ZSVECTOR3(0,0,1));
+            game_data->world->getCameraPtr()->setPosition(Vec3(0,0,0));
+            game_data->world->getCameraPtr()->setFront(Vec3(0,0,1));
             break;
         }
         case PERSP_3D:{ //3D project
             game_data->world->getCameraPtr()->setProjectionType(ZSCAMERA_PROJECTION_PERSPECTIVE);
-            game_data->world->getCameraPtr()->setPosition(ZSVECTOR3(0,0,0));
-            game_data->world->getCameraPtr()->setFront(ZSVECTOR3(0,0,1));
+            game_data->world->getCameraPtr()->setPosition(Vec3(0,0,0));
+            game_data->world->getCameraPtr()->setFront(Vec3(0,0,1));
             game_data->world->getCameraPtr()->setZplanes(1, 2000);
             break;
         }

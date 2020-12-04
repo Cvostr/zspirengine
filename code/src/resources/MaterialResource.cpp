@@ -1,8 +1,9 @@
 #include "../../headers/engine/Resources.hpp"
 
-Engine::MaterialResource::MaterialResource() {
+Engine::MaterialResource::MaterialResource():
+    material(nullptr)
+{
     this->resource_type = RESOURCE_TYPE_MATERIAL;
-    material = nullptr;
     loadInstantly = true;
 }
 

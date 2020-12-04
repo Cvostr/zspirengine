@@ -22,10 +22,10 @@
 #include "../render/Math.hpp"
 
 typedef struct PhysicalWorldSettings{
-    ZSVECTOR3 gravity;
+    Vec3 gravity;
 
     PhysicalWorldSettings(){
-        gravity = ZSVECTOR3(0, -10.0f, 0);
+        gravity = Vec3(0, -10.0f, 0);
     }
 }PhysicalWorldSettings;
 
@@ -47,7 +47,7 @@ public:
     void removeRidigbodyFromWorld(btRigidBody* body);
     void addCollisionObjToWorld(btCollisionObject* body);
     void removeCollisionObjFromWorld(btCollisionObject* body);
-    void rayTest(ZSVECTOR3 pos, ZSVECTOR3 dir, btCollisionWorld::RayResultCallback& callback);
+    void rayTest(Vec3 pos, Vec3 dir, btCollisionWorld::RayResultCallback& callback);
 
     PhysicalWorld(PhysicalWorldSettings* settings);
     ~PhysicalWorld();

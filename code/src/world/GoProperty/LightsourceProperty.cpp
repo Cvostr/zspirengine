@@ -29,7 +29,7 @@ void Engine::LightsourceProperty::onPreRender(Engine::Renderer* pipeline) {
 
     //check, if light transformation changed
     if ((this->last_pos != transform_prop->abs_translation || this->last_rot != transform_prop->rotation)) {
-        ZSVECTOR3* rot_vec_ptr = &transform_prop->rotation;
+        Vec3* rot_vec_ptr = &transform_prop->rotation;
         this->direction = _getDirection(rot_vec_ptr->X, rot_vec_ptr->Y, rot_vec_ptr->Z);
         //store new transform values
         this->last_pos = transform_prop->abs_translation;
