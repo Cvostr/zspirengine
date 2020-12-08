@@ -43,12 +43,13 @@ class ZPScriptProperty : public Engine::IGameObjectComponent {
 private:
     Engine::AGScript* script;
 public:
-    std::vector<GlobVarHandle*> vars;
+    std::vector<ClassFieldValue*> mVars;
     std::string script_path;
     ScriptResource* script_res;
     Engine::AGScript* getScript();
     
-    
+    void SetScript(ScriptResource* script);
+
     void onValueChanged();
     void addPropertyInterfaceToInspector();
     void SetupScript();
@@ -56,7 +57,7 @@ public:
     void onStop();
     void onUpdate(float deltaTime); //calls update in scripts
     void copyTo(Engine::IGameObjectComponent* dest);
-    bool makeGlobalVarsList();
+    bool makeFieldsList();
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);

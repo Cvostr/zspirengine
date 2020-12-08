@@ -6,112 +6,13 @@ using namespace Engine;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
 
-GlobVarHandle::GlobVarHandle(int typeID) : index(0),
-											name(""),
-											address(nullptr),
-											value_ptr(nullptr),
-											size(0)
-{
-	this->typeID = typeID;
-
-	switch (typeID) {
-	case asTYPEID_INT32:
-		size = sizeof(int);
-		value_ptr = malloc(size);
-		break;
-	case asTYPEID_FLOAT:
-		size = sizeof(float);
-		value_ptr = malloc(size);
-		break;
-	case asTYPEID_BOOL:
-		size = sizeof(bool);
-		value_ptr = malloc(size);
-		break;
-	case AG_VECTOR3:
-		size = sizeof(Vec3);
-		value_ptr = new Vec3;
-		break;
-	case AG_RGB_COLOR:
-		size = sizeof(ZSRGBCOLOR);
-		value_ptr = new ZSRGBCOLOR;
-		break;
-	case AG_STRING:
-		size = sizeof(std::string);
-		value_ptr = new std::string;
-		break;
-	}
-}
-
-GlobVarHandle::~GlobVarHandle() {
-	auto cl = value_ptr;
-	delete cl;
-}
-
-void GlobVarHandle::applyValue() {
-	copyValue(value_ptr, address);
-}
-void GlobVarHandle::updValue() {
-	copyValue(address, value_ptr);
-}
-
-void GlobVarHandle::copyValue(void* src, void* dest) {
-	switch (typeID) {
-	case AG_STRING: {
-#ifdef _DEBUG
-		std::string* src_Str = static_cast<std::string*>(src);
-		std::string* dest_Str = static_cast<std::string*>(dest);
-		*dest_Str = *src_Str;
-#else
-		memcpy(dest, src, size);
-#endif
-		break;
-	}
-	default:
-		memcpy(dest, src, size);
-		break;
-	}
-}
-
-bool AGScript::AddScriptFile(Engine::ScriptResource* res, CScriptBuilder& Builder) {
-	const char* script_str = res->script_content.c_str();
-	unsigned int scr_file_offset = 0;
-	int result = builder.AddSectionFromMemory(res->rel_path.c_str(), script_str, res->size);
-	std::string line;
-	//read first script line
-	readLine(line, script_str, scr_file_offset);
-	bool Result = true;
-	while (startsWith(line, "//use")) {
-		const char* dep_str_c = line.c_str() + 6;
-		std::string dep_str = std::string(dep_str_c);
-		dep_str.pop_back();
-		Engine::ScriptResource* DependencyRes = game_data->resources->getScriptByLabel(dep_str);
-		//include dependency
-		Result = AddScriptFile(DependencyRes, Builder);
-		readLine(line, script_str, scr_file_offset);
-	}
-	return Result;
-}
-
-bool AGScript::compileFromResource(Engine::ScriptResource* res) {
-	int result = 0;
-	//Add to compile file and its dependencies
-	AddScriptFile(res, builder);
-	//Build Script
-	result = builder.BuildModule();
-	if (result < 0) {
-		hasErrors = true;
-		res->hasError = true;
-		return false;
-	}
-	res->hasError = false;
-	return true;
+ZPSClassDesc* AGScript::getClassDesc() {
+	return game_data->script_manager->GetClassDesc(ClassName);
 }
 
 void AGScript::onStart() {
 
-	if (hasErrors == true)
-		return;
-
+	AGScriptMgr* engine = game_data->script_manager;
 	
 	//Obtain Start() function
 	asIScriptFunction* func = getFuncOnMainClass("void Start()");
@@ -121,12 +22,10 @@ void AGScript::onStart() {
 		engine->getAgScriptContext()->SetObject(mainClass_obj);
 		engine->getAgScriptContext()->Execute();
 	}
-
 }
 
 void AGScript::onStop() {
-	if (hasErrors == true)
-		return;
+	AGScriptMgr* engine = game_data->script_manager;
 
 	//Obtain Stop() function
 	asIScriptFunction* func = getFuncOnMainClass("void Stop()");
@@ -136,10 +35,6 @@ void AGScript::onStop() {
 		engine->getAgScriptContext()->SetObject(mainClass_obj);
 		engine->getAgScriptContext()->Execute();
 	}
-}
-
-bool AGScript::hasCompilerErrors() {
-	return hasErrors;
 }
 
 std::string AGScript::getClassName() {
@@ -158,9 +53,7 @@ asIScriptFunction* AGScript::getFuncOnMainClass(const char* decl) {
 }
 
 void AGScript::onUpdate() {
-	if (hasErrors == true)
-		return;
-
+	AGScriptMgr* engine = game_data->script_manager;
 	//Obtain Update() function
 	asIScriptFunction* func = getFuncOnMainClass("void Update()");
 	if (func != nullptr) {
@@ -172,9 +65,7 @@ void AGScript::onUpdate() {
 }
 
 void AGScript::onTrigger(Engine::GameObject* obj) {
-	if (hasErrors == true)
-		return;
-
+	AGScriptMgr* engine = game_data->script_manager;
 	//Obtain onTrigger() function
 	asIScriptFunction* func = getFuncOnMainClass("void onTrigger(GameObject@)");
 	if (func != nullptr) {
@@ -186,27 +77,8 @@ void AGScript::onTrigger(Engine::GameObject* obj) {
 	}
 }
 
-void AGScript::CallConstructor() {
-	int result = 0;
-	//Get pointer to class contructor
-	std::string construct_str = this->ClassName + " @" + this->ClassName + "(GameObject@)";
-	asIScriptFunction* factory = main_class->GetFactoryByDecl(construct_str.c_str());
-	//Allocate class by Constructor
-	{
-		engine->getAgScriptContext()->Prepare(factory);
-		if (obj != nullptr)
-			engine->getAgScriptContext()->SetArgObject(0, obj);
-		result = engine->getAgScriptContext()->Execute();
-	}
-	//Get returned created class
-	mainClass_obj = *(asIScriptObject**)engine->getAgScriptContext()->GetAddressOfReturnValue();
-	mainClass_obj->AddRef();
-}
-
 void AGScript::onTriggerEnter(Engine::GameObject* obj) {
-	if (hasErrors == true)
-		return;
-
+	AGScriptMgr* engine = game_data->script_manager;
 	//Obtain onTrigger() function
 	asIScriptFunction* func = getFuncOnMainClass("void onTriggerEnter(GameObject@)");
 	if (func != nullptr) {
@@ -218,8 +90,7 @@ void AGScript::onTriggerEnter(Engine::GameObject* obj) {
 	}
 }
 void AGScript::onTriggerExit(Engine::GameObject* obj) {
-	if (hasErrors == true)
-		return;
+	AGScriptMgr* engine = game_data->script_manager;
 
 	//Obtain onTrigger() function
 	asIScriptFunction* func = getFuncOnMainClass("void onTriggerExit(GameObject@)");
@@ -232,74 +103,24 @@ void AGScript::onTriggerExit(Engine::GameObject* obj) {
 	}
 }
 
-unsigned int AGScript::getGlobalVarsCount() {
-	return module->GetGlobalVarCount();
-}
-
 void* AGScript::getGlobalVariableAddr(unsigned int index) {
-	return module->GetAddressOfGlobalVar(index);
-}
-
-void AGScript::getGlobalVariable(unsigned int index, const char** name, const char** _namespace, int* typeID) {
-	unsigned int max = module->GetGlobalVarCount();
-	if (index > max - 1) 
-		return;
-	module->GetGlobalVar(index, name, _namespace, typeID);
-}
-
-void AGScript::obtainScriptModule() {
-	asIScriptModule* mod = engine->GetModule(ModuleName, asGM_ONLY_IF_EXISTS);
-	this->module = mod;
+	return this->mainClass_obj->GetAddressOfProperty(index);
 }
 
 void AGScript::obtainScriptMainClass() {
-	if (hasErrors == true)
-		return;
+	AGScriptMgr* engine = game_data->script_manager;
 
-	int result = 0;
-	obtainScriptModule();
-	//Obtain class with interface ZPScript
-	main_class = getClassWithInterface("ZPScript");	
-	ClassName = main_class->GetName();
+	engine->CreateClass(ClassName, obj, &mainClass_obj, &main_class);
 }
 
-asITypeInfo* AGScript::getClassWithInterface(std::string class_name) {
-	asITypeInfo* type = 0;
-	asIScriptModule* mod = engine->GetModule(ModuleName, asGM_ONLY_IF_EXISTS);
-	int tc = mod->GetObjectTypeCount();
-	for (int n = 0; n < tc; n++)
-	{
-		bool found = false;
-		type = mod->GetObjectTypeByIndex(n);
-		int ic = type->GetInterfaceCount();
-		for (int i = 0; i < ic; i++)
-		{
-			if (strcmp(type->GetInterface(i)->GetName(), class_name.c_str()) == 0)
-			{
-				return type;
-			}
-		}
-	}
-	return type;
-}
-
-AGScript::AGScript(AGScriptMgr* engine, Engine::GameObject* obj, std::string ClassName) {
-	this->ClassName = ClassName;
-	this->engine = engine;
-	this->obj = obj;
-	if (obj != nullptr)
-		ModuleName = ClassName + "_" + obj->str_id;
-	else
-		ModuleName = "startupModule";
-
-	builder.StartNewModule(engine->getAgScriptEngine(), ModuleName.c_str());
-	hasErrors = false;
-	//nullptr to pointers
-	module = nullptr;
-	mainClass_obj = nullptr;
-	main_class = nullptr;
+AGScript::AGScript(Engine::GameObject* obj, std::string ClassName) :
+	ClassName(ClassName),
+	obj(obj),
+	mainClass_obj(nullptr),
+	main_class(nullptr)
+{
+	
 }
 AGScript::~AGScript() {
-	if(module != nullptr)
-		module->Discard();
+
 }

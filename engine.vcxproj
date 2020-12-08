@@ -203,6 +203,7 @@
     <ClCompile Include="code\src\ui\Layouts\ILayout.cpp" />
     <ClCompile Include="code\src\ui\Layouts\LinearLayout.cpp" />
     <ClCompile Include="code\src\ui\UiManager.cpp" />
+    <ClCompile Include="code\src\ui\UiScripting.cpp" />
     <ClCompile Include="code\src\ui\View.cpp" />
     <ClCompile Include="code\src\ui\Widgets\Button.cpp" />
     <ClCompile Include="code\src\ui\Widgets\Widget.cpp" />

@@ -1,10 +1,12 @@
 #pragma once
 
 #include <angelscript/angelscript.h>
+#include <angelscript/scriptbuilder.h>
 #include "Types/StdString.hpp"
 #include "Types/ASFile.hpp"
 #include <angelscript/scripthandle.h>
 #include <string>
+#include "../engine/Resources.hpp"
 
 #define GAME_OBJECT_TYPE_NAME "GameObject"
 #define WORLD_TYPE_NAME "World"
@@ -42,17 +44,61 @@
 #define SHADOWCAST_PROP_TYPE_NAME "ShadowCaster"
 
 namespace Engine {
+    class GameObject;
+
+    struct ClassFieldDesc {
+        unsigned int index;
+        std::string name;
+        int typeID;
+        bool isPrivate;
+        bool isProtected;
+    };
+
+    class ZPSClassDesc {
+    public:
+        std::string Name;
+        asITypeInfo* Info;
+        unsigned int ClassFieldsNum;
+        std::vector<ClassFieldDesc> Fields;
+        asIScriptObject* __SampleObject;
+
+        ClassFieldDesc* GetSuitableDesc(std::string Name, int TypeID, unsigned int index);
+
+        ZPSClassDesc():
+            Name(""),
+            Info(nullptr),
+            ClassFieldsNum(0) {}
+        ~ZPSClassDesc() {
+            Fields.clear();
+            __SampleObject->Release();
+        }
+
+    };
+
     class AGScriptMgr {
     private:
-        asIScriptEngine* ag_engine;
-        asIScriptContext* ag_context;
-    public:
+        asIScriptEngine* mEngine;
+        asIScriptContext* mContext;
+        asIScriptModule* mModule; //Module of the script
+        CScriptBuilder mBuilder;
 
+        std::vector<ZPSClassDesc*> ZPSClassInfos;
+
+        void UpdateClassesNames();
+        void CreateModule();
+
+        bool CompileError;
+        bool ModuleCompiled;
+    public:
+        //Create angel script engine
         void create_Engine();
         void recreate_Engine();
 
+        bool HasCompilerErrors() { return CompileError; }
+
         asIScriptEngine* getAgScriptEngine();
         asIScriptContext* getAgScriptContext();
+        asIScriptModule* getAgScriptModule();
 
         int RegisterInterface(const char* name);
         int RegisterObjectType(const char* name, int byteSize, asDWORD flags);
@@ -69,13 +115,18 @@ namespace Engine {
         int RegisterEnum(const char* type);
         int RegisterEnumValue(const char* type, const char* name, int value);
 
-        asIScriptModule* GetModule(std::string module,
-            asEGMFlags 	flag = asGM_ONLY_IF_EXISTS
-        );
+        
+        bool AddScriptFiles();
+        bool AddScriptFile(Engine::ScriptResource* res);
+
+        bool CreateClass(std::string ClassName, Engine::GameObject* obj, asIScriptObject** ClassObj, asITypeInfo** ClassInfo);
+        ZPSClassDesc* GetClassDesc(std::string ClassName);
 
         AGScriptMgr();
         ~AGScriptMgr();
     };
+
+    void bindUiSDK(AGScriptMgr* mgr);
     void bindGameObjectSDK(AGScriptMgr* mgr);
     void bindWorldSDK(AGScriptMgr* mgr);
     void bindGameObjectPropertiesSDK(AGScriptMgr* mgr);

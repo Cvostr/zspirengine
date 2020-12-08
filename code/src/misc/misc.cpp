@@ -48,6 +48,17 @@ void RemoveExtension(std::string& str) {
     str.pop_back();
 }
 
+void GetFileName(std::string& str) {
+    std::string old = str;
+    str.clear();
+    int last_slash = old.size() - 1;
+    while (old[last_slash] != '/')
+        last_slash--;
+    for (int i = last_slash + 1; i < old.size(); i++) {
+        str.push_back(old[i]);
+    }
+}
+
 void skipSpaces(const char* data, unsigned int& offset) {
     while (data[offset] == ' ' || data[offset] == '\n') {
         offset++;

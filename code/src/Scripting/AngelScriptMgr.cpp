@@ -49,11 +49,15 @@ void printToConsole(asIScriptGeneric* gen)
 }
 
 asIScriptEngine* AGScriptMgr::getAgScriptEngine() {
-	return ag_engine;
+	return mEngine;
 }
 
 asIScriptContext* AGScriptMgr::getAgScriptContext() {
-	return ag_context;
+	return mContext;
+}
+
+asIScriptModule* AGScriptMgr::getAgScriptModule() {
+	return mModule;
 }
 
 void MessageCallback(const asSMessageInfo* msg, void* param)
@@ -84,12 +88,12 @@ void MessageCallback(const asSMessageInfo* msg, void* param)
 }
 
 void AGScriptMgr::create_Engine() {
-	ag_engine = asCreateScriptEngine();
+	mEngine = asCreateScriptEngine();
 
-	ag_engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
-	Engine::RegisterStdString(ag_engine);
-	RegisterScriptHandle(ag_engine);
-	RegisterScriptFile(ag_engine);
+	mEngine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
+	Engine::RegisterStdString(mEngine);
+	RegisterScriptHandle(mEngine);
+	RegisterScriptFile(mEngine);
 	//Add base script class
 	RegisterInterface("ZPScript");
 
@@ -100,6 +104,7 @@ void AGScriptMgr::create_Engine() {
 	bindResourceManagerSDK(this);
 	bindInputSDK(this);
 	bindFilesSDK(this);
+	bindUiSDK(this);
 	bindGameObjectPropertySDK<TransformProperty>(this, TRANSFORM_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<LightsourceProperty>(this, LIGHTSOURCE_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<AudioSourceProperty>(this, AUDSOURCE_PROP_TYPE_NAME);
@@ -121,47 +126,61 @@ void AGScriptMgr::create_Engine() {
 	}
 
 	//Create Context
-	ag_context = ag_engine->CreateContext();
+	mContext = mEngine->CreateContext();
+	CreateModule();
 }
+
+void AGScriptMgr::CreateModule() {
+	if (ModuleCompiled) {
+		mModule->Discard();
+	}
+	//Create module
+	mBuilder.StartNewModule(getAgScriptEngine(), "ZSPscriptCore");
+	mModule = getAgScriptEngine()->GetModule("ZSPscriptCore", asGM_ONLY_IF_EXISTS);
+}
+
 void AGScriptMgr::recreate_Engine() {
 	//close old engine
-	ag_context->Release();
-	ag_engine->ShutDownAndRelease();
+	mContext->Release();
+	mEngine->ShutDownAndRelease();
 	//Create new engine instance
 	create_Engine();
 }
 
-AGScriptMgr::AGScriptMgr() {
+AGScriptMgr::AGScriptMgr() :
+	CompileError(false),
+	ModuleCompiled(false)
+{
 	create_Engine();
 }
 
 AGScriptMgr::~AGScriptMgr() {
-	ag_context->Release();
-	ag_engine->ShutDownAndRelease();
+	mContext->Release();
+	mEngine->ShutDownAndRelease();
 }
 
 int AGScriptMgr::RegisterInterface(const char* name) {
-	return ag_engine->RegisterInterface(name);
+	return mEngine->RegisterInterface(name);
 }
 
 int AGScriptMgr::RegisterObjectType(const char* name, int byteSize, asDWORD flags) {
-	return ag_engine->RegisterObjectType(name, byteSize, flags);
+	return mEngine->RegisterObjectType(name, byteSize, flags);
 }
 
 int AGScriptMgr::RegisterObjectBehaviour(const char* obj, asEBehaviours behaviour, const char* declaration, const asSFuncPtr& funcPointer, asDWORD callConv, void* auxiliary, int compositeOffset, bool isCompositeIndirect) {
-	return ag_engine->RegisterObjectBehaviour(obj, behaviour, declaration, funcPointer, callConv, auxiliary, compositeOffset, isCompositeIndirect);
+	return mEngine->RegisterObjectBehaviour(obj, behaviour, declaration, funcPointer, callConv, auxiliary, compositeOffset, isCompositeIndirect);
 }
 
 int AGScriptMgr::RegisterObjectMethod(const char* obj, std::string declaration, const asSFuncPtr& funcPointer, asDWORD callConv, void* auxiliary, int compositeOffset, bool isCompositeIndirect) {
-	return ag_engine->RegisterObjectMethod(obj, declaration.c_str(), funcPointer, callConv, auxiliary, compositeOffset, isCompositeIndirect);
+	return mEngine->RegisterObjectMethod(obj, declaration.c_str(), funcPointer, callConv, auxiliary, compositeOffset, isCompositeIndirect);
 }
 
 int AGScriptMgr::RegisterGlobalProperty(std::string declaration, void* pointer) {
-	return ag_engine->RegisterGlobalProperty(declaration.c_str(), pointer);
+	return mEngine->RegisterGlobalProperty(declaration.c_str(), pointer);
 }
 
 int AGScriptMgr::RegisterObjectProperty(const char* obj, const char* declaration, int byteOffset, int compositeOffset, bool isCompositeIndirect ) {
-	return ag_engine->RegisterObjectProperty(obj, declaration, byteOffset, compositeOffset, isCompositeIndirect);
+	return mEngine->RegisterObjectProperty(obj, declaration, byteOffset, compositeOffset, isCompositeIndirect);
 }
 
 bool AGScriptMgr::RegisterGlobalFunction(std::string func_name,
@@ -169,18 +188,147 @@ bool AGScriptMgr::RegisterGlobalFunction(std::string func_name,
 	asDWORD 	callConv,
 	void* auxiliary) {
 
-	int result = ag_engine->RegisterGlobalFunction(func_name.c_str(), funcPointer, callConv, auxiliary);
+	int result = mEngine->RegisterGlobalFunction(func_name.c_str(), funcPointer, callConv, auxiliary);
 
 	return (result >= 0);
 }
 
 int AGScriptMgr::RegisterEnum(const char* type) {
-	return ag_engine->RegisterEnum(type);
+	return mEngine->RegisterEnum(type);
 }
 int AGScriptMgr::RegisterEnumValue(const char* type, const char* name, int value) {
-	return ag_engine->RegisterEnumValue(type, name, value);
+	return mEngine->RegisterEnumValue(type, name, value);
 }
 
-asIScriptModule* AGScriptMgr::GetModule(std::string module, asEGMFlags 	flag) {
-	return ag_engine->GetModule(module.c_str(), flag);
+bool AGScriptMgr::AddScriptFiles() {
+
+	CreateModule();
+
+	for (unsigned int i = 0; i < game_data->resources->getResourcesSize(); i++) {
+		ZsResource* res_ptr = game_data->resources->getResourceByIndex(i);
+		if (res_ptr->resource_type == RESOURCE_TYPE::RESOURCE_TYPE_SCRIPT) {
+			Engine::ScriptResource* script = static_cast<Engine::ScriptResource*>(res_ptr);
+			AddScriptFile(script);
+			script->ClassName = script->resource_label;
+			GetFileName(script->ClassName);
+		}
+	}
+
+	int result = mBuilder.BuildModule();
+
+	if (result < 0) {
+		CompileError = true;
+		game_data->out_manager->spawnRuntimeError(RuntimeErrorType::RE_TYPE_SCRIPT_ERROR);
+	}
+	else {
+		ModuleCompiled = true;
+	}
+
+	UpdateClassesNames();
+
+	return (result >= 0);
+}
+
+bool AGScriptMgr::AddScriptFile(Engine::ScriptResource* res) {
+	const char* script_str = res->script_content.c_str();
+	unsigned int scr_file_offset = 0;
+	int result = mBuilder.AddSectionFromMemory(res->resource_label.c_str(), script_str, res->size);
+	std::string line;
+	//read first script line
+	readLine(line, script_str, scr_file_offset);
+	bool Result = true;
+	while (startsWith(line, "//use")) {
+		const char* dep_str_c = line.c_str() + 6;
+		std::string dep_str = std::string(dep_str_c);
+		dep_str.pop_back();
+		Engine::ScriptResource* DependencyRes = game_data->resources->getScriptByLabel(dep_str);
+		//include dependency
+		Result = AddScriptFile(DependencyRes);
+		readLine(line, script_str, scr_file_offset);
+	}
+	return Result;
+}
+
+void AGScriptMgr::UpdateClassesNames() {
+	ZPSClassInfos.clear();
+
+	int tc = mModule->GetObjectTypeCount();
+	for (int n = 0; n < tc; n++)
+	{
+		bool found = false;
+		asITypeInfo* type = mModule->GetObjectTypeByIndex(n);
+		int ic = type->GetInterfaceCount();
+		for (int i = 0; i < ic; i++)
+		{
+			if (strcmp(type->GetInterface(i)->GetName(), "ZPScript") == 0)
+			{
+				ZPSClassDesc* desc = new ZPSClassDesc;
+				desc->Name = type->GetName();
+				desc->Info = type;
+				//Get class fields amount
+				desc->ClassFieldsNum = type->GetPropertyCount();
+				for (unsigned int field_i = 0; field_i < desc->ClassFieldsNum; field_i++) {
+					ClassFieldDesc cf_desc;
+					const char* _Name;
+					type->GetProperty(field_i, &_Name, &cf_desc.typeID, &cf_desc.isPrivate, &cf_desc.isProtected);
+					cf_desc.name = std::string(_Name);
+					cf_desc.index = field_i;
+					desc->Fields.push_back(cf_desc);
+				}
+
+				ZPSClassInfos.push_back(desc);
+			}
+		}
+	}
+	for (unsigned int i = 0; i < ZPSClassInfos.size(); i ++) {
+		asITypeInfo* __ClassInfo;
+		CreateClass(ZPSClassInfos[i]->Name, new GameObject, &ZPSClassInfos[i]->__SampleObject, &__ClassInfo);
+	}
+}
+
+bool AGScriptMgr::CreateClass(std::string ClassName, Engine::GameObject* obj, asIScriptObject** ClassObj, asITypeInfo** ClassInfo) {
+	int result = 0;
+
+	for (unsigned int i = 0; i < ZPSClassInfos.size(); i++) {
+		asITypeInfo* info = ZPSClassInfos[i]->Info;
+		if (strcmp(info->GetName(), ClassName.c_str()) == 0)
+			*ClassInfo = info;
+	}
+
+	std::string construct_str = ClassName + " @" + ClassName + "(GameObject@)";
+	asIScriptFunction* factory = (*ClassInfo)->GetFactoryByDecl(construct_str.c_str());
+	//Allocate class by Constructor
+	{
+		mContext->Prepare(factory);
+		if (obj != nullptr)
+			mContext->SetArgObject(0, obj);
+		result = mContext->Execute();
+	}
+	//Get returned created class
+	*ClassObj = *(asIScriptObject**)mContext->GetAddressOfReturnValue();
+	(*ClassObj)->AddRef();
+
+	return true;
+}
+
+ZPSClassDesc* AGScriptMgr::GetClassDesc(std::string ClassName) {
+	for (unsigned int i = 0; i < ZPSClassInfos.size(); i++) {
+		asITypeInfo* info = ZPSClassInfos[i]->Info;
+		if (strcmp(info->GetName(), ClassName.c_str()) == 0)
+			return ZPSClassInfos[i];
+	}
+	return nullptr;
+}
+
+ClassFieldDesc* ZPSClassDesc::GetSuitableDesc(std::string Name, int TypeID, unsigned int index) {
+	for (unsigned int i = 0; i < this->Fields.size(); i++) {
+		ClassFieldDesc* desc = &Fields[i];
+
+		if (desc->index == index && desc->typeID == TypeID && desc->name.compare(Name) == 0)
+			return desc;
+
+		if (desc->name.compare(Name) == 0)
+			return desc;
+	}
+	return nullptr;
 }

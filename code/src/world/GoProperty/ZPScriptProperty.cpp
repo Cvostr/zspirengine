@@ -2,9 +2,11 @@
 
 extern ZSGAME_DATA* game_data;
 
-Engine::ZPScriptProperty::ZPScriptProperty() : script(nullptr) {
+Engine::ZPScriptProperty::ZPScriptProperty() : 
+	script(nullptr),
+	script_res(nullptr)
+{
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT;
-    script_res = nullptr;
 }
 
 Engine::ZPScriptProperty::~ZPScriptProperty() {
@@ -16,33 +18,29 @@ Engine::AGScript* Engine::ZPScriptProperty::getScript() {
 }
 
 void Engine::ZPScriptProperty::SetupScript() {
+	script_res = game_data->resources->getScriptByLabel(script_path);
+	//if resource isn't found, then exit function
+	if (script_res == nullptr)
+		return;
+	if (this->script != nullptr)
+		delete this->script;
+	//Allocate script with that resource
+	script = new AGScript(go_link.updLinkPtr(), script_res->ClassName);
+	script->obtainScriptMainClass();
 	if (script_res != nullptr) {
-		script = new AGScript(game_data->script_manager, go_link.updLinkPtr(), script_res->resource_label);
-		script->compileFromResource(this->script_res);
-		script->obtainScriptModule();
-		//if script contains errors, then stop further activity 
-		if (script->hasCompilerErrors())
-			return;
-
 		//Write global variables
-		if (vars.size() > 0) {
+		if (mVars.size() > 0) {
 			//Send all global data to script
-			for (unsigned int v_i = 0; v_i < vars.size(); v_i++) {
-				vars[v_i]->address = script->getGlobalVariableAddr(v_i);
-				vars[v_i]->applyValue();
+			for (unsigned int v_i = 0; v_i < mVars.size(); v_i++) {
+				mVars[v_i]->inscriptValue = script->getGlobalVariableAddr(mVars[v_i]->Desc->index);
+				mVars[v_i]->applyValue();
 			}
 		}
-			//fill pointer with main class
-		script->obtainScriptMainClass();
-		script->CallConstructor();
 	}
 }
 
 void Engine::ZPScriptProperty::onStart() {
     if (script_res != nullptr) {
-
-		if (script->hasCompilerErrors())
-			return;
         script->onStart(); 
     }
 }
@@ -53,38 +51,48 @@ void Engine::ZPScriptProperty::onUpdate(float deltaTime) {
     }
 }
 
-bool Engine::ZPScriptProperty::makeGlobalVarsList() {
-	if (script == nullptr) 
-		return false;
-	//Clear vars list
-	vars.clear();
-	if (!script->compileFromResource(this->script_res)) {
-		game_data->out_manager->spawnRuntimeError(RuntimeErrorType::RE_TYPE_SCRIPT_ERROR);
-		return false;
+bool Engine::ZPScriptProperty::makeFieldsList() {
+	
+	ZPSClassDesc* Desc = this->script->getClassDesc();
+	//Clear old fields array
+	mVars.clear();
+	for (unsigned int field_i = 0; field_i < Desc->ClassFieldsNum; field_i++) {
+		ClassFieldDesc* CFDesc = &Desc->Fields[field_i];
+		ClassFieldValue* new_CFV = new ClassFieldValue;
+		new_CFV->Desc = CFDesc;
+		void* v = Desc->__SampleObject->GetAddressOfProperty(field_i);
+		bool TypeCreated = false;
+		switch (CFDesc->typeID) {
+		case asTYPEID_INT32:
+			new_CFV->InitValue(*((int*)v));
+			TypeCreated = true;
+			break;
+		case asTYPEID_FLOAT:
+			new_CFV->InitValue(*((float*)v));
+			TypeCreated = true;
+			break;
+		case asTYPEID_BOOL:
+			new_CFV->InitValue(*((bool*)v));
+			TypeCreated = true;
+			break;
+		case AG_VECTOR3:
+			new_CFV->InitValue(*((Vec3*)v));
+			TypeCreated = true;
+			break;
+		case AG_RGB_COLOR:
+			new_CFV->InitValue(*((ZSRGBCOLOR*)v));
+			TypeCreated = true;
+			break;
+		case AG_STRING:
+			new_CFV->InitValue(*((std::string*)v));
+			TypeCreated = true;
+			break;
+		}
+		if (TypeCreated && !CFDesc->isPrivate) {
+			mVars.push_back(new_CFV);
+		}
 	}
-	script->obtainScriptModule();
-	unsigned int gVarsNum = script->getGlobalVarsCount();
-	//iterate over all variables
-	for (unsigned int gV_i = 0; gV_i < gVarsNum; gV_i++) {
-		//define property variables
-		const char* gVar_name;
-		const char* gVar_namespace;
-		int typeID = 0;
-		//get variable properties
-		script->getGlobalVariable(gV_i, &gVar_name, &gVar_namespace, &typeID);
 
-		GlobVarHandle* handle = new GlobVarHandle(typeID);
-		//assign variable props
-		handle->index = gV_i;
-		handle->name = std::string(gVar_name);
-		handle->_namespace = std::string(gVar_namespace);
-		handle->address = script->getGlobalVariableAddr(gV_i);
-		//Write base value
-		handle->updValue();
-		//push property handle
-		this->vars.push_back(handle);
-	}
-	delete script;
 	return true;
 }
 
@@ -99,17 +107,14 @@ void Engine::ZPScriptProperty::copyTo(Engine::IGameObjectComponent* dest) {
 	ZPScriptProperty* _dest = static_cast<ZPScriptProperty*>(dest);
 	//write path to script
 	_dest->script_path = this->script_path;
-	_dest->script_res = game_data->resources->getScriptByLabel(script_path);
+	_dest->SetScript(game_data->resources->getScriptByLabel(script_path));
 	//copy global variable handlers
-	for (unsigned int v_i = 0; v_i < vars.size(); v_i++) {
-		GlobVarHandle* old_handle = vars[v_i];
-		GlobVarHandle* new_handle = new GlobVarHandle(old_handle->typeID);
+	for (unsigned int v_i = 0; v_i < mVars.size(); v_i++) {
+		ClassFieldValue* old_handle = mVars[v_i];
+		ClassFieldValue* new_handle = _dest->mVars[v_i];
 
-		new_handle->index = old_handle->index;
-		new_handle->name = old_handle->name;
-		new_handle->_namespace = old_handle->_namespace;
-		memcpy(new_handle->value_ptr, old_handle->value_ptr, old_handle->size);
-		_dest->vars.push_back(new_handle);
+		new_handle->Desc = old_handle->Desc;
+		memcpy(new_handle->TempValue, old_handle->TempValue, old_handle->FieldSize);
 	}
 }
 
@@ -123,28 +128,21 @@ void Engine::ZPScriptProperty::onTriggerExit(Engine::GameObject* obj) {
 	script->onTriggerExit(obj);
 }
 
+void Engine::ZPScriptProperty::SetScript(ScriptResource* script) {
+	script_res = script;
+	if (this->script != nullptr)
+		delete this->script;
+	this->script = new AGScript(go_link.updLinkPtr(), script_res->ClassName);
+	makeFieldsList();
+}
+
 void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
 	unsigned int offset = 1;
 	unsigned int vars = 0;
 
 	readString(script_path, data, offset);
-	bool _hasErrors;
 	//get ScriptResource pointer
-	{
-		script_res = game_data->resources->getScriptByLabel(script_path);
-		//if resource isn't found, then exit function
-		if (script_res == nullptr)
-			return;
-		//Allocate script with that resource
-		script = new AGScript(game_data->script_manager, nullptr, script_res->rel_path);
-		//Create list with global variables
-		_hasErrors = !makeGlobalVarsList();
-		script_res->hasError = _hasErrors;
-	}
-
-	if (_hasErrors)
-		return;
-
+	SetScript(game_data->resources->getScriptByLabel(script_path));
 	//get count of variables
 	readBinaryValue(&vars, data + offset, offset);
 	//read all variables data
@@ -153,33 +151,33 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 		unsigned int index = v_i;
 		//read index
 		readBinaryValue(&index, data + offset, offset);
-		index = v_i;
 		//read ID of type
 		readBinaryValue(&typeID, data + offset, offset);
+		//read field name
+		std::string FieldName;
+		readString(FieldName, data, offset);
 
-		Engine::GlobVarHandle* var = this->vars[index];
-		var->index = index;
+		Engine::ClassFieldValue* var = this->mVars[v_i];
+		Engine::ClassFieldDesc* SuitableDesc = script->getClassDesc()->GetSuitableDesc(FieldName, typeID, index);
+		
+		if (SuitableDesc == nullptr)
+			continue;
+
+		var->Desc = SuitableDesc;
+		
 		if (typeID != AG_STRING) {
 			//if value is non-std string
-			memcpy(var->value_ptr, data + offset, var->size);
-			offset += var->size;
+			memcpy(var->TempValue, data + offset, var->FieldSize);
+			offset += var->FieldSize;
 		}
 		else {
 			//value is string
 			//then load its symbols
-			std::string* str = static_cast<std::string*>(var->value_ptr);
+			std::string* str = static_cast<std::string*>(var->TempValue);
 			//clear old string
 			str->clear();
 			//Obtain size of string
-			unsigned int str_size = 0;
-			{
-				readBinaryValue(&str_size, data + offset, offset);
-			}
-			//Read and append string symbols
-			for (unsigned int i = 0; i < str_size; i++) {
-				str->push_back(*(data + offset));	
-				offset += 1;
-			}
+			readString(*str, data, offset);
 		}
 	}
 }
@@ -191,22 +189,22 @@ void Engine::ZPScriptProperty::savePropertyToStream(ZsStream* stream, GameObject
 	*stream << " ";
 	//Write script
 	stream->writeString(script_path);
-	unsigned int varsNum = static_cast<unsigned int>(vars.size());
+	unsigned int varsNum = static_cast<unsigned int>(mVars.size());
 	stream->writeBinaryValue(&varsNum);
 
-	for (unsigned int v_i = 0; v_i < vars.size(); v_i++) {
-		Engine::GlobVarHandle* var = vars[v_i];
+	for (unsigned int v_i = 0; v_i < mVars.size(); v_i++) {
+		Engine::ClassFieldValue* var = mVars[v_i];
 
-		stream->writeBinaryValue(&var->index);
-		stream->writeBinaryValue(&var->typeID);
-		if (var->typeID != AG_STRING)
-			stream->write(reinterpret_cast<char*>(var->value_ptr), var->size);
+		stream->writeBinaryValue(&var->Desc->index);
+		stream->writeBinaryValue(&var->Desc->typeID);
+		stream->writeString(var->Desc->name);
+		if (var->Desc->typeID != AG_STRING)
+			stream->write(reinterpret_cast<char*>(var->TempValue), var->FieldSize);
 		else {
-			std::string* str = static_cast<std::string*>(var->value_ptr);
+			std::string* str = static_cast<std::string*>(var->TempValue);
 			const char* ch = str->c_str();
 			unsigned int str_size = static_cast<unsigned int>(str->size());
-			stream->writeBinaryValue(&str_size);
-			stream->write(ch, str_size);
+			stream->writeString(*str);
 		}
 	}
 }

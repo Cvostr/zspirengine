@@ -24,6 +24,7 @@ void Engine::ScriptResource::load() {
             this->script_content.push_back(static_cast<char>(request->data[i]));
         }
 
+        this->size = request->size;
         delete[] request->data;
         delete this->request;
     }

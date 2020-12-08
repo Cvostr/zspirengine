@@ -17,63 +17,67 @@
 
 namespace Engine{
 
-    class GlobVarHandle {
-    protected:
+    class ClassFieldValue {
     public:
-        unsigned int index;
-        std::string name;
-        std::string _namespace;
-        void* address;
-        void* value_ptr;
-        int typeID;
-        unsigned int size;
+        void* inscriptValue;
+        void* TempValue;
 
-        void applyValue();
-        void updValue();
-        void copyValue(void* src, void* dest);
-
+        ClassFieldDesc* Desc;
+        uint32_t FieldSize;
         template <typename T>
-        T* getValue() {
-            return static_cast<T*>(value_ptr);
+        T& Value() {
+            return *(static_cast<T*>(TempValue));
+        }
+        
+        template <typename T>
+        void InitValue(T value) {
+            TempValue = new T;
+            FieldSize = sizeof(T);
+            copyValue(&value, TempValue);
+        }
+        //Put temp value into script value
+        void applyValue() {
+            copyValue(TempValue, inscriptValue);
+        }
+        void updateValue() {
+            copyValue(inscriptValue, TempValue);
         }
 
-        GlobVarHandle(int typeID);
-        ~GlobVarHandle();
+        void copyValue(void* src, void* dest) {
+            switch (Desc->typeID) {
+            case AG_STRING: {
+                std::string* src_Str = static_cast<std::string*>(src);
+                std::string* dest_Str = static_cast<std::string*>(dest);
+                *dest_Str = *src_Str;
+
+                break;
+            }
+            default:
+                memcpy(dest, src, FieldSize);
+                break;
+            }
+        }
+
     };
 
     class AGScript{
     private:
-        
-        AGScriptMgr* engine;
+       
         Engine::GameObject* obj;
         std::string ClassName;
-        std::string ModuleName;
-        CScriptBuilder builder;
-
-
-        asITypeInfo* getClassWithInterface(std::string class_name);
         
-        asIScriptModule* module; //Module of the script
         asIScriptObject* mainClass_obj; //Object of main script class
         asITypeInfo* main_class; //Type of main script class
-        bool hasErrors;
     public:
-        void obtainScriptModule();
         void obtainScriptMainClass();
         asIScriptFunction* getFuncOnMainClass(const char* decl);
         asITypeInfo* getMainClassType();
         asIScriptObject* getMainClassPtr();
         std::string getClassName();
-        unsigned int getGlobalVarsCount();
-        void* getGlobalVariableAddr(unsigned int index);
-        void getGlobalVariable(unsigned int index, const char** name, const char** _namespace, int* typeID);
-        
-        bool AddScriptFile(Engine::ScriptResource* res, CScriptBuilder& Builder);
-        bool compileFromResource(Engine::ScriptResource* res);
-        
-        bool hasCompilerErrors();
 
-        void CallConstructor();
+        ZPSClassDesc* getClassDesc();
+        void* getGlobalVariableAddr(unsigned int index);
+      
         void onStart();
         void onStop();
         void onUpdate();
@@ -81,7 +85,7 @@ namespace Engine{
         void onTriggerEnter(Engine::GameObject* obj);
         void onTriggerExit(Engine::GameObject* obj);
 
-        AGScript(AGScriptMgr* engine, Engine::GameObject* obj, std::string ClassName);
+        AGScript(Engine::GameObject* obj, std::string ClassName);
         ~AGScript();
     };
 
