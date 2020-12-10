@@ -161,7 +161,8 @@ void ZSpireEngine::loadGame(){
     Engine::Loader::setBlobRootDirectory(this->desc->blob_root_path);
     //Load all resources
     game_data->resources->loadResourcesTable(this->desc->resource_map_file_path);
-
+    //Compile script
+    game_data->script_manager->AddScriptFiles();
 
     Engine::ZsResource* world_resource = game_data->resources->getResource<Engine::ZsResource>(desc->startup_scene);
     //check, if World resource found

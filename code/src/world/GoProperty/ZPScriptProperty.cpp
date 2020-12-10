@@ -1,4 +1,5 @@
 #include "../../../headers/world/go_properties.h"
+#include "../../../headers/misc/misc.h"
 
 extern ZSGAME_DATA* game_data;
 
@@ -18,12 +19,12 @@ Engine::AGScript* Engine::ZPScriptProperty::getScript() {
 }
 
 void Engine::ZPScriptProperty::SetupScript() {
+	if (this->script != nullptr)
+		delete this->script;
 	script_res = game_data->resources->getScriptByLabel(script_path);
 	//if resource isn't found, then exit function
 	if (script_res == nullptr)
 		return;
-	if (this->script != nullptr)
-		delete this->script;
 	//Allocate script with that resource
 	script = new AGScript(go_link.updLinkPtr(), script_res->ClassName);
 	script->obtainScriptMainClass();
@@ -61,31 +62,28 @@ bool Engine::ZPScriptProperty::makeFieldsList() {
 		ClassFieldValue* new_CFV = new ClassFieldValue;
 		new_CFV->Desc = CFDesc;
 		void* v = Desc->__SampleObject->GetAddressOfProperty(field_i);
-		bool TypeCreated = false;
+		bool TypeCreated = true;
 		switch (CFDesc->typeID) {
 		case asTYPEID_INT32:
 			new_CFV->InitValue(*((int*)v));
-			TypeCreated = true;
 			break;
 		case asTYPEID_FLOAT:
 			new_CFV->InitValue(*((float*)v));
-			TypeCreated = true;
 			break;
 		case asTYPEID_BOOL:
 			new_CFV->InitValue(*((bool*)v));
-			TypeCreated = true;
 			break;
 		case AG_VECTOR3:
 			new_CFV->InitValue(*((Vec3*)v));
-			TypeCreated = true;
 			break;
 		case AG_RGB_COLOR:
 			new_CFV->InitValue(*((ZSRGBCOLOR*)v));
-			TypeCreated = true;
 			break;
 		case AG_STRING:
 			new_CFV->InitValue(*((std::string*)v));
-			TypeCreated = true;
+			break;
+		default:
+			TypeCreated = false;
 			break;
 		}
 		if (TypeCreated && !CFDesc->isPrivate) {
@@ -128,6 +126,48 @@ void Engine::ZPScriptProperty::onTriggerExit(Engine::GameObject* obj) {
 	script->onTriggerExit(obj);
 }
 
+Engine::ClassFieldValue* Engine::ZPScriptProperty::GetSuitableField(std::string Name, int TypeID, unsigned int index) {
+	for (unsigned int i = 0; i < this->mVars.size(); i++) {
+		ClassFieldValue* field = mVars[i];
+
+		if (field->Desc->index == index && field->Desc->typeID == TypeID && field->Desc->name.compare(Name) == 0)
+			return field;
+		if (field->Desc->typeID == TypeID && field->Desc->name.compare(Name) == 0)
+			return field;
+	}
+	return nullptr;
+}
+
+void Engine::ZPScriptProperty::OnScriptChanges() {
+	//Store old fields
+	tCFVList tempVars = mVars;
+	//Get new fields arrays
+	SetScript(script_res);
+
+	Engine::ZPSClassDesc* class_desc = script->getClassDesc();
+	for (unsigned int field_i = 0; field_i < class_desc->ClassFieldsNum; field_i++) {
+		ClassFieldDesc* Desc = &class_desc->Fields[field_i];
+
+		Engine::ClassFieldValue* oldVar = nullptr;
+		Engine::ClassFieldValue* newVar = nullptr;
+		//Try to find old and new field pointer
+		for (unsigned int tmpv_i = 0; tmpv_i < tempVars.size(); tmpv_i++) {
+			Engine::ClassFieldValue* field = tempVars[tmpv_i];
+			if (field->Desc->typeID == Desc->typeID && field->Desc->name.compare(Desc->name) == 0)
+				oldVar = field;
+		}
+		for (unsigned int newv_i = 0; newv_i < this->mVars.size(); newv_i++) {
+			Engine::ClassFieldValue* field = mVars[newv_i];
+			if (field->Desc->typeID == Desc->typeID && field->Desc->name.compare(Desc->name) == 0)
+				newVar = field;
+		}
+		if(newVar != nullptr && oldVar != nullptr)
+			oldVar->copyValue(oldVar->TempValue, newVar->TempValue);
+		//if (oldVar != nullptr)
+		//	delete oldVar;
+	}
+}
+
 void Engine::ZPScriptProperty::SetScript(ScriptResource* script) {
 	script_res = script;
 	if (this->script != nullptr)
@@ -157,13 +197,13 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 		std::string FieldName;
 		readString(FieldName, data, offset);
 
-		Engine::ClassFieldValue* var = this->mVars[v_i];
 		Engine::ClassFieldDesc* SuitableDesc = script->getClassDesc()->GetSuitableDesc(FieldName, typeID, index);
-		
-		if (SuitableDesc == nullptr)
-			continue;
+		Engine::ClassFieldValue* var = GetSuitableField(FieldName, typeID, index);
 
-		var->Desc = SuitableDesc;
+		if (var == nullptr && SuitableDesc == nullptr)
+			continue;
+		else
+			var->Desc = SuitableDesc; //Bind existing desc
 		
 		if (typeID != AG_STRING) {
 			//if value is non-std string

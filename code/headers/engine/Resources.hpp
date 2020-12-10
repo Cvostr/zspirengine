@@ -142,7 +142,6 @@ public:
 
 class ScriptResource : public ZsResource{
 public:
-    bool hasError;
     std::string script_content;
     std::string ClassName;
 

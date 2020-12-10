@@ -3,8 +3,7 @@
 
 extern ZSGAME_DATA* game_data;
 
-Engine::ScriptResource::ScriptResource() :
-    hasError(false)
+Engine::ScriptResource::ScriptResource()
 {
     this->resource_type = RESOURCE_TYPE_SCRIPT;
     loadInstantly = true;

@@ -52,6 +52,11 @@ namespace Engine {
         int typeID;
         bool isPrivate;
         bool isProtected;
+
+        ClassFieldDesc():
+            index(0)
+        {
+        }
     };
 
     class ZPSClassDesc {

@@ -43,7 +43,7 @@ class ZPScriptProperty : public Engine::IGameObjectComponent {
 private:
     Engine::AGScript* script;
 public:
-    std::vector<ClassFieldValue*> mVars;
+    tCFVList mVars;
     std::string script_path;
     ScriptResource* script_res;
     Engine::AGScript* getScript();
@@ -58,6 +58,8 @@ public:
     void onUpdate(float deltaTime); //calls update in scripts
     void copyTo(Engine::IGameObjectComponent* dest);
     bool makeFieldsList();
+    void OnScriptChanges();
+    ClassFieldValue* GetSuitableField(std::string Name, int TypeID, unsigned int index);
 
     void loadPropertyFromMemory(const char* data, GameObject* obj);
     void savePropertyToStream(ZsStream* stream, GameObject* obj);

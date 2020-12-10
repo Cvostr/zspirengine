@@ -326,8 +326,7 @@ ClassFieldDesc* ZPSClassDesc::GetSuitableDesc(std::string Name, int TypeID, unsi
 
 		if (desc->index == index && desc->typeID == TypeID && desc->name.compare(Name) == 0)
 			return desc;
-
-		if (desc->name.compare(Name) == 0)
+		if (desc->typeID == TypeID && desc->name.compare(Name) == 0)
 			return desc;
 	}
 	return nullptr;

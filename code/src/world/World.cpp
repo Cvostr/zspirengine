@@ -372,6 +372,19 @@ void Engine::World::call_onStop() {
     }
 }
 
+void Engine::World::call_onScriptChanged() {
+    size_t objs_num = objects.size();
+    for (size_t obj_it = 0; obj_it < objs_num; obj_it++) {
+        Engine::GameObject* obj = objects[obj_it];
+        unsigned int scripts_num = obj->scripts_num;
+        for (unsigned int s_i = 0; s_i < scripts_num; s_i++) {
+            ZPScriptProperty* script_prop = obj->mScripts[s_i];
+            script_prop->OnScriptChanges();
+        }
+
+    }
+}
+
 bool Engine::World::isObjectLabelUnique(const std::string& label) {
     size_t objs_num = objects.size();
     int ret_amount = 0;

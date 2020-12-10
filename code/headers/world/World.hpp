@@ -146,6 +146,7 @@ public:
 
     void call_onStart();
     void call_onStop();
+    void call_onScriptChanged();
 
     Engine::Camera* getCameraPtr();
     Engine::Camera world_camera;

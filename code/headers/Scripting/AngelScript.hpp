@@ -24,6 +24,11 @@ namespace Engine{
 
         ClassFieldDesc* Desc;
         uint32_t FieldSize;
+
+        ClassFieldValue() {
+            delete TempValue;
+        }
+
         template <typename T>
         T& Value() {
             return *(static_cast<T*>(TempValue));
@@ -59,6 +64,8 @@ namespace Engine{
         }
 
     };
+
+    typedef std::vector<ClassFieldValue*> tCFVList;
 
     class AGScript{
     private:
