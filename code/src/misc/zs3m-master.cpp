@@ -50,7 +50,7 @@ void ZS3M::SceneFileExport::write(std::string output_file){
         for (unsigned int v_i = 0; v_i < static_cast<unsigned int>(mesh_ptr->mVerticesNum); v_i ++) {
             ZSVERTEX* v_ptr = &mesh_ptr->vertices_arr[v_i];
             //Write vertex vectors
-            stream.write(reinterpret_cast<char*>(&v_ptr->pos), sizeof(float) * 3);
+            stream.writeVec3(v_ptr->pos);
             stream.write(reinterpret_cast<char*>(&v_ptr->uv), sizeof(float) * 2);
             stream.write(reinterpret_cast<char*>(&v_ptr->normal), sizeof(float) * 3);
             stream.write(reinterpret_cast<char*>(&v_ptr->tangent), sizeof(float) * 3);

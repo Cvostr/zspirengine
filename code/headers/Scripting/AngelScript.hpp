@@ -22,7 +22,7 @@ namespace Engine{
         void* inscriptValue;
         void* TempValue;
 
-        ClassFieldDesc* Desc;
+        ClassFieldDesc Desc;
         uint32_t FieldSize;
 
         ClassFieldValue() {
@@ -49,7 +49,7 @@ namespace Engine{
         }
 
         void copyValue(void* src, void* dest) {
-            switch (Desc->typeID) {
+            switch (Desc.typeID) {
             case AG_STRING: {
                 std::string* src_Str = static_cast<std::string*>(src);
                 std::string* dest_Str = static_cast<std::string*>(dest);

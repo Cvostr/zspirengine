@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <cstring>
+#include "../math/Vec3.hpp"
 
 void genRandomString(std::string* result, unsigned int len);
 void readString(std::string& str, const char* data, unsigned int& offset);
@@ -14,6 +15,8 @@ void readBinaryValue(T* out, const char* data, unsigned int& offset) {
 	offset += sizeof(T);
 }
 
+void ProcessFileName(std::string& str);
+
 bool startsWith(std::string& s, std::string m);
 
 void RemoveExtension(std::string& str);
@@ -24,6 +27,10 @@ public:
 	template <typename T>
 	void writeBinaryValue(T* v) {
 		write(reinterpret_cast<const char*>(v), sizeof(T));
+	}
+
+	void writeVec3(Vec3& vec) {
+		write(reinterpret_cast<char*>(&vec), sizeof(float) * 3);
 	}
 
 	void writeString(std::string str);

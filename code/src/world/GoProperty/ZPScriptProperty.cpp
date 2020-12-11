@@ -33,7 +33,7 @@ void Engine::ZPScriptProperty::SetupScript() {
 		if (mVars.size() > 0) {
 			//Send all global data to script
 			for (unsigned int v_i = 0; v_i < mVars.size(); v_i++) {
-				mVars[v_i]->inscriptValue = script->getGlobalVariableAddr(mVars[v_i]->Desc->index);
+				mVars[v_i]->inscriptValue = script->getGlobalVariableAddr(mVars[v_i]->Desc.index);
 				mVars[v_i]->applyValue();
 			}
 		}
@@ -49,6 +49,14 @@ void Engine::ZPScriptProperty::onStart() {
 void Engine::ZPScriptProperty::onUpdate(float deltaTime) {
     if (script_res != nullptr) {
         script->onUpdate();
+		if (game_data->isEditor) {
+			//if we are in editor
+			//then update value in inspector
+			for (unsigned int v_i = 0; v_i < mVars.size(); v_i++) {
+				ClassFieldValue* field = mVars[v_i];
+				field->updateValue();
+			}
+		}
     }
 }
 
@@ -60,7 +68,7 @@ bool Engine::ZPScriptProperty::makeFieldsList() {
 	for (unsigned int field_i = 0; field_i < Desc->ClassFieldsNum; field_i++) {
 		ClassFieldDesc* CFDesc = &Desc->Fields[field_i];
 		ClassFieldValue* new_CFV = new ClassFieldValue;
-		new_CFV->Desc = CFDesc;
+		new_CFV->Desc = *CFDesc;
 		void* v = Desc->__SampleObject->GetAddressOfProperty(field_i);
 		bool TypeCreated = true;
 		switch (CFDesc->typeID) {
@@ -130,15 +138,17 @@ Engine::ClassFieldValue* Engine::ZPScriptProperty::GetSuitableField(std::string 
 	for (unsigned int i = 0; i < this->mVars.size(); i++) {
 		ClassFieldValue* field = mVars[i];
 
-		if (field->Desc->index == index && field->Desc->typeID == TypeID && field->Desc->name.compare(Name) == 0)
+		if (field->Desc.index == index && field->Desc.typeID == TypeID && field->Desc.name.compare(Name) == 0)
 			return field;
-		if (field->Desc->typeID == TypeID && field->Desc->name.compare(Name) == 0)
+		if (field->Desc.typeID == TypeID && field->Desc.name.compare(Name) == 0)
 			return field;
 	}
 	return nullptr;
 }
 
 void Engine::ZPScriptProperty::OnScriptChanges() {
+	if (game_data->script_manager->HasCompilerErrors())
+		return;
 	//Store old fields
 	tCFVList tempVars = mVars;
 	//Get new fields arrays
@@ -153,18 +163,16 @@ void Engine::ZPScriptProperty::OnScriptChanges() {
 		//Try to find old and new field pointer
 		for (unsigned int tmpv_i = 0; tmpv_i < tempVars.size(); tmpv_i++) {
 			Engine::ClassFieldValue* field = tempVars[tmpv_i];
-			if (field->Desc->typeID == Desc->typeID && field->Desc->name.compare(Desc->name) == 0)
+			if (field->Desc.typeID == Desc->typeID && field->Desc.name.compare(Desc->name) == 0)
 				oldVar = field;
 		}
 		for (unsigned int newv_i = 0; newv_i < this->mVars.size(); newv_i++) {
 			Engine::ClassFieldValue* field = mVars[newv_i];
-			if (field->Desc->typeID == Desc->typeID && field->Desc->name.compare(Desc->name) == 0)
+			if (field->Desc.typeID == Desc->typeID && field->Desc.name.compare(Desc->name) == 0)
 				newVar = field;
 		}
 		if(newVar != nullptr && oldVar != nullptr)
 			oldVar->copyValue(oldVar->TempValue, newVar->TempValue);
-		//if (oldVar != nullptr)
-		//	delete oldVar;
 	}
 }
 
@@ -172,6 +180,8 @@ void Engine::ZPScriptProperty::SetScript(ScriptResource* script) {
 	script_res = script;
 	if (this->script != nullptr)
 		delete this->script;
+	if (game_data->script_manager->HasCompilerErrors())
+		return;
 	this->script = new AGScript(go_link.updLinkPtr(), script_res->ClassName);
 	makeFieldsList();
 }
@@ -188,22 +198,22 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 	//read all variables data
 	for (unsigned int v_i = 0; v_i < vars; v_i++) {
 		int typeID = 0;
-		unsigned int index = v_i;
+		unsigned int index = 0;
+		std::string FieldName;
 		//read index
 		readBinaryValue(&index, data + offset, offset);
 		//read ID of type
 		readBinaryValue(&typeID, data + offset, offset);
 		//read field name
-		std::string FieldName;
 		readString(FieldName, data, offset);
 
-		Engine::ClassFieldDesc* SuitableDesc = script->getClassDesc()->GetSuitableDesc(FieldName, typeID, index);
+		//Engine::ClassFieldDesc* SuitableDesc = script->getClassDesc()->GetSuitableDesc(FieldName, typeID, index);
 		Engine::ClassFieldValue* var = GetSuitableField(FieldName, typeID, index);
 
-		if (var == nullptr && SuitableDesc == nullptr)
+		if (var == nullptr )
 			continue;
-		else
-			var->Desc = SuitableDesc; //Bind existing desc
+		//else
+			//var->Desc = SuitableDesc; //Bind existing desc
 		
 		if (typeID != AG_STRING) {
 			//if value is non-std string
@@ -235,10 +245,10 @@ void Engine::ZPScriptProperty::savePropertyToStream(ZsStream* stream, GameObject
 	for (unsigned int v_i = 0; v_i < mVars.size(); v_i++) {
 		Engine::ClassFieldValue* var = mVars[v_i];
 
-		stream->writeBinaryValue(&var->Desc->index);
-		stream->writeBinaryValue(&var->Desc->typeID);
-		stream->writeString(var->Desc->name);
-		if (var->Desc->typeID != AG_STRING)
+		stream->writeBinaryValue(&var->Desc.index);
+		stream->writeBinaryValue(&var->Desc.typeID);
+		stream->writeString(var->Desc.name);
+		if (var->Desc.typeID != AG_STRING)
 			stream->write(reinterpret_cast<char*>(var->TempValue), var->FieldSize);
 		else {
 			std::string* str = static_cast<std::string*>(var->TempValue);

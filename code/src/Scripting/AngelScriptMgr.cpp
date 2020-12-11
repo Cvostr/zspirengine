@@ -221,6 +221,7 @@ bool AGScriptMgr::AddScriptFiles() {
 		game_data->out_manager->spawnRuntimeError(RuntimeErrorType::RE_TYPE_SCRIPT_ERROR);
 	}
 	else {
+		CompileError = false;
 		ModuleCompiled = true;
 	}
 

@@ -59,6 +59,14 @@ void GetFileName(std::string& str) {
     }
 }
 
+void ProcessFileName(std::string& str) {
+    for (int i = 0; i < str.size(); i++) {
+        char c = str[i];
+        if (c == '|' || c == ':' || c == '/' || c == '\\' || c == '*')
+            str[i] = '_';
+    }
+}
+
 void skipSpaces(const char* data, unsigned int& offset) {
     while (data[offset] == ' ' || data[offset] == '\n') {
         offset++;

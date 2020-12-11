@@ -546,7 +546,7 @@ const BoundingBox3& Engine::GameObject::getBoundingBox() {
     mBoundingBox.ApplyTransform(getTransformProperty()->transform_mat);
     
     for (size_t i = 0; i < getChildrenNum(); i++) {
-        BoundingBox3 child_bb = getChild(i)->getBoundingBox();
+        BoundingBox3 child_bb = getChild((unsigned int)i)->getBoundingBox();
         mBoundingBox.Extend(child_bb);
     }
 
