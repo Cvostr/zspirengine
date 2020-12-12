@@ -1,5 +1,6 @@
-#include "../../../headers/world/go_properties.h"
+#include "../../../headers/world/ObjectsComponents/ZPScriptComponent.hpp"
 #include "../../../headers/misc/misc.h"
+#include "../../../headers/game.h"
 
 extern ZSGAME_DATA* game_data;
 

@@ -43,6 +43,11 @@
 #define COLLIDER_PROP_TYPE_NAME "Collider"
 #define SHADOWCAST_PROP_TYPE_NAME "ShadowCaster"
 
+#define AG_STRING 67108876
+#define AG_VECTOR3 67108881
+#define AG_QUAT 67108882
+#define AG_RGB_COLOR 67108883
+
 namespace Engine {
     class GameObject;
 

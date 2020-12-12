@@ -128,14 +128,16 @@ void ZSpireEngine::loadGame(){
     startManager(game_data->glyph_manager);
     //Allocate script manager
     game_data->script_manager = new Engine::AGScriptMgr;
-
+    //Allocate output manager
     game_data->out_manager = new Engine::OutputManager;
     game_data->out_manager->consoleLogWorking = true;
 
     game_data->ui_manager = new Engine::UiManager;
-
+    //Allocate OpenAL manager
     game_data->oal_manager = new Engine::OALManager;
     game_data->oal_manager->initAL();
+    //Allocate time manager
+    game_data->time = new Engine::Time;
 
     game_data->world = new Engine::World();
 
@@ -178,15 +180,10 @@ void ZSpireEngine::loadGame(){
     //call onStart on all objects
     game_data->world->call_onStart();
 
-    static uint64_t NOW = SDL_GetPerformanceCounter();
-    static uint64_t last = 0;
-
     while(gameRuns == true){
 
-        last = NOW;
-        NOW = SDL_GetPerformanceCounter();
-        deltaTime = (NOW - last) / 1000.f;
-        updateDeltaTime(deltaTime);
+        game_data->time->Tick();
+        updateDeltaTime(game_data->time->GetDeltaTime());
 
         SDL_Event event;
         while (SDL_PollEvent(&event)){
@@ -196,7 +193,7 @@ void ZSpireEngine::loadGame(){
             Input::processEventsSDL(&event);
 
         }
-        game_data->world->physical_world->stepSimulation(deltaTime);
+        game_data->world->physical_world->stepSimulation(game_data->time->GetDeltaTime());
         game_data->pipeline->render();
 
         Input::clearMouseState();

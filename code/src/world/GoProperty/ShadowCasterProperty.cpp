@@ -1,4 +1,6 @@
 #include "../../../headers/world/go_properties.h"
+#include "../../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
 
 Engine::ShadowCasterProperty::ShadowCasterProperty() :
     TextureSize(2048),

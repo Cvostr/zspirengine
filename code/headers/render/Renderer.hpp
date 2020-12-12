@@ -41,13 +41,12 @@ struct RenderSettings {
     }
 };
 
-class LightsourceProperty;
 class World;
 
 class Renderer : public IEngineComponent {
 protected:
     //Vector to store lights
-    std::vector<LightsourceProperty*> lights_ptr;
+    std::vector<void*> lights_ptr;
     RenderSettings render_settings;
 
     Framebuffer* gbuffer;
@@ -56,8 +55,6 @@ protected:
 
     void setLightsToBuffer();
     void updateShadersCameraInfo(Engine::Camera* cam_ptr);
-    
-
     
 private:
     virtual void InitShaders(){}
@@ -95,7 +92,7 @@ public:
 
     void processObjects(World* world_ptr);
 
-    void addLight(LightsourceProperty* light_ptr);
+    void addLight(void* light_ptr);
     void removeLights();
 
     void TryRenderShadows(Engine::Camera* cam);

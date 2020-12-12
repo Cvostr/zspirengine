@@ -9,6 +9,7 @@
 #include "ui/UiManager.hpp"
 #include "audio/OALManager.hpp"
 #include "vulkan/ZSVulkan.hpp"
+#include "engine/Time.hpp"
 
 typedef struct ZSGAME_DATA{
     //Pointer to resource manager
@@ -25,6 +26,7 @@ typedef struct ZSGAME_DATA{
     Engine::UiManager* ui_manager;
     Engine::OALManager* oal_manager;
     Engine::ZSVulkan* vk_main;
+    Engine::Time* time;
     //TRUE, if this struct was created by editor
     bool isEditor; 
 

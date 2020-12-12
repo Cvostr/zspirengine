@@ -1,4 +1,4 @@
-#include "../../../headers/world/go_properties.h"
+#include "../../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
 
 Engine::LightsourceProperty::LightsourceProperty() : light_type(LIGHTSOURCE_TYPE::LIGHTSOURCE_TYPE_DIRECTIONAL),
                                                      intensity(1.f),

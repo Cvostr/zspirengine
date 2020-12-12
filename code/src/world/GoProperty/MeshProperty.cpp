@@ -19,9 +19,14 @@ void Engine::MeshProperty::copyTo(IGameObjectComponent* dest) {
     _dest->mesh_ptr = mesh_ptr;
     _dest->castShadows = castShadows;
     _dest->rootNodeStr = rootNodeStr;
+    //updateRootNodePtr();
 }
 void Engine::MeshProperty::updateMeshPtr() {
     this->mesh_ptr = game_data->resources->getMeshByLabel(this->resource_relpath);
+}
+
+void Engine::MeshProperty::updateRootNodePtr() {
+    skinning_root_node = go_link.world_ptr->getGameObjectByLabel(this->rootNodeStr);
 }
 
 void Engine::MeshProperty::setMeshResource(MeshResource* resource) {
@@ -31,7 +36,7 @@ void Engine::MeshProperty::setMeshResource(MeshResource* resource) {
 
 void Engine::MeshProperty::onRender(Engine::Renderer* pipeline) {
     if (this->skinning_root_node == nullptr && mesh_ptr->mesh_ptr->hasBones())
-        skinning_root_node = go_link.world_ptr->getGameObjectByLabel(this->rootNodeStr);
+        updateRootNodePtr();
 }
 
 void Engine::MeshProperty::onValueChanged() {
@@ -52,6 +57,7 @@ void Engine::MeshProperty::loadPropertyFromMemory(const char* data, GameObject* 
 
 void Engine::MeshProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     stream->writeString(resource_relpath);
+    updateRootNodePtr(); //update node pointer
     if (skinning_root_node != nullptr)
         stream->writeString(skinning_root_node->getLabel());
     else

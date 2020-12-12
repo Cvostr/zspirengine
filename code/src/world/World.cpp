@@ -1,6 +1,7 @@
 #include "../../headers/world/World.hpp"
 #include "../../headers/world/go_properties.h"
 #include "../../headers/misc/misc.h"
+#include "../../headers/world/ObjectsComponents/ZPScriptComponent.hpp"
 
 extern ZSGAME_DATA* game_data;
 
@@ -128,7 +129,7 @@ void Engine::World::trimObjectsList(){
                 objects[obj_i - 1]->array_index = obj_i - 1;
 
             }
-            objects.resize(objects.size() - 1); //remove last position
+            objects.pop_back(); //remove last position
         }
     }
 }

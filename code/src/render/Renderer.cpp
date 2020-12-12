@@ -3,6 +3,10 @@
 #include "../../headers/game.h"
 #include "../../headers/world/go_properties.h"
 #include "../../headers/world/tile_properties.h"
+#include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
+#include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
+#include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
+#include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
 
 #define LIGHT_STRUCT_SIZE 64
 extern ZSpireEngine* engine_ptr;
@@ -134,7 +138,7 @@ void Engine::Renderer::setLightsToBuffer(){
     this->lightsBuffer->bind();
     //Iterate over all lights
     for(unsigned int light_i = 0; light_i < this->lights_ptr.size(); light_i ++){
-        LightsourceProperty* _light_ptr = lights_ptr[light_i];
+        LightsourceProperty* _light_ptr = static_cast<LightsourceProperty*>(lights_ptr[light_i]);
 
         LIGHTSOURCE_TYPE light_type = (_light_ptr->light_type);
 
@@ -238,10 +242,13 @@ void Engine::GameObject::setSkinningMatrices(Renderer* pipeline) {
             Mat4 rootNodeTransform;
 
             if (RootNode != nullptr) {
-                //if RootNode is specified
-                node = (mesh_prop->skinning_root_node)->getChildObjectWithNodeLabel(b->bone_name);
-                //Get root transform
-                rootNodeTransform = (RootNode->getPropertyPtr<Engine::NodeProperty>()->transform_mat);
+                NodeProperty* RootNodeProp = RootNode->getPropertyPtr<Engine::NodeProperty>();
+                if (RootNodeProp != nullptr) {
+                    //if RootNode is specified
+                    node = (mesh_prop->skinning_root_node)->getChildObjectWithNodeLabel(b->bone_name);
+                    //Get root transform
+                    rootNodeTransform = (RootNodeProp->transform_mat);
+                }
             }
 
             if (node != nullptr) {
@@ -474,7 +481,7 @@ Engine::Shader* Engine::Renderer::getUiShader() {
     return this->ui_shader;
 }
 
-void Engine::Renderer::addLight(LightsourceProperty* light_ptr){
+void Engine::Renderer::addLight(void* light_ptr){
     this->lights_ptr.push_back(light_ptr);
 }
 

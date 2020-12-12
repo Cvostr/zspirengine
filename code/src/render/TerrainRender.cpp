@@ -1,6 +1,7 @@
 #include "../../headers/world/Terrain.hpp"
 #include "../../headers/render/Renderer.hpp"
-#include "../../headers/world/go_properties.h"
+#include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
+#include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
 #include <GL/glew.h>
 
 void TerrainData::initGL() {

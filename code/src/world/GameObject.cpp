@@ -1,6 +1,9 @@
 #include "../../headers/world/World.hpp"
 #include "../../headers/world/go_properties.h"
 #include "../../headers/misc/misc.h"
+#include "../../headers/world/ObjectsComponents/ZPScriptComponent.hpp"
+#include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
+#include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
 
 Engine::GameObjectLink::GameObjectLink() : ptr(nullptr),
                                            world_ptr(nullptr)

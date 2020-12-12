@@ -1,4 +1,4 @@
-#include "../../../headers/world/go_properties.h"
+#include "../../../headers/world/ObjectsComponents/AudioSourceComponent.hpp"
 
 extern ZSGAME_DATA* game_data;
 

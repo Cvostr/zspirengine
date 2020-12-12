@@ -1,6 +1,13 @@
 #include "../../../headers/world/go_properties.h"
 #include "../../../headers/world/tile_properties.h"
 
+#include "../../../headers/world/ObjectsComponents/AudioSourceComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/ZPScriptComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/TerrainComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/MaterialComponent.hpp"
+
 extern ZSGAME_DATA* game_data;
 
 Engine::IGameObjectComponent::IGameObjectComponent() :

@@ -252,6 +252,7 @@
     <ClInclude Include="code\headers\engine\LocaleStringsFile.h" />
     <ClInclude Include="code\headers\engine\Logger.hpp" />
     <ClInclude Include="code\headers\engine\Resources.hpp" />
+    <ClInclude Include="code\headers\engine\Time.hpp" />
     <ClInclude Include="code\headers\engine_types.h" />
     <ClInclude Include="code\headers\game.h" />
     <ClInclude Include="code\headers\input\zs-input.h" />
@@ -308,6 +309,12 @@
     <ClInclude Include="code\headers\vulkan\ZSVulkanPipeline.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanSwapchain.hpp" />
     <ClInclude Include="code\headers\world\go_properties.h" />
+    <ClInclude Include="code\headers\world\ObjectsComponents\AudioSourceComponent.hpp" />
+    <ClInclude Include="code\headers\world\ObjectsComponents\LightSourceComponent.hpp" />
+    <ClInclude Include="code\headers\world\ObjectsComponents\MaterialComponent.hpp" />
+    <ClInclude Include="code\headers\world\ObjectsComponents\ShadowCasterComponent.hpp" />
+    <ClInclude Include="code\headers\world\ObjectsComponents\TerrainComponent.hpp" />
+    <ClInclude Include="code\headers\world\ObjectsComponents\ZPScriptComponent.hpp" />
     <ClInclude Include="code\headers\world\Physics.h" />
     <ClInclude Include="code\headers\world\Terrain.hpp" />
     <ClInclude Include="code\headers\world\tile_properties.h" />

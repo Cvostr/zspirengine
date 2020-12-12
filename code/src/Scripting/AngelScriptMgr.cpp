@@ -1,5 +1,9 @@
 #include "../../headers/Scripting/AngelScriptMgr.h"
 #include "../../headers/world/go_properties.h"
+#include "../../headers/world/ObjectsComponents/AudioSourceComponent.hpp"
+#include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
+#include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
+#include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
 
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
