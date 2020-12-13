@@ -178,6 +178,8 @@ void Engine::ZPScriptProperty::OnScriptChanges() {
 }
 
 void Engine::ZPScriptProperty::SetScript(ScriptResource* script) {
+	if (script == nullptr)
+		return;
 	script_res = script;
 	if (this->script != nullptr)
 		delete this->script;

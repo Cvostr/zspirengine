@@ -1,5 +1,6 @@
 #include "../../headers/world/Physics.h"
 #include "../../headers/world/go_properties.h"
+#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
 
 PhysicalWorld::PhysicalWorld(PhysicalWorldSettings* settings){
     this->collisionConfiguraton = new btDefaultCollisionConfiguration();

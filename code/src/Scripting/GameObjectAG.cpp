@@ -5,6 +5,8 @@
 #include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
 #include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
 #include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
+#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
+#include "../../headers/world/ObjectsComponents/AnimationComponent.hpp"
 
 void Engine::bindGameObjectSDK(AGScriptMgr* mgr) {
 	//Regiter base GameObject

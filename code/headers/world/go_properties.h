@@ -7,51 +7,6 @@
 
 namespace Engine {
 
-class MeshProperty : public IGameObjectComponent {
-public:
-    std::string resource_relpath; //Relative path to resource
-    MeshResource* mesh_ptr; //Pointer to mesh
-    bool castShadows;
-
-    std::string rootNodeStr;
-    GameObject* skinning_root_node;
-
-    void updateMeshPtr(); //Updates pointer according to resource_relpath
-    void updateRootNodePtr();
-    void copyTo(IGameObjectComponent* dest);
-    void onRender(Engine::Renderer* pipeline);
-    void setMeshResource(MeshResource* resource);
-
-    //EDITOR STUFF
-    void addPropertyInterfaceToInspector();
-    void onValueChanged(); //Update mesh    pointer
-    void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(ZsStream* stream, GameObject* obj);
-    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
-
-    MeshProperty();
-};
-
-
-class NodeProperty : public IGameObjectComponent {
-public:
-    std::string node_label;
-
-    Vec3 translation;
-    Vec3 scale;
-    ZSQUATERNION rotation;
-    //Node transform from file
-    Mat4 transform_mat;
-    //Caclulated node transform
-    Mat4 abs;
-
-    void copyTo(IGameObjectComponent* dest);
-   // void addPropertyInterfaceToInspector();
-    void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(ZsStream* stream, GameObject* obj);
-
-    NodeProperty();
-};
 
 class SkyboxProperty : public Engine::IGameObjectComponent {
 public:
@@ -172,35 +127,6 @@ public:
     void savePropertyToStream(ZsStream* stream, GameObject* obj);
 
     TriggerProperty();
-};
-
-class AnimationProperty : public Engine::IGameObjectComponent {
-private:
-public:
-    bool Playing;
-    double start_sec;
-
-    Engine::AnimationResource* anim_prop_ptr;
-    std::string anim_label;
-
-    void addPropertyInterfaceToInspector();
-    void onPreRender(Engine::Renderer* pipeline);
-    void onValueChanged();
-    void copyTo(Engine::IGameObjectComponent* dest);
-
-    void play();
-    void stop();
-
-    void setAnimationResource(Engine::AudioResource* anim);
-
-    void updateAnimationPtr();
-    void updateNodeTransform(GameObject* obj, Mat4 parent);
-
-    void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
-    void loadPropertyFromMemory(const char* data, GameObject* obj);
-    void savePropertyToStream(ZsStream* stream, GameObject* obj);
-
-    AnimationProperty();
 };
 
 }

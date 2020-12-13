@@ -1,4 +1,4 @@
-#include "../../../headers/world/go_properties.h"
+#include "../../../headers/world/ObjectsComponents/NodeComponent.hpp"
 
 Engine::NodeProperty::NodeProperty() : scale (1.f)
 {
@@ -30,7 +30,7 @@ void Engine::NodeProperty::loadPropertyFromMemory(const char* data, GameObject* 
 
 void Engine::NodeProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     //Write node name
-    *stream << node_label << '\0';
+    stream->writeString(node_label);
     //Write node transform matrix
     for (unsigned int m_i = 0; m_i < 4; m_i++) {
         for (unsigned int m_j = 0; m_j < 4; m_j++) {

@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 #include "../render/Renderer.hpp"
+#include "../vulkan/ZSVulkanPipeline.hpp"
 
 namespace Engine {
 	class VKRenderer : public Renderer{
@@ -10,6 +11,8 @@ namespace Engine {
 		VkSemaphore renderFinishedSemaphore;
 
 		VkCommandBuffer mCmdBuf;
+
+		ZSVulkanPipeline* MainPipeline;
 
 	public:
 		void InitShaders();

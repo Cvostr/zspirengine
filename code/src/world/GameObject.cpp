@@ -4,6 +4,8 @@
 #include "../../headers/world/ObjectsComponents/ZPScriptComponent.hpp"
 #include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
 #include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
+#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
+#include "../../headers/world/ObjectsComponents/NodeComponent.hpp"
 
 Engine::GameObjectLink::GameObjectLink() : ptr(nullptr),
                                            world_ptr(nullptr)

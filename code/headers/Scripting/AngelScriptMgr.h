@@ -153,6 +153,7 @@ namespace Engine {
         
         T* prop = new T;
         prop->bindObjectPropertyToAngel(mgr);
+        delete prop;
 
         result = mgr->RegisterObjectMethod(obj_type, "void setActive(bool)", asMETHOD(T, setActive), asCALL_THISCALL);
     }

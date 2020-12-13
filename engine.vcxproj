@@ -296,6 +296,7 @@
     <ClInclude Include="code\headers\ui\Layouts\LinearLayout.hpp" />
     <ClInclude Include="code\headers\ui\UI.hpp" />
     <ClInclude Include="code\headers\ui\UiManager.hpp" />
+    <ClInclude Include="code\headers\ui\UiScripting.hpp" />
     <ClInclude Include="code\headers\ui\View.hpp" />
     <ClInclude Include="code\headers\ui\Widgets\Button.hpp" />
     <ClInclude Include="code\headers\ui\Widgets\Widget.hpp" />
@@ -309,9 +310,12 @@
     <ClInclude Include="code\headers\vulkan\ZSVulkanPipeline.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanSwapchain.hpp" />
     <ClInclude Include="code\headers\world\go_properties.h" />
+    <ClInclude Include="code\headers\world\ObjectsComponents\AnimationComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\AudioSourceComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\LightSourceComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\MaterialComponent.hpp" />
+    <ClInclude Include="code\headers\world\ObjectsComponents\MeshComponent.hpp" />
+    <ClInclude Include="code\headers\world\ObjectsComponents\NodeComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\ShadowCasterComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\TerrainComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\ZPScriptComponent.hpp" />

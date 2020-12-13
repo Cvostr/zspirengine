@@ -14,16 +14,16 @@ Engine::Animation::~Animation(){
 Engine::AnimationChannel::AnimationChannel() :
     posKeysNum(0),
     rotationKeysNum(0),
-    scaleKeysNum(0)
-{
+    scaleKeysNum(0),
     //Set all pointers to nullptr
-    rotTimes = nullptr;
-    scaleTimes = nullptr;
-    posTimes = nullptr;
-    pos = nullptr;
-    rot = nullptr;
-    scale = nullptr;
+    pos(nullptr),
+    rot(nullptr),
+    scale(nullptr),
 
+    rotTimes(nullptr),
+    scaleTimes(nullptr),
+    posTimes(nullptr)
+{
     anim_ptr = nullptr;
 }
 

@@ -24,6 +24,8 @@ namespace Engine {
         unsigned int marginRight;
 
         ViewMargin() : marginTop(10), marginBottom(10), marginLeft(10), marginRight(10) {}
+        ViewMargin(unsigned int Top, unsigned int Bottom, unsigned int Left, unsigned int Right) :
+            marginTop(Top), marginBottom(Bottom), marginLeft(Left), marginRight(Right) {}
     }ViewMargin;
 
     typedef struct ViewPosition {
@@ -37,11 +39,11 @@ namespace Engine {
 	class IView {
 	public:
 
-        virtual void resize(unsigned int Width, unsigned int Height);
-        virtual void move(unsigned int x, unsigned int y);
+        void resize(unsigned int Width, unsigned int Height);
+        void move(unsigned int x, unsigned int y);
 
-        virtual void resize(const ViewSize& Size);
-        virtual void move(const ViewPosition& Pos);
+        void resize(const ViewSize& Size);
+        void move(const ViewPosition& Pos);
 
         void setMarginTop(unsigned int marginTop) { margin.marginTop = marginTop; }
         void setMarginBottom(unsigned int marginBottom) { margin.marginBottom = marginBottom; }

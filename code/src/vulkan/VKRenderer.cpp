@@ -12,5 +12,6 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
 
 }
 void Engine::VKRenderer::InitShaders() {
-
+	MainPipeline = new ZSVulkanPipeline();
+	//MainPipeline->Create()
 }

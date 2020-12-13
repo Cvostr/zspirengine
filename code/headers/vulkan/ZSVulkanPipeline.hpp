@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
+#include "ZSVulkan.hpp"
 #include "vk_data.h"
 
 namespace Engine {
@@ -11,8 +12,11 @@ namespace Engine {
         VkPolygonMode polygonMode;
 
         unsigned int cullFace;
-
         bool hasDepth;
+
+        std::vector<VkAttachmentDescription> mAttachmentDescriptions;
+        std::vector<VkAttachmentReference> mAttachmentReferences;
+        VkAttachmentReference DepthDescriptionRef;
 
         ZsVkPipelineConf() {
             iaTopology = VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -59,7 +63,14 @@ namespace Engine {
 	class ZSVulkanPipeline {
 	private:
 		VkPipeline pipeline; //Vulkan pipeline object
+        VkRenderPass mRenderPass; //Render pass of this layout
+        VkPipelineLayout mPipelineLayout;
 	public:
-		void Create(_vk_Shader* Shader, ZsVkPipelineConf Conf);
+
+        VkRenderPass GetRenderPass();
+        VkPipelineLayout GetPipelineLayout();
+        VkPipeline GetPipeline();
+
+		bool Create(ZSVulkanDevice* device, _vk_Shader* Shader, ZsVkPipelineConf Conf);
 	};
 }

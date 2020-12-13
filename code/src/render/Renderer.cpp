@@ -7,6 +7,8 @@
 #include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
 #include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
 #include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
+#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
+#include "../../headers/world/ObjectsComponents/NodeComponent.hpp"
 
 #define LIGHT_STRUCT_SIZE 64
 extern ZSpireEngine* engine_ptr;
