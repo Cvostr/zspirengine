@@ -227,7 +227,7 @@ void Material::saveToFile(){
     ZsStream mat_stream;
     mat_stream.open(file_path, std::ofstream::out);
 
-    if(!mat_stream){ //File isn't opened
+    if(!mat_stream.is_open()){ //File isn't opened
         std::cout << "Error opening output stream " << file_path;
         return;
     }
@@ -235,13 +235,16 @@ void Material::saveToFile(){
     //Write material header
     mat_stream << "ZSP_MATERIAL\n";
     //Write group string
-    mat_stream << "_GROUP " << (this->group_str + '\0') << "\n";
+    mat_stream << "_GROUP "; //write group header
+    mat_stream.writeString(this->group_str); //write group label
+
     for(unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i ++){
         //Obtain pointers to prop and prop's configuration
         MaterialShaderProperty* prop_ptr = group_ptr->properties[prop_i];
         MaterialShaderPropertyConf* conf_ptr = this->confs[prop_i];
         //write entry header
-        mat_stream << "_ENTRY " << (prop_ptr->prop_identifier + '\0'); //Write identifier
+        mat_stream << "_ENTRY "; 
+        mat_stream.writeString(prop_ptr->prop_identifier); //Write identifier
 
         switch(prop_ptr->type){
             case MATSHPROP_TYPE_NONE:{
@@ -312,7 +315,7 @@ void Material::saveToFile(){
                 break;
             }
         }
-    mat_stream << "\n"; //Write divider
+        mat_stream << "\n"; //Write divider
     }
     mat_stream.close(); //close stream
 }
@@ -344,7 +347,7 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
             std::string group_name;
             //Read shader group name
             readString(group_name, buffer, position);
-            position += 1;
+            //position += 1;
 
             setPropertyGroup(MtShProps::getMtShaderPropertyGroup(group_name));
         }

@@ -1,15 +1,19 @@
-#include "../../../headers/world/go_properties.h"
 #include "../../../headers/world/tile_properties.h"
 
 #include "../../../headers/world/ObjectsComponents/AudioSourceComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/ZPScriptComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/SkyboxComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/TerrainComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/MaterialComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/MeshComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/AnimationComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/NodeComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/ColliderComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/CharacterController.hpp"
+#include "../../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/TriggerComponent.hpp"
 
 extern ZSGAME_DATA* game_data;
 

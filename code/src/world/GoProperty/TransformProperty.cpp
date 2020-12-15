@@ -1,4 +1,5 @@
-#include "../../../headers/world/go_properties.h"
+#include "../../../headers/world/World.hpp"
+#include "../../../headers/world/ObjectsComponents/PhysicalComponent.hpp"
 
 Engine::TransformProperty::TransformProperty() : scale(1.f)
 {

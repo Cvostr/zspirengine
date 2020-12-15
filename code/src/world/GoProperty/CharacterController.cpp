@@ -1,4 +1,4 @@
-#include "../../../headers/world/go_properties.h"
+#include "../../../headers/world/ObjectsComponents/CharacterController.hpp"
 
 Engine::CharacterControllerProperty::CharacterControllerProperty() {
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_CHARACTER_CONTROLLER;
@@ -47,7 +47,7 @@ void Engine::CharacterControllerProperty::jump(float height) {
 
 void Engine::CharacterControllerProperty::walk(float x, float z) {
     btVector3 current_vel_l = rigidBody->getLinearVelocity();
-    rigidBody->setLinearVelocity(btVector3(x, current_vel_l.y(), z));
+    setLinearVelocity(Vec3(x, current_vel_l.y(), z));
 }
 
 void Engine::CharacterControllerProperty::onUpdate(float deltaTime) {
@@ -75,6 +75,9 @@ void Engine::CharacterControllerProperty::onUpdate(float deltaTime) {
     else {
         _isOnGround = false;
     }
+
+    btVector3 current_vel_l = rigidBody->getLinearVelocity();
+    rigidBody->setLinearVelocity(btVector3(0, current_vel_l.y(), 0));
 }
 
 void Engine::CharacterControllerProperty::onStart() {

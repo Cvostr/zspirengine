@@ -144,16 +144,15 @@ void Engine::_ogl_Mesh::DrawInstanced(unsigned int instances) {
 void Engine::_ogl_Mesh::DrawLines(){
 
     glBindVertexArray(this->meshVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, this->meshVBO);
     if(this->mIndicesNum != NO_INDICES) //if object uses indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->meshEBO);
 
     if (this->mIndicesNum == NO_INDICES) {
         //Draw without indices
-        glDrawArrays(GL_LINE_LOOP, 0, static_cast<int>(this->mVerticesNum));
+        glDrawArrays(GL_LINE_LOOP, 0, this->mVerticesNum);
     }
     else {
         //Indexed draw
-        glDrawElements(GL_LINE_LOOP, static_cast<int>(this->mVerticesNum), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_LINE_LOOP, this->mVerticesNum, GL_UNSIGNED_INT, nullptr);
     }
 }

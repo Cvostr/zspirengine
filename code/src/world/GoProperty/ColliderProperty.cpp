@@ -1,4 +1,5 @@
-#include "../../../headers/world/go_properties.h"
+#include "../../../headers/world/ObjectsComponents/ColliderComponent.hpp"
+#include "../../../headers/game.h"
 
 extern ZSGAME_DATA* game_data;
 

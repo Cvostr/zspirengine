@@ -1,12 +1,15 @@
 #include "../../headers/Scripting/AngelScriptMgr.h"
 #include "../../headers/world/World.hpp"
-#include "../../headers/world/go_properties.h"
+
 #include "../../headers/world/ObjectsComponents/AudioSourceComponent.hpp"
 #include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
 #include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
 #include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
 #include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
 #include "../../headers/world/ObjectsComponents/AnimationComponent.hpp"
+#include "../../headers/world/ObjectsComponents/CharacterController.hpp"
+#include "../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
+#include "../../headers/world/ObjectsComponents/ColliderComponent.hpp"
 
 void Engine::bindGameObjectSDK(AGScriptMgr* mgr) {
 	//Regiter base GameObject

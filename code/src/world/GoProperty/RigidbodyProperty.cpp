@@ -1,4 +1,4 @@
-#include "../../../headers/world/go_properties.h"
+#include "../../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
 
 Engine::RigidbodyProperty::RigidbodyProperty() : 
     gravity(0.f, -10.f, 0.f),                               

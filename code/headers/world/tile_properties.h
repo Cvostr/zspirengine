@@ -1,7 +1,7 @@
 #ifndef TILE_PROPERTIES_H
 #define TILE_PROPERTIES_H
 
-#include "go_properties.h"
+#include "World.hpp"
 
 namespace Engine {
 

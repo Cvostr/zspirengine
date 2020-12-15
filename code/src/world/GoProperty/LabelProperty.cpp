@@ -1,4 +1,4 @@
-#include "../../../headers/world/go_properties.h"
+#include "../../../headers/world/World.hpp"
 
 
 Engine::LabelProperty::LabelProperty() {

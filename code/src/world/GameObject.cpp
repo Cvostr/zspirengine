@@ -1,11 +1,15 @@
 #include "../../headers/world/World.hpp"
-#include "../../headers/world/go_properties.h"
+
 #include "../../headers/misc/misc.h"
 #include "../../headers/world/ObjectsComponents/ZPScriptComponent.hpp"
 #include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
 #include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
 #include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
 #include "../../headers/world/ObjectsComponents/NodeComponent.hpp"
+#include "../../headers/world/ObjectsComponents/ColliderComponent.hpp"
+#include "../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
+#include "../../headers/world/ObjectsComponents/CharacterController.hpp"
+#include "../../headers/world/ObjectsComponents/TriggerComponent.hpp"
 
 Engine::GameObjectLink::GameObjectLink() : ptr(nullptr),
                                            world_ptr(nullptr)

@@ -1,4 +1,7 @@
 #include "../../headers/engine/Resources.hpp"
+#include "../../headers/game.h"
+
+extern ZSGAME_DATA* game_data;
 
 Engine::MaterialResource::MaterialResource():
     material(nullptr)
@@ -31,4 +34,12 @@ Engine::MaterialResource* Engine::ResourceManager::getMaterialByLabel(std::strin
             return static_cast<MaterialResource*>(resource_ptr);
     }
     return nullptr;
+}
+
+void Engine::ResourceManager::saveMaterials() {
+    for (unsigned int res = 0; res < this->resources.size(); res++) {
+        ZsResource* resource_ptr = this->resources[res];
+        if (resource_ptr->resource_type == RESOURCE_TYPE_MATERIAL)
+            static_cast<MaterialResource*>(resource_ptr)->material->saveToFile();
+    }
 }

@@ -80,6 +80,7 @@ public:
     unsigned int getResourcesSize();
 
     void reloadScripts();
+    void saveMaterials();
 
     TextureResource* getTextureByLabel(std::string label);
     MeshResource* getMeshByLabel(std::string label);
