@@ -20,38 +20,32 @@ void Engine::_vk_Mesh::Destroy() {
 }
 
 void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num){
-    VkBufferCreateInfo vertexBufferCreateInf;
-    vertexBufferCreateInf.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    vertexBufferCreateInf.pNext = nullptr;
-    vertexBufferCreateInf.flags = 0;
-    vertexBufferCreateInf.size = vertices_num * sizeof (ZSVERTEX);
-    vertexBufferCreateInf.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-    vertexBufferCreateInf.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-    VkBufferCreateInfo indexBufferCreateInf;
-    indexBufferCreateInf.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    indexBufferCreateInf.pNext = nullptr;
-    indexBufferCreateInf.flags = 0;
-    indexBufferCreateInf.size = indices_num * sizeof (unsigned int);
-    indexBufferCreateInf.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-    indexBufferCreateInf.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    mVerticesNum = vertices_num;
+    mIndicesNum = indices_num;
 
     //Allocate buffer
-    game_data->vk_main->mVMA->allocate(vertexBufferCreateInf, &this->vertexBuffer);
-    game_data->vk_main->mVMA->allocate(indexBufferCreateInf, &this->indexBuffer);
+    game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &this->vertexBuffer, vertices, vertices_num * sizeof(ZSVERTEX));
+    game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, &this->indexBuffer, indices, indices_num * sizeof(unsigned int));
 }
 void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){
-    VkBufferCreateInfo vertexBufferCreateInf;
-    vertexBufferCreateInf.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    vertexBufferCreateInf.pNext = nullptr;
-    vertexBufferCreateInf.flags = 0;
-    vertexBufferCreateInf.size = vertices_num * sizeof (ZSVERTEX);
-    vertexBufferCreateInf.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-    vertexBufferCreateInf.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
+    mVerticesNum = vertices_num;
     //Allocate buffer
-    game_data->vk_main->mVMA->allocate(vertexBufferCreateInf, &this->vertexBuffer);
+    game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &this->vertexBuffer, vertices, vertices_num * sizeof(ZSVERTEX));
 }
-void Engine::_vk_Mesh::Draw(){
+void Engine::_vk_Mesh::Draw(VkCommandBuffer CmdBuf){
+    VkDeviceSize offsets[] = {0};
+    vkCmdBindVertexBuffers(CmdBuf, 0, 1, &this->vertexBuffer, offsets);
 
+    if (this->mIndicesNum != NO_INDICES) //if object uses indices
+        vkCmdBindIndexBuffer(CmdBuf, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+
+    if (this->mIndicesNum == NO_INDICES) {
+        //Draw without indices
+        vkCmdDraw(CmdBuf, mVerticesNum, 1, 0, 0);
+    }
+    else {
+        //Indexed draw
+        vkCmdDrawIndexed(CmdBuf, mIndicesNum, 1, 0, 0, 0);
+    }
 }

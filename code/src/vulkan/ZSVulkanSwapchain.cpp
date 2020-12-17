@@ -1,6 +1,12 @@
 #include "../../headers/vulkan/ZSVulkanSwapchain.hpp"
 #include "../../headers/engine/Logger.hpp"
 
+VkImageView Engine::ZSVulkanSwapChain::GetImageViewAtIndex(unsigned int Index) {
+    if (Index > this->mSwapChainImageViews.size())
+        Index = mSwapChainImageViews.size();
+    return mSwapChainImageViews[Index];
+}
+
 bool Engine::ZSVulkanSwapChain::initSwapchain(ZSVulkanDevice* Device, ZSVulkanInstance* instance, int Width, int Height) {
     SwapChainSupportDetails result;
     //Get surface capabilities
@@ -19,9 +25,6 @@ bool Engine::ZSVulkanSwapChain::initSwapchain(ZSVulkanDevice* Device, ZSVulkanIn
     result.presentModes.resize(present_mode_count);
     vkGetPhysicalDeviceSurfacePresentModesKHR(Device->getPhysicalDevice(), instance->GetSurface(), &present_mode_count, result.presentModes.data());
 
-
-    VkSurfaceFormatKHR chosenSurfaceFormat;
-    VkPresentModeKHR chosenPresentMode;
 
     for (unsigned int i = 0; i < result.formats.size(); i++) {
         VkSurfaceFormatKHR format = result.formats[i];

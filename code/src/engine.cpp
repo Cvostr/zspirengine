@@ -55,7 +55,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, ZSWINDOW_CREATE_INFO* win
             game_data->vk_main = new Engine::ZSVulkan;
 
             game_data->vk_main->mInstance = new Engine::ZSVulkanInstance;
-            game_data->vk_main->mInstance->init(false, desc->app_label.c_str(), desc->app_version, mWindow);
+            game_data->vk_main->mInstance->init(true, desc->app_label.c_str(), desc->app_version, mWindow);
             game_data->vk_main->mDevice = CreatePrimaryDevice(game_data->vk_main->mInstance);
             game_data->vk_main->mSwapChain = new Engine::ZSVulkanSwapChain;
             game_data->vk_main->mSwapChain->initSwapchain(game_data->vk_main->mDevice,

@@ -1,8 +1,9 @@
 #include "../../headers/vulkan/vk_data.h"
+#include "../../headers/game.h"
 #include <fstream>
 #include <iostream>
 
-extern ZSpireEngine* engine_ptr;
+extern ZSGAME_DATA* game_data;
 
 bool Engine::_vk_Shader::readBinaryShaderFile(std::string path, char** result, size_t& size){
     std::ifstream stream;
@@ -37,7 +38,7 @@ bool Engine::_vk_Shader::compileFromFile(std::string VSpath, std::string FSpath,
 
     readBinaryShaderFile(VSpath, &vertShaderData, vertShaderSize);
     readBinaryShaderFile(FSpath, &fragShaderData, fragShaderSize);
-    if(GSpath.empty())
+    if(!GSpath.empty())
         readBinaryShaderFile(GSpath, &geomShaderData, geomShaderSize);
 
     VkShaderModuleCreateInfo createVsInfo = {};
@@ -45,22 +46,22 @@ bool Engine::_vk_Shader::compileFromFile(std::string VSpath, std::string FSpath,
     createVsInfo.pNext = nullptr;
     createVsInfo.codeSize = vertShaderSize;
     createVsInfo.pCode = reinterpret_cast<const uint32_t*>(vertShaderData);
-    vkCreateShaderModule(engine_ptr->GetDevice()->getVkDevice(), &createVsInfo, nullptr, &vertexShader);
+    vkCreateShaderModule(game_data->vk_main->mDevice->getVkDevice(), &createVsInfo, nullptr, &vertexShader);
 
     VkShaderModuleCreateInfo createFsInfo = {};
     createFsInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createFsInfo.pNext = nullptr;
     createFsInfo.codeSize = fragShaderSize;
     createFsInfo.pCode = reinterpret_cast<const uint32_t*>(fragShaderData);
-    vkCreateShaderModule(engine_ptr->GetDevice()->getVkDevice(), &createFsInfo, nullptr, &fragmentShader);
+    vkCreateShaderModule(game_data->vk_main->mDevice->getVkDevice(), &createFsInfo, nullptr, &fragmentShader);
 
-    if (GSpath.empty()) {
+    if (!GSpath.empty()) {
         VkShaderModuleCreateInfo createGsInfo = {};
         createGsInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         createGsInfo.pNext = nullptr;
         createGsInfo.codeSize = geomShaderSize;
         createGsInfo.pCode = reinterpret_cast<const uint32_t*>(geomShaderData);
-        vkCreateShaderModule(engine_ptr->GetDevice()->getVkDevice(), &createGsInfo, nullptr, &geometryShader);
+        vkCreateShaderModule(game_data->vk_main->mDevice->getVkDevice(), &createGsInfo, nullptr, &geometryShader);
     }
 
     return true;

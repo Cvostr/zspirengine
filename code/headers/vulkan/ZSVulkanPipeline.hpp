@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.hpp>
 #include "ZSVulkan.hpp"
 #include "vk_data.h"
+#include "ZSVulkanDescriptorSet.hpp"
 
 namespace Engine {
     typedef struct ZsVkPipelineConf {
@@ -14,9 +15,8 @@ namespace Engine {
         unsigned int cullFace;
         bool hasDepth;
 
-        std::vector<VkAttachmentDescription> mAttachmentDescriptions;
-        std::vector<VkAttachmentReference> mAttachmentReferences;
-        VkAttachmentReference DepthDescriptionRef;
+        ZSVulkanDescriptorSet* DescrSetLayout;
+        ZSVulkanDescriptorSet* DescrSetLayoutSampler;
 
         ZsVkPipelineConf() {
             iaTopology = VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -35,8 +35,10 @@ namespace Engine {
             swap_extend.height = 480;
             scissor.offset = { 0, 0 };
             scissor.extent = swap_extend;
-
             hasDepth = false;
+
+            DescrSetLayout = new ZSVulkanDescriptorSet(DESCR_SET_TYPE::DESCR_SET_TYPE_UBO);
+            DescrSetLayoutSampler = new ZSVulkanDescriptorSet(DESCR_SET_TYPE::DESCR_SET_TYPE_TEXTURE);
         }
         ZsVkPipelineConf(float w, float h, float maxDepth) {
             iaTopology = VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -55,8 +57,10 @@ namespace Engine {
             swap_extend.height = static_cast<uint32_t>(h);
             scissor.offset = { 0, 0 };
             scissor.extent = swap_extend;
-
             hasDepth = false;
+
+            DescrSetLayout = new ZSVulkanDescriptorSet(DESCR_SET_TYPE::DESCR_SET_TYPE_UBO);
+            DescrSetLayoutSampler = new ZSVulkanDescriptorSet(DESCR_SET_TYPE::DESCR_SET_TYPE_TEXTURE);
         }
     }ZsVkPipelineConf;
 
@@ -65,12 +69,22 @@ namespace Engine {
 		VkPipeline pipeline; //Vulkan pipeline object
         VkRenderPass mRenderPass; //Render pass of this layout
         VkPipelineLayout mPipelineLayout;
+
+        std::vector<VkAttachmentDescription> mAttachmentDescriptions;
+        std::vector<VkAttachmentReference> mAttachmentReferences;
+        VkAttachmentReference DepthDescriptionRef;
+
+        std::vector<VkDescriptorSetLayout> mDescrSetLayouts; //Array of all layouts
+        std::vector<VkDescriptorSet> mDescrSets; //Array of all descriptors
 	public:
 
         VkRenderPass GetRenderPass();
         VkPipelineLayout GetPipelineLayout();
         VkPipeline GetPipeline();
 
-		bool Create(ZSVulkanDevice* device, _vk_Shader* Shader, ZsVkPipelineConf Conf);
+        void PushColorAttachment(VkFormat Format, VkImageLayout Layout);
+        void PushColorOutputAttachment();
+
+		bool Create(_vk_Shader* Shader, ZsVkPipelineConf Conf);
 	};
 }

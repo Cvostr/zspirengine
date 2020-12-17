@@ -1,7 +1,9 @@
 #include "../../headers/vulkan/ZSVulkanPipeline.hpp"
 #include "../../headers/math/Vertex.hpp"
+#include "../../headers/game.h"
 
 #define VERTEX_BUFFER_BIND 0
+extern ZSGAME_DATA* game_data;
 
 VkRenderPass Engine::ZSVulkanPipeline::GetRenderPass() {
     return mRenderPass;
@@ -13,6 +15,30 @@ VkPipeline Engine::ZSVulkanPipeline::GetPipeline() {
     return pipeline;
 }
 
+void Engine::ZSVulkanPipeline::PushColorAttachment(VkFormat Format, VkImageLayout Layout) {
+    VkAttachmentDescription colorAttachment = {};
+    colorAttachment.format = Format;
+    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    colorAttachment.finalLayout = Layout;
+    //Push new attachment description
+    mAttachmentDescriptions.push_back(colorAttachment);
+
+    //Create Attachment Reference for Depth Attachment
+    VkAttachmentReference colorAttachmentRef = {};
+    colorAttachmentRef.attachment = mAttachmentReferences.size();
+    colorAttachmentRef.layout = Layout;
+    //Push new attachment reference
+    mAttachmentReferences.push_back(colorAttachmentRef);
+}
+void Engine::ZSVulkanPipeline::PushColorOutputAttachment() {
+    PushColorAttachment(game_data->vk_main->mSwapChain->GetChosenSurfaceFormat().format, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+}
+
 VkVertexInputBindingDescription getBindingDescription() {
     VkVertexInputBindingDescription bindingDescription{};
     bindingDescription.binding = VERTEX_BUFFER_BIND;
@@ -22,7 +48,7 @@ VkVertexInputBindingDescription getBindingDescription() {
     return bindingDescription;
 }
 
-bool Engine::ZSVulkanPipeline::Create(ZSVulkanDevice* device, _vk_Shader* Shader, ZsVkPipelineConf Conf) {
+bool Engine::ZSVulkanPipeline::Create(_vk_Shader* Shader, ZsVkPipelineConf Conf) {
     VkPipelineShaderStageCreateInfo vertexStageCreateInfo = {}, fragmentStageCreateInfo = {};
 
     vertexStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -74,14 +100,14 @@ bool Engine::ZSVulkanPipeline::Create(ZSVulkanDevice* device, _vk_Shader* Shader
     multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
     multisampling.alphaToOneEnable = VK_FALSE; // Optional
 
-
     //Create SubPass
     //This collects attachment references
     VkSubpassDescription subpass = {};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpass.colorAttachmentCount = Conf.mAttachmentReferences.size();
-    subpass.pColorAttachments = Conf.mAttachmentReferences.data();
-    subpass.pDepthStencilAttachment = &Conf.DepthDescriptionRef;
+    subpass.colorAttachmentCount = mAttachmentReferences.size();
+    subpass.pColorAttachments = mAttachmentReferences.data();
+    if(Conf.hasDepth)
+        subpass.pDepthStencilAttachment = &DepthDescriptionRef;
 
     VkSubpassDependency dependency{};
     dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -94,8 +120,8 @@ bool Engine::ZSVulkanPipeline::Create(ZSVulkanDevice* device, _vk_Shader* Shader
     //RENDER PASS
     VkRenderPassCreateInfo renderPassInfo = {};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.attachmentCount = Conf.mAttachmentDescriptions.size();
-    renderPassInfo.pAttachments = Conf.mAttachmentDescriptions.data();
+    renderPassInfo.attachmentCount = mAttachmentDescriptions.size();
+    renderPassInfo.pAttachments = mAttachmentDescriptions.data();
     //Set subpass
     renderPassInfo.subpassCount = 1;
     renderPassInfo.pSubpasses = &subpass;
@@ -103,9 +129,29 @@ bool Engine::ZSVulkanPipeline::Create(ZSVulkanDevice* device, _vk_Shader* Shader
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(device->getVkDevice(), &renderPassInfo, nullptr, &mRenderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(game_data->vk_main->mDevice->getVkDevice(), &renderPassInfo, nullptr, &mRenderPass) != VK_SUCCESS) {
         return false;
     }
+
+
+
+    VkPipelineLayoutCreateInfo pipeline_info = {};
+    pipeline_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+
+    mDescrSetLayouts.push_back(Conf.DescrSetLayout->getDescriptorSetLayout());
+    mDescrSets.push_back(Conf.DescrSetLayout->getDescriptorSet());
+
+    mDescrSetLayouts.push_back(Conf.DescrSetLayoutSampler->getDescriptorSetLayout());
+    mDescrSets.push_back(Conf.DescrSetLayoutSampler->getDescriptorSet());
+
+    pipeline_info.setLayoutCount = mDescrSetLayouts.size();
+    pipeline_info.pSetLayouts = mDescrSetLayouts.data();
+    pipeline_info.setLayoutCount = 0;
+    pipeline_info.pSetLayouts = nullptr;
+    pipeline_info.pushConstantRangeCount = 0;
+    pipeline_info.pPushConstantRanges = nullptr;
+    vkCreatePipelineLayout(game_data->vk_main->mDevice->getVkDevice(), &pipeline_info, nullptr, &this->mPipelineLayout);
+
 
 
 
@@ -141,8 +187,6 @@ bool Engine::ZSVulkanPipeline::Create(ZSVulkanDevice* device, _vk_Shader* Shader
     attrDescr[4].offset = offsetof(ZSVERTEX, bitangent);
 
     vertexInputInfo.pVertexAttributeDescriptions = attrDescr; // Optional
-
-
 
     //Color blend
     VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
@@ -203,7 +247,7 @@ bool Engine::ZSVulkanPipeline::Create(ZSVulkanDevice* device, _vk_Shader* Shader
     pipeline_create_info.basePipelineHandle = VK_NULL_HANDLE; // Optional
     pipeline_create_info.basePipelineIndex = -1; // Optional
     //Try to create pipeline
-    if (vkCreateGraphicsPipelines(device->getVkDevice(), VK_NULL_HANDLE, 1, &pipeline_create_info, nullptr, &this->pipeline) != VK_SUCCESS)
+    if (vkCreateGraphicsPipelines(game_data->vk_main->mDevice->getVkDevice(), VK_NULL_HANDLE, 1, &pipeline_create_info, nullptr, &this->pipeline) != VK_SUCCESS)
         return false;
 
     return true;

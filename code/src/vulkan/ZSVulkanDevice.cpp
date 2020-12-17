@@ -99,7 +99,8 @@ bool Engine::ZSVulkanDevice::initDevice(VkPhysicalDevice Device, ZSVulkanInstanc
     }
 
     //create logical device
-    vkCreateDevice(Device, &logical_gpu_create_info, nullptr, &mDevice); //creating logical device
+    if (vkCreateDevice(Device, &logical_gpu_create_info, nullptr, &mDevice) != VK_SUCCESS) //creating logical device
+        return false;                                                           
     //get graphics queue
     vkGetDeviceQueue(mDevice, static_cast<uint32_t>(GraphicsQueueFamilyIndex), 0, &this->mGraphicsQueue);
     //get present queue
