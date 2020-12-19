@@ -27,3 +27,8 @@ void UiManager::DrawRootLayout() {
 	if (HasRootLayout())
 		mRootLayout->draw();
 }
+
+void UiManager::bindAngelScript(Engine::AGScriptMgr* mgr) {
+	mgr->RegisterObjectType("Ui", 0, asOBJ_REF | asOBJ_NOCOUNT);
+	mgr->RegisterObjectMethod("Ui", "void SetRootLayout(View@)", asMETHOD(UiManager, SetRootLayout), asCALL_THISCALL);
+}

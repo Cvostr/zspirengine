@@ -53,11 +53,13 @@ public:
 
 class _vk_UniformBuffer : public UniformBuffer{
 private:
-
+    VkBuffer mVkBuffer;
 public:
-    void init(unsigned int slot, unsigned int size);
+    void init(unsigned int slot, unsigned int size, bool CreateCpuBuffer = false);
     void writeData(unsigned int offset, unsigned int size, void* data);
     void bind();
+    void updateBufferedData();
+    VkBuffer GetBuffer() { return mVkBuffer; }
 
     _vk_UniformBuffer();
     ~_vk_UniformBuffer();

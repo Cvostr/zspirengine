@@ -96,6 +96,14 @@ void MessageCallback(const asSMessageInfo* msg, void* param)
 		game_data->out_manager->spawnRuntimeError(RuntimeErrorType::RE_TYPE_SCRIPT_ERROR);
 }
 
+Time* GetTimeMgr() {
+	return game_data->time;
+}
+
+UiManager* GetUi() {
+	return game_data->ui_manager;
+}
+
 void AGScriptMgr::create_Engine() {
 	mEngine = asCreateScriptEngine();
 
@@ -126,6 +134,13 @@ void AGScriptMgr::create_Engine() {
 	bindGameObjectPropertySDK<ShadowCasterProperty>(this, SHADOWCAST_PROP_TYPE_NAME);
 
 	bindGameObjectPropertiesSDK(this);
+
+	//Bind Time mgr
+	Engine::Time::bindAngelScript(this);
+	RegisterGlobalFunction("Time@ GetTime()", asFUNCTION(GetTimeMgr), asCALL_CDECL);
+
+	Engine::UiManager::bindAngelScript(this);
+	RegisterGlobalFunction("Ui@ GetUi()", asFUNCTION(GetUi), asCALL_CDECL);
 
 	std::string args = "?&in";
 	for (unsigned int i = 0; i < 9; i++) {

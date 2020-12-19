@@ -19,9 +19,7 @@ Engine::TerrainProperty::TerrainProperty() :
     textures_size(0),
     grassType_size(0),
 
-    rigidBody(nullptr),
-    terrainUniformBuffer(nullptr),
-    transformBuffer(nullptr)
+    rigidBody(nullptr)
 {
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TERRAIN;
 }

@@ -169,6 +169,9 @@ namespace Engine {
     static T* new_as_ref_T(T* ptr) {
         return new T;
     }
-
+    template <typename T, typename U>
+    static U* ag_cast(T* ptr) {
+        return static_cast<U*>(ptr);
+    }
  
 }

@@ -3,6 +3,7 @@
 #include "../../headers/ui/UiScripting.hpp"
 
 #include "../../headers/ui/Widgets/Button.hpp"
+#include "../../headers/ui/Layouts/LinearLayout.hpp"
 
 #define VIEWSIZE_TYPE_NAME "ViewSize"
 #define VIEWMARGIN_TYPE_NAME "ViewMargin"
@@ -11,6 +12,7 @@
 #define VIEW_TYPE_NAME "View"
 #define LAYOUT_TYPE_NAME "Layout"
 #define LINEARLAYOUT_TYPE_NAME "LinearLayout"
+#define LAYOUT_ORIENTATION_NAME "LayoutOrientation"
 #define FREELAYOUT_TYPE_NAME "FreeLayout"
 
 #define WIDGET_TYPE_NAME "Widget"
@@ -29,6 +31,7 @@ static void CreateMargin(unsigned int Top, unsigned int Bottom, unsigned int Lef
 }
 
 void bindButtonSDK(Engine::AGScriptMgr* mgr);
+void bindLinearLayoutSDK(Engine::AGScriptMgr* mgr);
 
 void Engine::bindUiSDK(AGScriptMgr* mgr) {
 
@@ -60,18 +63,29 @@ void Engine::bindUiSDK(AGScriptMgr* mgr) {
 	bindLayoutSDK<Engine::ILayout>(mgr, LAYOUT_TYPE_NAME);
 
 
+	bindLinearLayoutSDK(mgr);
 	bindButtonSDK(mgr);
 	
-	/*
-	bindViewSDK<Engine::LinearLayout>(mgr, LINEARLAYOUT_TYPE_NAME);
-	bindLayoutSDK<Engine::LinearLayout>(mgr, LINEARLAYOUT_TYPE_NAME);*/
 }
 
 void bindButtonSDK(Engine::AGScriptMgr* mgr) {
 	Engine::bindViewSDK<Engine::Button>(mgr, BUTTON_TYPE_NAME);
+	mgr->RegisterObjectBehaviour(BUTTON_TYPE_NAME, asBEHAVE_FACTORY, "Button@ f()", asFUNCTION(Engine::new_as_ref_T<Engine::Button>), asCALL_CDECL);
 	int result = 0;
 	result = mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "bool isClicked()", asMETHOD(Engine::Button, isClicked), asCALL_THISCALL);
 
 	result = mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "void SetDefaultSprite(TextureResource@)", asMETHOD(Engine::Button, SetDefaultSprite), asCALL_THISCALL);
 	result = mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "bool SetHoveredSprite(TextureResource@)", asMETHOD(Engine::Button, SetHoveredSprite), asCALL_THISCALL);
+}
+
+void bindLinearLayoutSDK(Engine::AGScriptMgr* mgr) {
+	mgr->RegisterEnum(LAYOUT_ORIENTATION_NAME);
+	
+	mgr->RegisterEnumValue(LAYOUT_ORIENTATION_NAME, "ORIENTATION_HORIZONTAL", Engine::ORIENTATION_HORIZONTAL);
+	mgr->RegisterEnumValue(LAYOUT_ORIENTATION_NAME, "ORIENTATION_VERTICAL", Engine::ORIENTATION_VERTICAL);
+
+
+	Engine::bindLayoutSDK<Engine::LinearLayout>(mgr, LINEARLAYOUT_TYPE_NAME);
+	mgr->RegisterObjectBehaviour(LINEARLAYOUT_TYPE_NAME, asBEHAVE_FACTORY, "LinearLayout@ f()", asFUNCTION(Engine::new_as_ref_T<Engine::LinearLayout>), asCALL_CDECL);
+	mgr->RegisterObjectProperty(LINEARLAYOUT_TYPE_NAME, "LayoutOrientation Orientation", offsetof(Engine::LinearLayout, Orientation));
 }

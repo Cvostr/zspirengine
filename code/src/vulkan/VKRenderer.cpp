@@ -35,6 +35,8 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
     vkCmdBeginRenderPass(mCmdBuf, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(mCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, MainPipeline->GetPipeline());
 
+    vkCmdBindDescriptorSets(mCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, MainPipeline->GetPipelineLayout(), 0, MainPipeline->GetDescriptorSetsCount(), MainPipeline->GetDescriptorsSets(), 0, nullptr);
+
     ((Engine::_vk_Mesh*)Engine::getPlaneMesh2D())->Draw(mCmdBuf);
 
     vkCmdEndRenderPass(mCmdBuf);
@@ -48,6 +50,8 @@ void Engine::VKRenderer::InitShaders() {
 	test_shader->compileFromFile("Shaders/vulkan_test/vert.spv", "Shaders/vulkan_test/frag.spv");
 
 	ZsVkPipelineConf Conf;
+    Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->transformBuffer, VK_SHADER_STAGE_VERTEX_BIT);
+
 	MainPipeline = new ZSVulkanPipeline();
 	MainPipeline->PushColorOutputAttachment();
 	MainPipeline->Create(test_shader, Conf);

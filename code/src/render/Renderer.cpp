@@ -10,7 +10,6 @@
 #include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
 #include "../../headers/world/ObjectsComponents/NodeComponent.hpp"
 
-#define LIGHT_STRUCT_SIZE 64
 extern ZSpireEngine* engine_ptr;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
@@ -50,10 +49,10 @@ Engine::Renderer::Renderer(){
 
     //Allocate transform buffer
     this->transformBuffer = allocUniformBuffer();
-    transformBuffer->init(0, sizeof (Mat4) * 3 + 16 * 2);
+    transformBuffer->init(0, sizeof(Mat4) * 3 + 16 * 2);
     //allocate lights buffer
     lightsBuffer = allocUniformBuffer();
-    lightsBuffer->init(1, LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16 * 2);
+    lightsBuffer->init(1, LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16 * 2, true);
     //Shadow uniform buffer
     shadowBuffer = allocUniformBuffer();
     shadowBuffer->init(2, 432);
@@ -63,10 +62,10 @@ Engine::Renderer::Renderer(){
     {
         //Skinning uniform buffer
         skinningUniformBuffer = allocUniformBuffer();
-        skinningUniformBuffer->init(4, sizeof (Mat4) * MAX_MESH_BONES);
-        for(unsigned int i = 0; i < MAX_MESH_BONES; i ++){
+        skinningUniformBuffer->init(4, sizeof(Mat4) * MAX_MESH_BONES, true);
+        for (unsigned int i = 0; i < MAX_MESH_BONES; i++) {
             Mat4 m = getIdentity();
-            skinningUniformBuffer->writeData(sizeof (Mat4) * i, sizeof (Mat4), &m);
+            skinningUniformBuffer->writeData(sizeof(Mat4) * i, sizeof(Mat4), &m);
         }
     }
     //Tile uniform buffer
@@ -74,21 +73,20 @@ Engine::Renderer::Renderer(){
     tileBuffer->init(5, 28);
     //Skybox uniform buffer
     skyboxTransformUniformBuffer = Engine::allocUniformBuffer();
-    skyboxTransformUniformBuffer->init(6, sizeof (Mat4) * 2);
+    skyboxTransformUniformBuffer->init(6, sizeof(Mat4) * 2);
 
     uiUniformBuffer = Engine::allocUniformBuffer();
-    uiUniformBuffer->init(7, sizeof (Mat4) * 2 + 16 + 16);
+    uiUniformBuffer->init(7, sizeof(Mat4) * 2 + 16 + 16);
 
     {
         instancedTransformBuffer = Engine::allocUniformBuffer();
-        instancedTransformBuffer->init(9, sizeof (Mat4) * INSTANCED_RENDER_BUFFER_SIZE);
+        instancedTransformBuffer->init(9, sizeof(Mat4) * INSTANCED_RENDER_BUFFER_SIZE);
 
-        for(unsigned int i = 0; i < INSTANCED_RENDER_BUFFER_SIZE; i ++){
+        for (unsigned int i = 0; i < INSTANCED_RENDER_BUFFER_SIZE; i++) {
             Mat4 m = getIdentity();
-            instancedTransformBuffer->writeData(sizeof (Mat4) * i, sizeof (Mat4), &m);
+            instancedTransformBuffer->writeData(sizeof(Mat4) * i, sizeof(Mat4), &m);
         }
     }
-
 
     Engine::setupDefaultMeshes();
     //to avoid memory reallocations
@@ -144,26 +142,27 @@ void Engine::Renderer::setLightsToBuffer(){
 
         LIGHTSOURCE_TYPE light_type = (_light_ptr->light_type);
 
-        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i, sizeof (LIGHTSOURCE_TYPE), &light_type);
+        lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * light_i, sizeof (LIGHTSOURCE_TYPE), &light_type);
         if(_light_ptr->light_type > LIGHTSOURCE_TYPE::LIGHTSOURCE_TYPE_DIRECTIONAL){
-            lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 4, sizeof (float), &_light_ptr->range);
-            lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 12, sizeof (float), &_light_ptr->spot_angle);
+            lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * light_i + 4, sizeof (float), &_light_ptr->range);
+            lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * light_i + 12, sizeof (float), &_light_ptr->spot_angle);
         }
-        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 8, sizeof (float), &_light_ptr->intensity);
+        lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * light_i + 8, sizeof (float), &_light_ptr->intensity);
 
-        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 16, 12, &_light_ptr->last_pos);
-        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 32, 12, &_light_ptr->direction);
-        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 48, sizeof (int), &_light_ptr->color.gl_r);
-        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 52, sizeof (int), &_light_ptr->color.gl_g);
-        lightsBuffer->writeData(LIGHT_STRUCT_SIZE * light_i + 56, sizeof (int), &_light_ptr->color.gl_b);
+        lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * light_i + 16, 12, &_light_ptr->last_pos);
+        lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * light_i + 32, 12, &_light_ptr->direction);
+        lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * light_i + 48, sizeof (int), &_light_ptr->color.gl_r);
+        lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * light_i + 52, sizeof (int), &_light_ptr->color.gl_g);
+        lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * light_i + 56, sizeof (int), &_light_ptr->color.gl_b);
     }
 
     int ls = static_cast<int>(lights_ptr.size());
-    lightsBuffer->writeData(LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT, 4, &ls);
+    lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT, 4, &ls);
 
     Vec3 ambient_L = Vec3(render_settings.ambient_light_color.r / 255.0f,render_settings.ambient_light_color.g / 255.0f, render_settings.ambient_light_color.b / 255.0f);
-    lightsBuffer->writeData(LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16, 12, &ambient_L);
+    lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16, 12, &ambient_L);
 
+    lightsBuffer->updateBufferedData();
     //free lights array
     this->removeLights();
 }
@@ -258,10 +257,12 @@ void Engine::GameObject::setSkinningMatrices(Renderer* pipeline) {
                 //Calculate result matrix
                 Mat4 matrix = transpose(invert(rootNodeTransform) * nd->abs * b->offset);
                 //Send skinned matrix to skinning uniform buffer
-                pipeline->skinningUniformBuffer->bind();
-                pipeline->skinningUniformBuffer->writeData(sizeof(Mat4) * bone_i, sizeof(Mat4), &matrix);
+                
+                pipeline->skinningUniformBuffer->writeDataBuffered(sizeof(Mat4) * bone_i, sizeof(Mat4), &matrix);
             }
         }
+        pipeline->skinningUniformBuffer->bind();
+        pipeline->skinningUniformBuffer->updateBufferedData();
     }
 }
 

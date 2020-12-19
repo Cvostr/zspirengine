@@ -13,8 +13,6 @@ namespace Engine {
 
         btRigidBody* rigidBody;
     public:
-        Engine::UniformBuffer* terrainUniformBuffer;
-        Engine::UniformBuffer* transformBuffer;
 
         std::vector<HeightmapTexturePair> textures;
 

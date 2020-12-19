@@ -14,6 +14,8 @@
 #include "../render/Framebuffer.hpp"
 #include "../ui/Layouts/ILayout.hpp"
 
+#define LIGHT_STRUCT_SIZE 64
+
 enum class PIPELINE_STATE {
     PIPELINE_STATE_DEFAULT,
     PIPELINE_STATE_PICKING,
@@ -89,6 +91,8 @@ public:
     Engine::Shader* getTileShader();
     Engine::Shader* getShadowmapShader();
     Engine::Shader* getUiShader();
+    UniformBuffer* GetTerrainUniformBuffer() { return terrainUniformBuffer; }
+    UniformBuffer* GetTransformUniformBuffer() { return transformBuffer; }
 
     void processObjects(World* world_ptr);
 

@@ -78,14 +78,13 @@ VkDescriptorSet Engine::ZSVulkanDescriptorSet::getDescriptorSet() {
 }
 
 void Engine::ZSVulkanDescriptorSet::UpdUniformBuffer(unsigned int index) {
-    /*if (type == DESCR_SET_TYPE::DESCR_SET_TYPE_UBO) {
+    if (type == DESCR_SET_TYPE::DESCR_SET_TYPE_UBO) {
         _vk_UniformBuffer* buf = ubuffers[index];
-        VKbuffer* _buf = buf->getBuffer();
         //Generating buffer
         VkDescriptorBufferInfo bufferInfo{};
         bufferInfo.offset = 0;
         bufferInfo.range = buf->GetBufferSize();
-        bufferInfo.buffer = _buf->getBuffer();
+        bufferInfo.buffer = buf->GetBuffer();
 
         VkWriteDescriptorSet descriptorWrite{};
         descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -98,7 +97,7 @@ void Engine::ZSVulkanDescriptorSet::UpdUniformBuffer(unsigned int index) {
         descriptorWrite.pImageInfo = nullptr; // Optional
         descriptorWrite.pTexelBufferView = nullptr; // Optional
         vkUpdateDescriptorSets(game_data->vk_main->mDevice->getVkDevice(), 1, &descriptorWrite, 0, nullptr);
-    }*/
+    }
 
 }
 

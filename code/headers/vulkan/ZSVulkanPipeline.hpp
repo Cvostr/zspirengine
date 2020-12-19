@@ -81,6 +81,8 @@ namespace Engine {
         VkRenderPass GetRenderPass();
         VkPipelineLayout GetPipelineLayout();
         VkPipeline GetPipeline();
+        VkDescriptorSet* GetDescriptorsSets();
+        unsigned int GetDescriptorSetsCount();
 
         void PushColorAttachment(VkFormat Format, VkImageLayout Layout);
         void PushColorOutputAttachment();

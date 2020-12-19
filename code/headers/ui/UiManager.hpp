@@ -4,6 +4,7 @@
 #include "View.hpp"
 #include "Layouts/ILayout.hpp"
 #include <vector>
+#include "../Scripting/AngelScriptMgr.h"
 
 namespace Engine {
 	class UiManager : public IEngineComponent {
@@ -18,6 +19,8 @@ namespace Engine {
 		bool HasRootLayout();
 		void DrawRootLayout();
 
+
+		static void bindAngelScript(Engine::AGScriptMgr* mgr);
 	private:
 		tViewList mViews;
 		ILayout* mRootLayout;

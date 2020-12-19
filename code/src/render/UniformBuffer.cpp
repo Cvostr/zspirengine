@@ -6,12 +6,22 @@
 
 extern ZSpireEngine* engine_ptr;
 
-Engine::UniformBuffer::UniformBuffer(){
+Engine::UniformBuffer::UniformBuffer():
+    mSlot(0),
+    mBufferSize(0),
+    mCpuBufferCreated(false)
+{
 
 }
 Engine::UniformBuffer::UniformBuffer(unsigned int slot, unsigned int size){
     init(slot, size);
 }
+
+void Engine::UniformBuffer::writeDataBuffered(unsigned int offset, unsigned int size, void* data) {
+    if(mCpuBufferCreated)
+        memcpy(this->mCpuBuffer + offset, data, size);
+}
+
 Engine::UniformBuffer::~UniformBuffer(){
 
 }

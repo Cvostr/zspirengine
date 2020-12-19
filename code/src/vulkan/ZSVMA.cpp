@@ -25,6 +25,23 @@ void Engine::ZSVMA::allocate(const VkBufferCreateInfo createInfo, VkBuffer* buff
 	vmaCreateBuffer(*((VmaAllocator*)allocator), &createInfo, &allocInfo, buffer, &allocation, nullptr);
 }
 
+void Engine::ZSVMA::allocate(VkBufferUsageFlags flags, VkBuffer* buffer, unsigned int size) {
+    VkBufferCreateInfo vbInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
+    vbInfo.size = size;
+    vbInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+    vbInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    VmaAllocationCreateInfo vbAllocCreateInfo = {};
+    vbAllocCreateInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+    vbAllocCreateInfo.flags = 0;
+
+    VkBuffer stagingVertexBuffer = VK_NULL_HANDLE;
+    VmaAllocation stagingVertexBufferAlloc = VK_NULL_HANDLE;
+    VmaAllocationInfo stagingVertexBufferAllocInfo = {};
+    vmaCreateBuffer(*((VmaAllocator*)allocator), &vbInfo, &vbAllocCreateInfo, &stagingVertexBuffer, &stagingVertexBufferAlloc, &stagingVertexBufferAllocInfo);
+
+}
+
 void Engine::ZSVMA::allocate(VkBufferUsageFlags flags, VkBuffer* buffer, void* data, unsigned int size) {
     VkBufferCreateInfo vbInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
     vbInfo.size = size;

@@ -123,20 +123,19 @@ Vec3 Engine::Camera::getCameraViewCenterPos(){
 void Engine::Camera::updateTick(float deltaTime){
     if(!isMoving) return;
 
-    if(getDistance(camera_pos, _dest_pos) < 6){
-        camera_pos = _dest_pos;
-        updateViewMat();
+    Vec3 real_dest = (_dest_pos - (5) * camera_front);
+
+    if(getDistance(camera_pos, real_dest) < 2){
         isMoving = false;
     }else{
-        Vec3 delta = camera_pos - _dest_pos;
-        float dist = getDistance(camera_pos, _dest_pos);
+        Vec3 delta = real_dest - camera_pos;
+        float dist = getDistance(camera_pos, real_dest);
 
         Vec3 toMove = delta / dist;
-        toMove = toMove * (deltaTime) - (10 / dist);
-        camera_pos = camera_pos - toMove;
+        toMove = toMove * (deltaTime) * 40;
+        camera_pos = camera_pos + toMove;
         updateViewMat();
     }
-
 }
 
 void Engine::Camera::startMoving(){

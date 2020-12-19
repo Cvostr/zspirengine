@@ -15,6 +15,13 @@ VkPipeline Engine::ZSVulkanPipeline::GetPipeline() {
     return pipeline;
 }
 
+VkDescriptorSet* Engine::ZSVulkanPipeline::GetDescriptorsSets() {
+    return mDescrSets.data();
+}
+unsigned int Engine::ZSVulkanPipeline::GetDescriptorSetsCount() {
+    return mDescrSets.size();
+}
+
 void Engine::ZSVulkanPipeline::PushColorAttachment(VkFormat Format, VkImageLayout Layout) {
     VkAttachmentDescription colorAttachment = {};
     colorAttachment.format = Format;
@@ -146,8 +153,6 @@ bool Engine::ZSVulkanPipeline::Create(_vk_Shader* Shader, ZsVkPipelineConf Conf)
 
     pipeline_info.setLayoutCount = mDescrSetLayouts.size();
     pipeline_info.pSetLayouts = mDescrSetLayouts.data();
-    pipeline_info.setLayoutCount = 0;
-    pipeline_info.pSetLayouts = nullptr;
     pipeline_info.pushConstantRangeCount = 0;
     pipeline_info.pPushConstantRanges = nullptr;
     vkCreatePipelineLayout(game_data->vk_main->mDevice->getVkDevice(), &pipeline_info, nullptr, &this->mPipelineLayout);

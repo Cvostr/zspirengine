@@ -28,8 +28,11 @@ bool Engine::ZSVulkanSampler::CreateSampler() {
 	samplerInfo.minLod = 0.0f;
 	samplerInfo.maxLod = 0.0f;
 
-	if (vkCreateSampler(game_data->vk_main->mDevice->getVkDevice(), &samplerInfo, nullptr, &this->sampler))
+	if (vkCreateSampler(game_data->vk_main->mDevice->getVkDevice(), &samplerInfo, nullptr, &this->sampler)) {
 		throw std::runtime_error("VULKAN: Failed creating image sampler");
+	}
+
+	return true;
 }
 VkSampler Engine::ZSVulkanSampler::GetVkSampler() {
 	return this->sampler;

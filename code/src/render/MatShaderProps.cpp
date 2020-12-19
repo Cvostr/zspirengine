@@ -29,23 +29,19 @@ void MtShaderPropertiesGroup::loadFromFile(const char* fpath){
 MtShaderPropertiesGroup::MtShaderPropertiesGroup(Engine::Shader* shader, const char* UB_CAPTION, unsigned int UB_ConnectID, unsigned int UB_SIZE){
     render_shader = shader;
 
-    if(UB_SIZE == 0 || strlen(UB_CAPTION) == 0) return;
-    this->UB_ConnectID = UB_ConnectID;
-    //First of all, tell shader uniform buffer point
-    //Get Index of buffer
-    //shader->setUniformBufferBinding(UB_CAPTION, UB_ConnectID);
-
-    //Generate uniform buffer
-    this->UB_ID = Engine::allocUniformBuffer();
-    this->UB_ID->init(UB_ConnectID, UB_SIZE);
-
     acceptShadows = false;
     properties.resize(0);
+
+    if(UB_SIZE == 0 || strlen(UB_CAPTION) == 0) return;
+    this->UB_ConnectID = UB_ConnectID;
+    //Generate uniform buffer
+    this->UB_ID = Engine::allocUniformBuffer();
+    this->UB_ID->init(UB_ConnectID, UB_SIZE, true);
 }
 
 void MtShaderPropertiesGroup::setUB_Data(unsigned int offset, unsigned int size, void* data){
 
-    this->UB_ID->writeData(offset, size, data);
+    this->UB_ID->writeDataBuffered(offset, size, data);
 }
 
 MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
@@ -357,7 +353,7 @@ void Material::loadFromBuffer(char* buffer, unsigned int size){
             std::string prop_identifier;
             readString(prop_identifier, buffer, position);
 
-            for(unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i ++){
+            for(unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i ++) {
                 MaterialShaderProperty* prop_ptr = group_ptr->properties[prop_i];
                 MaterialShaderPropertyConf* conf_ptr = this->confs[prop_i];
                 //check if compare
@@ -485,10 +481,9 @@ void Material::applyMatToPipeline(){
     if(shader == nullptr)
         return;
     shader->Use();
-    if(group_ptr->UB_ID != nullptr)
-        group_ptr->UB_ID->bind();
+   
     //iterate over all properties, send them all!
-    for(unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i ++){
+    for(unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i ++) {
         MaterialShaderProperty* prop_ptr = group_ptr->properties[prop_i];
         MaterialShaderPropertyConf* conf_ptr = confs[prop_i];
         switch(prop_ptr->type){
@@ -596,5 +591,9 @@ void Material::applyMatToPipeline(){
                 break;
             }
         }
+    }
+    if (group_ptr->UB_ID != nullptr) {
+        group_ptr->UB_ID->bind();
+        group_ptr->UB_ID->updateBufferedData();
     }
 }

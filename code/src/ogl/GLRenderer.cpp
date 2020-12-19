@@ -25,7 +25,6 @@ void Engine::GLRenderer::InitShaders() {
         this->shadowMap->compileFromFile("Shaders/shadowmap/shadowmap.vert", "Shaders/shadowmap/shadowmap.frag", "Shaders/shadowmap/shadowmap.geom");
         this->final_shader->compileFromFile("Shaders/postprocess/final/final.vert", "Shaders/postprocess/final/final.frag");
         this->water_shader->compileFromFile("Shaders/water/water.vert", "Shaders/water/water.frag");
-
     }
 }
 
