@@ -46,15 +46,15 @@ void Engine::IView::__GetTransform(ViewSize& _Size, ViewPosition& _Pos) {
 			LinearLayout* _LinearLayout = static_cast<LinearLayout*>(ParentLayout);
 			//Get previous object
 			IView* PreviousView = static_cast<ILayout*>(mParent)->GetPreviousObject(this);
-			ViewSize pvSize;
-			ViewPosition pvPos;
+			ViewSize pvSize; // Size of previous view
+			ViewPosition pvPos; //Position of previous view
 			if (PreviousView != nullptr)
 				PreviousView->__GetTransform(pvSize, pvPos);
 			if (_LinearLayout->Orientation == ORIENTATION_HORIZONTAL) {
 				_Pos.posX = pvPos.posX + pvSize.WIDTH + margin.marginLeft;
 			}
 			if (_LinearLayout->Orientation == ORIENTATION_VERTICAL) {
-				_Pos.posX = pvPos.posY + pvSize.HEIGHT + margin.marginTop;
+				_Pos.posY = pvPos.posY - ( margin.marginTop);
 			}
 		}
 		else {

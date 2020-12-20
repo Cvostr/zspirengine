@@ -15,7 +15,14 @@ vec3 colors[3] = vec3[](
     vec3(0.0, 0.0, 1.0)
 );
 
+layout (std140, binding = 0) uniform CamMatrices{
+    uniform mat4 cam_projection;
+    uniform mat4 cam_view;
+    uniform mat4 object_transform;
+    uniform vec3 cam_position;
+};
+
 void main() {
-    gl_Position = vec4(position, 1.0);
+    gl_Position = vec4(cam_position, 1.0);
     fragColor = colors[gl_VertexIndex];
 }

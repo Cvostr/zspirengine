@@ -22,6 +22,7 @@ namespace Engine {
         float farPlane;
         int projection_viewport;
         int mCascadesNum;
+        int mPcfNum;
 
         void addPropertyInterfaceToInspector();
         void onPreRender(Engine::Renderer* pipeline);

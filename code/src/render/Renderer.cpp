@@ -55,7 +55,7 @@ Engine::Renderer::Renderer(){
     lightsBuffer->init(1, LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16 * 2, true);
     //Shadow uniform buffer
     shadowBuffer = allocUniformBuffer();
-    shadowBuffer->init(2, 432);
+    shadowBuffer->init(2, 448, true);
     //Terrain uniform buffer
     terrainUniformBuffer = allocUniformBuffer();
     terrainUniformBuffer->init(3, 12 * 16 * 2 + 4 * 3);
@@ -312,21 +312,21 @@ void Engine::MaterialProperty::onRender(Engine::Renderer* pipeline){
     if (pipeline->getRenderSettings()->shadowcaster_obj_ptr != nullptr) {
         shadowcast =
             pipeline->getRenderSettings()->shadowcaster_obj_ptr->getPropertyPtr<Engine::ShadowCasterProperty>();
+        
+        int recShadows = 1;
+
+        if(shadowcast == nullptr){
+            //In GLSL we should use Integer instead of bool
+            recShadows = 0;
+        }else if(!receiveShadows || !shadowcast->isActive()){
+            recShadows = 0;
+        }else
+            shadowcast->setTexture();
+
         //Bind shadow uniform buffer
         pipeline->shadowBuffer->bind();
+        pipeline->shadowBuffer->writeData(8, sizeof(int), &recShadows);
     }
-
-    int recShadows = 1;
-
-    if(shadowcast == nullptr){
-        //In GLSL we should use Integer instead of bool
-        recShadows = 0;
-    }else if(!receiveShadows || !shadowcast->isActive()){
-        recShadows = 0;
-    }else
-        shadowcast->setTexture();
-
-    pipeline->shadowBuffer->writeData(8, sizeof(int), &recShadows);
     //Apply matrerial to shader and textures
     material_ptr->applyMatToPipeline();
 }
@@ -443,8 +443,10 @@ void Engine::Renderer::renderSprite(Engine::Texture* texture_sprite, int X, int 
 }
 
 void Engine::Renderer::renderSprite(Engine::TextureResource* texture_sprite, int X, int Y, int scaleX, int scaleY){
-    texture_sprite->Use(0);
-    renderSprite(texture_sprite->texture_ptr, X, Y, scaleX, scaleY);
+    if (texture_sprite != nullptr) {
+        texture_sprite->Use(0);
+        renderSprite(texture_sprite->texture_ptr, X, Y, scaleX, scaleY);
+    }
 }
 
 void Engine::Renderer::renderGlyph(Engine::Texture* glyph, int X, int Y, int scaleX, int scaleY, ZSRGBCOLOR color){

@@ -51,6 +51,8 @@ void Engine::VKRenderer::InitShaders() {
 
 	ZsVkPipelineConf Conf;
     Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->transformBuffer, VK_SHADER_STAGE_VERTEX_BIT);
+    Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->lightsBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
+    Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->shadowBuffer, VK_SHADER_STAGE_ALL_GRAPHICS);
 
 	MainPipeline = new ZSVulkanPipeline();
 	MainPipeline->PushColorOutputAttachment();

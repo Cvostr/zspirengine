@@ -132,7 +132,7 @@ void Engine::Camera::updateTick(float deltaTime){
         float dist = getDistance(camera_pos, real_dest);
 
         Vec3 toMove = delta / dist;
-        toMove = toMove * (deltaTime) * 40;
+        toMove = toMove * (deltaTime) * 80;
         camera_pos = camera_pos + toMove;
         updateViewMat();
     }

@@ -13,6 +13,7 @@ Engine::ShadowCasterProperty::ShadowCasterProperty() :
     mShadowBuffer(0),
     mShadowDepthTexture(0),
     mCascadesNum(3),
+    mPcfNum(1),
 
     initialized(false)
 {
@@ -49,6 +50,7 @@ void Engine::ShadowCasterProperty::copyTo(Engine::IGameObjectComponent* dest) {
     _dest->mShadowBias = this->mShadowBias;
     _dest->TextureSize = this->TextureSize;
     _dest->mCascadesNum = this->mCascadesNum;
+    _dest->mPcfNum = this->mPcfNum;
     _dest->projection_viewport = this->projection_viewport;
 }
 
@@ -78,6 +80,7 @@ void Engine::ShadowCasterProperty::loadPropertyFromMemory(const char* data, Game
 
     readBinaryValue(&TextureSize, data + offset, offset);
     readBinaryValue(&mCascadesNum, data + offset, offset);
+    readBinaryValue(&mPcfNum, data + offset, offset);
     readBinaryValue(&mShadowBias, data + offset, offset);
     readBinaryValue(&nearPlane, data + offset, offset);
     readBinaryValue(&farPlane, data + offset, offset);
@@ -88,6 +91,7 @@ void Engine::ShadowCasterProperty::savePropertyToStream(ZsStream* stream, GameOb
     //write collider type
     stream->writeBinaryValue(&TextureSize);
     stream->writeBinaryValue(&mCascadesNum);
+    stream->writeBinaryValue(&mPcfNum);
     stream->writeBinaryValue(&mShadowBias);
     stream->writeBinaryValue(&nearPlane);
     stream->writeBinaryValue(&farPlane);
@@ -153,14 +157,15 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, Renderer* pipeline)
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
     glDisable(GL_CULL_FACE);
-    //Bind shadow uniform buffer
-    pipeline->shadowBuffer->bind();
+    
     //Send BIAS value
-    pipeline->shadowBuffer->writeData(0, sizeof(float), &mShadowBias);
+    pipeline->shadowBuffer->writeDataBuffered(0, sizeof(float), &mShadowBias);
     //Send Width of shadow texture
-    pipeline->shadowBuffer->writeData(sizeof(float), sizeof(int), &this->TextureSize);
+    pipeline->shadowBuffer->writeDataBuffered(sizeof(float), sizeof(int), &this->TextureSize);
     //Send number of cascades of shadow texture
-    pipeline->shadowBuffer->writeData(12, sizeof(int), &this->mCascadesNum);
+    pipeline->shadowBuffer->writeDataBuffered(12, sizeof(int), &this->mCascadesNum);
+    //Send number of pcf passes
+    pipeline->shadowBuffer->writeDataBuffered(16, sizeof(int), &this->mPcfNum);
     //Use shadowmap shader to draw objects
     pipeline->getShadowmapShader()->Use();
 
@@ -175,12 +180,17 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, Renderer* pipeline)
 
         Mat4 mat = matview * LightProjectionMat;
 
-        pipeline->shadowBuffer->bind();
-        unsigned int offset = 16 + sizeof(Mat4) * i;
-        pipeline->shadowBuffer->writeData(offset, sizeof(Mat4), &mat);
-        unsigned int DistOffset = 400 + sizeof(int) * i;
-        pipeline->shadowBuffer->writeData(DistOffset, sizeof(int), &dists[i]);
+        //pipeline->shadowBuffer->bind();
+        unsigned int offset = 32 + sizeof(Mat4) * i;
+        pipeline->shadowBuffer->writeDataBuffered(offset, sizeof(Mat4), &mat);
+        unsigned int DistOffset = 416 + sizeof(int) * i;
+        pipeline->shadowBuffer->writeDataBuffered(DistOffset, sizeof(int), &dists[i]);
     }
+
+    //Bind shadow uniform buffer
+    pipeline->shadowBuffer->bind();
+    pipeline->shadowBuffer->updateBufferedData();
+
     glViewport(0, 0, TextureSize, TextureSize);
     //Render to depth all scene
     pipeline->renderShadowDepth(this->go_link.world_ptr, mCascadesNum);

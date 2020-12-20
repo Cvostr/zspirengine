@@ -8,22 +8,23 @@ void Engine::_vk_UniformBuffer::init(unsigned int slot, unsigned int size, bool 
         mSlot = slot;
         mBufferSize = size;
 
-        if (CreateCpuBuffer) {
-            mCpuBuffer = new char[mBufferSize];
-            mCpuBufferCreated = true;
-        }
+        mCpuBuffer = new char[mBufferSize];
+        mCpuBufferCreated = true;
 
-        game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, &this->mVkBuffer, size);
+        game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, &mVkBuffer, size);
 
         mCreated = true;
     }
 }
 void Engine::_vk_UniformBuffer::writeData(unsigned int offset, unsigned int size, void* data){
-
+    writeDataBuffered(offset, size, data);
+    updateBufferedData();
 }
 
 void Engine::_vk_UniformBuffer::updateBufferedData() {
-
+    if (mCreated && mCpuBufferCreated) {
+        game_data->vk_main->mVMA->copy(mVkBuffer, 0, mCpuBuffer, this->mBufferSize);
+    }
 }
 
 void Engine::_vk_UniformBuffer::bind(){

@@ -13,5 +13,6 @@ namespace Engine {
 		void allocate(const VkBufferCreateInfo createInfo, VkBuffer* buffer);
 		void allocate(VkBufferUsageFlags flags, VkBuffer* buffer, unsigned int size);
 		void allocate(VkBufferUsageFlags flags, VkBuffer* buffer, void* data, unsigned int size);
+		void copy(VkBuffer buffer, unsigned int offset, void* data, unsigned int size);
 	};
 }
