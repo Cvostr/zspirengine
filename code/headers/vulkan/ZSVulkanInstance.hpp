@@ -5,7 +5,7 @@
 #include <SDL2/SDL_vulkan.h>
 #include <vector>
 
-#include "../engine/engine_window.h"
+#include "../engine/Window.hpp"
 
 namespace Engine {
 

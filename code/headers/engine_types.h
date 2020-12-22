@@ -25,4 +25,14 @@ typedef struct ZSGAME_DESC{
 
 }ZSGAME_DESC;
 
+typedef struct Project {
+    std::string label; //Label of the project
+    std::string root_path; //Project root folder
+
+    int version; //Project version
+    ZSPERSPECTIVE perspective; //3D or 2D
+
+    std::string startup_scene;
+}Project;
+
 #endif // ENGINE_TYPES_H

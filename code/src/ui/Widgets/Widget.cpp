@@ -16,7 +16,7 @@ Engine::IWidget::~IWidget(){
 }
 bool Engine::IWidget::isHoveredByMouse(){
     Input::MouseState mstate = Input::getMouseState();
-    mstate.mouseY = engine_ptr->window_info->Height - mstate.mouseY;
+    mstate.mouseY = engine_ptr->GetWindow()->GetWindowHeight() - mstate.mouseY;
 
     unsigned int uiMouseX = static_cast<unsigned int>(mstate.mouseX);
     unsigned int uiMouseY = static_cast<unsigned int>(mstate.mouseY);

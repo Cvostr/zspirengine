@@ -4,6 +4,6 @@
 
 namespace Engine {
 	VkCommandPool beginCommandPool();
-	VkCommandBuffer beginSingleTimeComdbuf(VkCommandPool commandPool);
+	VkCommandBuffer CreateSingleTimeComdbuf(VkCommandPool commandPool);
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer, VkCommandPool commandPool);
 }

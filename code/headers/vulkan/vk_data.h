@@ -6,18 +6,21 @@
 #include "../render/Shader.hpp"
 #include "../render/Texture.h"
 #include "../vulkan/ZSVulkanInstance.hpp"
+#include "ZSVMA.hpp"
 
 namespace Engine{
 
 class _vk_Mesh : public Engine::Mesh {
 private:
-    VkBuffer vertexBuffer;
-    VkBuffer indexBuffer;
+    VmaVkBuffer vertexBuffer;
+    VmaVkBuffer indexBuffer;
 public:
     void Init();
     void setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num);
     void setMeshData(ZSVERTEX* vertices, unsigned int vertices_num);
     void Draw(VkCommandBuffer CmdBuf);
+    void Draw();
+    void DrawInstanced(unsigned int instances);
     void Destroy();
 
     _vk_Mesh();
@@ -53,13 +56,14 @@ public:
 
 class _vk_UniformBuffer : public UniformBuffer{
 private:
-    VkBuffer mVkBuffer;
+    VmaVkBuffer mVkBuffer;
 public:
     void init(unsigned int slot, unsigned int size, bool CreateCpuBuffer = false);
     void writeData(unsigned int offset, unsigned int size, void* data);
     void bind();
     void updateBufferedData();
-    VkBuffer GetBuffer() { return mVkBuffer; }
+    void Destroy();
+    VkBuffer GetBuffer() { return mVkBuffer.Buffer; }
 
     _vk_UniformBuffer();
     ~_vk_UniformBuffer();

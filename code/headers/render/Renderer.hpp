@@ -111,6 +111,7 @@ public:
     void render();
     virtual void render2D(){}
     virtual void render3D(Engine::Camera* cam){}
+    virtual void DrawObject(Engine::GameObject* obj){}
     void renderShadowDepth(World* world_ptr, unsigned int CascadesNum);
 
     void OnCreate();

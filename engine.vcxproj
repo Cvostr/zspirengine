@@ -150,10 +150,12 @@
     <ClCompile Include="code\src\audio\SoundSource.cpp" />
     <ClCompile Include="code\src\engine.cpp" />
     <ClCompile Include="code\src\engine\EngineComponent.cpp" />
+    <ClCompile Include="code\src\engine\EngineComponentManager.cpp" />
     <ClCompile Include="code\src\engine\LocaleStringsFile.cpp" />
     <ClCompile Include="code\src\engine\Logger.cpp" />
     <ClCompile Include="code\src\engine\Resources.cpp" />
     <ClCompile Include="code\src\engine\Time.cpp" />
+    <ClCompile Include="code\src\engine\Window.cpp" />
     <ClCompile Include="code\src\input\zs-input.cpp" />
     <ClCompile Include="code\src\math\BB3.cpp" />
     <ClCompile Include="code\src\math\Mat4.cpp" />
@@ -251,7 +253,8 @@
     <ClInclude Include="code\headers\audio\SoundSource.hpp" />
     <ClInclude Include="code\headers\engine.h" />
     <ClInclude Include="code\headers\engine\EngineComponent.h" />
-    <ClInclude Include="code\headers\engine\engine_window.h" />
+    <ClInclude Include="code\headers\engine\EngineComponentManager.hpp" />
+    <ClInclude Include="code\headers\engine\Window.hpp" />
     <ClInclude Include="code\headers\engine\BackgroundLoader.hpp" />
     <ClInclude Include="code\headers\engine\LocaleStringsFile.h" />
     <ClInclude Include="code\headers\engine\Logger.hpp" />

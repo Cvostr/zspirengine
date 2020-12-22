@@ -9,6 +9,7 @@ namespace Engine {
 		void InitShaders();
 		void initManager();
 
+		void DrawObject(Engine::GameObject* obj);
 		void render2D();
 		void render3D(Engine::Camera* cam);
 

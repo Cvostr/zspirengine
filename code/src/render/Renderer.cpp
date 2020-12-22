@@ -212,9 +212,9 @@ void Engine::GameObject::processObject(Renderer* pipeline) {
     Engine::TransformProperty* transform_prop = this->getTransformProperty();
     //Call update on every property in objects
     if (pipeline->allowOnUpdate && pipeline->current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
-        this->onUpdate(static_cast<int>(pipeline->deltaTime));
+        this->onUpdate(static_cast<int>(game_data->time->GetDeltaTime()));
 
-    this->Draw(pipeline);
+    pipeline->DrawObject(this);
 
     for (unsigned int obj_i = 0; obj_i < this->mChildren.size(); obj_i++) {
         if (!mChildren[obj_i].isEmpty()) { //if link isn't broken
@@ -263,40 +263,6 @@ void Engine::GameObject::setSkinningMatrices(Renderer* pipeline) {
         }
         pipeline->skinningUniformBuffer->bind();
         pipeline->skinningUniformBuffer->updateBufferedData();
-    }
-}
-
-void Engine::GameObject::Draw(Renderer* pipeline){    //On render pipeline wish to draw the object
-    if (pipeline->current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
-        //Call prerender on each property in object
-        this->onPreRender(pipeline);
-    if (hasMesh() || hasTerrain()) {
-        if (pipeline->current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT) {
-            MeshProperty* mesh_prop = getPropertyPtr<MeshProperty>();
-            
-            //Render all properties
-            this->onRender(pipeline);
-            //Send mesh skinning matrices
-            setSkinningMatrices(pipeline);
-            //Draw mesh
-            DrawMesh(pipeline);
-        }
-
-        if (pipeline->current_state == PIPELINE_STATE::PIPELINE_STATE_SHADOWDEPTH) {
-            Engine::TransformProperty* transform_ptr = getTransformProperty();
-            MeshProperty* mesh_prop = getPropertyPtr<MeshProperty>();
-            //set transform to camera buffer
-            pipeline->transformBuffer->bind();
-            pipeline->transformBuffer->writeData(sizeof(Mat4) * 2, sizeof(Mat4), &transform_ptr->transform_mat);
-            //Send mesh skinning matrices
-            setSkinningMatrices(pipeline);
-            
-            //Get castShadows boolean from several properties
-            bool castShadows = (hasTerrain()) ? getPropertyPtr<TerrainProperty>()->castShadows : mesh_prop->castShadows;
-            //If castShadows is true, then render mesh to DepthBuffer
-            if(castShadows)
-                DrawMeshInstanced(pipeline, pipeline->getRenderSettings()->mShadowCascadesNum);
-        }
     }
 }
 

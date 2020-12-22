@@ -118,9 +118,6 @@ void Engine::TransformProperty::copyTo(IGameObjectComponent* dest) {
 
 void Engine::TransformProperty::onPreRender(Renderer* pipeline) {
     this->updateMatrix();
-    //Send transform matrix to transform buffer
-    pipeline->transformBuffer->bind();
-    pipeline->transformBuffer->writeData(sizeof(Mat4) * 2, sizeof(Mat4), &transform_mat);
 }
 
 void Engine::TransformProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {

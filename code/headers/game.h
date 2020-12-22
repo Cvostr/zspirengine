@@ -10,8 +10,10 @@
 #include "audio/OALManager.hpp"
 #include "vulkan/ZSVulkan.hpp"
 #include "engine/Time.hpp"
+#include "engine/Window.hpp"
 
 typedef struct ZSGAME_DATA{
+    Engine::Window* window;
     //Pointer to resource manager
     Engine::ResourceManager* resources; 
     //Pointer to World class

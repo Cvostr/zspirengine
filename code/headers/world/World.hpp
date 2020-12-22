@@ -246,7 +246,7 @@ public:
     GameObjectLink getLinkToThisObject();
     void copyTo(GameObject* dest);
     void processObject(Renderer* pipeline); //On render pipeline wish to work with object
-    void Draw(Renderer* pipeline); //On render pipeline wish to draw the object
+
     void onStart(); //calls onStart() on all properties
     void onStop(); //calls onStop() on all properties
     void onUpdate(int deltaTime); //calls onUpdate on all properties

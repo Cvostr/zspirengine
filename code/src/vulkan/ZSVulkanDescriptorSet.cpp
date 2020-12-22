@@ -45,7 +45,8 @@ void Engine::ZSVulkanDescriptorSet::addDescriptorPool(VkDescriptorType type) {
 VkDescriptorSetLayout Engine::ZSVulkanDescriptorSet::getDescriptorSetLayout() {
 
     VkDescriptorPoolCreateInfo poolInfo =
-        getDescrPoolCreateInfo(pool_sizes.size(), pool_sizes.data(), 1);
+        getDescrPoolCreateInfo(static_cast<unsigned int>(pool_sizes.size()),
+                                pool_sizes.data(), 1);
 
     //Create POOL
     if (vkCreateDescriptorPool(game_data->vk_main->mDevice->getVkDevice(), &poolInfo, nullptr, &this->Descr_Pool) != VK_SUCCESS) {

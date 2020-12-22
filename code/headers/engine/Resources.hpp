@@ -123,6 +123,7 @@ class MeshResource : public ZsResource{
 public:
     Engine::Mesh* mesh_ptr;
 
+    void load();
     void Draw();
     void DrawInstanced(unsigned int inst_num);
     void Release();

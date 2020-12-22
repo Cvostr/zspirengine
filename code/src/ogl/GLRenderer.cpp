@@ -1,6 +1,9 @@
 #include "../../headers/ogl/GLRenderer.hpp"
 #include "../../headers/game.h"
 
+#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
+#include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
+
 extern ZSpireEngine* engine_ptr;
 extern ZSGAME_DATA* game_data;
 
@@ -46,8 +49,9 @@ void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int hei
 
 void Engine::GLRenderer::initManager() {
     setDepthState(true);
+    Engine::Window* win = engine_ptr->GetWindow();
 
-    if (this->game_desc_ptr->game_perspective == PERSP_2D) {
+    if (engine_ptr->desc->game_perspective == PERSP_2D) {
         cullFaces = false;
         setFaceCullState(false);
     }
@@ -56,21 +60,22 @@ void Engine::GLRenderer::initManager() {
         setFaceCullState(true);
     }
     //if we use opengl, then create GBUFFER in GL commands
-    if (this->game_desc_ptr->game_perspective == PERSP_3D) {
-        create_G_Buffer_GL(this->WIDTH, this->HEIGHT);
+    if (engine_ptr->desc->game_perspective == PERSP_3D) {
+        create_G_Buffer_GL(win->GetWindowWidth(), win->GetWindowHeight());
     }
 }
 
 
 void Engine::GLRenderer::render2D() {
     World* world_ptr = game_data->world;
+    Engine::Window* win = engine_ptr->GetWindow();
 
     if (engine_ptr->engine_info->graphicsApi == OGL) {
         setClearColor(0, 0, 0, 1);
         ClearFBufferGL(true, true);
         setBlendingState(true); //Disable blending to render Skybox and shadows
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        setFullscreenViewport(this->WIDTH, this->HEIGHT);
+        setFullscreenViewport(win->GetWindowWidth(), win->GetWindowHeight());
         setDepthState(true);
         //Render objects
         processObjects(world_ptr);
@@ -79,6 +84,7 @@ void Engine::GLRenderer::render2D() {
 
 void Engine::GLRenderer::render3D(Engine::Camera* cam) {
     World* world_ptr = game_data->world;
+    Engine::Window* win = engine_ptr->GetWindow();
     //Render shadows, first
     TryRenderShadows(cam);
     this->cam = cam;
@@ -90,7 +96,7 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
         {
             //Render Skybox
             setBlendingState(false);
-            setFullscreenViewport(this->WIDTH, this->HEIGHT);
+            setFullscreenViewport(win->GetWindowWidth(), win->GetWindowHeight());
             TryRenderSkybox();
         }
         {
@@ -132,6 +138,37 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
         ((GLframebuffer*)ui_buffer)->bindTextures(1);
         final_shader->Use();
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
+    }
+}
+
+void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
+    if (current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
+        //Call prerender on each property in object
+        obj->onPreRender(this);
+    if (obj->hasMesh() || obj->hasTerrain()) {
+        //Send mesh skinning matrices
+        obj->setSkinningMatrices(this);
+        //Send transform matrix to transform buffer
+        Engine::TransformProperty* transform_ptr = obj->getTransformProperty();
+        transformBuffer->bind();
+        transformBuffer->writeData(sizeof(Mat4) * 2, sizeof(Mat4), &transform_ptr->transform_mat);
+
+        if (current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT) {
+            MeshProperty* mesh_prop = obj->getPropertyPtr<MeshProperty>();
+            //Render all properties
+            obj->onRender(this);
+            //Draw mesh
+            obj->DrawMesh(this);
+        }
+
+        if (current_state == PIPELINE_STATE::PIPELINE_STATE_SHADOWDEPTH) {
+            MeshProperty* mesh_prop = obj->getPropertyPtr<MeshProperty>();
+            //Get castShadows boolean from several properties
+            bool castShadows = (obj->hasTerrain()) ? obj->getPropertyPtr<TerrainProperty>()->castShadows : mesh_prop->castShadows;
+            //If castShadows is true, then render mesh to DepthBuffer
+            if (castShadows)
+                obj->DrawMeshInstanced(this, getRenderSettings()->mShadowCascadesNum);
+        }
     }
 }
 

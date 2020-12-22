@@ -15,7 +15,7 @@ VkCommandPool Engine::beginCommandPool() {
     return commandPool;
 }
 
-VkCommandBuffer Engine::beginSingleTimeComdbuf(VkCommandPool commandPool) {
+VkCommandBuffer Engine::CreateSingleTimeComdbuf(VkCommandPool commandPool) {
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -25,12 +25,6 @@ VkCommandBuffer Engine::beginSingleTimeComdbuf(VkCommandPool commandPool) {
 
     VkCommandBuffer commandBuffer;
     vkAllocateCommandBuffers(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, &commandBuffer);
-
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    vkBeginCommandBuffer(commandBuffer, &beginInfo);
 
     return commandBuffer;
 }

@@ -1,5 +1,8 @@
 #include "../../headers/vulkan/ZSVMA.hpp"
 #include "../../headers/vulkan/ZSVulkanCmdBuf.hpp"
+#include "../../headers/game.h"
+
+extern ZSGAME_DATA* game_data;
 
 #define VMA_IMPLEMENTATION
 #include <VMA/vk_mem_alloc.h>
@@ -14,6 +17,9 @@ Engine::ZSVMA::ZSVMA(Engine::ZSVulkanInstance* inst, Engine::ZSVulkanDevice* dev
 	allocatorInfo.instance = inst->GetInstance();
 	
 	vmaCreateAllocator(&allocatorInfo, (VmaAllocator*)allocator);
+
+    this->MemoryCommandPool = beginCommandPool();
+    this->MemoryCommandBuffer = CreateSingleTimeComdbuf(MemoryCommandPool);
 }
 
 void Engine::ZSVMA::allocate(const VkBufferCreateInfo createInfo, VkBuffer* buffer) {
@@ -41,6 +47,24 @@ void Engine::ZSVMA::allocate(VkBufferUsageFlags flags, VkBuffer* buffer, unsigne
     vmaCreateBuffer(*((VmaAllocator*)allocator), &vbInfo, &vbAllocCreateInfo, buffer, &stagingVertexBufferAlloc, &stagingVertexBufferAllocInfo);
 }
 
+void Engine::ZSVMA::allocateCpu(VkBufferUsageFlags flags, VmaVkBuffer* buffer, unsigned int size, void** mapped){
+    VkBufferCreateInfo vbInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
+    vbInfo.size = size;
+    vbInfo.usage = flags;
+    vbInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    VmaAllocationCreateInfo vbAllocCreateInfo = {};
+    vbAllocCreateInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+    //vbAllocCreateInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
+
+    VmaAllocation tempBufferAlloc = VK_NULL_HANDLE;
+    //VmaAllocationInfo tempBufferAllocInfo = {};
+    vmaCreateBuffer(*((VmaAllocator*)allocator), &vbInfo, &vbAllocCreateInfo, &buffer->Buffer, &tempBufferAlloc, nullptr);
+    //*mapped = tempBufferAllocInfo.pMappedData;
+    buffer->_allocation = tempBufferAlloc;
+
+    map(buffer, mapped);
+}
 
 void Engine::ZSVMA::copy(VkBuffer buffer, unsigned int offset, void* data, unsigned int size) {
     VkBufferCreateInfo vbInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
@@ -59,19 +83,30 @@ void Engine::ZSVMA::copy(VkBuffer buffer, unsigned int offset, void* data, unsig
     //Copy data to temporary buffer
     memcpy((char*)tempBufferAllocInfo.pMappedData + offset, data, size);
 
+    
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-    VkCommandPool commandPool = beginCommandPool();
-    VkCommandBuffer copyCmdBuf = beginSingleTimeComdbuf(commandPool);
+    vkBeginCommandBuffer(this->MemoryCommandBuffer, &beginInfo);
     //Copy buffer command
     VkBufferCopy copyRegion{};
     copyRegion.srcOffset = 0; // Optional
     copyRegion.dstOffset = 0; // Optional
     copyRegion.size = size;
-    vkCmdCopyBuffer(copyCmdBuf, tempBuffer, buffer, 1, &copyRegion);
+    vkCmdCopyBuffer(MemoryCommandBuffer, tempBuffer, buffer, 1, &copyRegion);
     //Run command
-    endSingleTimeCommands(copyCmdBuf, commandPool);
-}
+    vkEndCommandBuffer(MemoryCommandBuffer);
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &MemoryCommandBuffer;
 
+    vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(game_data->vk_main->mDevice->GetGraphicsQueue());
+    
+    vkDestroyBuffer(game_data->vk_main->mDevice->getVkDevice(), tempBuffer, nullptr);
+}
 
 void Engine::ZSVMA::allocate(VkBufferUsageFlags flags, VkBuffer* buffer, void* data, unsigned int size) {
     VkBufferCreateInfo vbInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
@@ -88,4 +123,14 @@ void Engine::ZSVMA::allocate(VkBufferUsageFlags flags, VkBuffer* buffer, void* d
     vmaCreateBuffer(*((VmaAllocator*)allocator), &vbInfo, &vbAllocCreateInfo, buffer, &g_hVertexBufferAlloc, nullptr);
     //Copy data to GPU buffer
     copy(*buffer, 0, data, size);
-}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+}
+
+void Engine::ZSVMA::map(VmaVkBuffer* buf, void** mem) {
+    vmaMapMemory(*(VmaAllocator*)this->allocator, (VmaAllocation)buf->_allocation, mem);
+}
+void Engine::ZSVMA::unmap(VmaVkBuffer* buf) {
+    vmaUnmapMemory(*(VmaAllocator*)this->allocator, (VmaAllocation)buf->_allocation);
+}
+void Engine::ZSVMA::destroyBuffer(VmaVkBuffer* buf) {
+    vmaDestroyBuffer(*((VmaAllocator*)allocator), buf->Buffer, (VmaAllocation)buf->_allocation);
+}

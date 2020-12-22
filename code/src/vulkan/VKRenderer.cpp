@@ -1,5 +1,6 @@
 #include "../../headers/vulkan/VKRenderer.hpp"
 #include "../../headers/game.h"
+#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
 
 extern ZSGAME_DATA* game_data;
 
@@ -11,12 +12,20 @@ void Engine::VKRenderer::render2D() {
 
 }
 void Engine::VKRenderer::render3D(Engine::Camera* cam) {
+    World* world_ptr = game_data->world;
+    ObjectsToRender.clear();
+    //Fill render arrays
+    processObjects(world_ptr);
+
+
     VkCommandBufferBeginInfo beginInfo = {};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = 0; // Optional
     beginInfo.pInheritanceInfo = nullptr; // Optional
 
     vkBeginCommandBuffer(mCmdBuf, &beginInfo);
+
+    game_data->vk_main->CurrentCmdBuffer = mCmdBuf;
 
     VkRenderPassBeginInfo renderPassInfo = {};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -37,13 +46,42 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
 
     vkCmdBindDescriptorSets(mCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, MainPipeline->GetPipelineLayout(), 0, MainPipeline->GetDescriptorSetsCount(), MainPipeline->GetDescriptorsSets(), 0, nullptr);
 
-    ((Engine::_vk_Mesh*)Engine::getPlaneMesh2D())->Draw(mCmdBuf);
+    Engine::getPlaneMesh2D()->Draw();
+    Engine::getCubeMesh3D()->Draw();
+
+    for (unsigned int i = 0; i < 7; i++) {
+        GameObject* obj = ObjectsToRender[i].obj;
+        if (obj->hasMesh()) {
+            MeshProperty* mesh = obj->getPropertyPtr<MeshProperty>();
+            if(mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
+                obj->DrawMesh(this);
+        }
+    }
 
     vkCmdEndRenderPass(mCmdBuf);
     vkEndCommandBuffer(mCmdBuf);
 
     Present();
 }
+
+void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
+    if (obj->hasMesh() //|| obj->hasTerrain()
+        ) {
+        VKObjectToRender obr;
+        //Send transform matrix to transform buffer
+        Engine::TransformProperty* transform_ptr = obj->getTransformProperty();
+        Engine::MeshProperty* mesh_prop = obj->getPropertyPtr<Engine::MeshProperty>();
+
+        if (mesh_prop->mesh_ptr->resource_state != RESOURCE_STATE::STATE_LOADED)
+            mesh_prop->mesh_ptr->load();
+
+        obr.transform = transform_ptr->transform_mat;
+        obr.obj = obj;
+
+        this->ObjectsToRender.push_back(obr);
+    }
+}
+
 void Engine::VKRenderer::InitShaders() {
 
 	test_shader = new Engine::_vk_Shader;

@@ -9,12 +9,7 @@ Engine::MeshResource::~MeshResource() {
     delete mesh_ptr;
 }
 
-void Engine::MeshResource::DrawInstanced(unsigned int inst_num) {
-    //Check, if texture already loaded
-    if (this->resource_state == RESOURCE_STATE::STATE_LOADED)
-        //If loaded, just use it in slot
-        this->mesh_ptr->DrawInstanced(inst_num);
-    //Otherwise perform texture loading
+void Engine::MeshResource::load() {
     if (this->resource_state == RESOURCE_STATE::STATE_NOT_LOADED) {
         request = new Engine::Loader::LoadRequest;
         request->offset = this->offset;
@@ -45,8 +40,22 @@ void Engine::MeshResource::DrawInstanced(unsigned int inst_num) {
     }
 }
 
+void Engine::MeshResource::DrawInstanced(unsigned int inst_num) {
+    //Check, if mesh already loaded
+    if (this->resource_state == RESOURCE_STATE::STATE_LOADED)
+        //If loaded, just draw it
+        this->mesh_ptr->DrawInstanced(inst_num);
+    //Otherwise perform mesh loading
+    load();
+}
+
 void Engine::MeshResource::Draw() {
-    DrawInstanced(1);
+    //Check, if mesh already loaded
+    if (this->resource_state == RESOURCE_STATE::STATE_LOADED)
+        //If loaded, just draw it
+        this->mesh_ptr->Draw();
+    //Otherwise perform mesh loading
+    load();
 }
 void Engine::MeshResource::Release() {
     if (this->resource_state == RESOURCE_STATE::STATE_LOADED) {

@@ -14,5 +14,7 @@ namespace Engine {
 		ZSVulkanDevice* mDevice;
 		ZSVulkanSwapChain* mSwapChain;
 		ZSVMA* mVMA;
+
+		VkCommandBuffer CurrentCmdBuffer;
 	};
 }

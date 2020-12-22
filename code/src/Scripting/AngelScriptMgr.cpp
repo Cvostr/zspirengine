@@ -104,6 +104,10 @@ UiManager* GetUi() {
 	return game_data->ui_manager;
 }
 
+Window* GetWindow() {
+	return game_data->window;
+}
+
 void AGScriptMgr::create_Engine() {
 	mEngine = asCreateScriptEngine();
 
@@ -141,6 +145,9 @@ void AGScriptMgr::create_Engine() {
 
 	Engine::UiManager::bindAngelScript(this);
 	RegisterGlobalFunction("Ui@ GetUi()", asFUNCTION(GetUi), asCALL_CDECL);
+
+	Engine::Window::bindAngelScript(this);
+	RegisterGlobalFunction("Window@ GetWindow()", asFUNCTION(GetWindow), asCALL_CDECL);
 
 	std::string args = "?&in";
 	for (unsigned int i = 0; i < 9; i++) {
