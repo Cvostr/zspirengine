@@ -1,8 +1,10 @@
 #include "../../headers/vulkan/VKRenderer.hpp"
 #include "../../headers/game.h"
 #include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
+#include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
 
 extern ZSGAME_DATA* game_data;
+extern ZSpireEngine* engine_ptr;
 
 Engine::VKRenderer::VKRenderer() {
 	InitShaders();
@@ -27,36 +29,25 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
 
     game_data->vk_main->CurrentCmdBuffer = mCmdBuf;
 
-    VkRenderPassBeginInfo renderPassInfo = {};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = MainPipeline->GetRenderPass();
-    renderPassInfo.framebuffer = TestFb->GetFramebuffer();
+    MaterialRenderPass->CmdBegin(mCmdBuf, TestFb);
 
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = game_data->vk_main->mSwapChain->GetExtent();
+    
 
-    std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[1].depthStencil = { 1.0f, 0 };
-    renderPassInfo.clearValueCount = 2;
-    renderPassInfo.pClearValues = &clearValues[0];
-
-    vkCmdBeginRenderPass(mCmdBuf, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdBindPipeline(mCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, MainPipeline->GetPipeline());
-
-    vkCmdBindDescriptorSets(mCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, MainPipeline->GetPipelineLayout(), 0, MainPipeline->GetDescriptorSetsCount(), MainPipeline->GetDescriptorsSets(), 0, nullptr);
-
-    Engine::getPlaneMesh2D()->Draw();
-    Engine::getCubeMesh3D()->Draw();
-
-    for (unsigned int i = 0; i < 7; i++) {
+    for (unsigned int i = 0; i < ObjectsToRender.size(); i++) {
+        VKObjectToRender* obr = &ObjectsToRender[i];
         GameObject* obj = ObjectsToRender[i].obj;
-        if (obj->hasMesh()) {
+        if (obj->hasMesh() && obr->mat != nullptr) {
             MeshProperty* mesh = obj->getPropertyPtr<MeshProperty>();
-            if(mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
-                obj->DrawMesh(this);
+            
+                obr->mat->Pipeline->CmdBindPipeline(mCmdBuf);
+                obr->mat->Pipeline->CmdBindDescriptorSets(mCmdBuf);
+
+                obr->mat->Pipeline->CmdPushConstants(this->mCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, &ObjectsToRender[i].transform);
+                if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
+                    obj->DrawMesh(this);
         }
     }
+    
 
     vkCmdEndRenderPass(mCmdBuf);
     vkEndCommandBuffer(mCmdBuf);
@@ -65,18 +56,32 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
 }
 
 void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
+
+    
+
+    if (current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
+        //Call prerender on each property in object
+        obj->onPreRender(this);
     if (obj->hasMesh() //|| obj->hasTerrain()
         ) {
         VKObjectToRender obr;
         //Send transform matrix to transform buffer
         Engine::TransformProperty* transform_ptr = obj->getTransformProperty();
         Engine::MeshProperty* mesh_prop = obj->getPropertyPtr<Engine::MeshProperty>();
+        Engine::MaterialProperty* mat_prop = obj->getPropertyPtr<Engine::MaterialProperty>();
 
         if (mesh_prop->mesh_ptr->resource_state != RESOURCE_STATE::STATE_LOADED)
             mesh_prop->mesh_ptr->load();
 
         obr.transform = transform_ptr->transform_mat;
         obr.obj = obj;
+
+        if (mat_prop != nullptr) {
+            obr.mat = mat_prop->material_ptr;
+            if(obr.mat != nullptr)
+                obr.mat->applyMatToPipeline();
+        }
+
 
         this->ObjectsToRender.push_back(obr);
     }
@@ -87,18 +92,30 @@ void Engine::VKRenderer::InitShaders() {
 	test_shader = new Engine::_vk_Shader;
 	test_shader->compileFromFile("Shaders/vulkan_test/vert.spv", "Shaders/vulkan_test/frag.spv");
 
+    this->default3d->compileFromFile("Shaders/vulkan_test/vert.spv", "Shaders/vulkan_test/frag.spv");
+
 	ZsVkPipelineConf Conf;
     Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->transformBuffer, VK_SHADER_STAGE_VERTEX_BIT);
     Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->lightsBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
     Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->shadowBuffer, VK_SHADER_STAGE_ALL_GRAPHICS);
+    Conf.DescrSetLayoutSampler->pushImageSampler(0);
 
-	MainPipeline = new ZSVulkanPipeline();
-	MainPipeline->PushColorOutputAttachment();
-	MainPipeline->Create(test_shader, Conf);
+    MaterialRenderPass = new ZSVulkanRenderPass;
+    MaterialRenderPass->PushColorOutputAttachment();
+    MaterialRenderPass->PushDepthAttachment();
+    MaterialRenderPass->Create();
+    game_data->vk_main->mMaterialsRenderPass = MaterialRenderPass;
+
+    mMaterialSampler = new ZSVulkanSampler;
+    mMaterialSampler->CreateSampler();
+    game_data->vk_main->mDefaultTextureSampler = mMaterialSampler;
+
 
 	TestFb = new ZSVulkanFramebuffer;
 	TestFb->PushOutputAttachment();
-    TestFb->Create(MainPipeline);
+    TestFb->PushDepthAttachment(640, 480);
+    TestFb->Create(MaterialRenderPass);
+    
 
 	VkSemaphoreCreateInfo semaphoreInfo = {};
 	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -129,6 +146,10 @@ void Engine::VKRenderer::InitShaders() {
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = 0; // Optional
     beginInfo.pInheritanceInfo = nullptr; // Optional
+
+    if (engine_ptr->desc->game_perspective == PERSP_3D) {
+        MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, water_shader);
+    }
 }
 
 void Engine::VKRenderer::Present() {

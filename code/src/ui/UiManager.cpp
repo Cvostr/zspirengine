@@ -28,6 +28,14 @@ void UiManager::DrawRootLayout() {
 		mRootLayout->draw();
 }
 
+void UiManager::RemoveAllViews() {
+	for (unsigned int i = 0; i < mViews.size(); i++) {
+		delete mViews[i];
+	}
+	mViews.clear();
+	mRootLayout = nullptr;
+}
+
 void UiManager::bindAngelScript(Engine::AGScriptMgr* mgr) {
 	mgr->RegisterObjectType("Ui", 0, asOBJ_REF | asOBJ_NOCOUNT);
 	mgr->RegisterObjectMethod("Ui", "void SetRootLayout(View@)", asMETHOD(UiManager, SetRootLayout), asCALL_THISCALL);

@@ -78,8 +78,8 @@ bool Engine::_ogl_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
 
     Init();
 
-    int HEIGHT = *(reinterpret_cast<int*>(&(data[12]))); //Getting height of texture in px info
-    int WIDTH = *(reinterpret_cast<int*>(&(data[16]))); //Getting width of texture in px info
+    maxHeight = *(reinterpret_cast<int*>(&(data[12]))); //Getting height of texture in px info
+    maxWidth = *(reinterpret_cast<int*>(&(data[16]))); //Getting width of texture in px info
     unsigned int linearSize = *(reinterpret_cast<unsigned int*>(&(data[20])));
     unsigned int mipMapCount = *(reinterpret_cast<unsigned int*>(&(data[28])));
     unsigned int fourCC = *(reinterpret_cast<unsigned int*>(&(data[84])));
@@ -112,8 +112,8 @@ bool Engine::_ogl_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
     unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
     unsigned int offset = 0;
 
-    int nwidth = WIDTH;
-    int nheight = HEIGHT;
+    int nwidth = maxWidth;
+    int nheight = maxHeight;
 
     //Mipmaps
     for (unsigned int level = 0; level < mipMapCount && (nwidth || nheight); ++level) //Iterating over mipmaps

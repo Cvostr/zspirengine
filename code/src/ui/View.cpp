@@ -54,7 +54,7 @@ void Engine::IView::__GetTransform(ViewSize& _Size, ViewPosition& _Pos) {
 				_Pos.posX = pvPos.posX + pvSize.WIDTH + margin.marginLeft;
 			}
 			if (_LinearLayout->Orientation == ORIENTATION_VERTICAL) {
-				_Pos.posY = pvPos.posY - ( margin.marginTop);
+				_Pos.posY = pvPos.posY - (margin.marginTop);
 			}
 		}
 		else {
@@ -67,6 +67,4 @@ void Engine::IView::__GetTransform(ViewSize& _Size, ViewPosition& _Pos) {
 		_Pos.posX += parentPos.posX;
 		_Pos.posY += parentPos.posY;
 	}
-
-		
 }

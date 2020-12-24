@@ -35,14 +35,6 @@ void Engine::Button::draw(){
     else
         game_data->pipeline->renderSprite(common_sprite, pvPos.posX, pvPos.posY, pvSize.WIDTH, pvSize.HEIGHT);
 }
-bool Engine::Button::isClicked() {
-    Input::MouseState* mstate = Input::getMouseStatePtr();
-    if (IWidget::isHoveredByMouse() || mstate->isLButtonDown) {
-        return true;
-    }
-    else
-        return false;
-}
 
 void Engine::Button::resize(unsigned int Width, unsigned int Height){
     IWidget::resize(Width, Height);

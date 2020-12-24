@@ -25,9 +25,10 @@ void Engine::RenderSettings::resetPointers(){
 }
 
 Engine::Renderer::Renderer(){
+    game_data->pipeline = this;
+
     this->current_state = PIPELINE_STATE::PIPELINE_STATE_DEFAULT;
     this->cullFaces = false;
-
 
     this->ui_shader = Engine::allocShader();
 
@@ -44,7 +45,7 @@ Engine::Renderer::Renderer(){
         this->final_shader = allocShader();
         this->water_shader = allocShader();
 
-        MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, water_shader);
+        //MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, water_shader);
     }
 
     //Allocate transform buffer
@@ -87,6 +88,10 @@ Engine::Renderer::Renderer(){
             instancedTransformBuffer->writeData(sizeof(Mat4) * i, sizeof(Mat4), &m);
         }
     }
+
+    //if (engine_ptr->desc->game_perspective == PERSP_3D) {
+    //    MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, water_shader);
+    //}
 
     Engine::setupDefaultMeshes();
     //to avoid memory reallocations
@@ -353,6 +358,10 @@ void Engine::TileProperty::onRender(Engine::Renderer* pipeline){
 void Engine::Renderer::updateShadersCameraInfo(Engine::Camera* cam_ptr){
     transformBuffer->bind();
     Mat4 proj = cam_ptr->getProjMatrix();
+
+    if(engine_ptr->engine_info->graphicsApi == VULKAN)
+        proj.m[1][1] *= -1;
+
     Mat4 view = cam_ptr->getViewMatrix();
     Vec3 cam_pos = cam_ptr->getCameraPosition();
     transformBuffer->writeData(0, sizeof (Mat4), &proj);

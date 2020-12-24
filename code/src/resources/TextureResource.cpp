@@ -10,11 +10,7 @@ Engine::TextureResource::~TextureResource() {
     delete texture_ptr;
 }
 
-void Engine::TextureResource::Use(int slot) {
-    //Check, if texture already loaded
-    if (this->resource_state == RESOURCE_STATE::STATE_LOADED)
-        //If loaded, just use it in slot
-        this->texture_ptr->Use(slot);
+void Engine::TextureResource::load() {
     //Otherwise perform texture loading
     if (this->resource_state == RESOURCE_STATE::STATE_NOT_LOADED) {
         //Create loading request
@@ -40,6 +36,14 @@ void Engine::TextureResource::Use(int slot) {
             this->resource_state = RESOURCE_STATE::STATE_LOADED;
         }
     }
+}
+
+void Engine::TextureResource::Use(int slot) {
+    //Check, if texture already loaded
+    if (this->resource_state == RESOURCE_STATE::STATE_LOADED)
+        //If loaded, just use it in slot
+        this->texture_ptr->Use(slot);
+    load();
 }
 
 void Engine::TextureResource::Release() {

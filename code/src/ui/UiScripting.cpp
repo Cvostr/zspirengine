@@ -71,11 +71,9 @@ void Engine::bindUiSDK(AGScriptMgr* mgr) {
 void bindButtonSDK(Engine::AGScriptMgr* mgr) {
 	Engine::bindViewSDK<Engine::Button>(mgr, BUTTON_TYPE_NAME);
 	mgr->RegisterObjectBehaviour(BUTTON_TYPE_NAME, asBEHAVE_FACTORY, "Button@ f()", asFUNCTION(Engine::new_as_ref_T<Engine::Button>), asCALL_CDECL);
-	int result = 0;
-	result = mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "bool isClicked()", asMETHOD(Engine::Button, isClicked), asCALL_THISCALL);
-
-	result = mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "void SetDefaultSprite(TextureResource@)", asMETHOD(Engine::Button, SetDefaultSprite), asCALL_THISCALL);
-	result = mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "bool SetHoveredSprite(TextureResource@)", asMETHOD(Engine::Button, SetHoveredSprite), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "bool isClicked()", asMETHOD(Engine::Button, isClicked), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "void SetDefaultSprite(TextureResource@)", asMETHOD(Engine::Button, SetDefaultSprite), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "bool SetHoveredSprite(TextureResource@)", asMETHOD(Engine::Button, SetHoveredSprite), asCALL_THISCALL);
 }
 
 void bindLinearLayoutSDK(Engine::AGScriptMgr* mgr) {

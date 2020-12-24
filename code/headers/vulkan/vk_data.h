@@ -28,8 +28,14 @@ public:
 };
 
 class _vk_Texture : public Engine::Texture{
+private:
+    VkImage mImage;
+    VkImageView mImageView;
+    void Transition(VmaVkBuffer temp);
+    void CreateImageView(VkFormat format);
 public:
 
+    VkImageView GetImageView() { return mImageView; }
     void Init();
     //Loads texture from buffer
     bool LoadDDSTextureFromBuffer(unsigned char* data);

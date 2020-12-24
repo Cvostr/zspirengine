@@ -4,6 +4,7 @@
 #include "Shader.hpp"
 #include "UniformBuffer.hpp"
 #include <vector>
+#include "../vulkan/ZSVulkanPipeline.hpp"
 
 enum MATSHPROP_TYPE{
     MATSHPROP_TYPE_NONE,
@@ -61,6 +62,7 @@ class Material{
 private:
     std::string group_str;
 public:
+    Engine::ZSVulkanPipeline* Pipeline;
     //path to material file
     std::string file_path;
     //Pointer to shader group

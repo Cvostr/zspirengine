@@ -222,6 +222,7 @@
     <ClCompile Include="code\src\vulkan\ZSVulkanFramebuffer.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanInstance.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanPipeline.cpp" />
+    <ClCompile Include="code\src\vulkan\ZSVulkanRenderPass.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanSampler.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanSwapchain.cpp" />
     <ClCompile Include="code\src\world\GameObject.cpp" />
@@ -318,6 +319,7 @@
     <ClInclude Include="code\headers\vulkan\ZSVulkanFramebuffer.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanInstance.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanPipeline.hpp" />
+    <ClInclude Include="code\headers\vulkan\ZSVulkanRenderPass.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanSampler.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanSwapchain.hpp" />
     <ClInclude Include="code\headers\world\go_properties.h" />

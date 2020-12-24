@@ -24,9 +24,9 @@ void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, un
     mIndicesNum = indices_num;
 
     //Allocate buffer
-    //game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &this->vertexBuffer, vertices, vertices_num * sizeof(ZSVERTEX));
-    //game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, &this->indexBuffer, indices, indices_num * sizeof(unsigned int));
-    void* vert;
+    game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &this->vertexBuffer, vertices, vertices_num * sizeof(ZSVERTEX));
+    game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, &this->indexBuffer, indices, indices_num * sizeof(unsigned int));
+    /*void* vert;
     void* ind;
     game_data->vk_main->mVMA->allocateCpu(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &this->vertexBuffer, vertices_num * sizeof(ZSVERTEX), (void**)&vert);
     game_data->vk_main->mVMA->allocateCpu(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, &this->indexBuffer, indices_num * sizeof(unsigned int), (void**)&ind);
@@ -35,7 +35,7 @@ void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, un
     memcpy(ind, indices, indices_num * sizeof(unsigned int));
 
     game_data->vk_main->mVMA->unmap(&vertexBuffer);
-    game_data->vk_main->mVMA->unmap(&indexBuffer);
+    game_data->vk_main->mVMA->unmap(&indexBuffer);*/
 }
 void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){
 

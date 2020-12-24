@@ -18,6 +18,7 @@ namespace Engine {
 		ILayout* GetRootLayout();
 		bool HasRootLayout();
 		void DrawRootLayout();
+		void RemoveAllViews();
 
 
 		static void bindAngelScript(Engine::AGScriptMgr* mgr);

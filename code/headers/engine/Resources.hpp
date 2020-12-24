@@ -112,6 +112,7 @@ class TextureResource : public ZsResource{
 public:
     Engine::Texture* texture_ptr;
 
+    void load();
     void Use(int slot);
     void Release();
 

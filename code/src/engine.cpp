@@ -64,13 +64,15 @@ void ZSpireEngine::loadGame(){
     mComponentManager = new Engine::EngineComponentManager;
     mWindow->SetComponentManager(mComponentManager);
 
-    this->zsgame_ptr = static_cast<void*>(game_data);
+    game_data->window = this->mWindow;
+
     //Allocate pipeline and start it as manager
     if(engine_info->graphicsApi == VULKAN)
         game_data->pipeline = new Engine::VKRenderer;
     else
         game_data->pipeline = new Engine::GLRenderer;
     mComponentManager->startManager(game_data->pipeline);
+
     //Allocate resource manager
     game_data->resources = new Engine::ResourceManager;
     //Start it as manager
@@ -93,7 +95,6 @@ void ZSpireEngine::loadGame(){
 
     game_data->world = new Engine::World();
 
-    game_data->window = this->mWindow;
 
     switch(this->desc->game_perspective){
         case PERSP_2D:{ //2D project

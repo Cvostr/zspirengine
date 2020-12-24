@@ -166,7 +166,7 @@ namespace Engine {
         ((T*)ptr)->~T();
     }
     template <typename T>
-    static T* new_as_ref_T(T* ptr) {
+    static T* new_as_ref_T() {
         return new T;
     }
     template <typename T, typename U>

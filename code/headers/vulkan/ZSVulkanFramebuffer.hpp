@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../render/Framebuffer.hpp"
-#include "../vulkan/ZSVulkanPipeline.hpp"
+#include "../vulkan/ZSVulkanRenderPass.hpp"
 #include <vulkan/vulkan.hpp>
 #include <vector>
 
@@ -28,11 +28,12 @@ namespace Engine {
 
         VkFramebuffer GetFramebuffer() { return mFramebuffer; }
 
-        void PushAttachment(unsigned int Width, unsigned int Height, VkFormat format, VkImageUsageFlagBits usage, VkImageAspectFlagBits aspect);
+        VkImageView getImageView(FbAttachment* attachment);
+        FbAttachment* PushAttachment(unsigned int Width, unsigned int Height, VkFormat format, VkImageUsageFlagBits usage, VkImageAspectFlagBits aspect);
         void PushOutputAttachment();
         void PushDepthAttachment(unsigned int Width, unsigned int Height);
 
-		bool Create(ZSVulkanPipeline* pipeline);
+		bool Create(ZSVulkanRenderPass* renderpass);
 		ZSVulkanFramebuffer();
 	};
 }

@@ -56,7 +56,7 @@ VkDescriptorSetLayout Engine::ZSVulkanDescriptorSet::getDescriptorSetLayout() {
 
     VkDescriptorSetLayoutCreateInfo cr_info = {};
     cr_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    cr_info.bindingCount = bindings.size();
+    cr_info.bindingCount = static_cast<uint32_t>(bindings.size());
     cr_info.pBindings = bindings.data();
     cr_info.pNext = nullptr;
 

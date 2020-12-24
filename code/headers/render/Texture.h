@@ -30,6 +30,9 @@ namespace Engine {
     };
 
 	class Texture : public GpuObject{
+    protected:
+        unsigned int maxWidth;
+        unsigned int maxHeight;
 	public:
 
 		//Only for OGL : initialize texture in GL

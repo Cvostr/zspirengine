@@ -11,6 +11,8 @@ namespace Engine {
 		void startManager(IEngineComponent* component);
 		void updateResolution(int W, int H);
 		void destroyAllManagers();
+		unsigned int GetComponentsCount() { 
+			return static_cast<unsigned int>(components.size()); }
 		
 		EngineComponentManager();
 	};

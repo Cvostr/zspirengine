@@ -16,6 +16,7 @@ void EngineComponentManager::destroyAllManagers() {
     for (int i = static_cast<int>(components.size()) - 1; i >= 0; i--) {
         delete components[i];
     }
+    components.clear();
 }
 
 void EngineComponentManager::updateResolution(int W, int H) {

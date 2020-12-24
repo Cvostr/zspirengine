@@ -31,7 +31,7 @@ void Engine::ZSVMA::allocate(const VkBufferCreateInfo createInfo, VkBuffer* buff
 	vmaCreateBuffer(*((VmaAllocator*)allocator), &createInfo, &allocInfo, buffer, &allocation, nullptr);
 }
 
-void Engine::ZSVMA::allocate(VkBufferUsageFlags flags, VkBuffer* buffer, unsigned int size) {
+void Engine::ZSVMA::allocate(VkBufferUsageFlags flags, VmaVkBuffer* buffer, unsigned int size) {
     VkBufferCreateInfo vbInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
     vbInfo.size = size;
     vbInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
@@ -41,10 +41,8 @@ void Engine::ZSVMA::allocate(VkBufferUsageFlags flags, VkBuffer* buffer, unsigne
     vbAllocCreateInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
     vbAllocCreateInfo.flags = 0;
 
-    VkBuffer stagingVertexBuffer = VK_NULL_HANDLE;
-    VmaAllocation stagingVertexBufferAlloc = VK_NULL_HANDLE;
     VmaAllocationInfo stagingVertexBufferAllocInfo = {};
-    vmaCreateBuffer(*((VmaAllocator*)allocator), &vbInfo, &vbAllocCreateInfo, buffer, &stagingVertexBufferAlloc, &stagingVertexBufferAllocInfo);
+    vmaCreateBuffer(*((VmaAllocator*)allocator), &vbInfo, &vbAllocCreateInfo, &buffer->Buffer, (VmaAllocation*)&buffer->_allocation, &stagingVertexBufferAllocInfo);
 }
 
 void Engine::ZSVMA::allocateCpu(VkBufferUsageFlags flags, VmaVkBuffer* buffer, unsigned int size, void** mapped){
@@ -108,21 +106,20 @@ void Engine::ZSVMA::copy(VkBuffer buffer, unsigned int offset, void* data, unsig
     vkDestroyBuffer(game_data->vk_main->mDevice->getVkDevice(), tempBuffer, nullptr);
 }
 
-void Engine::ZSVMA::allocate(VkBufferUsageFlags flags, VkBuffer* buffer, void* data, unsigned int size) {
+void Engine::ZSVMA::allocate(VkBufferUsageFlags flags, VmaVkBuffer* buffer, void* data, unsigned int size) {
     VkBufferCreateInfo vbInfo = { VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO };
     vbInfo.size = size;
     vbInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     VmaAllocationCreateInfo vbAllocCreateInfo = {};
 
-    VmaAllocation g_hVertexBufferAlloc;
     vbInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | flags;
     vbAllocCreateInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
     vbAllocCreateInfo.flags = 0;
     //Create GPU buffer
-    vmaCreateBuffer(*((VmaAllocator*)allocator), &vbInfo, &vbAllocCreateInfo, buffer, &g_hVertexBufferAlloc, nullptr);
+    vmaCreateBuffer(*((VmaAllocator*)allocator), &vbInfo, &vbAllocCreateInfo, &buffer->Buffer, (VmaAllocation*)&buffer->_allocation, nullptr);
     //Copy data to GPU buffer
-    copy(*buffer, 0, data, size);
+    copy(buffer->Buffer, 0, data, size);
 }
 
 void Engine::ZSVMA::map(VmaVkBuffer* buf, void** mem) {

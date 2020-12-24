@@ -64,6 +64,8 @@ bool Engine::_vk_Shader::compileFromFile(std::string VSpath, std::string FSpath,
         vkCreateShaderModule(game_data->vk_main->mDevice->getVkDevice(), &createGsInfo, nullptr, &geometryShader);
     }
 
+    mCreated = true;
+
     return true;
 }
 void Engine::_vk_Shader::Use(){

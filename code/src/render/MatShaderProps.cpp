@@ -11,6 +11,8 @@ static std::vector<MtShaderPropertiesGroup*> MatGroups;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
 
+extern ZSpireEngine* engine_ptr;
+
 MaterialShaderProperty* MtShaderPropertiesGroup::addProperty(int type){
     //Allocate property in heap
     MaterialShaderProperty* newprop_ptr = MtShProps::allocateProperty(type);
@@ -316,166 +318,6 @@ void Material::saveToFile(){
     mat_stream.close(); //close stream
 }
 
-void Material::loadFromBuffer(char* buffer, unsigned int size){
-    //Define and open file stream
-    unsigned int position = 0;
-
-    char test_header[13];
-    //Read header
-    memcpy(test_header, &buffer[position], 12);
-    test_header[12] = '\0'; //Terminate string
-
-    if(strcmp(test_header, "ZSP_MATERIAL") == 1) //If it isn't zspire material
-        return; //Go out, we have nothing to do
-
-    position += 13;
-
-    while(position <= size){ //While file not finished reading
-        char prefix[7];
-        prefix[6] = '\0';
-        memcpy(prefix, &buffer[position], 6);
-
-        if(strcmp(prefix, "_GROUP") && strcmp(prefix, "_ENTRY"))
-            position ++;
-
-        if(strcmp(prefix, "_GROUP") == 0){ //if it is game object
-            position += 7;
-            std::string group_name;
-            //Read shader group name
-            readString(group_name, buffer, position);
-            //position += 1;
-
-            setPropertyGroup(MtShProps::getMtShaderPropertyGroup(group_name));
-        }
-
-        if(strcmp(prefix, "_ENTRY") == 0){ //if it is game object
-            position += 7;
-            std::string prop_identifier;
-            readString(prop_identifier, buffer, position);
-
-            for(unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i ++) {
-                MaterialShaderProperty* prop_ptr = group_ptr->properties[prop_i];
-                MaterialShaderPropertyConf* conf_ptr = this->confs[prop_i];
-                //check if compare
-                if(prop_identifier.compare(prop_ptr->prop_identifier) == 0){
-                    switch(prop_ptr->type){
-                        case MATSHPROP_TYPE_NONE:{
-                            break;
-                        }
-                        case MATSHPROP_TYPE_TEXTURE:{
-                            //Cast pointer
-                            TextureMtShPropConf* texture_conf = static_cast<TextureMtShPropConf*>(conf_ptr);
-                            readString(texture_conf->path, buffer, position);
-
-                            position += 1;
-                            break;
-                        }
-
-                        case MATSHPROP_TYPE_FLOAT:{
-                            //Cast pointer
-                            FloatMtShPropConf* float_conf = static_cast<FloatMtShPropConf*>(conf_ptr);
-
-                            readBinaryValue(&float_conf->value, buffer + position, position);
-
-                            break;
-                        }
-
-                        case MATSHPROP_TYPE_INTEGER:{
-                            //Cast pointer
-                            IntegerMtShPropConf* int_conf = static_cast<IntegerMtShPropConf*>(conf_ptr);
-
-                            readBinaryValue(&int_conf->value, &buffer[position], position);
-                            break;
-                        }
-
-                        case MATSHPROP_TYPE_COLOR:{
-                            //Cast pointer
-                            ColorMtShPropConf* color_conf = static_cast<ColorMtShPropConf*>(conf_ptr);
-                            //Read color values
-                            readBinaryValue(&color_conf->color.r, buffer + position, position);
-                            readBinaryValue(&color_conf->color.g, buffer + position, position);
-                            readBinaryValue(&color_conf->color.b, buffer + position, position);
-                            position += 1;
-                            break;
-                        }
-
-                        case MATSHPROP_TYPE_FVEC3:{
-                            //Cast pointer
-                            Float3MtShPropConf* fvec3_conf = static_cast<Float3MtShPropConf*>(conf_ptr);
-                            //Read float vector values
-                            readBinaryValue(&fvec3_conf->value.X, buffer + position, position);
-                            readBinaryValue(&fvec3_conf->value.Y, buffer + position, position);
-                            readBinaryValue(&fvec3_conf->value.Z, buffer + position, position);
-                            position += 1;
-                            break;
-                        }
-
-                        case MATSHPROP_TYPE_FVEC2:{
-                            //Cast pointer
-                            Float2MtShPropConf* fvec2_conf = static_cast<Float2MtShPropConf*>(conf_ptr);
-                            //Read float vector values
-                            readBinaryValue(&fvec2_conf->value.X, buffer + position, position);
-                            readBinaryValue(&fvec2_conf->value.Y, buffer + position, position);
-                            position += 1;
-                            break;
-                        }
-
-                        case MATSHPROP_TYPE_IVEC2:{
-                            //Cast pointer
-                            Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
-                            //Read float vector values
-                            readBinaryValue(&ivec2_conf->value[0], buffer + position, position);
-                            readBinaryValue(&ivec2_conf->value[1], buffer + position, position);
-
-                            position += 1;
-                            break;
-                        }
-
-                        case MATSHPROP_TYPE_TEXTURE3:{
-                            //Cast pointer
-                            Texture3MtShPropConf* texture3_conf = static_cast<Texture3MtShPropConf*>(conf_ptr);
-
-                            for(int i = 0; i < 6; i ++){
-                                readString(texture3_conf->texture_str[i], buffer, position);
-                            }
-
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-void Material::loadFromFile(std::string fpath){
-    std::cout << "Loading Material " << fpath << std::endl;
-
-    this->file_path = fpath;
-
-    std::ifstream mat_stream;
-    //Open stream
-    mat_stream.open(fpath, std::ifstream::in | std::ifstream::ate);
-
-    if(!mat_stream){ //File isn't opened
-        std::cout << "Error opening file " << fpath;
-        return;
-    }
-
-    //Allocate space for file
-    unsigned int fileSize = static_cast<unsigned int>(mat_stream.tellg());
-    char* data = new char[fileSize];
-    mat_stream.seekg(0);
-    //Read file
-    mat_stream.read(data, fileSize);
-    //Parse it from buffer
-    loadFromBuffer(data, fileSize);
-    //Free buffer
-    delete[] data;
-
-    mat_stream.close(); //close material stream
-}
-
 void Material::applyMatToPipeline(){
     Engine::Shader* shader = this->group_ptr->render_shader;
     if(shader == nullptr)
@@ -508,6 +350,9 @@ void Material::applyMatToPipeline(){
                     db = 1;
                     Engine::TextureResource* tex_ptr = static_cast<Engine::TextureResource*>(texture_conf->texture);
                     tex_ptr->Use(texture_p->slotToBind);
+                    if (engine_ptr->engine_info->graphicsApi == VULKAN) {
+                        this->Pipeline->DescrSetLayoutSampler->setTexture(texture_p->slotToBind, ((Engine::_vk_Texture*)tex_ptr->texture_ptr)->GetImageView(), game_data->vk_main->mDefaultTextureSampler );
+                    }
                 }
                 //Set texture state
                 group_ptr->setUB_Data(texture_p->start_offset, 4, &db);
@@ -587,6 +432,7 @@ void Material::applyMatToPipeline(){
                 }else{
                     //3D texture already created, Use it
                     texture_conf->texture3D->Use(texture_p->slotToBind);
+                    
                 }
                 break;
             }

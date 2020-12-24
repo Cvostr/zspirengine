@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.hpp>
 #include "../render/Renderer.hpp"
 #include "ZSVulkanPipeline.hpp"
+#include "ZSVulkanRenderPass.hpp"
 #include "ZSVulkanFramebuffer.hpp"
 #include <vector>
 #include "vk_data.h"
@@ -13,7 +14,12 @@ namespace Engine {
 	public:
 		Engine::GameObject* obj;
 		Mat4 transform;
+		Material* mat;
 		//Engine::MeshResource* mesh;
+
+		VKObjectToRender() {
+			mat = nullptr;
+		}
 	};
 
 	class VKRenderer : public Renderer{
@@ -26,6 +32,8 @@ namespace Engine {
 
 		ZSVulkanPipeline* MainPipeline;
 		ZSVulkanFramebuffer* TestFb;
+		ZSVulkanRenderPass* MaterialRenderPass;
+		ZSVulkanSampler* mMaterialSampler;
 
 		_vk_Shader* test_shader;
 		std::vector<VKObjectToRender> ObjectsToRender;

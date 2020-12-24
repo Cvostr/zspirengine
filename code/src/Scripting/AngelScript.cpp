@@ -35,6 +35,8 @@ void AGScript::onStop() {
 		engine->getAgScriptContext()->SetObject(mainClass_obj);
 		engine->getAgScriptContext()->Execute();
 	}
+
+	engine->getAgScriptEngine()->ReleaseScriptObject(this->mainClass_obj, this->main_class);
 }
 
 std::string AGScript::getClassName() {
@@ -122,5 +124,5 @@ AGScript::AGScript(Engine::GameObject* obj, std::string ClassName) :
 	
 }
 AGScript::~AGScript() {
-
+	AGScriptMgr* engine = game_data->script_manager;
 }
