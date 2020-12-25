@@ -222,6 +222,7 @@
     <ClCompile Include="code\src\vulkan\ZSVulkanFramebuffer.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanInstance.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanPipeline.cpp" />
+    <ClCompile Include="code\src\vulkan\ZSVulkanPipelineLayout.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanRenderPass.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanSampler.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanSwapchain.cpp" />
@@ -283,13 +284,13 @@
     <ClInclude Include="code\headers\ogl\GLRenderer.hpp" />
     <ClInclude Include="code\headers\ogl\ogl.h" />
     <ClInclude Include="code\headers\render\GpuObject.hpp" />
-    <ClInclude Include="code\headers\render\screen_effects\gauss_blur.h" />
     <ClInclude Include="code\headers\render\Animation.hpp" />
     <ClInclude Include="code\headers\render\Material.hpp" />
     <ClInclude Include="code\headers\render\Math.hpp" />
     <ClInclude Include="code\headers\render\Mesh.hpp" />
     <ClInclude Include="code\headers\render\Renderer.hpp" />
     <ClInclude Include="code\headers\render\Framebuffer.hpp" />
+    <ClInclude Include="code\headers\render\ScreenEffect.hpp" />
     <ClInclude Include="code\headers\render\Shader.hpp" />
     <ClInclude Include="code\headers\render\Texture.h" />
     <ClInclude Include="code\headers\render\UniformBuffer.hpp" />
@@ -319,6 +320,7 @@
     <ClInclude Include="code\headers\vulkan\ZSVulkanFramebuffer.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanInstance.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanPipeline.hpp" />
+    <ClInclude Include="code\headers\vulkan\ZSVulkanPipelineLayout.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanRenderPass.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanSampler.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanSwapchain.hpp" />

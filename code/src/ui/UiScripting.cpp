@@ -18,15 +18,15 @@
 #define WIDGET_TYPE_NAME "Widget"
 #define BUTTON_TYPE_NAME "Button"
 
-static void CreateViewSize(unsigned int Width, unsigned int Height, Engine::ViewSize* ptr) {
+static void CreateViewSize(int Width, int Height, Engine::ViewSize* ptr) {
 	new (ptr) Engine::ViewSize(Width, Height);
 }
 
-static void CreateViewPosition(unsigned int posX, unsigned int posY, Engine::ViewPosition* ptr) {
+static void CreateViewPosition(int posX, int posY, Engine::ViewPosition* ptr) {
 	new (ptr) Engine::ViewPosition(posX, posY);
 }
 
-static void CreateMargin(unsigned int Top, unsigned int Bottom, unsigned int Left, unsigned int Right, Engine::ViewMargin* ptr) {
+static void CreateMargin(int Top, int Bottom, int Left, int Right, Engine::ViewMargin* ptr) {
 	new (ptr) Engine::ViewMargin(Top, Bottom, Left, Right);
 }
 
@@ -37,26 +37,26 @@ void Engine::bindUiSDK(AGScriptMgr* mgr) {
 
 	mgr->RegisterObjectType(VIEWSIZE_TYPE_NAME, sizeof(ViewSize), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<ViewSize>());
 	mgr->RegisterObjectBehaviour(VIEWSIZE_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(new_as_obj_T<ViewSize>), asCALL_CDECL_OBJLAST);
-	mgr->RegisterObjectBehaviour(VIEWSIZE_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(uint, uint)", asFUNCTION(CreateViewSize), asCALL_CDECL_OBJLAST);
+	mgr->RegisterObjectBehaviour(VIEWSIZE_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(int, int)", asFUNCTION(CreateViewSize), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(VIEWSIZE_TYPE_NAME, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(del_as_obj_T<ViewSize>), asCALL_CDECL_OBJLAST);
-	mgr->RegisterObjectProperty(VIEWSIZE_TYPE_NAME, "uint Width", offsetof(ViewSize, WIDTH));
-	mgr->RegisterObjectProperty(VIEWSIZE_TYPE_NAME, "uint Height", offsetof(ViewSize, HEIGHT));
+	mgr->RegisterObjectProperty(VIEWSIZE_TYPE_NAME, "int Width", offsetof(ViewSize, WIDTH));
+	mgr->RegisterObjectProperty(VIEWSIZE_TYPE_NAME, "int Height", offsetof(ViewSize, HEIGHT));
 
 	mgr->RegisterObjectType(VIEWPOSITION_TYPE_NAME, sizeof(ViewPosition), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<ViewPosition>());
 	mgr->RegisterObjectBehaviour(VIEWPOSITION_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(new_as_obj_T<ViewPosition>), asCALL_CDECL_OBJLAST);
-	mgr->RegisterObjectBehaviour(VIEWPOSITION_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(uint, uint)", asFUNCTION(CreateViewPosition), asCALL_CDECL_OBJLAST);
+	mgr->RegisterObjectBehaviour(VIEWPOSITION_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(int, int)", asFUNCTION(CreateViewPosition), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(VIEWPOSITION_TYPE_NAME, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(del_as_obj_T<ViewPosition>), asCALL_CDECL_OBJLAST);
-	mgr->RegisterObjectProperty(VIEWPOSITION_TYPE_NAME, "uint posX", offsetof(ViewPosition, posX));
-	mgr->RegisterObjectProperty(VIEWPOSITION_TYPE_NAME, "uint posY", offsetof(ViewPosition, posY));
+	mgr->RegisterObjectProperty(VIEWPOSITION_TYPE_NAME, "int posX", offsetof(ViewPosition, posX));
+	mgr->RegisterObjectProperty(VIEWPOSITION_TYPE_NAME, "int posY", offsetof(ViewPosition, posY));
 
 	mgr->RegisterObjectType(VIEWMARGIN_TYPE_NAME, sizeof(ViewMargin), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<ViewMargin>());
 	mgr->RegisterObjectBehaviour(VIEWMARGIN_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(new_as_obj_T<ViewMargin>), asCALL_CDECL_OBJLAST);
-	mgr->RegisterObjectBehaviour(VIEWMARGIN_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(uint, uint, uint, uint)", asFUNCTION(CreateMargin), asCALL_CDECL_OBJLAST);
+	mgr->RegisterObjectBehaviour(VIEWMARGIN_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(int, int, int, int)", asFUNCTION(CreateMargin), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(VIEWMARGIN_TYPE_NAME, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(del_as_obj_T<ViewMargin>), asCALL_CDECL_OBJLAST);
-	mgr->RegisterObjectProperty(VIEWMARGIN_TYPE_NAME, "uint marginTop", offsetof(ViewMargin, marginTop));
-	mgr->RegisterObjectProperty(VIEWMARGIN_TYPE_NAME, "uint marginBottom", offsetof(ViewMargin, marginBottom));
-	mgr->RegisterObjectProperty(VIEWMARGIN_TYPE_NAME, "uint marginLeft", offsetof(ViewMargin, marginLeft));
-	mgr->RegisterObjectProperty(VIEWMARGIN_TYPE_NAME, "uint marginRight", offsetof(ViewMargin, marginRight));
+	mgr->RegisterObjectProperty(VIEWMARGIN_TYPE_NAME, "int marginTop", offsetof(ViewMargin, marginTop));
+	mgr->RegisterObjectProperty(VIEWMARGIN_TYPE_NAME, "int marginBottom", offsetof(ViewMargin, marginBottom));
+	mgr->RegisterObjectProperty(VIEWMARGIN_TYPE_NAME, "int marginLeft", offsetof(ViewMargin, marginLeft));
+	mgr->RegisterObjectProperty(VIEWMARGIN_TYPE_NAME, "int marginRight", offsetof(ViewMargin, marginRight));
 
 	//Bind base view class
 	bindViewSDK<Engine::IView>(mgr, VIEW_TYPE_NAME);

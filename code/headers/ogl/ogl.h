@@ -8,6 +8,9 @@
 
 namespace Engine{
 
+    GLenum GetFormatGL(TextureFormat format);
+    GLint GetInternalFormatGL(TextureFormat format);
+
 class _ogl_Mesh : public Engine::Mesh {
 public:
 
@@ -40,6 +43,7 @@ public:
 
     //Only for OGL : initialize texture in GL
     void Init();
+    void Create(unsigned int Width, unsigned int Height, TextureFormat format);
     //Loads texture from buffer
     bool LoadDDSTextureFromBuffer(unsigned char* data);
     bool LoadPNGTextureFromBuffer(unsigned char* data, int size);

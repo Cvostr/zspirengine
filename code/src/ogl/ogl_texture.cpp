@@ -6,7 +6,65 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-void Engine::_ogl_Texture::Init() {
+using namespace Engine;
+
+GLint Engine::GetInternalFormatGL(TextureFormat format) {
+    GLint gl_format = 0;
+    switch (format) {
+    case TextureFormat::FORMAT_R:
+        gl_format = GL_RED;
+        break;
+    case TextureFormat::FORMAT_RG:
+        gl_format = GL_RG;
+        break;
+    case TextureFormat::FORMAT_RGB:
+        gl_format = GL_RGB;
+        break;
+    case TextureFormat::FORMAT_RGBA:
+        gl_format = GL_RGBA;
+        break;
+    case TextureFormat::FORMAT_R16:
+        gl_format = GL_R16;
+        break;
+    case TextureFormat::FORMAT_RG16:
+        gl_format = GL_RG16;
+        break;
+    case TextureFormat::FORMAT_RGB16:
+        gl_format = GL_RGB16;
+        break;
+    case TextureFormat::FORMAT_RGBA16:
+        gl_format = GL_RGBA16;
+        break;
+    case TextureFormat::FORMAT_R16F:
+        gl_format = GL_R16F;
+        break;
+    case TextureFormat::FORMAT_RG16F:
+        gl_format = GL_RG16F;
+        break;
+    case TextureFormat::FORMAT_RGB16F:
+        gl_format = GL_RGB16F;
+        break;
+    case TextureFormat::FORMAT_RGBA16F:
+        gl_format = GL_RGBA16F;
+        break;
+    }
+    return gl_format;
+}
+GLenum Engine::GetFormatGL(TextureFormat format) {
+    GLint gl_format = 0;
+
+    if (format % 4 == 0)
+        gl_format = GL_RGBA;
+    if (format % 4 == 1)
+        gl_format = GL_RED;
+    if (format % 4 == 2)
+        gl_format = GL_RG;
+    if (format % 4 == 3)
+        gl_format = GL_RGB;
+    return gl_format;
+}
+
+void _ogl_Texture::Init() {
     if (mCreated) {
         return;
     }
@@ -22,59 +80,47 @@ void Engine::_ogl_Texture::Init() {
     mCreated = true;
 }
 
-Engine::_ogl_Texture::_ogl_Texture() {
+void _ogl_Texture::Create(unsigned int Width, unsigned int Height, TextureFormat format) {
+    Init();
+    glTexImage2D(GL_TEXTURE_2D, 0, GetInternalFormatGL(format), Width, Height, 0, GetFormatGL(format), GL_UNSIGNED_BYTE, nullptr);
+}
+
+_ogl_Texture::_ogl_Texture() {
     mCreated = false;
 }
 
-Engine::_ogl_Texture::~_ogl_Texture(){
+_ogl_Texture::~_ogl_Texture(){
 
 }
 
-void Engine::_ogl_Texture::Use(int slot) {
+void _ogl_Texture::Use(int slot) {
     glBindTextureUnit(slot, TEXTURE_ID);
 }
 
-void Engine::_ogl_Texture::Destroy() {
+void _ogl_Texture::Destroy() {
     glDeleteTextures(1, &this->TEXTURE_ID);
     mCreated = false;
 }
 
-bool Engine::_ogl_Texture::LoadTextureFromBufferUByte(unsigned char* data, int Width, int Height, TextureFormat format) {
+bool _ogl_Texture::LoadTextureFromBufferUByte(unsigned char* data, int Width, int Height, TextureFormat format) {
     Init();
-
-    GLint gl_format = 0;
-
-    switch (format) {
-    case TextureFormat::FORMAT_R:
-        gl_format = GL_RED;
-        break;
-    case TextureFormat::FORMAT_RG:
-        gl_format = GL_RG;
-        break;
-    case TextureFormat::FORMAT_RGB:
-        gl_format = GL_RGB;
-        break;
-    case TextureFormat::FORMAT_RGBA:
-        gl_format = GL_RGBA;
-        break;
-    }
 
     glBindTexture(GL_TEXTURE_2D, this->TEXTURE_ID);
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        gl_format,
+        GetInternalFormatGL(format),
         Width,
         Height,
         0,
-        gl_format,
+        GetFormatGL(format),
         GL_UNSIGNED_BYTE,
         data
     );
     return true;
 }
 
-bool Engine::_ogl_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
+bool _ogl_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
 
     Init();
 
@@ -130,7 +176,7 @@ bool Engine::_ogl_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
     return true;
 }
 
-bool Engine::_ogl_Texture::LoadPNGTextureFromBuffer(unsigned char* data, int size) {
+bool _ogl_Texture::LoadPNGTextureFromBuffer(unsigned char* data, int size) {
     // Load from file
     int image_width = 0;
     int image_height = 0;
@@ -154,7 +200,7 @@ bool Engine::_ogl_Texture::LoadPNGTextureFromBuffer(unsigned char* data, int siz
     return true;
 }
 
-void Engine::_ogl_Texture3D::Init(){
+void _ogl_Texture3D::Init(){
     glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &TEXTURE_ID);
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -163,7 +209,7 @@ void Engine::_ogl_Texture3D::Init(){
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
-bool Engine::_ogl_Texture3D::pushTextureBuffer(int index, unsigned char* data){
+bool _ogl_Texture3D::pushTextureBuffer(int index, unsigned char* data){
     glBindTexture(GL_TEXTURE_CUBE_MAP, this->TEXTURE_ID);
 
     int HEIGHT = *(reinterpret_cast<int*>(&(data[12]))); //Getting height of texture in px info
@@ -218,10 +264,10 @@ bool Engine::_ogl_Texture3D::pushTextureBuffer(int index, unsigned char* data){
 }
 
 //Use in rendering pipeline
-void Engine::_ogl_Texture3D::Use(int slot){
+void _ogl_Texture3D::Use(int slot){
     glBindTextureUnit(slot, TEXTURE_ID);
 }
-void Engine::_ogl_Texture3D::Destroy(){
+void _ogl_Texture3D::Destroy(){
     glDeleteTextures(1, &TEXTURE_ID);
 }
 Engine::_ogl_Texture3D::_ogl_Texture3D(){

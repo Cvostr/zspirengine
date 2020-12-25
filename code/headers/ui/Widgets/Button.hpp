@@ -35,8 +35,6 @@ namespace Engine {
         void SetDefaultSprite(TextureResource* sprite) { common_sprite = sprite; }
         void SetHoveredSprite(TextureResource* sprite) { hovered_sprite = sprite; }
 
-        void resize(unsigned int Width, unsigned int Height);
-        void move(unsigned int x, unsigned int y);
         void draw();
 
         void setText(ZSPIRE::LocString* btn_text_string);

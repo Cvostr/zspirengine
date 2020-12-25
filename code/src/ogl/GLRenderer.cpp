@@ -29,22 +29,26 @@ void Engine::GLRenderer::InitShaders() {
         this->final_shader->compileFromFile("Shaders/postprocess/final/final.vert", "Shaders/postprocess/final/final.frag");
         this->water_shader->compileFromFile("Shaders/water/water.vert", "Shaders/water/water.frag");
     }
+
+    if (engine_ptr->desc->game_perspective == PERSP_3D) {
+        MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, water_shader);
+    }
 }
 
 void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int height) {
     gbuffer = new GLframebuffer(width, height, true);
-    ((GLframebuffer*)gbuffer)->addTexture(GL_RGBA8, GL_RGBA); //Diffuse map
-    ((GLframebuffer*)gbuffer)->addTexture(GL_RGB16F, GL_RGB); //Normal map
-    ((GLframebuffer*)gbuffer)->addTexture(GL_RGB16F, GL_RGB); //Position map
-    ((GLframebuffer*)gbuffer)->addTexture(GL_RGBA, GL_RGBA); //Transparent map
-    ((GLframebuffer*)gbuffer)->addTexture(GL_RGBA, GL_RGBA); //Masks map
+    ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGBA); //Diffuse map
+    ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGB16F); //Normal map
+    ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGB16F); //Position map
+    ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGBA); //Transparent map
+    ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGBA); //Masks map
 
     df_light_buffer = new GLframebuffer(width, height, false);
-    ((GLframebuffer*)df_light_buffer)->addTexture(GL_RGBA, GL_RGBA); //Diffuse map
-    ((GLframebuffer*)df_light_buffer)->addTexture(GL_RGB, GL_RGB); //Bloom map
+    ((GLframebuffer*)df_light_buffer)->addTexture(FORMAT_RGBA); //Diffuse map
+    ((GLframebuffer*)df_light_buffer)->addTexture(FORMAT_RGB); //Bloom map
 
     ui_buffer = new GLframebuffer(width, height, false);
-    ((GLframebuffer*)ui_buffer)->addTexture(GL_RGBA, GL_RGBA); //UI Diffuse map
+    ((GLframebuffer*)ui_buffer)->addTexture(FORMAT_RGBA); //UI Diffuse map
 }
 
 void Engine::GLRenderer::initManager() {
@@ -184,6 +188,7 @@ void Engine::GLRenderer::setFullscreenViewport(unsigned int Width, unsigned int 
 
 void Engine::GLRenderer::ClearFBufferGL(bool clearColor, bool clearDepth) {
     GLbitfield clearMask = 0;
+
     if (clearColor)
         clearMask |= GL_COLOR_BUFFER_BIT;
     if (clearDepth)

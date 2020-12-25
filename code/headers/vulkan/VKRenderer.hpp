@@ -15,7 +15,6 @@ namespace Engine {
 		Engine::GameObject* obj;
 		Mat4 transform;
 		Material* mat;
-		//Engine::MeshResource* mesh;
 
 		VKObjectToRender() {
 			mat = nullptr;
@@ -35,7 +34,6 @@ namespace Engine {
 		ZSVulkanRenderPass* MaterialRenderPass;
 		ZSVulkanSampler* mMaterialSampler;
 
-		_vk_Shader* test_shader;
 		std::vector<VKObjectToRender> ObjectsToRender;
 
 		void Present();

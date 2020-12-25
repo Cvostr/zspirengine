@@ -17,10 +17,10 @@ Engine::IView::~IView() {
 	game_data->ui_manager->RemoveView(this);
 }
 
-void Engine::IView::resize(unsigned int Width, unsigned int Height) {
+void Engine::IView::resize(int Width, int Height) {
 	this->size = ViewSize(Width, Height);
 }
-void Engine::IView::move(unsigned int x, unsigned int y) {
+void Engine::IView::move(int x, int y) {
 	this->pos = ViewPosition(x, y);
 }
 void Engine::IView::resize(const ViewSize& Size) {
@@ -52,19 +52,22 @@ void Engine::IView::__GetTransform(ViewSize& _Size, ViewPosition& _Pos) {
 				PreviousView->__GetTransform(pvSize, pvPos);
 			if (_LinearLayout->Orientation == ORIENTATION_HORIZONTAL) {
 				_Pos.posX = pvPos.posX + pvSize.WIDTH + margin.marginLeft;
+				_Pos.posY = pvPos.posY;
 			}
 			if (_LinearLayout->Orientation == ORIENTATION_VERTICAL) {
-				_Pos.posY = pvPos.posY - (margin.marginTop);
+				_Pos.posY = pvPos.posY - pvSize.HEIGHT - (margin.marginTop);
+				_Pos.posX = pvPos.posX;
 			}
 		}
 		else {
 			_Pos = this->pos;
 		}
-
-		ViewSize parentSize;
-		ViewPosition parentPos;
-		mParent->__GetTransform(parentSize, parentPos);
-		_Pos.posX += parentPos.posX;
-		_Pos.posY += parentPos.posY;
+		if (ParentLayout->IsFirstView(this)) {
+			ViewSize parentSize;
+			ViewPosition parentPos;
+			mParent->__GetTransform(parentSize, parentPos);
+			_Pos.posX += parentPos.posX;
+			_Pos.posY += parentPos.posY;
+		}
 	}
 }

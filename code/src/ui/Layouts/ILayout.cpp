@@ -29,3 +29,7 @@ void ILayout::RemoveView(IView* View) {
 	std::remove(mViews.begin(), mViews.end(), View);
 	mViews.pop_back();
 }
+
+bool ILayout::IsFirstView(IView* View) {
+	return mViews[0] == View;
+}

@@ -16,6 +16,7 @@ namespace Engine {
 		void AddView(IView* View);
 		void RemoveView(IView* View);
 		IView* GetPreviousObject(IView* View);
+		bool IsFirstView(IView* View);
 		void draw();
 		ILayout() : mType(LAYOUT_TYPE_NONE) {}
 	protected:

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../render/Renderer.hpp"
+#include "../ogl/ogl.h"
 
 namespace Engine {
 
@@ -18,13 +19,13 @@ namespace Engine {
 
     public:
 
-        GLuint textures[MAX_RENDERER_ATTACHMENT_COUNT];
+        _ogl_Texture* textures[MAX_RENDERER_ATTACHMENT_COUNT];
 
         void bind();
 
         void bindTextures(unsigned int m);
 
-        void addTexture(GLint intFormat = GL_RGBA8, GLint format = GL_RGBA);
+        void addTexture(TextureFormat Format);
 
         ~GLframebuffer();
         GLframebuffer(unsigned int width, unsigned int height, bool depth);

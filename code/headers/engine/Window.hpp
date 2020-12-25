@@ -43,6 +43,7 @@ namespace Engine {
         unsigned int GetWindowHeight() { return window_info->Height; }
         void SetTitle(const char* Title);
         void SetSize(unsigned int Width, unsigned int Height);
+        void SetPosition(unsigned int posX, unsigned int posY);
         void SetWindowMode(unsigned int mode);
         void SetResizeable(bool resizeable);
         void SetGLSwapInterval(int interval);

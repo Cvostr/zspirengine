@@ -23,10 +23,20 @@ typedef struct Texture3D_Unit{
 namespace Engine {
 
     enum TextureFormat {
-        FORMAT_R,
+        FORMAT_R = 1,
         FORMAT_RG,
         FORMAT_RGB,
-        FORMAT_RGBA
+        FORMAT_RGBA,
+
+        FORMAT_R16,
+        FORMAT_RG16,
+        FORMAT_RGB16,
+        FORMAT_RGBA16,
+
+        FORMAT_R16F,
+        FORMAT_RG16F,
+        FORMAT_RGB16F,
+        FORMAT_RGBA16F
     };
 
 	class Texture : public GpuObject{
@@ -37,6 +47,7 @@ namespace Engine {
 
 		//Only for OGL : initialize texture in GL
         virtual void Init(){}
+        virtual void Create(unsigned int Width, unsigned int Height, TextureFormat format){}
 		//Loads texture from buffer
         virtual bool LoadDDSTextureFromBuffer(unsigned char* data) { return false; }
         virtual bool LoadPNGTextureFromBuffer(unsigned char* data, int size) { return false; }

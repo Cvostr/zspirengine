@@ -5,26 +5,23 @@
 #define VERTEX_BUFFER_BIND 0
 extern ZSGAME_DATA* game_data;
 
-VkPipelineLayout Engine::ZSVulkanPipeline::GetPipelineLayout() {
-    return mPipelineLayout;
+VkPipelineLayout Engine::ZSVulkanPipeline::_GetPipelineLayout() {
+    return mLayout->GetPipelineLayout();
 }
 VkPipeline Engine::ZSVulkanPipeline::GetPipeline() {
     return pipeline;
 }
 
-VkDescriptorSet* Engine::ZSVulkanPipeline::GetDescriptorsSets() {
-    return mDescrSets.data();
-}
-unsigned int Engine::ZSVulkanPipeline::GetDescriptorSetsCount() {
-    return static_cast<uint32_t>(mDescrSets.size());
+Engine::ZSVulkanPipelineLayout* Engine::ZSVulkanPipeline::GetPipelineLayout() {
+    return this->mLayout;
 }
 
 void Engine::ZSVulkanPipeline::CmdPushConstants(VkCommandBuffer cmdbuf, VkShaderStageFlagBits stage, unsigned int offset, unsigned int size, void* data) {
-    vkCmdPushConstants(cmdbuf, this->mPipelineLayout, stage, offset, size, data);
+    vkCmdPushConstants(cmdbuf, _GetPipelineLayout(), stage, offset, size, data);
 }
 
 void Engine::ZSVulkanPipeline::CmdBindDescriptorSets(VkCommandBuffer cmdbuf) {
-    vkCmdBindDescriptorSets(cmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, GetPipelineLayout(), 0, GetDescriptorSetsCount(), GetDescriptorsSets(), 0, nullptr);
+    mLayout->CmdBindDescriptorSets(cmdbuf);
 }
 
 void Engine::ZSVulkanPipeline::CmdBindPipeline(VkCommandBuffer cmdbuf) {
@@ -40,15 +37,6 @@ VkVertexInputBindingDescription getBindingDescription() {
     return bindingDescription;
 }
 
-void Engine::ZSVulkanPipeline::AddPushConstant(unsigned int size, VkShaderStageFlagBits flag) {
-    VkPushConstantRange PCRange = {};
-    PCRange.offset = this->mPushConstantBuffersSize;
-    PCRange.size = size;
-    PCRange.stageFlags = flag;
-    this->mPushConstants.push_back(PCRange);
-
-    mPushConstantBuffersSize += size;
-}
 
 bool Engine::ZSVulkanPipeline::Create(_vk_Shader* Shader, ZSVulkanRenderPass* renderPass, ZsVkPipelineConf Conf) {
     VkPipelineShaderStageCreateInfo vertexStageCreateInfo = {}, fragmentStageCreateInfo = {},
@@ -120,29 +108,8 @@ bool Engine::ZSVulkanPipeline::Create(_vk_Shader* Shader, ZSVulkanRenderPass* re
     multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
     multisampling.alphaToOneEnable = VK_FALSE; // Optional
 
-    
-
-
-
-    VkPipelineLayoutCreateInfo pipeline_info = {};
-    pipeline_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-
-    mDescrSetLayouts.push_back(Conf.DescrSetLayout->getDescriptorSetLayout());
-    mDescrSets.push_back(Conf.DescrSetLayout->getDescriptorSet());
-
-    mDescrSetLayouts.push_back(Conf.DescrSetLayoutSampler->getDescriptorSetLayout());
-    mDescrSets.push_back(Conf.DescrSetLayoutSampler->getDescriptorSet());
-
-    this->DescrSetLayoutSampler = Conf.DescrSetLayoutSampler;
-
-    pipeline_info.setLayoutCount = static_cast<uint32_t>(mDescrSetLayouts.size());
-    pipeline_info.pSetLayouts = mDescrSetLayouts.data();
-    pipeline_info.pushConstantRangeCount = 
-        static_cast<uint32_t>(this->mPushConstants.size());
-    pipeline_info.pPushConstantRanges = mPushConstants.data();
-    vkCreatePipelineLayout(game_data->vk_main->mDevice->getVkDevice(), &pipeline_info, nullptr, &this->mPipelineLayout);
-
-
+    //Create Layout
+    mLayout->Create(Conf.LayoutInfo);
     //Get
     VkVertexInputBindingDescription bindingDescription = getBindingDescription();
 
@@ -225,7 +192,7 @@ bool Engine::ZSVulkanPipeline::Create(_vk_Shader* Shader, ZSVulkanRenderPass* re
 
     pipeline_create_info.pColorBlendState = &colorBlending;
     pipeline_create_info.pDynamicState = nullptr;
-    pipeline_create_info.layout = mPipelineLayout;
+    pipeline_create_info.layout = _GetPipelineLayout();
     //Bind render pass
     pipeline_create_info.renderPass = renderPass->GetRenderPass();
     pipeline_create_info.subpass = 0;

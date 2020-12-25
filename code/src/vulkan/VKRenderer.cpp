@@ -31,15 +31,17 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
 
     MaterialRenderPass->CmdBegin(mCmdBuf, TestFb);
 
-    
+    bool binded = false;
 
     for (unsigned int i = 0; i < ObjectsToRender.size(); i++) {
         VKObjectToRender* obr = &ObjectsToRender[i];
         GameObject* obj = ObjectsToRender[i].obj;
         if (obj->hasMesh() && obr->mat != nullptr) {
             MeshProperty* mesh = obj->getPropertyPtr<MeshProperty>();
-            
+            if (!binded) {
                 obr->mat->Pipeline->CmdBindPipeline(mCmdBuf);
+                binded = true;
+            }
                 obr->mat->Pipeline->CmdBindDescriptorSets(mCmdBuf);
 
                 obr->mat->Pipeline->CmdPushConstants(this->mCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, &ObjectsToRender[i].transform);
@@ -88,17 +90,7 @@ void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
 }
 
 void Engine::VKRenderer::InitShaders() {
-
-	test_shader = new Engine::_vk_Shader;
-	test_shader->compileFromFile("Shaders/vulkan_test/vert.spv", "Shaders/vulkan_test/frag.spv");
-
     this->default3d->compileFromFile("Shaders/vulkan_test/vert.spv", "Shaders/vulkan_test/frag.spv");
-
-	ZsVkPipelineConf Conf;
-    Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->transformBuffer, VK_SHADER_STAGE_VERTEX_BIT);
-    Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->lightsBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
-    Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->shadowBuffer, VK_SHADER_STAGE_ALL_GRAPHICS);
-    Conf.DescrSetLayoutSampler->pushImageSampler(0);
 
     MaterialRenderPass = new ZSVulkanRenderPass;
     MaterialRenderPass->PushColorOutputAttachment();

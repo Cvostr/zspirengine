@@ -10,45 +10,45 @@
 namespace Engine {
 
     typedef struct ViewSize {
-        unsigned int WIDTH;
-        unsigned int HEIGHT;
+        int WIDTH;
+        int HEIGHT;
 
         ViewSize() : WIDTH(0), HEIGHT(0) {}
-        ViewSize(unsigned int Width, unsigned int Height) : WIDTH(Width), HEIGHT(Height) {}
+        ViewSize(int Width, int Height) : WIDTH(Width), HEIGHT(Height) {}
     }ViewSize;
 
     typedef struct ViewMargin {
-        unsigned int marginTop;
-        unsigned int marginBottom;
-        unsigned int marginLeft;
-        unsigned int marginRight;
+        int marginTop;
+        int marginBottom;
+        int marginLeft;
+        int marginRight;
 
         ViewMargin() : marginTop(10), marginBottom(10), marginLeft(10), marginRight(10) {}
-        ViewMargin(unsigned int Top, unsigned int Bottom, unsigned int Left, unsigned int Right) :
+        ViewMargin(int Top, int Bottom, int Left, int Right) :
             marginTop(Top), marginBottom(Bottom), marginLeft(Left), marginRight(Right) {}
     }ViewMargin;
 
     typedef struct ViewPosition {
-        unsigned int posX;
-        unsigned int posY;
+        int posX;
+        int posY;
 
         ViewPosition() : posX(0), posY(0) {}
-        ViewPosition(unsigned int PosX, unsigned int PosY) : posX(PosX), posY(PosY) {}
+        ViewPosition(int PosX, int PosY) : posX(PosX), posY(PosY) {}
     }ViewPosition;
 
 	class IView {
 	public:
 
-        void resize(unsigned int Width, unsigned int Height);
-        void move(unsigned int x, unsigned int y);
+        void resize(int Width, int Height);
+        void move(int x, int y);
 
         void resize(const ViewSize& Size);
         void move(const ViewPosition& Pos);
 
-        void setMarginTop(unsigned int marginTop) { margin.marginTop = marginTop; }
-        void setMarginBottom(unsigned int marginBottom) { margin.marginBottom = marginBottom; }
-        void setMarginLeft(unsigned int marginLeft) { margin.marginLeft = marginLeft; }
-        void setMarginRight(unsigned int marginRight) { margin.marginRight = marginRight; }
+        void setMarginTop(int marginTop) { margin.marginTop = marginTop; }
+        void setMarginBottom(int marginBottom) { margin.marginBottom = marginBottom; }
+        void setMarginLeft(int marginLeft) { margin.marginLeft = marginLeft; }
+        void setMarginRight(int marginRight) { margin.marginRight = marginRight; }
 
         virtual ViewSize& __GetSizeWrapContent() { return size; }
         void __GetTransform(ViewSize& _Size, ViewPosition& _Pos);

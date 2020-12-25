@@ -20,6 +20,14 @@ void Window::SetSize(unsigned int Width, unsigned int Height) {
         mComponentManager->updateResolution(Width, Height);
 }
 
+void Window::SetPosition(unsigned int posX, unsigned int posY) {
+    if (mWindow)
+        SDL_SetWindowPosition(this->mWindow, posX, posY);
+
+    window_info->PosX = posX;
+    window_info->PosY = posY;
+}
+
 void Window::SetWindowMode(unsigned int mode) {
 	SDL_SetWindowFullscreen(this->mWindow, mode);
 }

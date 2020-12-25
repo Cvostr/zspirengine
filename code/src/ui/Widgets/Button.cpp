@@ -36,13 +36,6 @@ void Engine::Button::draw(){
         game_data->pipeline->renderSprite(common_sprite, pvPos.posX, pvPos.posY, pvSize.WIDTH, pvSize.HEIGHT);
 }
 
-void Engine::Button::resize(unsigned int Width, unsigned int Height){
-    IWidget::resize(Width, Height);
-}
-void Engine::Button::move(unsigned int x, unsigned int y){
-    IWidget::move(x, y);
-}
-
 void Engine::Button::setText(ZSPIRE::LocString* btn_text_string) {
     this->btn_text_string = btn_text_string;
 }

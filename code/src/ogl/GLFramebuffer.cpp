@@ -7,21 +7,21 @@ void Engine::GLframebuffer::bind() {
 
 void Engine::GLframebuffer::bindTextures(unsigned int m) {
     for (unsigned int t = 0; t < texture_size; t++) {
-        glActiveTexture(GL_TEXTURE0 + m + t);
-        glBindTexture(GL_TEXTURE_2D, textures[t]);
+        textures[t]->Use(m + t);
     }
 }
 
-void Engine::GLframebuffer::addTexture(GLint intFormat, GLint format) {
+void Engine::GLframebuffer::addTexture(TextureFormat Format) {
     if (texture_size == MAX_RENDERER_ATTACHMENT_COUNT) return;
     bind();
     //Create texture
-    glGenTextures(1, &textures[texture_size]);
-    glBindTexture(GL_TEXTURE_2D, textures[texture_size]);
-    glTexImage2D(GL_TEXTURE_2D, 0, intFormat, Width, Height, 0, format, GL_UNSIGNED_BYTE, nullptr);
+    textures[texture_size] = new _ogl_Texture;
+
+    textures[texture_size]->Create(Width, Height, Format);
+    //glTexImage2D(GL_TEXTURE_2D, 0, intFormat, Width, Height, 0, format, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + texture_size, GL_TEXTURE_2D, textures[texture_size], 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + texture_size, GL_TEXTURE_2D, textures[texture_size]->TEXTURE_ID, 0);
     texture_size++; //Add texture
 
     unsigned int attachments[MAX_RENDERER_ATTACHMENT_COUNT] =
@@ -44,7 +44,8 @@ Engine::GLframebuffer::~GLframebuffer() {
     glDeleteFramebuffers(1, &this->fbuffer);
 
     for (unsigned int t = 0; t < texture_size; t++) {
-        glDeleteTextures(1, &textures[t]);
+        textures[t]->Destroy();
+        delete textures[t];
     }
 }
 Engine::GLframebuffer::GLframebuffer(unsigned int width, unsigned int height, bool depth) {
