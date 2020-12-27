@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <GL/glew.h>
-#include "../../headers/ogl/ogl.h"
+#include "../../headers/ogl/GLTexture.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
@@ -12,16 +12,16 @@ GLint Engine::GetInternalFormatGL(TextureFormat format) {
     GLint gl_format = 0;
     switch (format) {
     case TextureFormat::FORMAT_R:
-        gl_format = GL_RED;
+        gl_format = GL_R8;
         break;
     case TextureFormat::FORMAT_RG:
-        gl_format = GL_RG;
+        gl_format = GL_RG8;
         break;
     case TextureFormat::FORMAT_RGB:
-        gl_format = GL_RGB;
+        gl_format = GL_RGB8;
         break;
     case TextureFormat::FORMAT_RGBA:
-        gl_format = GL_RGBA;
+        gl_format = GL_RGBA8;
         break;
     case TextureFormat::FORMAT_R16:
         gl_format = GL_R16;
@@ -64,7 +64,7 @@ GLenum Engine::GetFormatGL(TextureFormat format) {
     return gl_format;
 }
 
-void _ogl_Texture::Init() {
+void glTexture::Init() {
     if (mCreated) {
         return;
     }
@@ -80,29 +80,30 @@ void _ogl_Texture::Init() {
     mCreated = true;
 }
 
-void _ogl_Texture::Create(unsigned int Width, unsigned int Height, TextureFormat format) {
+void glTexture::Create(unsigned int Width, unsigned int Height, TextureFormat format) {
     Init();
     glTexImage2D(GL_TEXTURE_2D, 0, GetInternalFormatGL(format), Width, Height, 0, GetFormatGL(format), GL_UNSIGNED_BYTE, nullptr);
+    mFormat = format;
 }
 
-_ogl_Texture::_ogl_Texture() {
+glTexture::glTexture() {
     mCreated = false;
 }
 
-_ogl_Texture::~_ogl_Texture(){
+glTexture::~glTexture(){
 
 }
 
-void _ogl_Texture::Use(int slot) {
+void glTexture::Use(int slot) {
     glBindTextureUnit(slot, TEXTURE_ID);
 }
 
-void _ogl_Texture::Destroy() {
+void glTexture::Destroy() {
     glDeleteTextures(1, &this->TEXTURE_ID);
     mCreated = false;
 }
 
-bool _ogl_Texture::LoadTextureFromBufferUByte(unsigned char* data, int Width, int Height, TextureFormat format) {
+bool glTexture::LoadTextureFromBufferUByte(unsigned char* data, int Width, int Height, TextureFormat format) {
     Init();
 
     glBindTexture(GL_TEXTURE_2D, this->TEXTURE_ID);
@@ -117,23 +118,26 @@ bool _ogl_Texture::LoadTextureFromBufferUByte(unsigned char* data, int Width, in
         GL_UNSIGNED_BYTE,
         data
     );
+
+    mFormat = format;
+
     return true;
 }
 
-bool _ogl_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
+bool glTexture::LoadDDSTextureFromBuffer(unsigned char* data){
 
     Init();
 
     maxHeight = *(reinterpret_cast<int*>(&(data[12]))); //Getting height of texture in px info
     maxWidth = *(reinterpret_cast<int*>(&(data[16]))); //Getting width of texture in px info
     unsigned int linearSize = *(reinterpret_cast<unsigned int*>(&(data[20])));
-    unsigned int mipMapCount = *(reinterpret_cast<unsigned int*>(&(data[28])));
+    mMipsCount = *(reinterpret_cast<unsigned int*>(&(data[28])));
     unsigned int fourCC = *(reinterpret_cast<unsigned int*>(&(data[84])));
 
     unsigned char * bufferT;
     unsigned int bufsize;
 
-    bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize;//Getting buffer size
+    bufsize = mMipsCount > 1 ? linearSize * 2 : linearSize;//Getting buffer size
 
     bufferT = data + 128; //jumping over header
 
@@ -143,12 +147,15 @@ bool _ogl_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
     {
     case FOURCC_DXT1:
         format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+        mFormat = FORMAT_BC1_UNORM;
         break;
     case FOURCC_DXT3:
         format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+        mFormat = FORMAT_BC2_UNORM;
         break;
     case FOURCC_DXT5:
         format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+        mFormat = FORMAT_BC3_UNORM;
         break;
     default:
 
@@ -162,7 +169,7 @@ bool _ogl_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
     int nheight = maxHeight;
 
     //Mipmaps
-    for (unsigned int level = 0; level < mipMapCount && (nwidth || nheight); ++level) //Iterating over mipmaps
+    for (unsigned int level = 0; level < mMipsCount && (nwidth || nheight); ++level) //Iterating over mipmaps
     {
         unsigned int size = ((nwidth + 3) / 4)*((nheight + 3) / 4)*blockSize; //Calculating mip texture size
         glCompressedTexImage2D(GL_TEXTURE_2D, level, format, nwidth, nheight,
@@ -176,13 +183,17 @@ bool _ogl_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
     return true;
 }
 
-bool _ogl_Texture::LoadPNGTextureFromBuffer(unsigned char* data, int size) {
+bool glTexture::LoadPNGTextureFromBuffer(unsigned char* data, int size) {
     // Load from file
     int image_width = 0;
     int image_height = 0;
+    mFormat = FORMAT_RGBA;
     unsigned char* image_data = stbi_load_from_memory (data, size, &image_width, &image_height, NULL, 4);
     if (image_data == NULL)
         return false;
+
+    maxWidth = image_width;
+    maxHeight = image_height;
 
     // Create a OpenGL texture identifier
     Init();
@@ -193,14 +204,14 @@ bool _ogl_Texture::LoadPNGTextureFromBuffer(unsigned char* data, int size) {
 
     // Upload pixels into texture
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GetInternalFormatGL(mFormat), image_width, image_height, 0, GetFormatGL(mFormat), GL_UNSIGNED_BYTE, image_data);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(image_data);
 
     return true;
 }
 
-void _ogl_Texture3D::Init(){
+void glTexture3D::Init(){
     glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &TEXTURE_ID);
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -209,7 +220,7 @@ void _ogl_Texture3D::Init(){
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
-bool _ogl_Texture3D::pushTextureBuffer(int index, unsigned char* data){
+bool glTexture3D::pushTextureBuffer(int index, unsigned char* data){
     glBindTexture(GL_TEXTURE_CUBE_MAP, this->TEXTURE_ID);
 
     int HEIGHT = *(reinterpret_cast<int*>(&(data[12]))); //Getting height of texture in px info
@@ -264,15 +275,15 @@ bool _ogl_Texture3D::pushTextureBuffer(int index, unsigned char* data){
 }
 
 //Use in rendering pipeline
-void _ogl_Texture3D::Use(int slot){
+void glTexture3D::Use(int slot){
     glBindTextureUnit(slot, TEXTURE_ID);
 }
-void _ogl_Texture3D::Destroy(){
+void glTexture3D::Destroy(){
     glDeleteTextures(1, &TEXTURE_ID);
 }
-Engine::_ogl_Texture3D::_ogl_Texture3D(){
+Engine::glTexture3D::glTexture3D(){
 
 }
-Engine::_ogl_Texture3D::~_ogl_Texture3D(){
+Engine::glTexture3D::~glTexture3D(){
 
 }

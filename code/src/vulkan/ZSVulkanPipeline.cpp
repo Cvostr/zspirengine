@@ -38,7 +38,7 @@ VkVertexInputBindingDescription getBindingDescription() {
 }
 
 
-bool Engine::ZSVulkanPipeline::Create(_vk_Shader* Shader, ZSVulkanRenderPass* renderPass, ZsVkPipelineConf Conf) {
+bool Engine::ZSVulkanPipeline::Create(vkShader* Shader, ZSVulkanRenderPass* renderPass, ZsVkPipelineConf Conf) {
     VkPipelineShaderStageCreateInfo vertexStageCreateInfo = {}, fragmentStageCreateInfo = {},
         geometryStageCreateInfo = {};
 

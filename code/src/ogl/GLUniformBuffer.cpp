@@ -1,6 +1,7 @@
-#include "../../headers/ogl/ogl.h"
+#include "../../headers/ogl/GLUniformBuffer.hpp"
+#include <GL/glew.h>
 
-void Engine::_ogl_UniformBuffer::init(unsigned int slot, unsigned int size, bool CreateCpuBuffer){
+void Engine::glUniformBuffer::init(unsigned int slot, unsigned int size, bool CreateCpuBuffer){
     if (!mCreated) {
         mSlot = slot;
         mBufferSize = size;
@@ -19,33 +20,33 @@ void Engine::_ogl_UniformBuffer::init(unsigned int slot, unsigned int size, bool
         mCreated = true;
     }
 }
-void Engine::_ogl_UniformBuffer::writeData(unsigned int offset, unsigned int size, void* data){
+void Engine::glUniformBuffer::writeData(unsigned int offset, unsigned int size, void* data){
     if(mCreated && !mCpuBufferCreated)
         glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
 }
 
-void Engine::_ogl_UniformBuffer::updateBufferedData() {
+void Engine::glUniformBuffer::updateBufferedData() {
     if (mCreated && mCpuBufferCreated) {
         glBufferSubData(GL_UNIFORM_BUFFER, 0, mBufferSize, mCpuBuffer);
     }
 }
 
-void Engine::_ogl_UniformBuffer::bind(){
+void Engine::glUniformBuffer::bind(){
     if (mCreated)
         glBindBuffer(GL_UNIFORM_BUFFER, buffer_id);
 }
 
-void Engine::_ogl_UniformBuffer::Destroy(){
+void Engine::glUniformBuffer::Destroy(){
     if (mCreated) {
         glDeleteBuffers(1, &buffer_id);
         mCreated = false;
     }
 }
 
-Engine::_ogl_UniformBuffer::_ogl_UniformBuffer(){
+Engine::glUniformBuffer::glUniformBuffer(){
 
 }
-Engine::_ogl_UniformBuffer::~_ogl_UniformBuffer(){
+Engine::glUniformBuffer::~glUniformBuffer(){
     if (mCpuBufferCreated)
         delete[] mCpuBuffer;
 }

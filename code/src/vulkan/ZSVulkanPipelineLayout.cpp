@@ -1,4 +1,5 @@
 #include "../../headers/vulkan/ZSVulkanPipelineLayout.hpp"
+#include "../../headers/vulkan/VKTexture.hpp"
 #include "../../headers/game.h"
 
 extern ZSGAME_DATA* game_data;
@@ -26,7 +27,7 @@ void Engine::ZSVulkanPipelineLayout::CmdBindDescriptorSets(VkCommandBuffer cmdbu
     vkCmdBindDescriptorSets(cmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, GetPipelineLayout(), 0, GetDescriptorSetsCount(), GetDescriptorsSets(), 0, nullptr);
 }
 
-void Engine::ZSVulkanPipelineLayout::BindTexture(_vk_Texture* Texture, ZSVulkanSampler* sampler, uint32_t slot) {
+void Engine::ZSVulkanPipelineLayout::BindTexture(vkTexture* Texture, ZSVulkanSampler* sampler, uint32_t slot) {
     DescrSetLayoutSampler->setTexture(slot, Texture->GetImageView(), sampler);
 }
 

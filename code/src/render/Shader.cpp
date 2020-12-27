@@ -8,8 +8,8 @@
 #include <sstream>
 #include <iostream>
 
-#include "../../headers/ogl/ogl.h"
-#include "../../headers/vulkan/vk_data.h"
+#include "../../headers/ogl/GLShader.hpp"
+#include "../../headers/vulkan/VKShader.hpp"
 
 extern ZSpireEngine* engine_ptr;
 
@@ -17,11 +17,11 @@ Engine::Shader* Engine::allocShader(){
     Engine::Shader* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){
         case OGL: {
-            result = new _ogl_Shader;
+            result = new glShader;
             break;
         }
         case VULKAN : {
-            result = new _vk_Shader;
+            result = new vkShader;
             break;
         }
     }

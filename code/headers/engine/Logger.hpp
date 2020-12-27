@@ -3,7 +3,6 @@
 #include <string>
 #include <type_traits>
 #include <stdio.h>
-#include <iostream>
 
 namespace Engine {
 
@@ -29,20 +28,27 @@ namespace Engine {
 	public:
 		OpLogger() {}
 
-		template <typename T>
-		OpLogger& operator<<(T var) {
-			if (std::is_same<T, const char*>::value || std::is_same<T, char*>::value) {
-				printf("%s", (const char*)var);
-			}
-			if (std::is_same<T, std::string>::value) {
-				//std::string Str = var;
-				//printf("%s", Str.c_str());
-				std::cout << var;
-			}
-			if (std::is_same<T, int>::value) {
-				printf("%i", (int)var);
-			}
+	
+		OpLogger& operator<<(int var) {
+			printf("%i", var);
 			return *this;
 		}
+		OpLogger& operator<<(unsigned int var) {
+			printf("%u", var);
+			return *this;
+		}
+		OpLogger& operator<<(float var) {
+			printf("%f", var);
+			return *this;
+		}
+		OpLogger& operator<<(const char* var) {
+			printf("%s", var);
+			return *this;
+		}
+		OpLogger& operator<<(std::string var) {
+			printf("%s", var.c_str());
+			return *this;
+		}
+		
 	};
 }

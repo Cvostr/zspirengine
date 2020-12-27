@@ -1,11 +1,11 @@
-#include "../../headers/vulkan/vk_data.h"
+#include "../../headers/vulkan/VKShader.hpp"
 #include "../../headers/game.h"
 #include <fstream>
 #include <iostream>
 
 extern ZSGAME_DATA* game_data;
 
-bool Engine::_vk_Shader::readBinaryShaderFile(std::string path, char** result, size_t& size){
+bool Engine::vkShader::readBinaryShaderFile(std::string path, char** result, size_t& size){
     std::ifstream stream;
 
     stream.exceptions(std::ifstream::badbit);
@@ -28,7 +28,7 @@ bool Engine::_vk_Shader::readBinaryShaderFile(std::string path, char** result, s
     }
     return true;
 }
-bool Engine::_vk_Shader::compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath){
+bool Engine::vkShader::compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath){
     
     size_t vertShaderSize, fragShaderSize, geomShaderSize;
 
@@ -68,16 +68,16 @@ bool Engine::_vk_Shader::compileFromFile(std::string VSpath, std::string FSpath,
 
     return true;
 }
-void Engine::_vk_Shader::Use(){
+void Engine::vkShader::Use(){
 
 }
-void Engine::_vk_Shader::Destroy(){
+void Engine::vkShader::Destroy(){
 
 }
 
-Engine::_vk_Shader::_vk_Shader(){
+Engine::vkShader::vkShader(){
 
 }
-Engine::_vk_Shader::~_vk_Shader(){
+Engine::vkShader::~vkShader(){
 
 }

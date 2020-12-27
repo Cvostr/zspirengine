@@ -158,7 +158,7 @@ void Material::setPropertyGroup(MtShaderPropertiesGroup* group_ptr){
     if (engine_ptr->engine_info->graphicsApi == VULKAN && group_ptr->render_shader->mCreated) {
 
         Engine::ZsVkPipelineConf Conf;
-        Conf.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)game_data->pipeline->GetTransformUniformBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
+        Conf.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)game_data->pipeline->GetTransformUniformBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
         //Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->lightsBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
        // Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->shadowBuffer, VK_SHADER_STAGE_ALL_GRAPHICS);
         Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(0);
@@ -168,7 +168,7 @@ void Material::setPropertyGroup(MtShaderPropertiesGroup* group_ptr){
         Conf.LayoutInfo.AddPushConstant(64, VK_SHADER_STAGE_VERTEX_BIT);
         
         this->Pipeline = new Engine::ZSVulkanPipeline;
-        Pipeline->Create((Engine::_vk_Shader*)group_ptr->render_shader, game_data->vk_main->mMaterialsRenderPass, Conf);
+        Pipeline->Create((Engine::vkShader*)group_ptr->render_shader, game_data->vk_main->mMaterialsRenderPass, Conf);
     }
 }
 

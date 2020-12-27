@@ -1,25 +1,25 @@
-#include "../../headers/vulkan/vk_data.h"
+#include "../../headers/vulkan/VKMesh.hpp"
 #include "../../headers/game.h"
 
 extern ZSGAME_DATA* game_data;
 
-Engine::_vk_Mesh::_vk_Mesh(){
+Engine::vkMesh::vkMesh(){
 
 }
 
-Engine::_vk_Mesh::~_vk_Mesh(){
+Engine::vkMesh::~vkMesh(){
 
 }
 
-void Engine::_vk_Mesh::Init() {
+void Engine::vkMesh::Init() {
 
 }
 
-void Engine::_vk_Mesh::Destroy() {
+void Engine::vkMesh::Destroy() {
     game_data->vk_main->mVMA->destroyBuffer(&vertexBuffer);
 }
 
-void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num){
+void Engine::vkMesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num){
     mVerticesNum = vertices_num;
     mIndicesNum = indices_num;
 
@@ -37,7 +37,7 @@ void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, un
     game_data->vk_main->mVMA->unmap(&vertexBuffer);
     game_data->vk_main->mVMA->unmap(&indexBuffer);*/
 }
-void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){
+void Engine::vkMesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){
 
     mVerticesNum = vertices_num;
     //Allocate buffer
@@ -47,15 +47,15 @@ void Engine::_vk_Mesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num
     game_data->vk_main->mVMA->unmap(&vertexBuffer);
 }
 
-void Engine::_vk_Mesh::Draw() {
+void Engine::vkMesh::Draw() {
     Draw(game_data->vk_main->CurrentCmdBuffer);
 }
 
-void Engine::_vk_Mesh::DrawInstanced(unsigned int instances) {
+void Engine::vkMesh::DrawInstanced(unsigned int instances) {
     Draw(game_data->vk_main->CurrentCmdBuffer);
 }
 
-void Engine::_vk_Mesh::Draw(VkCommandBuffer CmdBuf){
+void Engine::vkMesh::Draw(VkCommandBuffer CmdBuf){
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(CmdBuf, 0, 1, &this->vertexBuffer.Buffer, offsets);
 

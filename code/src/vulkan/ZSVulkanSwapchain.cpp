@@ -3,7 +3,7 @@
 
 VkImageView Engine::ZSVulkanSwapChain::GetImageViewAtIndex(unsigned int Index) {
     if (Index > this->mSwapChainImageViews.size())
-        Index = mSwapChainImageViews.size();
+        Index = static_cast<uint32_t>(mSwapChainImageViews.size());
     return mSwapChainImageViews[Index];
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../render/Renderer.hpp"
-#include "../ogl/ogl.h"
+#include "../ogl/GLTexture.hpp"
 
 namespace Engine {
 
@@ -19,7 +19,7 @@ namespace Engine {
 
     public:
 
-        _ogl_Texture* textures[MAX_RENDERER_ATTACHMENT_COUNT];
+        glTexture* textures[MAX_RENDERER_ATTACHMENT_COUNT];
 
         void bind();
 

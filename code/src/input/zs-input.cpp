@@ -62,6 +62,10 @@ bool Input::isKeyHold(int keycode){
     return false;
 }
 
+void Input::SetMouseRelativeMode(bool Mode) {
+    SDL_SetRelativeMouseMode((SDL_bool)Mode);
+}
+
 Input::MouseState* Input::getMouseStatePtr(){
     return &mouse;
 }

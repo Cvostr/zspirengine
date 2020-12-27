@@ -5,10 +5,13 @@
 
 namespace Engine {
 	class ScreenEffect {
-	private:
+	protected:
 		std::vector<Texture*> mInputTextures;
 		Texture* OutputTexture;
 		Shader* mEffectShader;
+
+		unsigned int mWidth;
+		unsigned int mHeight;
 	public:
 		void PushInputTexture(Texture* Texture) { mInputTextures.push_back(Texture); }
 		Texture* GetOutputTexture() { return OutputTexture; }
@@ -19,9 +22,11 @@ namespace Engine {
 		}
 		virtual void Compute(){}
 
-		ScreenEffect(unsigned int width, unsigned int height, TextureFormat Format) :
+		explicit ScreenEffect(unsigned int width, unsigned int height, TextureFormat Format) :
 			mEffectShader(nullptr),
-			OutputTexture(allocTexture())
+			OutputTexture(allocTexture()),
+			mWidth(width),
+			mHeight(height)
 		{
 			OutputTexture->Create(width, height, Format);
 		}

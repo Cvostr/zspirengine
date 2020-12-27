@@ -36,15 +36,21 @@ namespace Engine {
         FORMAT_R16F,
         FORMAT_RG16F,
         FORMAT_RGB16F,
-        FORMAT_RGBA16F
+        FORMAT_RGBA16F,
+
+        FORMAT_BC1_UNORM,
+        FORMAT_BC2_UNORM,
+        FORMAT_BC3_UNORM,
     };
 
 	class Texture : public GpuObject{
     protected:
-        unsigned int maxWidth;
-        unsigned int maxHeight;
+        uint32_t maxWidth;
+        uint32_t maxHeight;
+        TextureFormat mFormat;
+        uint32_t mMipsCount;
 	public:
-
+        TextureFormat GetFormat() { return mFormat; }
 		//Only for OGL : initialize texture in GL
         virtual void Init(){}
         virtual void Create(unsigned int Width, unsigned int Height, TextureFormat format){}

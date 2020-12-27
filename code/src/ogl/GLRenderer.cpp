@@ -13,6 +13,8 @@ Engine::GLRenderer::GLRenderer() {
 }
 
 void Engine::GLRenderer::InitShaders() {
+    
+
     this->ui_shader->compileFromFile("Shaders/ui/ui.vert", "Shaders/ui/ui.frag");
 
     if (engine_ptr->desc->game_perspective == PERSP_2D) {
@@ -37,6 +39,10 @@ void Engine::GLRenderer::InitShaders() {
 
 void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int height) {
     gbuffer = new GLframebuffer(width, height, true);
+
+    effect = new GLScreenEffect(width, height, FORMAT_RGBA);
+    effect->CompileShaderFromFile("Shaders/postprocess/blur/blur.comp");
+
     ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGBA); //Diffuse map
     ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGB16F); //Normal map
     ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGB16F); //Position map
@@ -45,10 +51,12 @@ void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int hei
 
     df_light_buffer = new GLframebuffer(width, height, false);
     ((GLframebuffer*)df_light_buffer)->addTexture(FORMAT_RGBA); //Diffuse map
-    ((GLframebuffer*)df_light_buffer)->addTexture(FORMAT_RGB); //Bloom map
+    ((GLframebuffer*)df_light_buffer)->addTexture(FORMAT_RGBA); //Bloom map
 
     ui_buffer = new GLframebuffer(width, height, false);
     ((GLframebuffer*)ui_buffer)->addTexture(FORMAT_RGBA); //UI Diffuse map
+
+    effect->PushInputTexture(((GLframebuffer*)df_light_buffer)->textures[1]);
 }
 
 void Engine::GLRenderer::initManager() {
@@ -123,6 +131,8 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
         deffered_light->Use(); //use deffered shader
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
     }
+
+    effect->Compute();
 
     //Render ALL UI
     {

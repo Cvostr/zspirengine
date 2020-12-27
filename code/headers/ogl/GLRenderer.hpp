@@ -1,11 +1,15 @@
 #pragma once
 
 #include "GLFramebuffer.hpp"
+#include "GLScreenEffect.hpp"
 #include "../render/Renderer.hpp"
 
 namespace Engine {
 	class GLRenderer : public Renderer {
 	public:
+
+		GLScreenEffect* effect;
+
 		void InitShaders();
 		void initManager();
 

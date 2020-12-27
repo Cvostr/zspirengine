@@ -1,8 +1,8 @@
 #include "../../headers/render/UniformBuffer.hpp"
 #include "../../headers/game.h"
 
-#include "../../headers/ogl/ogl.h"
-#include "../../headers/vulkan/vk_data.h"
+#include "../../headers/ogl/GLUniformBuffer.hpp"
+#include "../../headers/vulkan/VKUniformBuffer.hpp"
 
 extern ZSpireEngine* engine_ptr;
 
@@ -30,11 +30,11 @@ Engine::UniformBuffer* Engine::allocUniformBuffer(){
     Engine::UniformBuffer* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){
         case OGL: {
-            result = new _ogl_UniformBuffer;
+            result = new glUniformBuffer;
             break;
         }
         case VULKAN : {
-            result = new _vk_UniformBuffer;
+            result = new vkUniformBuffer;
             break;
         }
     }

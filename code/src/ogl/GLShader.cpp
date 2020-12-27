@@ -4,16 +4,16 @@
 #include <fstream>
 #include <sstream>
 #include <GL/glew.h>
-#include "../../headers/ogl/ogl.h"
+#include "../../headers/ogl/GLShader.hpp"
 
-Engine::_ogl_Shader::_ogl_Shader(){
-
-}
-Engine::_ogl_Shader::~_ogl_Shader(){
+Engine::glShader::glShader(){
 
 }
+Engine::glShader::~glShader(){
 
-void Engine::_ogl_Shader::GLcheckCompileErrors(unsigned int shader, const char* type, const char* filepath){
+}
+
+void Engine::glShader::GLcheckCompileErrors(unsigned int shader, const char* type, const char* filepath){
     GLint success;
     GLchar infoLog[1024];
     if (strcmp(type, "PROGRAM"))
@@ -41,7 +41,7 @@ void Engine::_ogl_Shader::GLcheckCompileErrors(unsigned int shader, const char* 
     }
 }
 
-bool Engine::_ogl_Shader::readShaderFile(const char* path, char** result, size_t& size){
+bool Engine::glShader::readShaderFile(const char* path, char** result, size_t& size){
     std::string res_data;
     std::ifstream stream;
 
@@ -70,7 +70,7 @@ bool Engine::_ogl_Shader::readShaderFile(const char* path, char** result, size_t
 }
 
 
-bool Engine::_ogl_Shader::compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath) {
+bool Engine::glShader::compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath) {
     std::cout << "OGL: Compiling shader " << VSpath << " " << FSpath << std::endl;
 
     GLchar* vs_data;
@@ -93,7 +93,7 @@ bool Engine::_ogl_Shader::compileFromFile(std::string VSpath, std::string FSpath
 
     return Result;
 }
-bool Engine::_ogl_Shader::compileFromStr(const char* _VS, const char* _FS, const char* _GS) {
+bool Engine::glShader::compileFromStr(const char* _VS, const char* _FS, const char* _GS) {
     if (mCreated)
         return false;
     this->mShaderID = glCreateProgram();
@@ -132,7 +132,7 @@ bool Engine::_ogl_Shader::compileFromStr(const char* _VS, const char* _FS, const
     return true;
 }
 
-bool Engine::_ogl_Shader::compileComputeFromFile(std::string CSpath) {
+bool Engine::glShader::compileComputeFromFile(std::string CSpath) {
 
     GLchar* cs_data = nullptr;
 
@@ -144,7 +144,7 @@ bool Engine::_ogl_Shader::compileComputeFromFile(std::string CSpath) {
     delete[] cs_data;
     return Result;
 }
-bool Engine::_ogl_Shader::compileComputeFromStr(const char* _CS) {
+bool Engine::glShader::compileComputeFromStr(const char* _CS) {
     if (mCreated)
         return false;
 
@@ -159,20 +159,18 @@ bool Engine::_ogl_Shader::compileComputeFromStr(const char* _CS) {
 
     glDeleteShader(CShader);
 
+    mCreated = true;
+
     return true;
 }
 
-void Engine::_ogl_Shader::setUniformBufferBinding(const char* UB_NAME, unsigned int binding){
-    unsigned int SBI = glGetUniformBlockIndex(this->mShaderID, UB_NAME);
-    glUniformBlockBinding(this->mShaderID, SBI, binding);
-}
-void Engine::_ogl_Shader::Destroy(){
+void Engine::glShader::Destroy(){
     if (mCreated) {
         glDeleteProgram(this->mShaderID);
         mCreated = false;
     }
 }
-void Engine::_ogl_Shader::Use(){
+void Engine::glShader::Use(){
     if (mCreated)
         glUseProgram(this->mShaderID);
 }

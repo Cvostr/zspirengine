@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 #include "ZSVulkan.hpp"
-#include "vk_data.h"
+#include "VKShader.hpp"
 #include "ZSVulkanDescriptorSet.hpp"
 #include "ZSVulkanRenderPass.hpp"
 #include "ZSVulkanPipelineLayout.hpp"
@@ -42,7 +42,7 @@ namespace Engine {
         VkPipeline GetPipeline();
         ZSVulkanPipelineLayout* GetPipelineLayout();
 
-        bool Create(_vk_Shader* Shader, ZSVulkanRenderPass* renderPass,  ZsVkPipelineConf Conf);
+        bool Create(vkShader* Shader, ZSVulkanRenderPass* renderPass,  ZsVkPipelineConf Conf);
         void CmdBindPipeline(VkCommandBuffer cmdbuf);
         void CmdPushConstants(VkCommandBuffer cmdbuf, VkShaderStageFlagBits stage, unsigned int offset, unsigned int size, void* data);
         void CmdBindDescriptorSets(VkCommandBuffer cmdbuf);

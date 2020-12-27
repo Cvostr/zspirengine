@@ -1,8 +1,8 @@
 #include "../../headers/game.h"
 #include "../../headers/render/Texture.h"
 
-#include "../../headers/ogl/ogl.h"
-#include "../../headers/vulkan/vk_data.h"
+#include "../../headers/ogl/GLTexture.hpp"
+#include "../../headers/vulkan/VKTexture.hpp"
 
 extern ZSpireEngine* engine_ptr;
 //Hack to support resources
@@ -12,11 +12,11 @@ Engine::Texture* Engine::allocTexture(){
     Engine::Texture* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){
         case OGL: {
-            result = new _ogl_Texture;
+            result = new glTexture;
             break;
         }
         case VULKAN : {
-            result = new _vk_Texture;
+            result = new vkTexture;
             break;
         }
     }
@@ -27,11 +27,11 @@ Engine::Texture3D* Engine::allocTexture3D(){
     Engine::Texture3D* result = nullptr;
     switch(engine_ptr->engine_info->graphicsApi){
         case OGL: {
-            result = new _ogl_Texture3D;
+            result = new glTexture3D;
             break;
         }
         case VULKAN : {
-            result = new _vk_Texture3D;
+            result = new vkTexture3D;
             break;
         }
     }

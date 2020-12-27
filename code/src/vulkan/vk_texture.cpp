@@ -1,43 +1,46 @@
-#include "../../headers/vulkan/vk_data.h"
+#include "../../headers/vulkan/VKTexture.hpp"
 #include "../../headers/game.h"
 
 extern ZSGAME_DATA* game_data;
 
-void Engine::_vk_Texture::Init(){
+void Engine::vkTexture::Init(){
 
 }
 //Loads texture from buffer
-bool Engine::_vk_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
+bool Engine::vkTexture::LoadDDSTextureFromBuffer(unsigned char* data){
 
 	maxHeight = *(reinterpret_cast<int*>(&(data[12]))); //Getting height of texture in px info
 	maxWidth = *(reinterpret_cast<int*>(&(data[16]))); //Getting width of texture in px info
 	unsigned int linearSize = *(reinterpret_cast<unsigned int*>(&(data[20])));
-	unsigned int mipMapCount = *(reinterpret_cast<unsigned int*>(&(data[28])));
+	mMipsCount = *(reinterpret_cast<unsigned int*>(&(data[28])));
 	unsigned int fourCC = *(reinterpret_cast<unsigned int*>(&(data[84])));
 
 
 	unsigned int bufsize;
-	bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize;//Getting buffer size
+	bufsize = mMipsCount > 1 ? linearSize * 2 : linearSize;//Getting buffer size
 	unsigned char* bufferT = data + 128; //jumping over header
 
 	VkFormat format; //Getting texture format
 	switch (fourCC)
 	{
 	case FOURCC_DXT1:
-		format = VK_FORMAT_BC1_RGB_SRGB_BLOCK;
+		format = VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
+		mFormat = FORMAT_BC1_UNORM;
 		break;
 	case FOURCC_DXT3:
-		format = VK_FORMAT_BC2_SRGB_BLOCK;
+		format = VK_FORMAT_BC2_UNORM_BLOCK;
+		mFormat = FORMAT_BC2_UNORM;
 		break;
 	case FOURCC_DXT5:
-		format = VK_FORMAT_BC3_SRGB_BLOCK;
+		format = VK_FORMAT_BC3_UNORM_BLOCK;
+		mFormat = FORMAT_BC3_UNORM;
 		break;
 	default:
 
 		return 0;
 	}
 	//Getting block size
-	unsigned int blockSize = (format == VK_FORMAT_BC1_RGB_SRGB_BLOCK) ? 8 : 16;
+	unsigned int blockSize = (format == VK_FORMAT_BC1_RGBA_UNORM_BLOCK) ? 8 : 16;
 	unsigned int offset = 0;
 
 	unsigned int size = ((maxWidth + 3) / 4) * ((maxHeight + 3) / 4) * blockSize;
@@ -107,14 +110,14 @@ bool Engine::_vk_Texture::LoadDDSTextureFromBuffer(unsigned char* data){
     return true;
 }
 //Use in rendering pipeline
-void Engine::_vk_Texture::Use(int slot){
+void Engine::vkTexture::Use(int slot){
 	
 }
-void Engine::_vk_Texture::Destroy(){
+void Engine::vkTexture::Destroy(){
 
 }
 
-void Engine::_vk_Texture::Transition(VmaVkBuffer temp) {
+void Engine::vkTexture::Transition(VmaVkBuffer temp) {
 	VkCommandBuffer cmdbuf = game_data->vk_main->mVMA->GetSingleTimeCmdBuf();
 	VkCommandPool cmdpool = game_data->vk_main->mVMA->GetSingleTimeCmdPool();
 
@@ -184,7 +187,7 @@ void Engine::_vk_Texture::Transition(VmaVkBuffer temp) {
 }
 
 
-void Engine::_vk_Texture::CreateImageView(VkFormat format) {
+void Engine::vkTexture::CreateImageView(VkFormat format) {
 
 	VkImageViewCreateInfo textureImageViewInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 	textureImageViewInfo.image = mImage;
@@ -199,31 +202,31 @@ void Engine::_vk_Texture::CreateImageView(VkFormat format) {
 }
 
 
-Engine::_vk_Texture::_vk_Texture(){
+Engine::vkTexture::vkTexture(){
 
 }
-Engine::_vk_Texture::~_vk_Texture(){
+Engine::vkTexture::~vkTexture(){
 
 }
 
 
-void Engine::_vk_Texture3D::Init(){
+void Engine::vkTexture3D::Init(){
 
 }
-bool Engine::_vk_Texture3D::pushTextureBuffer(int index, unsigned char* data){
+bool Engine::vkTexture3D::pushTextureBuffer(int index, unsigned char* data){
     return true;
 }
 //Use in rendering pipeline
-void Engine::_vk_Texture3D::Use(int slot){
+void Engine::vkTexture3D::Use(int slot){
 
 }
-void Engine::_vk_Texture3D::Destroy(){
+void Engine::vkTexture3D::Destroy(){
 
 }
 
-Engine::_vk_Texture3D::_vk_Texture3D(){
+Engine::vkTexture3D::vkTexture3D(){
 
 }
-Engine::_vk_Texture3D::~_vk_Texture3D(){
+Engine::vkTexture3D::~vkTexture3D(){
 
 }

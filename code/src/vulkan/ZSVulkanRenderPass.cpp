@@ -69,7 +69,8 @@ void ZSVulkanRenderPass::PushDepthAttachment() {
 
     //Create Attachment Reference for Depth Attachment
     VkAttachmentReference colorAttachmentRef = {};
-    colorAttachmentRef.attachment = mAttachmentDescriptions.size() - 1;
+    colorAttachmentRef.attachment = 
+        static_cast<unsigned int>(mAttachmentDescriptions.size() - 1);
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
     //Push new attachment reference
     DepthDescriptionRef = colorAttachmentRef;
@@ -114,6 +115,7 @@ bool ZSVulkanRenderPass::Create() {
     if (vkCreateRenderPass(game_data->vk_main->mDevice->getVkDevice(), &renderPassInfo, nullptr, &mRenderPass) != VK_SUCCESS) {
         return false;
     }
+    return true;
 }
 
 void ZSVulkanRenderPass::CmdBegin(VkCommandBuffer cmdbuf, ZSVulkanFramebuffer* framebuffer) {

@@ -3,7 +3,7 @@
 
 extern ZSGAME_DATA* game_data;
 
-void Engine::ZSVulkanDescriptorSet::pushUniformBuffer(_vk_UniformBuffer* buf, VkShaderStageFlags stageFlags) {
+void Engine::ZSVulkanDescriptorSet::pushUniformBuffer(vkUniformBuffer* buf, VkShaderStageFlags stageFlags) {
 
     if (type != DESCR_SET_TYPE::DESCR_SET_TYPE_UBO)
         return;
@@ -80,7 +80,7 @@ VkDescriptorSet Engine::ZSVulkanDescriptorSet::getDescriptorSet() {
 
 void Engine::ZSVulkanDescriptorSet::UpdUniformBuffer(unsigned int index) {
     if (type == DESCR_SET_TYPE::DESCR_SET_TYPE_UBO) {
-        _vk_UniformBuffer* buf = ubuffers[index];
+        vkUniformBuffer* buf = ubuffers[index];
         //Generating buffer
         VkDescriptorBufferInfo bufferInfo{};
         bufferInfo.offset = 0;

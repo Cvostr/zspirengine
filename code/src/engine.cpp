@@ -45,10 +45,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, Engine::ZSWINDOW_CREATE_I
             
             glViewport(0, 0, win->Width, win->Height);
 
-            glewExperimental = GL_TRUE;
-            if (glewInit() != GLEW_OK) std::cout << "GLEW initialize failed" << std::endl; else {
-                std::cout << "GLEW initialize sucessful" << std::endl;
-            }
+            
         }
     }
 }
@@ -155,6 +152,7 @@ void ZSpireEngine::loadGame(){
         mWindow->SwapGL();
 
     }
+    mWindow->DestroyWindow();
     game_data->world->clear(); //clear world
     Engine::Loader::stop();
     //Destroys all created managers

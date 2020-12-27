@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <vulkan/vulkan.hpp>
-#include "vk_data.h"
+#include "VKUniformBuffer.hpp"
 #include "ZSVulkanSampler.hpp"
 
 namespace Engine {
@@ -22,13 +22,13 @@ namespace Engine {
 		VkDescriptorPool Descr_Pool; //Descriptor Pool
 		VkDescriptorSet Descr_Set; //Descriptor Set
 		//Array of pointers to Uniform Objects
-		std::vector<_vk_UniformBuffer*> ubuffers;
+		std::vector<vkUniformBuffer*> ubuffers;
 
 		void addDescriptorPool(VkDescriptorType type);
 
 	public:
 		void UpdUniformBuffer(unsigned int index);
-		void pushUniformBuffer(_vk_UniformBuffer* buf, VkShaderStageFlags stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS);
+		void pushUniformBuffer(vkUniformBuffer* buf, VkShaderStageFlags stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS);
 		void pushImageSampler(int slot);
 
 		void setTexture(int index, VkImageView image, ZSVulkanSampler* sampler);

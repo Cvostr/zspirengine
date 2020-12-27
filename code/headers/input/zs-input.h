@@ -11,6 +11,7 @@ namespace Input {
     void clearPressedKeys();
     bool isKeyPressed(int keycode);
     bool isKeyHold(int keycode);
+    void SetMouseRelativeMode(bool Mode);
 
     struct MouseState{
         int mouseX;

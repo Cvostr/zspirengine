@@ -46,7 +46,7 @@ void Window::CreateWindow(ZSWINDOW_CREATE_INFO* win_info, ZSENGINE_CREATE_INFO* 
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) //Trying to init SDL
     {
-        std::cout << "Error opening window " << SDL_GetError() << std::endl;
+        Logger::Log(LogType::LOG_TYPE_ERROR) << "Error opening window " << SDL_GetError() << "\n";
     }
 
     unsigned int SDL_WIN_MODE = 0;
@@ -56,11 +56,11 @@ void Window::CreateWindow(ZSWINDOW_CREATE_INFO* win_info, ZSENGINE_CREATE_INFO* 
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
         SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-        //OpenGL 4.3
+        //OpenGL 4.5
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
         SDL_WIN_MODE = SDL_WINDOW_OPENGL; //Set window mode to OpenGL
-        Engine::Logger::Log() << "OpenGL version : 4.3 core\n";
+        Engine::Logger::Log() << "OpenGL version : 4.5 core\n";
     }
     else if (engine_info->graphicsApi == VULKAN) {
         SDL_WIN_MODE = SDL_WINDOW_VULKAN;
@@ -71,8 +71,15 @@ void Window::CreateWindow(ZSWINDOW_CREATE_INFO* win_info, ZSENGINE_CREATE_INFO* 
     Engine::Logger::Log() << "Opening SDL2 window\n";
     this->mWindow = SDL_CreateWindow(win_info->title, window_info->PosX, window_info->PosY, win_info->Width, win_info->Height, SDL_WIN_MODE); //Create window
 
-    if (engine_info->graphicsApi == OGL)
+    if (engine_info->graphicsApi == OGL) {
         this->mGLContext = SDL_GL_CreateContext(mWindow);
+        //Initialize GLEW
+        glewExperimental = GL_TRUE;
+        if (glewInit() != GLEW_OK)
+            Logger::Log(LogType::LOG_TYPE_ERROR) << "GLEW initialize failed\n";
+        else 
+            Logger::Log(LogType::LOG_TYPE_INFO) << "GLEW initialize sucessful\n";
+    }
 }
 
 void Window::SwapGL() {

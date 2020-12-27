@@ -6,7 +6,7 @@
 #include "ZSVulkanRenderPass.hpp"
 #include "ZSVulkanFramebuffer.hpp"
 #include <vector>
-#include "vk_data.h"
+#include "VKUniformBuffer.hpp"
 
 namespace Engine {
 

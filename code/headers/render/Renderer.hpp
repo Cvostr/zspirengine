@@ -1,11 +1,10 @@
 #pragma once
 
+#define GLEW_STATIC
 #include "Shader.hpp"
 #include "Mesh.hpp"
 #include "../../headers/engine/EngineComponent.h"
 #include "../../headers/render/UniformBuffer.hpp"
-#include "../../headers/ogl/ogl.h"
-#include "../../headers/vulkan/vk_data.h"
 #include "SDL2/SDL.h"
 #include "GL/glew.h"
 #include "../world/Camera.hpp"

@@ -1,8 +1,8 @@
 #include "../../headers/render/Mesh.hpp"
 #include "../../headers/game.h"
 
-#include "../../headers/ogl/ogl.h"
-#include "../../headers/vulkan/vk_data.h"
+#include "../../headers/ogl/GLMesh.hpp"
+#include "../../headers/vulkan/VKMesh.hpp"
 
 #define SPHERE_SECTORS 36
 #define SPHERE_STACKS 18
@@ -291,7 +291,7 @@ Engine::Mesh* Engine::getGrassMesh(){
 
 void Engine::Mesh::DrawLines(){
     if(engine_ptr->engine_info->graphicsApi == OGL)
-        static_cast<_ogl_Mesh*>(this)->DrawLines();
+        static_cast<glMesh*>(this)->DrawLines();
 }
 
 bool Engine::Mesh::hasBones(){

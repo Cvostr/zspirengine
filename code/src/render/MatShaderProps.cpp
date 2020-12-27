@@ -351,7 +351,7 @@ void Material::applyMatToPipeline(){
                     Engine::TextureResource* tex_ptr = static_cast<Engine::TextureResource*>(texture_conf->texture);
                     tex_ptr->Use(texture_p->slotToBind);
                     if (engine_ptr->engine_info->graphicsApi == VULKAN) {
-                        this->Pipeline->GetPipelineLayout()->BindTexture(((Engine::_vk_Texture*)tex_ptr->texture_ptr), game_data->vk_main->mDefaultTextureSampler, texture_p->slotToBind);
+                        this->Pipeline->GetPipelineLayout()->BindTexture(((Engine::vkTexture*)tex_ptr->texture_ptr), game_data->vk_main->mDefaultTextureSampler, texture_p->slotToBind);
                     }
                 }
                 //Set texture state

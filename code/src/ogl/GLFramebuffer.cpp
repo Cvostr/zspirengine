@@ -15,7 +15,7 @@ void Engine::GLframebuffer::addTexture(TextureFormat Format) {
     if (texture_size == MAX_RENDERER_ATTACHMENT_COUNT) return;
     bind();
     //Create texture
-    textures[texture_size] = new _ogl_Texture;
+    textures[texture_size] = new glTexture;
 
     textures[texture_size]->Create(Width, Height, Format);
     //glTexImage2D(GL_TEXTURE_2D, 0, intFormat, Width, Height, 0, format, GL_UNSIGNED_BYTE, nullptr);

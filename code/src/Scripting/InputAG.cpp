@@ -37,7 +37,8 @@ void Engine::bindInputSDK(AGScriptMgr* mgr) {
 	bindKeyCodes(mgr);
 	bindMouseStateClassSDK(mgr);
 
-	mgr->RegisterGlobalFunction("bool isKeyPressed(Key code)", asFUNCTION(Input::isKeyPressed), asCALL_CDECL);
-	mgr->RegisterGlobalFunction("bool isKeyHold(Key code)", asFUNCTION(Input::isKeyHold), asCALL_CDECL);
+	mgr->RegisterGlobalFunction("bool isKeyPressed(Key)", asFUNCTION(Input::isKeyPressed), asCALL_CDECL);
+	mgr->RegisterGlobalFunction("bool isKeyHold(Key)", asFUNCTION(Input::isKeyHold), asCALL_CDECL);
+	mgr->RegisterGlobalFunction("void SetMouseRelativeMode(bool)", asFUNCTION(Input::SetMouseRelativeMode), asCALL_CDECL);
 	mgr->RegisterGlobalFunction("MouseState@ getMouseState()", asFUNCTION(Input::getMouseStatePtr), asCALL_CDECL);
 }

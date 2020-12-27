@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 #include "ZSVulkanDescriptorSet.hpp"
-#include "vk_data.h"
+#include "VKTexture.hpp"
 #include "ZSVulkanSampler.hpp"
 
 namespace Engine {
@@ -37,7 +37,7 @@ namespace Engine {
 		unsigned int GetDescriptorSetsCount();
 
 		void CmdBindDescriptorSets(VkCommandBuffer cmdbuf);
-		void BindTexture(_vk_Texture* Texture, ZSVulkanSampler* sampler, uint32_t slot);
+		void BindTexture(vkTexture* Texture, ZSVulkanSampler* sampler, uint32_t slot);
 
 		VkPipelineLayout GetPipelineLayout() {
 			return mPipelineLayout;
