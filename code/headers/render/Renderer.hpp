@@ -1,12 +1,10 @@
 #pragma once
 
-#define GLEW_STATIC
 #include "Shader.hpp"
 #include "Mesh.hpp"
 #include "../../headers/engine/EngineComponent.h"
 #include "../../headers/render/UniformBuffer.hpp"
 #include "SDL2/SDL.h"
-#include "GL/glew.h"
 #include "../world/Camera.hpp"
 #include "../../headers/engine/Resources.hpp"
 #include <vector>
@@ -121,7 +119,7 @@ public:
 
     Engine::Camera* cam;
 
-    Renderer();
+    explicit Renderer();
     ~Renderer();
 };
 

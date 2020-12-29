@@ -212,10 +212,10 @@
     <ClCompile Include="code\src\ui\Widgets\Button.cpp" />
     <ClCompile Include="code\src\ui\Widgets\Widget.cpp" />
     <ClCompile Include="code\src\vulkan\VKRenderer.cpp" />
-    <ClCompile Include="code\src\vulkan\vk_mesh.cpp" />
-    <ClCompile Include="code\src\vulkan\vk_shader.cpp" />
-    <ClCompile Include="code\src\vulkan\vk_texture.cpp" />
-    <ClCompile Include="code\src\vulkan\vk_uniform_buf.cpp" />
+    <ClCompile Include="code\src\vulkan\VKMesh.cpp" />
+    <ClCompile Include="code\src\vulkan\VKShader.cpp" />
+    <ClCompile Include="code\src\vulkan\VKTexture.cpp" />
+    <ClCompile Include="code\src\vulkan\VKUniformBuffer.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVMA.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanCmdBuf.cpp" />
     <ClCompile Include="code\src\vulkan\ZSVulkanDescriptorSet.cpp" />

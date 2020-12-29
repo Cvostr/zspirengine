@@ -4,11 +4,14 @@
 #include <GL/glew.h>
 #include <iostream>
 #include "../headers/input/zs-input.h"
+#include "../headers/engine/Logger.hpp"
 #include "../headers/ogl/GLRenderer.hpp"
 #include "../headers/vulkan/VKRenderer.hpp"
 
 ZSpireEngine* engine_ptr;
 ZSGAME_DATA* game_data;
+
+using namespace Engine;
 
 ZSpireEngine::ZSpireEngine(){
 
@@ -19,7 +22,7 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, Engine::ZSWINDOW_CREATE_I
     engine_ptr = this;
     game_data = new ZSGAME_DATA;
     mWindow = new Engine::Window;
-    std::cout << "ZSPIRE Engine v0.1" << std::endl;
+    Logger::Log(LogType::LOG_TYPE_INFO) << "ZSPIRE Engine v0.1\n";
     //Store info structures
     this->desc = desc;
     this->engine_info = info;
@@ -40,12 +43,6 @@ ZSpireEngine::ZSpireEngine(ZSENGINE_CREATE_INFO* info, Engine::ZSWINDOW_CREATE_I
                                                           win->Width, win->Height);
             game_data->vk_main->mVMA = new Engine::ZSVMA(game_data->vk_main->mInstance,
                                                          game_data->vk_main->mDevice);
-        }
-        else if (info->graphicsApi == OGL) {
-            
-            glViewport(0, 0, win->Width, win->Height);
-
-            
         }
     }
 }
@@ -110,17 +107,17 @@ void ZSpireEngine::loadGame(){
         }
     }
 
-    Engine::Loader::start();
-    Engine::Loader::setBlobRootDirectory(this->desc->blob_root_path);
+    Loader::start();
+    Loader::setBlobRootDirectory(this->desc->blob_root_path);
     //Load all resources
     game_data->resources->loadResourcesTable(this->desc->resource_map_file_path);
     //Compile script
     game_data->script_manager->AddScriptFiles();
 
-    Engine::ZsResource* world_resource = game_data->resources->getResource<Engine::ZsResource>(desc->startup_scene);
+    ZsResource* world_resource = game_data->resources->getResource<ZsResource>(desc->startup_scene);
     //check, if World resource found
     if (world_resource) {
-        world_resource->request = new Engine::Loader::LoadRequest;
+        world_resource->request = new Loader::LoadRequest;
         world_resource->request->offset = world_resource->offset;
         world_resource->request->size = world_resource->size;
         world_resource->request->file_path = world_resource->blob_path;
@@ -154,7 +151,7 @@ void ZSpireEngine::loadGame(){
     }
     mWindow->DestroyWindow();
     game_data->world->clear(); //clear world
-    Engine::Loader::stop();
+    Loader::stop();
     //Destroys all created managers
     mComponentManager->destroyAllManagers();
     delete game_data;

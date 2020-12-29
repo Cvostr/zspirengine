@@ -28,6 +28,9 @@ void bindMouseStateClassSDK(Engine::AGScriptMgr* mgr) {
 	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "int relX", offsetof(Input::MouseState, mouseRelX));
 	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "int relY", offsetof(Input::MouseState, mouseRelY));
 
+	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "int mouseWheelX", offsetof(Input::MouseState, mouseWheelX));
+	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "int mouseWheelY", offsetof(Input::MouseState, mouseWheelY));
+
 	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "bool isLButtonDown", offsetof(Input::MouseState, isLButtonDown));
 	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "bool isRButtonDown", offsetof(Input::MouseState, isRButtonDown));
 	mgr->RegisterObjectProperty(MOUSE_STATE_NAME, "bool isMidButtonDown", offsetof(Input::MouseState, isMidBtnDown));

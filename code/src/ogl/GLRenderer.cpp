@@ -30,9 +30,7 @@ void Engine::GLRenderer::InitShaders() {
         this->shadowMap->compileFromFile("Shaders/shadowmap/shadowmap.vert", "Shaders/shadowmap/shadowmap.frag", "Shaders/shadowmap/shadowmap.geom");
         this->final_shader->compileFromFile("Shaders/postprocess/final/final.vert", "Shaders/postprocess/final/final.frag");
         this->water_shader->compileFromFile("Shaders/water/water.vert", "Shaders/water/water.frag");
-    }
 
-    if (engine_ptr->desc->game_perspective == PERSP_3D) {
         MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, water_shader);
     }
 }
@@ -40,8 +38,8 @@ void Engine::GLRenderer::InitShaders() {
 void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int height) {
     gbuffer = new GLframebuffer(width, height, true);
 
-    effect = new GLScreenEffect(width, height, FORMAT_RGBA);
-    effect->CompileShaderFromFile("Shaders/postprocess/blur/blur.comp");
+    //effect = new GLScreenEffect(width, height, FORMAT_RGBA);
+    //effect->CompileShaderFromFile("Shaders/postprocess/blur/blur.comp");
 
     ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGBA); //Diffuse map
     ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGB16F); //Normal map
@@ -56,7 +54,7 @@ void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int hei
     ui_buffer = new GLframebuffer(width, height, false);
     ((GLframebuffer*)ui_buffer)->addTexture(FORMAT_RGBA); //UI Diffuse map
 
-    effect->PushInputTexture(((GLframebuffer*)df_light_buffer)->textures[1]);
+    //effect->PushInputTexture(((GLframebuffer*)df_light_buffer)->textures[1]);
 }
 
 void Engine::GLRenderer::initManager() {
@@ -105,10 +103,12 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
         ((GLframebuffer*)gbuffer)->bind();
         setClearColor(0, 0, 0, 1);
         ClearFBufferGL(true, true);
+        setFullscreenViewport(win->GetWindowWidth(), win->GetWindowHeight());
         {
             //Render Skybox
+            setDepthState(false);
             setBlendingState(false);
-            setFullscreenViewport(win->GetWindowWidth(), win->GetWindowHeight());
+            setFaceCullState(false);
             TryRenderSkybox();
         }
         {
@@ -132,7 +132,7 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
     }
 
-    effect->Compute();
+    //effect->Compute();
 
     //Render ALL UI
     {

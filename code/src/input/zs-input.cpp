@@ -63,6 +63,7 @@ bool Input::isKeyHold(int keycode){
 }
 
 void Input::SetMouseRelativeMode(bool Mode) {
+    mouse.RelativeMode = Mode;
     SDL_SetRelativeMouseMode((SDL_bool)Mode);
 }
 
@@ -80,10 +81,8 @@ void Input::clearMouseState(){
 
 void Input::processEventsSDL(SDL_Event* event){
     if (event->type == SDL_KEYDOWN) { //if user pressed a key on keyboard
-        //w.edit_win_ptr->onKeyDown(event.key.keysym); //Call press function on EditWindow
         Input::addPressedKeyToQueue(event->key.keysym.sym);
         Input::addHeldKeyToQueue(event->key.keysym.sym);
-
     }
     if (event->type == SDL_KEYUP) { //if user pressed a key on keyboard
         Input::removeHeldKeyFromQueue(event->key.keysym.sym);
@@ -120,6 +119,7 @@ void Input::processEventsSDL(SDL_Event* event){
         }
     }
     if (event->type == SDL_MOUSEWHEEL) {
-
+        mouse.mouseWheelX = event->wheel.x;
+        mouse.mouseWheelX = event->wheel.y;
     }
 }

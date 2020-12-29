@@ -1,8 +1,11 @@
 #pragma once
 
+#define GLEW_STATIC
+
 #include "GLFramebuffer.hpp"
 #include "GLScreenEffect.hpp"
 #include "../render/Renderer.hpp"
+#include <GL/glew.h>
 
 namespace Engine {
 	class GLRenderer : public Renderer {

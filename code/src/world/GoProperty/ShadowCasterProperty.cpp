@@ -14,6 +14,7 @@ Engine::ShadowCasterProperty::ShadowCasterProperty() :
     mShadowDepthTexture(0),
     mCascadesNum(3),
     mPcfNum(1),
+    mShadowStrength(1.f),
 
     initialized(false)
 {
@@ -81,6 +82,7 @@ void Engine::ShadowCasterProperty::loadPropertyFromMemory(const char* data, Game
     readBinaryValue(&TextureSize, data + offset, offset);
     readBinaryValue(&mCascadesNum, data + offset, offset);
     readBinaryValue(&mPcfNum, data + offset, offset);
+    readBinaryValue(&mShadowStrength, data + offset, offset);
     readBinaryValue(&mShadowBias, data + offset, offset);
     readBinaryValue(&nearPlane, data + offset, offset);
     readBinaryValue(&farPlane, data + offset, offset);
@@ -92,6 +94,7 @@ void Engine::ShadowCasterProperty::savePropertyToStream(ZsStream* stream, GameOb
     stream->writeBinaryValue(&TextureSize);
     stream->writeBinaryValue(&mCascadesNum);
     stream->writeBinaryValue(&mPcfNum);
+    stream->writeBinaryValue(&mShadowStrength);
     stream->writeBinaryValue(&mShadowBias);
     stream->writeBinaryValue(&nearPlane);
     stream->writeBinaryValue(&farPlane);
@@ -166,6 +169,8 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, Renderer* pipeline)
     pipeline->shadowBuffer->writeDataBuffered(12, sizeof(int), &this->mCascadesNum);
     //Send number of pcf passes
     pipeline->shadowBuffer->writeDataBuffered(16, sizeof(int), &this->mPcfNum);
+    //Send strength value
+    pipeline->shadowBuffer->writeDataBuffered(20, sizeof(int), &this->mShadowStrength);
     //Use shadowmap shader to draw objects
     pipeline->getShadowmapShader()->Use();
 

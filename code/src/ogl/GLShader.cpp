@@ -10,7 +10,7 @@ Engine::glShader::glShader(){
 
 }
 Engine::glShader::~glShader(){
-
+    Destroy();
 }
 
 void Engine::glShader::GLcheckCompileErrors(unsigned int shader, const char* type, const char* filepath){

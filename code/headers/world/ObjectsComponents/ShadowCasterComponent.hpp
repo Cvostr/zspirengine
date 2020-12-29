@@ -23,6 +23,7 @@ namespace Engine {
         int projection_viewport;
         int mCascadesNum;
         int mPcfNum;
+        float mShadowStrength;
 
         void addPropertyInterfaceToInspector();
         void onPreRender(Engine::Renderer* pipeline);

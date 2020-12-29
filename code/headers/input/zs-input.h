@@ -14,14 +14,25 @@ namespace Input {
     void SetMouseRelativeMode(bool Mode);
 
     struct MouseState{
+        //Current X coordinate of mouse cursor in screen
         int mouseX;
+        //Current movement on X of mouse cursor
         int mouseRelX;
-
+        //Current Y coordinate of mouse cursor in screen
         int mouseY;
+        //Current movement on Y of mouse cursor
         int mouseRelY;
 
+        bool RelativeMode;
+
+        int mouseWheelX;
+        int mouseWheelY;
+
+        //Is Left mouse button pressed
         bool isLButtonDown;
+        //Is Right mouse button pressed
         bool isRButtonDown;
+        //Is middle mouse button pressed
         bool isMidBtnDown;
     };
 

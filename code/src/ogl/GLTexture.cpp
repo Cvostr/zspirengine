@@ -65,19 +65,17 @@ GLenum Engine::GetFormatGL(TextureFormat format) {
 }
 
 void glTexture::Init() {
-    if (mCreated) {
-        return;
+    if (!mCreated) {
+        glCreateTextures(GL_TEXTURE_2D, 1, &TEXTURE_ID);
+        glBindTexture(GL_TEXTURE_2D, this->TEXTURE_ID); //We now working with this texture
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+        mCreated = true;
     }
-
-    glCreateTextures(GL_TEXTURE_2D, 1, &TEXTURE_ID);
-    glBindTexture(GL_TEXTURE_2D, this->TEXTURE_ID); //We now working with this texture
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-
-    mCreated = true;
 }
 
 void glTexture::Create(unsigned int Width, unsigned int Height, TextureFormat format) {
@@ -86,12 +84,14 @@ void glTexture::Create(unsigned int Width, unsigned int Height, TextureFormat fo
     mFormat = format;
 }
 
-glTexture::glTexture() {
+glTexture::glTexture():
+    TEXTURE_ID(0)
+{
     mCreated = false;
 }
 
 glTexture::~glTexture(){
-
+    Destroy();
 }
 
 void glTexture::Use(int slot) {
@@ -99,8 +99,10 @@ void glTexture::Use(int slot) {
 }
 
 void glTexture::Destroy() {
-    glDeleteTextures(1, &this->TEXTURE_ID);
-    mCreated = false;
+    if (mCreated) {
+        glDeleteTextures(1, &this->TEXTURE_ID);
+        mCreated = false;
+    }
 }
 
 bool glTexture::LoadTextureFromBufferUByte(unsigned char* data, int Width, int Height, TextureFormat format) {

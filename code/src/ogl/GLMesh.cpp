@@ -1,12 +1,16 @@
 #include "../../headers/ogl/GLMesh.hpp"
 
 
-Engine::glMesh::glMesh(){
+Engine::glMesh::glMesh():
+    meshVAO(0),
+    meshVBO(0),
+    meshEBO(0)
+{
 
 }
 
 Engine::glMesh::~glMesh(){
-
+    Destroy();
 }
 
 void Engine::glMesh::Init() {
@@ -113,46 +117,37 @@ void Engine::glMesh::setMeshOffsets(){
 
 void Engine::glMesh::Draw(){
     glBindVertexArray(this->meshVAO);
-    if(this->mIndicesNum != NO_INDICES) //if object uses indices
+    if (this->mIndicesNum != NO_INDICES) {//if object uses indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->meshEBO);
-
-    if (this->mIndicesNum == NO_INDICES) {
-        //Draw without indices
-        glDrawArrays(GL_TRIANGLES, 0, this->mVerticesNum);
-    }
-    else {
         //Indexed draw
         glDrawElements(GL_TRIANGLES, this->mIndicesNum, GL_UNSIGNED_INT, nullptr);
+    }else {
+        //Draw without indices
+        glDrawArrays(GL_TRIANGLES, 0, this->mVerticesNum);
     }
 }
 
 void Engine::glMesh::DrawInstanced(unsigned int instances) {
     glBindVertexArray(this->meshVAO);
-    if (this->mIndicesNum != NO_INDICES) //if object uses indices
+    if (this->mIndicesNum != NO_INDICES) {//if object uses indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->meshEBO);
-
-    if (this->mIndicesNum == NO_INDICES) {
-        //Draw without indices
-        glDrawArraysInstanced(GL_TRIANGLES, 0, this->mVerticesNum, instances);
-    }
-    else {
         //Indexed draw
         glDrawElementsInstanced(GL_TRIANGLES, this->mIndicesNum, GL_UNSIGNED_INT, nullptr, instances);
+    }else {
+        //Draw without indices
+        glDrawArraysInstanced(GL_TRIANGLES, 0, this->mVerticesNum, instances);
     }
 }
 
 void Engine::glMesh::DrawLines(){
 
     glBindVertexArray(this->meshVAO);
-    if(this->mIndicesNum != NO_INDICES) //if object uses indices
+    if (this->mIndicesNum != NO_INDICES) {//if object uses indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->meshEBO);
-
-    if (this->mIndicesNum == NO_INDICES) {
-        //Draw without indices
-        glDrawArrays(GL_LINE_LOOP, 0, this->mVerticesNum);
-    }
-    else {
         //Indexed draw
         glDrawElements(GL_LINE_LOOP, this->mVerticesNum, GL_UNSIGNED_INT, nullptr);
+    }else {
+        //Draw without indices
+        glDrawArrays(GL_LINE_LOOP, 0, this->mVerticesNum);
     }
 }

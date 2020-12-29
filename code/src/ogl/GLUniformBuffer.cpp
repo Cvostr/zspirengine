@@ -11,11 +11,11 @@ void Engine::glUniformBuffer::init(unsigned int slot, unsigned int size, bool Cr
             mCpuBufferCreated = true;
         }
 
-        glGenBuffers(1, &buffer_id);
-        glBindBuffer(GL_UNIFORM_BUFFER, buffer_id);
+        glGenBuffers(1, &mBufferID);
+        glBindBuffer(GL_UNIFORM_BUFFER, mBufferID);
         glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STATIC_DRAW);
         //Connect to point 0 (zero)
-        glBindBufferBase(GL_UNIFORM_BUFFER, slot, buffer_id);
+        glBindBufferBase(GL_UNIFORM_BUFFER, slot, mBufferID);
 
         mCreated = true;
     }
@@ -33,20 +33,23 @@ void Engine::glUniformBuffer::updateBufferedData() {
 
 void Engine::glUniformBuffer::bind(){
     if (mCreated)
-        glBindBuffer(GL_UNIFORM_BUFFER, buffer_id);
+        glBindBuffer(GL_UNIFORM_BUFFER, mBufferID);
 }
 
 void Engine::glUniformBuffer::Destroy(){
     if (mCreated) {
-        glDeleteBuffers(1, &buffer_id);
+        glDeleteBuffers(1, &mBufferID);
         mCreated = false;
     }
 }
 
-Engine::glUniformBuffer::glUniformBuffer(){
+Engine::glUniformBuffer::glUniformBuffer() :
+    mBufferID(0)
+{
 
 }
 Engine::glUniformBuffer::~glUniformBuffer(){
     if (mCpuBufferCreated)
         delete[] mCpuBuffer;
+    Destroy();
 }

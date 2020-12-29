@@ -45,7 +45,6 @@ Engine::Renderer::Renderer(){
         this->final_shader = allocShader();
         this->water_shader = allocShader();
 
-        //MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, water_shader);
     }
 
     //Allocate transform buffer
@@ -89,9 +88,6 @@ Engine::Renderer::Renderer(){
         }
     }
 
-    //if (engine_ptr->desc->game_perspective == PERSP_3D) {
-    //    MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, water_shader);
-    //}
 
     Engine::setupDefaultMeshes();
     //to avoid memory reallocations
@@ -110,32 +106,33 @@ void Engine::Renderer::OnCreate(){
 
 void Engine::Renderer::destroy(){
     if(engine_ptr->desc->game_perspective == PERSP_2D){
-        this->tileBuffer->Destroy();
-        tile_shader->Destroy();
+        delete tileBuffer;
+        delete tile_shader;
     }
 
-    ui_shader->Destroy();
+    delete ui_shader;
 
-    this->lightsBuffer->Destroy();
-    this->tileBuffer->Destroy();
-    this->transformBuffer->Destroy();
-    this->terrainUniformBuffer->Destroy();
-    this->skinningUniformBuffer->Destroy();
-    this->skyboxTransformUniformBuffer->Destroy();
-    this->instancedTransformBuffer->Destroy();
+    delete lightsBuffer;
+    delete transformBuffer;
+    delete terrainUniformBuffer;
+    delete skinningUniformBuffer;
+    delete skyboxTransformUniformBuffer;
+    delete instancedTransformBuffer;
 
     if(engine_ptr->desc->game_perspective == PERSP_3D){
-        deffered_light->Destroy();
-        default3d->Destroy();
-        skybox_shader->Destroy();
-        terrain_shader->Destroy();
-        grass_shader->Destroy();
-        shadowMap->Destroy();
-        water_shader->Destroy();
+        delete deffered_light;
+        delete default3d;
+        delete skybox_shader;
+        delete terrain_shader;
+        delete grass_shader;
+        delete shadowMap;
+        delete water_shader;
 
         delete gbuffer;
         delete df_light_buffer;
     }
+
+    MtShProps::clearMtShaderGroups();
 }
 
 void Engine::Renderer::setLightsToBuffer(){
@@ -316,7 +313,6 @@ void Engine::SkyboxProperty::DrawSky(Renderer* pipeline){
     //Apply material shader
     mat->onRender(pipeline);
     //Draw skybox cube
-    glDisable(GL_DEPTH_TEST);
     Engine::getSkyboxMesh()->Draw();
 }
 
@@ -373,7 +369,6 @@ void Engine::Renderer::updateShadersCameraInfo(Engine::Camera* cam_ptr){
     uiUniformBuffer->writeData(0, sizeof (Mat4), &proj);
     //Setting cameras to skybox shader
     proj = cam_ptr->getProjMatrix();
-    view = cam_ptr->getViewMatrix();
     view = removeTranslationFromViewMat(view);
     skyboxTransformUniformBuffer->bind();
     skyboxTransformUniformBuffer->writeData(0, sizeof (Mat4), &proj);

@@ -7,7 +7,7 @@ namespace Engine{
 class glUniformBuffer : public UniformBuffer{
 private:
     //openGL integer ID
-    unsigned int buffer_id;
+    unsigned int mBufferID;
 public:
     void init(unsigned int slot, unsigned int size, bool CreateCpuBuffer = false);
     void writeData(unsigned int offset, unsigned int size, void* data);
