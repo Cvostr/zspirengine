@@ -52,6 +52,7 @@ void Engine::ShadowCasterProperty::copyTo(Engine::IGameObjectComponent* dest) {
     _dest->TextureSize = this->TextureSize;
     _dest->mCascadesNum = this->mCascadesNum;
     _dest->mPcfNum = this->mPcfNum;
+    _dest->mShadowStrength = this->mShadowStrength;
     _dest->projection_viewport = this->projection_viewport;
 }
 

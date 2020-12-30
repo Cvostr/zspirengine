@@ -216,50 +216,57 @@ void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int
             ZsResource* resource_ptr = nullptr;
 
             switch (resource.resource_type) {
-            default: {
-                resource_ptr = new ZsResource;
-                break;
-            }
-            case RESOURCE_TYPE_FILE: {
-                break;
-            }
-            case RESOURCE_TYPE_TEXTURE: {
-                resource_ptr = new Engine::TextureResource;
+                default: {
+                    resource_ptr = new ZsResource;
+                    break;
+                }
+                case RESOURCE_TYPE_FILE: {
+                    break;
+                }
+                case RESOURCE_TYPE_TEXTURE: {
+                    resource_ptr = new Engine::TextureResource;
 
-                Engine::TextureResource* texture_ptr = static_cast<Engine::TextureResource*>(resource_ptr);
-                texture_ptr->texture_ptr = allocTexture();
-                break;
-            }
-            case RESOURCE_TYPE_MESH: {
-                resource_ptr = new MeshResource;
+                    Engine::TextureResource* texture_ptr = static_cast<Engine::TextureResource*>(resource_ptr);
+                    texture_ptr->texture_ptr = allocTexture();
+                    break;
+                }
+                case RESOURCE_TYPE_MESH: {
+                    resource_ptr = new MeshResource;
 
-                Engine::MeshResource* mesh_ptr = static_cast<Engine::MeshResource*>(resource_ptr);
-                mesh_ptr->mesh_ptr = allocateMesh();
-                break;
-            }
-            case RESOURCE_TYPE_AUDIO: {
-                resource_ptr = new Engine::AudioResource;
-                break;
-            }
-            case RESOURCE_TYPE_SCRIPT: {
-                resource_ptr = new Engine::ScriptResource;
-                break;
-            }
-            case RESOURCE_TYPE_MATERIAL: {
-                resource_ptr = new Engine::MaterialResource;
-                static_cast<Engine::MaterialResource*>(resource_ptr)->material = new Material;
-                break;
-            }
-            case RESOURCE_TYPE_ANIMATION: {
-                resource_ptr = new Engine::AnimationResource;
-                static_cast<Engine::AnimationResource*>(resource_ptr)->animation_ptr = new Engine::Animation;
-                break;
-            }
-            case RESOURCE_TYPE_FONT: {
-                resource_ptr = new GlyphResource;
-
-                break;
-            }
+                    Engine::MeshResource* mesh_ptr = static_cast<Engine::MeshResource*>(resource_ptr);
+                    mesh_ptr->mesh_ptr = allocateMesh();
+                    break;
+                }
+                case RESOURCE_TYPE_AUDIO: {
+                    resource_ptr = new Engine::AudioResource;
+                    break;
+                }
+                case RESOURCE_TYPE_SCRIPT: {
+                    resource_ptr = new Engine::ScriptResource;
+                    break;
+                }
+                case RESOURCE_TYPE_MATERIAL: {
+                    resource_ptr = new Engine::MaterialResource;
+                    static_cast<Engine::MaterialResource*>(resource_ptr)->material = new Material;
+                    break;
+                }
+                case RESOURCE_TYPE_ANIMATION: {
+                    resource_ptr = new Engine::AnimationResource;
+                    static_cast<Engine::AnimationResource*>(resource_ptr)->animation_ptr = new Engine::Animation;
+                    break;
+                }
+                case RESOURCE_TYPE_FONT: {
+                    resource_ptr = new GlyphResource;
+                    break;
+                }
+                case RESOURCE_TYPE_PREFAB: {
+                    resource_ptr = new PrefabResource;
+                    break;
+                }
+                case RESOURCE_TYPE_LOCALIZED_STR: {
+                    resource_ptr = new LocalizedStringResource;
+                    break;
+                }
             }
             resource_ptr->blob_path = resource.blob_path;
             resource_ptr->offset = resource.offset;
@@ -275,7 +282,7 @@ void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int
     }
 }
 
-void Engine::ResourceManager::loadResourcesTable(std::string resmap_path){
+void Engine::ResourceManager::loadResourcesTable(std::string resmap_path) {
     std::ifstream file_stream;
     file_stream.open(resmap_path, std::ifstream::binary | std::ifstream::ate); //open resources map file
 
