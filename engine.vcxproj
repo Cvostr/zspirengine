@@ -188,8 +188,10 @@
     <ClCompile Include="code\src\resources\AudioResource.cpp" />
     <ClCompile Include="code\src\resources\BackgroundLoader.cpp" />
     <ClCompile Include="code\src\resources\GlyphResource.cpp" />
+    <ClCompile Include="code\src\resources\LocalizedStringResource.cpp" />
     <ClCompile Include="code\src\resources\MaterialResource.cpp" />
     <ClCompile Include="code\src\resources\MeshResource.cpp" />
+    <ClCompile Include="code\src\resources\PrefabResource.cpp" />
     <ClCompile Include="code\src\resources\ScriptResource.cpp" />
     <ClCompile Include="code\src\resources\TextureResource.cpp" />
     <ClCompile Include="code\src\Scripting\AngelScript.cpp" />

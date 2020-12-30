@@ -512,6 +512,13 @@ Engine::GameObject* Engine::World::addObjectsFromPrefab(char* data, unsigned int
     return object;
 }
 
+Engine::GameObject* Engine::World::addObjectsFromPrefab(PrefabResource* Prefab) {
+    if (Prefab != nullptr)
+        return addObjectsFromPrefab((char*)Prefab->data, Prefab->size);
+    else
+        return nullptr;
+}
+
 void Engine::World::putToShapshot(WorldSnapshot* snapshot) {
     //iterate over all objects in scene
     for (size_t objs_num = 0; objs_num < this->objects.size(); objs_num++) {

@@ -38,7 +38,7 @@ bool Engine::ZSVulkanInstance::init(bool validate, const char* app_name, int app
     VkApplicationInfo vk_app_info = {};
     vk_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     vk_app_info.pNext = nullptr;
-    vk_app_info.apiVersion = VK_HEADER_VERSION_COMPLETE;
+    vk_app_info.apiVersion = VK_MAKE_VERSION(1, 2, 0);
     vk_app_info.pEngineName = "ZSPIRE";
     vk_app_info.engineVersion = 1;
     vk_app_info.pApplicationName = app_name;

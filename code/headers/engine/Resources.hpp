@@ -66,6 +66,7 @@ class ScriptResource;
 class MaterialResource;
 class AnimationResource;
 class GlyphResource;
+class PrefabResource;
 
 class ResourceManager : public IEngineComponent {
 private:
@@ -78,6 +79,7 @@ public:
     void pushResource(ZsResource* resource);
     ZsResource* getResourceByIndex(unsigned int index);
     unsigned int getResourcesSize();
+    unsigned int getActiveResourcesCount();
 
     void reloadScripts();
     void saveMaterials();
@@ -89,6 +91,7 @@ public:
     MaterialResource* getMaterialByLabel(std::string label);
     AnimationResource* getAnimationByLabel(std::string label);
     GlyphResource* getFontByLabel(std::string label);
+    PrefabResource* getPrefabByLabel(std::string label);
 
     template<typename T>
     T* getResource(std::string label){
@@ -103,6 +106,8 @@ public:
     }
 
     Engine::ZsResource* getResource(std::string label);
+    Engine::ZsResource* getResourceByRelPath(std::string label);
+    void DeleteResource(Engine::ZsResource* resource);
 
     ResourceManager();
     ~ResourceManager();
@@ -181,6 +186,24 @@ public:
 
     GlyphResource();
     ~GlyphResource();
+};
+
+class PrefabResource : public ZsResource {
+public:
+
+    unsigned char* data;
+    void load();
+
+    PrefabResource();
+    ~PrefabResource();
+};
+
+class LocalizedStringResource : public ZsResource {
+public:
+
+
+    LocalizedStringResource();
+    ~LocalizedStringResource();
 };
 
 }

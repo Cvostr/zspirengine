@@ -88,6 +88,23 @@ void Engine::ResourceManager::clear(){
     this->resources.clear();
 }
 
+void Engine::ResourceManager::DeleteResource(Engine::ZsResource* resource) {
+    resource->Release();
+    resource->resource_type = RESOURCE_TYPE_NONE;
+    resource->resource_label.clear();
+    resource->rel_path.clear();
+}
+
+unsigned int Engine::ResourceManager::getActiveResourcesCount() {
+    unsigned int size = 0;
+    for (unsigned int i = 0; i < this->resources.size(); i++) {
+        auto res_ptr = this->resources[i];
+        if (res_ptr->resource_type != RESOURCE_TYPE_NONE)
+            size++;
+    }
+    return size;
+}
+
 Engine::ResourceManager::~ResourceManager(){
     clear();
 }
@@ -144,6 +161,17 @@ Engine::ZsResource* Engine::ResourceManager::getResource(std::string label) {
     for (unsigned int res_i = 0; res_i < res; res_i++) {
         auto property_ptr = this->resources[res_i];
         if (!property_ptr->resource_label.compare(label)) { //If object already has one
+            return (property_ptr); //return it
+        }
+    }
+    return nullptr;
+}
+
+Engine::ZsResource* Engine::ResourceManager::getResourceByRelPath(std::string label) {
+    unsigned int res = static_cast<unsigned int>(this->resources.size());
+    for (unsigned int res_i = 0; res_i < res; res_i++) {
+        auto property_ptr = this->resources[res_i];
+        if (!property_ptr->rel_path.compare(label)) { //If object already has one
             return (property_ptr); //return it
         }
     }

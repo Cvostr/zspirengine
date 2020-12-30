@@ -120,8 +120,8 @@ void AGScriptMgr::create_Engine() {
 
 	bindGameObjectSDK(this);
 	bindMathSDK(this);
-	bindWorldSDK(this);
 	bindResourcesSDK(this);
+	bindWorldSDK(this);
 	bindResourceManagerSDK(this);
 	bindInputSDK(this);
 	bindFilesSDK(this);

@@ -143,6 +143,7 @@ public:
 
     void processPrefabObject(Engine::GameObject* object_ptr, std::vector<Engine::GameObject>* objects_array);
     GameObject* addObjectsFromPrefab(char* data, unsigned int size);
+    GameObject* addObjectsFromPrefab(PrefabResource* Prefab);
 
     void call_onStart();
     void call_onStop();

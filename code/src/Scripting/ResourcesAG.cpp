@@ -18,6 +18,7 @@ void Engine::bindResourceManagerSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(RESOURCEMAN_TYPE_NAME, std::string(ANIMRESOURCE_TYPE_NAME) + "@ getAnimation(string)", asMETHOD(Engine::ResourceManager, getAnimationByLabel), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(RESOURCEMAN_TYPE_NAME, std::string(MATRESOURCE_TYPE_NAME) + "@ getMaterial(string)", asMETHOD(Engine::ResourceManager, getMaterialByLabel), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(RESOURCEMAN_TYPE_NAME, std::string(FONTRESOURCE_TYPE_NAME) + "@ getFont(string)", asMETHOD(Engine::ResourceManager, getFontByLabel), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(RESOURCEMAN_TYPE_NAME, std::string(PREFABRESOURCE_TYPE_NAME) + "@ getPrefab(string)", asMETHOD(Engine::ResourceManager, getPrefabByLabel), asCALL_THISCALL);
 	//register global var to acess all resources
 	mgr->RegisterGlobalFunction(std::string(RESOURCEMAN_TYPE_NAME) + "@ getResources()", asFUNCTION(getResourcesMgr), asCALL_CDECL);
 }
@@ -36,4 +37,5 @@ void Engine::bindResourcesSDK(AGScriptMgr* mgr) {
 	bindResourceSDK(ANIMRESOURCE_TYPE_NAME, mgr);
 	bindResourceSDK(MATRESOURCE_TYPE_NAME, mgr);
 	bindResourceSDK(FONTRESOURCE_TYPE_NAME, mgr);
+	bindResourceSDK(PREFABRESOURCE_TYPE_NAME, mgr);
 }

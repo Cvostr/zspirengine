@@ -21,6 +21,7 @@
 #define ANIMRESOURCE_TYPE_NAME "AnimationResource"
 #define MATRESOURCE_TYPE_NAME "MaterialResource"
 #define FONTRESOURCE_TYPE_NAME "FontResource"
+#define PREFABRESOURCE_TYPE_NAME "PrefabResource"
 
 #define VEC3_TYPE_NAME "Vec3"
 #define QUAT_TYPE_NAME "Quat"
