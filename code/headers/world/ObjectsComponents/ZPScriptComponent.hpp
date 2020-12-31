@@ -4,7 +4,7 @@
 #include "../../engine/Resources.hpp"
 
 namespace Engine {
-    class ZPScriptProperty : public Engine::IGameObjectComponent {
+    class ZPScriptComponent : public Engine::IGameObjectComponent {
     private:
         Engine::AGScript* script;
     public:
@@ -37,8 +37,8 @@ namespace Engine {
         void onTriggerEnter(Engine::GameObject* obj);
         void onTriggerExit(Engine::GameObject* obj);
 
-        ZPScriptProperty();
-        ~ZPScriptProperty();
+        ZPScriptComponent();
+        ~ZPScriptComponent();
     };
 
 }

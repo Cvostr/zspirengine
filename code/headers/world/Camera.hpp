@@ -16,31 +16,34 @@ namespace Engine{
         unsigned int endX;
         unsigned int endY;
 
-        ZSVIEWPORT(unsigned int _startX, unsigned int _startY, unsigned int _endX, unsigned int _endY){
-            startX = _startX;
-            startY = _startY;
-            endX = _endX;
-            endY = _endY;
-        }
+        ZSVIEWPORT(unsigned int _startX, unsigned int _startY, unsigned int _endX, unsigned int _endY) : 
+            startX(_startX),
+            startY(_startY),
+            endX(_endX),
+            endY(_endY) {}
 
-        ZSVIEWPORT(){}
+        ZSVIEWPORT() : 
+            startX(0),
+            startY(0),
+            endX(0),
+            endY(0) {}
 
     }ZSVIEWPORT;
 
     class Camera{
         protected:
-            Mat4 proj; //Calculated Projection matrix
+            Mat4 mProjectionMatrix; //Calculated Projection matrix
             Mat4 ui_proj;
-            Mat4 view; //Calculated View matrix
+            Mat4 mViewMatrix; //Calculated View matrix
 
             ZSCAMERAPROJECTIONTYPE proj_type;
 
             bool isMoving;
 
         public:
-            Vec3 camera_pos; //Camera position vector
-            Vec3 camera_up; //Camera up direction vector
-            Vec3 camera_front; //Camera front direction vector
+            Vec3 mCameraPos; //Camera position vector
+            Vec3 mCameraUp; //Camera up direction vector
+            Vec3 mCameraFront; //Camera front direction vector
 
             float FOV; //Field of view
             float nearZ; //Nearest Z occlusion plane
@@ -52,10 +55,10 @@ namespace Engine{
             bool isAlListenerCamera;
             Vec3 _dest_pos;
 
-            Vec3 getCameraPosition();
-            Vec3 getCameraUpVec();
+            Vec3 getCameraPosition() { return mCameraPos; }
+            Vec3 getCameraUpVec() { return mCameraUp; }
             Vec3 getCameraRightVec();
-            Vec3 getCameraFrontVec();
+            Vec3 getCameraFrontVec() { return mCameraFront; }
 
             Vec3 getCameraViewCenterPos();
             ZSVIEWPORT getViewport();
@@ -75,8 +78,8 @@ namespace Engine{
             void startMoving();
             void stopMoving();
 
-            Mat4 getViewMatrix();
-            Mat4 getProjMatrix();
+            Mat4 getViewMatrix() { return mViewMatrix; }
+            Mat4 getProjMatrix() { return mProjectionMatrix; }
             Mat4 getUiProjMatrix();
             void updateTick(float deltaTime);
 

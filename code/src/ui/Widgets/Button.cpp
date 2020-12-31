@@ -7,7 +7,7 @@ Engine::Button::Button(unsigned int Width, unsigned int Height) {
     this->common_sprite = nullptr;
     this->hovered_sprite = nullptr;
     //Call resize function
-    resize(Width, Height);
+    //resize(Width, Height);
 }
 
 Engine::Button::Button(ButtonStyle* style) {
@@ -34,8 +34,9 @@ void Engine::Button::draw(){
         game_data->pipeline->renderSprite(hovered_sprite, pvPos.posX, pvPos.posY, pvSize.WIDTH, pvSize.HEIGHT);
     else
         game_data->pipeline->renderSprite(common_sprite, pvPos.posX, pvPos.posY, pvSize.WIDTH, pvSize.HEIGHT);
-}
+    
+    GlyphFontContainer* c = game_data->resources->getFontByLabel("LiberationMono-Regular")->font_ptr;
 
-void Engine::Button::setText(ZSPIRE::LocString* btn_text_string) {
-    this->btn_text_string = btn_text_string;
+    if(TextContent != nullptr)
+        c->DrawString(this->TextContent->STR[0].c_str(), this->TextContent->STR[0].size(), Vec2(pvPos.posX, pvPos.posY));
 }

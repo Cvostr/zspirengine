@@ -381,3 +381,33 @@ void Engine::processTangentSpace(ZSVERTEX* vert_array, int vertices_num){
         }
     }
 }
+
+Engine::Mesh* Engine::allocateMesh(unsigned int size) {
+    Engine::Mesh* result = nullptr;
+    switch (engine_ptr->engine_info->graphicsApi) {
+    case OGL: {
+        result = new glMesh[size];
+        break;
+    }
+    case VULKAN: {
+        result = new vkMesh[size];
+        break;
+    }
+    }
+    return result;
+}
+
+Engine::Mesh* Engine::allocateMesh() {
+    Engine::Mesh* result = nullptr;
+    switch (engine_ptr->engine_info->graphicsApi) {
+    case OGL: {
+        result = new glMesh;
+        break;
+    }
+    case VULKAN: {
+        result = new vkMesh;
+        break;
+    }
+    }
+    return result;
+}

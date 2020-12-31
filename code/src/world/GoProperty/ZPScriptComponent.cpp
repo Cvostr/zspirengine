@@ -4,22 +4,22 @@
 
 extern ZSGAME_DATA* game_data;
 
-Engine::ZPScriptProperty::ZPScriptProperty() : 
+Engine::ZPScriptComponent::ZPScriptComponent() :
 	script(nullptr),
 	script_res(nullptr)
 {
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT;
 }
 
-Engine::ZPScriptProperty::~ZPScriptProperty() {
+Engine::ZPScriptComponent::~ZPScriptComponent() {
 	delete script;
 }
 
-Engine::AGScript* Engine::ZPScriptProperty::getScript() {
+Engine::AGScript* Engine::ZPScriptComponent::getScript() {
 	return script;
 }
 
-void Engine::ZPScriptProperty::SetupScript() {
+void Engine::ZPScriptComponent::SetupScript() {
 	if (this->script != nullptr)
 		delete this->script;
 	script_res = game_data->resources->getScriptByLabel(script_path);
@@ -41,13 +41,13 @@ void Engine::ZPScriptProperty::SetupScript() {
 	}
 }
 
-void Engine::ZPScriptProperty::onStart() {
+void Engine::ZPScriptComponent::onStart() {
     if (script_res != nullptr) {
         script->onStart(); 
     }
 }
 
-void Engine::ZPScriptProperty::onUpdate(float deltaTime) {
+void Engine::ZPScriptComponent::onUpdate(float deltaTime) {
     if (script_res != nullptr) {
         script->onUpdate();
 		if (game_data->isEditor) {
@@ -61,7 +61,7 @@ void Engine::ZPScriptProperty::onUpdate(float deltaTime) {
     }
 }
 
-bool Engine::ZPScriptProperty::makeFieldsList() {
+bool Engine::ZPScriptComponent::makeFieldsList() {
 	
 	ZPSClassDesc* Desc = this->script->getClassDesc();
 	//Clear old fields array
@@ -103,15 +103,15 @@ bool Engine::ZPScriptProperty::makeFieldsList() {
 	return true;
 }
 
-void Engine::ZPScriptProperty::onStop() {
+void Engine::ZPScriptComponent::onStop() {
 	script->onStop();
 	delete script;
 }
 
-void Engine::ZPScriptProperty::copyTo(Engine::IGameObjectComponent* dest) {
+void Engine::ZPScriptComponent::copyTo(Engine::IGameObjectComponent* dest) {
 	if (dest->type != this->type) return; //if it isn't transform
 
-	ZPScriptProperty* _dest = static_cast<ZPScriptProperty*>(dest);
+	ZPScriptComponent* _dest = static_cast<ZPScriptComponent*>(dest);
 	//write path to script
 	_dest->script_path = this->script_path;
 	_dest->SetScript(game_data->resources->getScriptByLabel(script_path));
@@ -125,17 +125,17 @@ void Engine::ZPScriptProperty::copyTo(Engine::IGameObjectComponent* dest) {
 	}
 }
 
-void Engine::ZPScriptProperty::onTrigger(Engine::GameObject* obj) {
+void Engine::ZPScriptComponent::onTrigger(Engine::GameObject* obj) {
 	script->onTrigger(obj);
 }
-void Engine::ZPScriptProperty::onTriggerEnter(Engine::GameObject* obj) {
+void Engine::ZPScriptComponent::onTriggerEnter(Engine::GameObject* obj) {
 	script->onTriggerEnter(obj);
 }
-void Engine::ZPScriptProperty::onTriggerExit(Engine::GameObject* obj) {
+void Engine::ZPScriptComponent::onTriggerExit(Engine::GameObject* obj) {
 	script->onTriggerExit(obj);
 }
 
-Engine::ClassFieldValue* Engine::ZPScriptProperty::GetSuitableField(std::string Name, int TypeID, unsigned int index) {
+Engine::ClassFieldValue* Engine::ZPScriptComponent::GetSuitableField(std::string Name, int TypeID, unsigned int index) {
 	for (unsigned int i = 0; i < this->mVars.size(); i++) {
 		ClassFieldValue* field = mVars[i];
 
@@ -147,7 +147,7 @@ Engine::ClassFieldValue* Engine::ZPScriptProperty::GetSuitableField(std::string 
 	return nullptr;
 }
 
-void Engine::ZPScriptProperty::OnScriptChanges() {
+void Engine::ZPScriptComponent::OnScriptChanges() {
 	if (game_data->script_manager->HasCompilerErrors())
 		return;
 	//Store old fields
@@ -177,7 +177,7 @@ void Engine::ZPScriptProperty::OnScriptChanges() {
 	}
 }
 
-void Engine::ZPScriptProperty::SetScript(ScriptResource* script) {
+void Engine::ZPScriptComponent::SetScript(ScriptResource* script) {
 	if (script == nullptr)
 		return;
 	script_res = script;
@@ -189,7 +189,7 @@ void Engine::ZPScriptProperty::SetScript(ScriptResource* script) {
 	makeFieldsList();
 }
 
-void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
+void Engine::ZPScriptComponent::loadPropertyFromMemory(const char* data, GameObject* obj) {
 	unsigned int offset = 1;
 	unsigned int vars = 0;
 
@@ -235,7 +235,7 @@ void Engine::ZPScriptProperty::loadPropertyFromMemory(const char* data, GameObje
 	}
 }
 
-void Engine::ZPScriptProperty::savePropertyToStream(ZsStream* stream, GameObject* obj){
+void Engine::ZPScriptComponent::savePropertyToStream(ZsStream* stream, GameObject* obj){
 	//Write header
 	*stream << "\nG_SCRIPT ";
 	stream->writeBinaryValue(&active);

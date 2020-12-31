@@ -1,14 +1,16 @@
 #include "../../../headers/ui/Widgets/Widget.hpp"
 #include "../../../headers/input/zs-input.h"
-
+#include "../../../headers/game.h"
 #include "../../../headers/engine.h"
 
 extern ZSpireEngine* engine_ptr;
+extern ZSGAME_DATA* game_data;
 
-Engine::IWidget::IWidget(){
-
-}
-Engine::IWidget::IWidget(unsigned int Width, unsigned int Height) {
+Engine::IWidget::IWidget():
+    TextContent(nullptr) {}
+Engine::IWidget::IWidget(unsigned int Width, unsigned int Height) :
+    TextContent(nullptr)
+{
     resize(Width, Height);
 }
 Engine::IWidget::~IWidget(){
@@ -31,4 +33,8 @@ bool Engine::IWidget::isHoveredByMouse(){
 }
 bool Engine::IWidget::isClicked(){
     return (Input::getMouseState().isLButtonDown && isHoveredByMouse());
+}
+
+void Engine::IWidget::setText(std::string StrId) {
+    TextContent = game_data->resources->getStringByStrId(StrId);
 }

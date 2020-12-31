@@ -1,5 +1,4 @@
 #include "../../headers/render/Shader.hpp"
-#include "../../headers/world/go_properties.h"
 #include <GL/glew.h>
 
 #include <cstring>

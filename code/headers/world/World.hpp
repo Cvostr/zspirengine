@@ -166,7 +166,7 @@ public:
     ~World();
 };
 
-class ZPScriptProperty;
+class ZPScriptComponent;
 class PhysicalProperty;
 
 class GameObject{
@@ -194,7 +194,7 @@ public:
     GameObject* getChild(unsigned int index);
     //Pointers to properties and scripts
     IGameObjectComponent* mComponents[OBJ_PROPS_SIZE];
-    ZPScriptProperty* mScripts[OBJ_SCRIPT_PROPS_SIZE];
+    ZPScriptComponent* mScripts[OBJ_SCRIPT_PROPS_SIZE];
     //Allocate property in this object
     
     bool addScript();
@@ -286,7 +286,7 @@ public:
     std::vector<Engine::GameObjectLink> children; //Vector to store links to children of object
     std::vector<GameObjectSnapshot> children_snapshots;
     Engine::IGameObjectComponent* properties[OBJ_PROPS_SIZE]; //pointers to properties of object
-    Engine::ZPScriptProperty* mScripts[OBJ_SCRIPT_PROPS_SIZE];
+    Engine::ZPScriptComponent* mScripts[OBJ_SCRIPT_PROPS_SIZE];
 
     Engine::GameObjectLink parent_link;
 

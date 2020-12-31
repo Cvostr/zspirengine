@@ -40,7 +40,7 @@ public:
     void loadGlyph(unsigned int index);
 
     void DrawChar(int _char, Vec2 pos, unsigned int* char_length, ZSRGBCOLOR color);
-    void DrawString(int* string, unsigned int len, Vec2 pos, ZSRGBCOLOR color = ZSRGBCOLOR(255,255,255));
+    void DrawString(const char32_t* string, unsigned int len, Vec2 pos, ZSRGBCOLOR color = ZSRGBCOLOR(255,255,255));
 };
 
 class GlyphManager : public IEngineComponent {

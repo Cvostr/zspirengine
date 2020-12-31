@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../game.h"
-#include "../../engine/LocaleStringsFile.h"
 #include "Widget.hpp"
 #include "../../math/Vec3.hpp"
 
@@ -27,7 +26,7 @@ namespace Engine {
 
     class Button : public IWidget{
     private:
-        ZSPIRE::LocString* btn_text_string;
+        
 
         TextureResource* common_sprite;
         TextureResource* hovered_sprite;
@@ -37,7 +36,6 @@ namespace Engine {
 
         void draw();
 
-        void setText(ZSPIRE::LocString* btn_text_string);
         void SetStyle(ButtonStyle* style);
         
         Button(ButtonStyle* style);

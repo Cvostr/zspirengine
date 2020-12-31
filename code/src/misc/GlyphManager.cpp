@@ -95,7 +95,7 @@ void GlyphFontContainer::DrawChar(int _char, Vec2 pos, unsigned int* char_length
 
     game_data->pipeline->renderGlyph(glyph->texture, static_cast<int>(pos.X), static_cast<int>(pos.Y - (glyph->glyph_size.Y - glyph->glyph_bearing.Y)), static_cast<int>(glyph->glyph_size.X), static_cast<int>(glyph->glyph_size.Y), color);
 }
-void GlyphFontContainer::DrawString(int* string, unsigned int len, Vec2 pos, ZSRGBCOLOR color){
+void GlyphFontContainer::DrawString(const char32_t* string, unsigned int len, Vec2 pos, ZSRGBCOLOR color){
     unsigned int xpos_offset = static_cast<unsigned int>(pos.X);
     for(unsigned int i = 0; i < len; i ++){
         unsigned int char_len = 0;

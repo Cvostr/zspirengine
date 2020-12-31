@@ -32,15 +32,17 @@ LocaleStringsFile::LocaleStringsFile(std::string file_path) {
 	stream.open(file_path, std::ifstream::binary | std::ifstream::ate);
 	unsigned int size = static_cast<unsigned int>(stream.tellg());
 	stream.seekg(0);
-
+	//allocate buffer for file
 	char* data = new char[size];
 	//Read file
 	stream.read(data, size);
 	//Read from buffer
 	readFileHeader(data);
+	//close file stream
+	stream.close();
 }
 LocaleStringsFile::~LocaleStringsFile() {
-
+	this->strings.clear();
 }
 bool LocaleStringsFile::readFileHeader(const char* data) {
 	char header[25];

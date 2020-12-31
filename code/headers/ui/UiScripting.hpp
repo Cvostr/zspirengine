@@ -17,6 +17,13 @@ namespace Engine {
     }
 
     template<class T>
+    void bindWidgetSDK(AGScriptMgr* mgr, const char* obj_type) {
+        bindViewSDK<T>(mgr, obj_type);
+
+        mgr->RegisterObjectMethod(obj_type, "void setText(string)", asMETHOD(T, setText), asCALL_THISCALL);
+    }
+
+    template<class T>
     void bindLayoutSDK(AGScriptMgr* mgr, const char* obj_type) {
         bindViewSDK<T>(mgr, obj_type);
 

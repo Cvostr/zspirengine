@@ -379,7 +379,7 @@ void Engine::World::call_onScriptChanged() {
         Engine::GameObject* obj = objects[obj_it];
         unsigned int scripts_num = obj->scripts_num;
         for (unsigned int s_i = 0; s_i < scripts_num; s_i++) {
-            ZPScriptProperty* script_prop = obj->mScripts[s_i];
+            ZPScriptComponent* script_prop = obj->mScripts[s_i];
             script_prop->OnScriptChanges();
         }
 
@@ -535,9 +535,8 @@ void Engine::World::putToShapshot(WorldSnapshot* snapshot) {
         }
         //Iterate over all scripts in objects and copy them into snapshot
         for (unsigned int script_i = 0; script_i < obj_ptr->scripts_num; script_i++) {
-            Engine::ZPScriptProperty* script_ptr = static_cast<Engine::ZPScriptProperty*>
-                (obj_ptr->mScripts[script_i]);
-            Engine::ZPScriptProperty* script_prop = static_cast<Engine::ZPScriptProperty*>
+            Engine::ZPScriptComponent* script_ptr = obj_ptr->mScripts[script_i];
+            Engine::ZPScriptComponent* script_prop = static_cast<Engine::ZPScriptComponent*>
                 (Engine::allocProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT));
             script_prop->go_link = script_ptr->go_link;
             script_ptr->copyTo(script_prop);

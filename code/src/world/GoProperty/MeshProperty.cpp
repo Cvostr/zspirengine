@@ -20,7 +20,6 @@ void Engine::MeshProperty::copyTo(IGameObjectComponent* dest) {
     _dest->mesh_ptr = mesh_ptr;
     _dest->castShadows = castShadows;
     _dest->rootNodeStr = rootNodeStr;
-    //updateRootNodePtr();
 }
 void Engine::MeshProperty::updateMeshPtr() {
     this->mesh_ptr = game_data->resources->getMeshByLabel(this->resource_relpath);

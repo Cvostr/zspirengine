@@ -148,6 +148,11 @@ void Engine::ResourceManager::pushResource(ZsResource* resource){
 
             break;
         }
+        case RESOURCE_TYPE_LOCALIZED_STR: {
+            //resource_ptr = new LocalizedStringResource;
+            this->mLSResources.push_back((LocalizedStringResource*)resource);
+            break;
+        }
     }
 
     if(resource->loadInstantly)
@@ -265,6 +270,7 @@ void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int
                 }
                 case RESOURCE_TYPE_LOCALIZED_STR: {
                     resource_ptr = new LocalizedStringResource;
+                    this->mLSResources.push_back((LocalizedStringResource*)resource_ptr);
                     break;
                 }
             }
@@ -308,33 +314,14 @@ unsigned int Engine::ResourceManager::getResourcesSize(){
     return static_cast<unsigned int>(resources.size());
 }
 
+ZSPIRE::LocString* Engine::ResourceManager::getStringByStrId(std::string strid) {
+    unsigned int ls_resources = this->mLSResources.size();
 
-Engine::Mesh* Engine::allocateMesh(unsigned int size){
-    Engine::Mesh* result = nullptr;
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL: {
-            result = new glMesh[size];
-            break;
-        }
-        case VULKAN : {
-            result = new vkMesh[size];
-            break;
-        }
+    for (unsigned int i = 0; i < ls_resources; i++) {
+        ZSPIRE::LocaleStringsFile* LSF = mLSResources[i]->mLSFile;
+        ZSPIRE::LocString* String = LSF->getString(strid);
+        if (String != nullptr)
+            return String;
     }
-    return result;
-}
-
-Engine::Mesh* Engine::allocateMesh(){
-    Engine::Mesh* result = nullptr;
-    switch(engine_ptr->engine_info->graphicsApi){
-        case OGL: {
-            result = new glMesh;
-            break;
-        }
-        case VULKAN : {
-            result = new vkMesh;
-            break;
-        }
-    }
-    return result;
+    return nullptr;
 }

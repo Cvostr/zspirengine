@@ -85,7 +85,7 @@ bool Engine::GameObject::addProperty(PROPERTY_TYPE property){
 }
 
 bool Engine::GameObject::addScript() {
-    ZPScriptProperty* _ptr = static_cast<ZPScriptProperty*>(allocProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT));
+    ZPScriptComponent* _ptr = static_cast<ZPScriptComponent*>(allocProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT));
 
     _ptr->go_link = this->getLinkToThisObject();
     _ptr->go_link.updLinkPtr();
@@ -140,7 +140,7 @@ void Engine::GameObject::removeScript(Engine::IGameObjectComponent* pProp) {
 
 asIScriptObject* Engine::GameObject::getScriptObjectWithName(const std::string& name) {
     for (unsigned int script_i = 0; script_i < scripts_num; script_i++) {
-        ZPScriptProperty* script = static_cast<ZPScriptProperty*>(mScripts[script_i]);
+        ZPScriptComponent* script = mScripts[script_i];
         if (script->getScript()->getClassName().compare(name) == 0) {
             script->getScript()->getMainClassPtr()->AddRef();
             return script->getScript()->getMainClassPtr();
@@ -520,8 +520,8 @@ void Engine::GameObject::putToSnapshot(GameObjectSnapshot* snapshot) {
         snapshot->props_num += 1;
     }
     for (unsigned int i = 0; i < this->scripts_num; i++) {
-        Engine::ZPScriptProperty* script_ptr = static_cast<Engine::ZPScriptProperty*>(this->mScripts[i]);
-        Engine::ZPScriptProperty* new_script_ptr = static_cast<Engine::ZPScriptProperty*>(
+        Engine::ZPScriptComponent* script_ptr = this->mScripts[i];
+        Engine::ZPScriptComponent* new_script_ptr = static_cast<Engine::ZPScriptComponent*>(
             Engine::allocProperty(PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT));
         script_ptr->copyTo(new_script_ptr);
         snapshot->mScripts[snapshot->scripts_num] = new_script_ptr;

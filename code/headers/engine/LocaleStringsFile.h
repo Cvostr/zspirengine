@@ -13,7 +13,6 @@
 #define LANG_IT 5
 #define LANG_RU 6
 
-
 namespace ZSPIRE {
 
 	class LocString {

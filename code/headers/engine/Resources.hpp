@@ -10,11 +10,9 @@
 #include "../misc/zs3m-master.h"
 #include "../audio/SoundSource.hpp"
 #include "../misc/GlyphManager.h"
+#include "LocaleStringsFile.h"
 #include "BackgroundLoader.hpp"
 #include "EngineComponent.h"
-
-#include "../ogl/GLMesh.hpp"
-#include "../vulkan/VKMesh.hpp"
 
 enum RESOURCE_TYPE {RESOURCE_TYPE_NONE,
                     RESOURCE_TYPE_TEXTURE,
@@ -67,10 +65,12 @@ class MaterialResource;
 class AnimationResource;
 class GlyphResource;
 class PrefabResource;
+class LocalizedStringResource;
 
 class ResourceManager : public IEngineComponent {
 private:
     std::vector<ZsResource*> resources;
+    std::vector<LocalizedStringResource*> mLSResources;
 public:
     void loadResourcesTable(std::string resmap_path);
     void loadResourcesTableFromMem(char* data, unsigned int size);
@@ -92,6 +92,8 @@ public:
     AnimationResource* getAnimationByLabel(std::string label);
     GlyphResource* getFontByLabel(std::string label);
     PrefabResource* getPrefabByLabel(std::string label);
+
+    ZSPIRE::LocString* getStringByStrId(std::string strid);
 
     template<typename T>
     T* getResource(std::string label){
@@ -199,8 +201,14 @@ public:
 };
 
 class LocalizedStringResource : public ZsResource {
+private:
+    unsigned char* data;
 public:
+    ZSPIRE::LocaleStringsFile* mLSFile;
 
+    void load();
+    void Release();
+    void Reload();
 
     LocalizedStringResource();
     ~LocalizedStringResource();

@@ -83,7 +83,7 @@ Engine::IGameObjectComponent* Engine::allocProperty(PROPERTY_TYPE type){
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT:{
-            ZPScriptProperty* ptr = new ZPScriptProperty;
+            ZPScriptComponent* ptr = new ZPScriptComponent;
             _ptr = static_cast<IGameObjectComponent*>(ptr);
             break;
         }

@@ -376,20 +376,6 @@ void Engine::Renderer::updateShadersCameraInfo(Engine::Camera* cam_ptr){
 }
 
 void Engine::Renderer::renderUI() {
-    GlyphFontContainer* c = game_data->resources->getFontByLabel("LiberationMono-Regular")->font_ptr;
-    int f[12];
-    f[0] = static_cast<int>(L'H');
-    f[1] = static_cast<int>(L'e');
-    f[2] = static_cast<int>(L'l');
-    f[3] = static_cast<int>(L'l');
-    f[4] = static_cast<int>(L'o');
-    f[5] = static_cast<int>(L' ');
-    f[6] = static_cast<int>(L'W');
-    f[7] = static_cast<int>(L'o');
-    f[8] = static_cast<int>(L'r');
-    f[9] = static_cast<int>(L'l');
-    f[10] = static_cast<int>(L'd');
-    c->DrawString(f, 11, Vec2(10,10));
     game_data->ui_manager->DrawRootLayout();
 }
 
