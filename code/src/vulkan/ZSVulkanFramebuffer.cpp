@@ -36,17 +36,18 @@ Engine::FbAttachment* Engine::ZSVulkanFramebuffer::PushAttachment(unsigned int W
 	Attachment.aspect = aspect;
 
 	this->Attachments.push_back(Attachment);
+
+
+	VkImageView view = getImageView(&Attachments[Attachments.size() - 1]);
+	Views.push_back(view);
+
 	return &Attachments[Attachments.size() - 1];
 }
 void Engine::ZSVulkanFramebuffer::PushOutputAttachment() {
-	//PushAttachment();
 	Views.push_back(game_data->vk_main->mSwapChain->GetImageViewAtIndex(0));
 }
 void Engine::ZSVulkanFramebuffer::PushDepthAttachment(unsigned int Width, unsigned int Height) {
 	FbAttachment* att = PushAttachment(Width, Height, VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
-
-	VkImageView view = getImageView(att);
-	Views.push_back(view);
 }
 
 VkImageView Engine::ZSVulkanFramebuffer::getImageView(FbAttachment* attachment) {

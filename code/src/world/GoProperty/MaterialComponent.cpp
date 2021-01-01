@@ -4,8 +4,8 @@
 extern ZSGAME_DATA* game_data;
 
 Engine::MaterialProperty::MaterialProperty() :
-    receiveShadows(true),
-    material_ptr(nullptr)
+    mReceiveShadows(true),
+    mMaterial(nullptr)
 {
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_MATERIAL;
 }
@@ -19,14 +19,14 @@ void Engine::MaterialProperty::copyTo(Engine::IGameObjectComponent* dest) {
 
     MaterialProperty* mat_prop = static_cast<MaterialProperty*>(dest);
     mat_prop->material_path = this->material_path;
-    mat_prop->material_ptr = this->material_ptr;
-    mat_prop->group_label = this->group_label;
+    mat_prop->mMaterial = this->mMaterial;
+    mat_prop->mTemplateLabel = this->mTemplateLabel;
 }
 
 void Engine::MaterialProperty::setMaterial(Material* mat) {
-    this->material_ptr = mat;
+    this->mMaterial = mat;
     this->material_path = mat->file_path;
-    this->group_label = mat->group_ptr->groupCaption;
+    this->mTemplateLabel = mat->mTemplate->Label;
 }
 
 void Engine::MaterialProperty::setMaterial(std::string path) {
@@ -34,7 +34,7 @@ void Engine::MaterialProperty::setMaterial(std::string path) {
     setMaterial(newmat_ptr);
 }
 
-void Engine::MaterialProperty::_setMaterial(MaterialResource* mat) {
+void Engine::MaterialProperty::setMaterial(MaterialResource* mat) {
     setMaterial(mat->material);
 }
 
@@ -46,25 +46,24 @@ void Engine::MaterialProperty::loadPropertyFromMemory(const char* data, GameObje
     MaterialResource* mat_resource = game_data->resources->getMaterialByLabel(material_path);
     if (mat_resource == nullptr)
         return;
-    material_ptr = mat_resource->material; //find it and process
+    mMaterial = mat_resource->material; //find it and process
     //Read receiveShadows boolean
-    readBinaryValue(&receiveShadows, data + offset, offset);
-    this->group_label = material_ptr->group_ptr->groupCaption;
+    readBinaryValue(&mReceiveShadows, data + offset, offset);
+    mTemplateLabel = mMaterial->mTemplate->Label;
 }
 
 void Engine::MaterialProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     //Write path to material string
-    if (material_ptr != nullptr)
+    if (mMaterial != nullptr)
         stream->writeString(material_path);//Write material relpath
     else
         stream->writeString("@none");
 
-    stream->writeBinaryValue(&receiveShadows);
+    stream->writeBinaryValue(&mReceiveShadows);
 }
 
 void Engine::MaterialProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
     mgr->RegisterObjectType(MAT_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
 
-    mgr->RegisterObjectMethod(MAT_PROP_TYPE_NAME, "void setMaterial(MaterialResource@)", asMETHOD(MaterialProperty, _setMaterial), asCALL_THISCALL);
-
+    mgr->RegisterObjectMethod(MAT_PROP_TYPE_NAME, "void setMaterial(MaterialResource@)", asMETHODPR(MaterialProperty, setMaterial, (MaterialResource*), void), asCALL_THISCALL);
 }

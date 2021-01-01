@@ -30,8 +30,13 @@ namespace Engine {
 		VkCommandPool commandPool;
 
 		ZSVulkanPipeline* MainPipeline;
+
 		ZSVulkanFramebuffer* TestFb;
 		ZSVulkanRenderPass* MaterialRenderPass;
+
+		ZSVulkanFramebuffer* OutFb;
+		ZSVulkanRenderPass* OutRenderPass;
+
 		ZSVulkanSampler* mMaterialSampler;
 
 		std::vector<VKObjectToRender> ObjectsToRender;

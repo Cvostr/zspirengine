@@ -28,12 +28,10 @@ FloatMtShPropConf::FloatMtShPropConf(){
 
 Float3MtShPropConf::Float3MtShPropConf(){
     type = MATSHPROP_TYPE_FVEC3;
-    value = Vec3(0.0f, 0.0f, 0.0f);
 }
 
 Float2MtShPropConf::Float2MtShPropConf(){
     type = MATSHPROP_TYPE_FVEC2;
-    value = Vec2(0.0f, 0.0f);
 }
 
 Int2MtShPropConf::Int2MtShPropConf(){
@@ -142,20 +140,20 @@ void Material::clear(){
     confs.clear(); //Resize array to 0
 }
 
-void Material::setPropertyGroup(MtShaderPropertiesGroup* group_ptr){
+void Material::setTemplate(MaterialTemplate* Template){
     this->clear(); //clear all confs, first
     //Iterate over all properties in group
-    for(unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i ++){
+    for(unsigned int prop_i = 0; prop_i < Template->properties.size(); prop_i ++){
         //Obtain pointer to property in group
-        MaterialShaderProperty* prop_ptr = group_ptr->properties[prop_i];
+        MaterialShaderProperty* prop_ptr = Template->properties[prop_i];
         //Add PropertyConf with the same type
         this->addPropertyConf(prop_ptr->type);
     }
     //store pointer of picked group
-    this->group_ptr = group_ptr;
+    this->mTemplate = Template;
     //store string id of picked group
-    this->group_str = group_ptr->str_path;
-    if (engine_ptr->engine_info->graphicsApi == VULKAN && group_ptr->render_shader->mCreated) {
+    this->mTemplateStr = Template->str_path;
+    if (engine_ptr->engine_info->graphicsApi == VULKAN && Template->render_shader->mCreated) {
 
         Engine::ZsVkPipelineConf Conf;
         Conf.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)game_data->pipeline->GetTransformUniformBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
@@ -168,20 +166,20 @@ void Material::setPropertyGroup(MtShaderPropertiesGroup* group_ptr){
         Conf.LayoutInfo.AddPushConstant(64, VK_SHADER_STAGE_VERTEX_BIT);
         
         this->Pipeline = new Engine::ZSVulkanPipeline;
-        Pipeline->Create((Engine::vkShader*)group_ptr->render_shader, game_data->vk_main->mMaterialsRenderPass, Conf);
+        Pipeline->Create((Engine::vkShader*)Template->render_shader, game_data->vk_main->mMaterialsRenderPass, Conf);
     }
 }
 
 Material::Material(){
-    setPropertyGroup(MtShProps::getDefaultMtShGroup());
+    setTemplate(MtShProps::getDefaultMtShGroup());
 }
 
 Material::Material(std::string shader_group_str){
-    setPropertyGroup(MtShProps::getMtShaderPropertyGroup(shader_group_str));
+    setTemplate(MtShProps::getMtShaderPropertyGroup(shader_group_str));
 }
 
-Material::Material(MtShaderPropertiesGroup* _group_ptr){
-    setPropertyGroup(_group_ptr);
+Material::Material(MaterialTemplate* Template){
+    setTemplate(Template);
 }
 
 Material::~Material(){
@@ -226,7 +224,7 @@ void Material::loadFromBuffer(char* buffer, unsigned int size) {
             //Read shader group name
             readString(group_name, buffer, position);
 
-            setPropertyGroup(MtShProps::getMtShaderPropertyGroup(group_name));
+            setTemplate(MtShProps::getMtShaderPropertyGroup(group_name));
         }
 
         if (strcmp(prefix, "_ENTRY") == 0) { //if it is game object
@@ -234,8 +232,8 @@ void Material::loadFromBuffer(char* buffer, unsigned int size) {
             std::string prop_identifier;
             readString(prop_identifier, buffer, position);
 
-            for (unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i++) {
-                MaterialShaderProperty* prop_ptr = group_ptr->properties[prop_i];
+            for (unsigned int prop_i = 0; prop_i < mTemplate->properties.size(); prop_i++) {
+                MaterialShaderProperty* prop_ptr = mTemplate->properties[prop_i];
                 MaterialShaderPropertyConf* conf_ptr = this->confs[prop_i];
                 //check if compare
                 if (prop_identifier.compare(prop_ptr->prop_identifier) == 0) {
@@ -345,11 +343,11 @@ void Material::saveToFile() {
     mat_stream << "ZSP_MATERIAL\n";
     //Write group string
     mat_stream << "_GROUP "; //write group header
-    mat_stream.writeString(this->group_str); //write group label
+    mat_stream.writeString(this->mTemplateStr); //write group label
 
-    for (unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i++) {
+    for (unsigned int prop_i = 0; prop_i < mTemplate->properties.size(); prop_i++) {
         //Obtain pointers to prop and prop's configuration
-        MaterialShaderProperty* prop_ptr = group_ptr->properties[prop_i];
+        MaterialShaderProperty* prop_ptr = mTemplate->properties[prop_i];
         MaterialShaderPropertyConf* conf_ptr = this->confs[prop_i];
         //write entry header
         mat_stream << "_ENTRY ";
@@ -459,14 +457,14 @@ void Material::loadFromFile(std::string fpath) {
 
 
 void Material::applyMatToPipeline() {
-    Engine::Shader* shader = this->group_ptr->render_shader;
+    Engine::Shader* shader = this->mTemplate->render_shader;
     if (shader == nullptr)
         return;
     shader->Use();
 
     //iterate over all properties, send them all!
-    for (unsigned int prop_i = 0; prop_i < group_ptr->properties.size(); prop_i++) {
-        MaterialShaderProperty* prop_ptr = group_ptr->properties[prop_i];
+    for (unsigned int prop_i = 0; prop_i < mTemplate->properties.size(); prop_i++) {
+        MaterialShaderProperty* prop_ptr = mTemplate->properties[prop_i];
         MaterialShaderPropertyConf* conf_ptr = confs[prop_i];
         switch (prop_ptr->type) {
         case MATSHPROP_TYPE_NONE: {
@@ -495,7 +493,7 @@ void Material::applyMatToPipeline() {
                 }
             }
             //Set texture state
-            group_ptr->setUB_Data(texture_p->start_offset, 4, &db);
+            mTemplate->setUB_Data(texture_p->start_offset, 4, &db);
 
             break;
         }
@@ -503,7 +501,7 @@ void Material::applyMatToPipeline() {
             FloatMtShPropConf* float_conf = static_cast<FloatMtShPropConf*>(conf_ptr);
 
             //set float to buffer
-            group_ptr->setUB_Data(prop_ptr->start_offset, 4, &float_conf->value);
+            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &float_conf->value);
 
             break;
         }
@@ -511,7 +509,7 @@ void Material::applyMatToPipeline() {
             IntegerMtShPropConf* int_conf = static_cast<IntegerMtShPropConf*>(conf_ptr);
 
             //set integer to buffer
-            group_ptr->setUB_Data(prop_ptr->start_offset, 4, &int_conf->value);
+            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &int_conf->value);
 
             break;
         }
@@ -521,9 +519,9 @@ void Material::applyMatToPipeline() {
             color_conf->color.updateGL();
 
             //Write color to buffer
-            group_ptr->setUB_Data(prop_ptr->start_offset, 4, &color_conf->color.gl_r);
-            group_ptr->setUB_Data(prop_ptr->start_offset + 4, 4, &color_conf->color.gl_g);
-            group_ptr->setUB_Data(prop_ptr->start_offset + 8, 4, &color_conf->color.gl_b);
+            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &color_conf->color.gl_r);
+            mTemplate->setUB_Data(prop_ptr->start_offset + 4, 4, &color_conf->color.gl_g);
+            mTemplate->setUB_Data(prop_ptr->start_offset + 8, 4, &color_conf->color.gl_b);
 
 
             break;
@@ -532,9 +530,9 @@ void Material::applyMatToPipeline() {
             Float3MtShPropConf* fvec3_conf = static_cast<Float3MtShPropConf*>(conf_ptr);
 
             //Write vec3 to buffer
-            group_ptr->setUB_Data(prop_ptr->start_offset, 4, &fvec3_conf->value.X);
-            group_ptr->setUB_Data(prop_ptr->start_offset + 4, 4, &fvec3_conf->value.Y);
-            group_ptr->setUB_Data(prop_ptr->start_offset + 8, 4, &fvec3_conf->value.Z);
+            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &fvec3_conf->value.X);
+            mTemplate->setUB_Data(prop_ptr->start_offset + 4, 4, &fvec3_conf->value.Y);
+            mTemplate->setUB_Data(prop_ptr->start_offset + 8, 4, &fvec3_conf->value.Z);
 
             break;
         }
@@ -542,16 +540,16 @@ void Material::applyMatToPipeline() {
             Float2MtShPropConf* fvec2_conf = static_cast<Float2MtShPropConf*>(conf_ptr);
 
             //Write vec2 to buffer
-            group_ptr->setUB_Data(prop_ptr->start_offset, 4, &fvec2_conf->value.X);
-            group_ptr->setUB_Data(prop_ptr->start_offset + 4, 4, &fvec2_conf->value.Y);
+            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &fvec2_conf->value.X);
+            mTemplate->setUB_Data(prop_ptr->start_offset + 4, 4, &fvec2_conf->value.Y);
             break;
         }
         case MATSHPROP_TYPE_IVEC2: {
             Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
 
             //Write vec2 to buffer
-            group_ptr->setUB_Data(prop_ptr->start_offset, 4, &ivec2_conf->value[0]);
-            group_ptr->setUB_Data(prop_ptr->start_offset + 4, 4, &ivec2_conf->value[1]);
+            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &ivec2_conf->value[0]);
+            mTemplate->setUB_Data(prop_ptr->start_offset + 4, 4, &ivec2_conf->value[1]);
             break;
         }
         case MATSHPROP_TYPE_TEXTURE3: {
@@ -579,8 +577,8 @@ void Material::applyMatToPipeline() {
         }
         }
     }
-    if (group_ptr->UB_ID != nullptr) {
-        group_ptr->UB_ID->bind();
-        group_ptr->UB_ID->updateBufferedData();
+    if (mTemplate->UB_ID != nullptr) {
+        mTemplate->UB_ID->bind();
+        mTemplate->UB_ID->updateBufferedData();
     }
 }

@@ -270,9 +270,9 @@ void Engine::GameObject::setSkinningMatrices(Renderer* pipeline) {
 
 void Engine::MaterialProperty::onRender(Engine::Renderer* pipeline){
     //Check for validity of pointer
-    if(material_ptr == nullptr) return;
+    if(mMaterial == nullptr) return;
 
-    MtShaderPropertiesGroup* group_ptr = material_ptr->group_ptr;
+    MaterialTemplate* group_ptr = mMaterial->mTemplate;
     if( group_ptr == nullptr) return ; //if object hasn't property
 
     //Get pointer to shadowcaster
@@ -286,7 +286,7 @@ void Engine::MaterialProperty::onRender(Engine::Renderer* pipeline){
         if(shadowcast == nullptr){
             //In GLSL we should use Integer instead of bool
             recShadows = 0;
-        }else if(!receiveShadows || !shadowcast->isActive()){
+        }else if(!mReceiveShadows || !shadowcast->isActive()){
             recShadows = 0;
         }else
             shadowcast->setTexture();
@@ -296,7 +296,7 @@ void Engine::MaterialProperty::onRender(Engine::Renderer* pipeline){
         pipeline->shadowBuffer->writeData(8, sizeof(int), &recShadows);
     }
     //Apply matrerial to shader and textures
-    material_ptr->applyMatToPipeline();
+    mMaterial->applyMatToPipeline();
 }
 
 void Engine::SkyboxProperty::onPreRender(Engine::Renderer* pipeline){

@@ -7,13 +7,13 @@
 
 Material* default3dmat;
 Material* defaultTerrainMat;
-static std::vector<MtShaderPropertiesGroup*> MatGroups;
+static std::vector<MaterialTemplate*> MatGroups;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
 
 extern ZSpireEngine* engine_ptr;
 
-MaterialShaderProperty* MtShaderPropertiesGroup::addProperty(int type){
+MaterialShaderProperty* MaterialTemplate::addProperty(int type){
     //Allocate property in heap
     MaterialShaderProperty* newprop_ptr = MtShProps::allocateProperty(type);
     //Push new material
@@ -22,39 +22,38 @@ MaterialShaderProperty* MtShaderPropertiesGroup::addProperty(int type){
     return properties[properties.size() - 1];
 }
 
-void MtShaderPropertiesGroup::loadFromFile(const char* fpath){
+void MaterialTemplate::loadFromFile(const char* fpath){
     std::ifstream mat_shader_group;
     mat_shader_group.open(fpath);
 
     mat_shader_group.close();
 }
-MtShaderPropertiesGroup::MtShaderPropertiesGroup(Engine::Shader* shader, const char* UB_CAPTION, unsigned int UB_ConnectID, unsigned int UB_SIZE){
+MaterialTemplate::MaterialTemplate(Engine::Shader* shader, const char* UB_CAPTION, unsigned int UB_ConnectID, unsigned int UB_SIZE){
     render_shader = shader;
 
     acceptShadows = false;
     properties.resize(0);
 
     if(UB_SIZE == 0 || strlen(UB_CAPTION) == 0) return;
-    this->UB_ConnectID = UB_ConnectID;
     //Generate uniform buffer
     this->UB_ID = Engine::allocUniformBuffer();
     this->UB_ID->init(UB_ConnectID, UB_SIZE, true);
 }
 
-void MtShaderPropertiesGroup::setUB_Data(unsigned int offset, unsigned int size, void* data){
+void MaterialTemplate::setUB_Data(unsigned int offset, unsigned int size, void* data){
 
     this->UB_ID->writeDataBuffered(offset, size, data);
 }
 
-MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
+MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
                                                         Engine::Shader* heightmap,
                                                         Engine::Shader* water){
 
-    MtShaderPropertiesGroup* default_group = new MtShaderPropertiesGroup(shader3d, "Default3d", 50, 48);
+    MaterialTemplate* default_group = new MaterialTemplate(shader3d, "Default3d", 50, 48);
     {
         default_group->acceptShadows = true;
         default_group->str_path = "@default";
-        default_group->groupCaption = "Default 3D";
+        default_group->Label = "Default 3D";
 
         MaterialShaderProperty* diff_color_prop = (default_group->addProperty(MATSHPROP_TYPE_COLOR));
         diff_color_prop->prop_caption = "Color"; //Set caption in Inspector
@@ -112,10 +111,10 @@ MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d
     {
 
         //Water
-        MtShaderPropertiesGroup* water_group = new MtShaderPropertiesGroup(water, "WaterData", 51, 32);
+        MaterialTemplate* water_group = new MaterialTemplate(water, "WaterData", 51, 32);
         water_group->acceptShadows = true;
         water_group->str_path = "@basewater";
-        water_group->groupCaption = "Water";
+        water_group->Label = "Water";
 
         TextureMaterialShaderProperty* reflection_texture_prop =
             static_cast<TextureMaterialShaderProperty*>(water_group->addProperty(MATSHPROP_TYPE_TEXTURE));
@@ -152,9 +151,9 @@ MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d
     }
 
 //Default skybox material
-    MtShaderPropertiesGroup* default_sky_group = new MtShaderPropertiesGroup(skybox, "", 0, 0);
+    MaterialTemplate* default_sky_group = new MaterialTemplate(skybox, "", 0, 0);
     default_sky_group->str_path = "@skybox";
-    default_sky_group->groupCaption = "Default Skybox";
+    default_sky_group->Label = "Default Skybox";
     Texture3MaterialShaderProperty* sky_texture =
             static_cast<Texture3MaterialShaderProperty*>(default_sky_group->addProperty(MATSHPROP_TYPE_TEXTURE3));
     sky_texture->slotToBind = 0;
@@ -164,9 +163,9 @@ MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d
     MtShProps::addMtShaderPropertyGroup(default_sky_group);
 
 //Default terrain material
-    MtShaderPropertiesGroup* default_heightmap_group = new MtShaderPropertiesGroup(heightmap, "", 0, 0);
+    MaterialTemplate* default_heightmap_group = new MaterialTemplate(heightmap, "", 0, 0);
     default_heightmap_group->str_path = "@heightmap";
-    default_heightmap_group->groupCaption = "Default Heightmap";
+    default_heightmap_group->Label = "Default Heightmap";
     default_heightmap_group->acceptShadows = true;
 
     MtShProps::addMtShaderPropertyGroup(default_heightmap_group);
@@ -180,29 +179,29 @@ MtShaderPropertiesGroup* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d
 
     return default_group;
 }
-MtShaderPropertiesGroup* MtShProps::getDefaultMtShGroup(){
+MaterialTemplate* MtShProps::getDefaultMtShGroup(){
     return MatGroups[0];
 }
 
-void MtShProps::addMtShaderPropertyGroup(MtShaderPropertiesGroup* group){
+void MtShProps::addMtShaderPropertyGroup(MaterialTemplate* group){
     //Check if this property already added
     if(getMtShaderPropertyGroup(group->str_path) == nullptr)
         MatGroups.push_back(group);
 }
-MtShaderPropertiesGroup* MtShProps::getMtShaderPropertyGroup(std::string group_name){
+MaterialTemplate* MtShProps::getMtShaderPropertyGroup(std::string group_name){
     for(unsigned int group_i = 0; group_i < MatGroups.size(); group_i ++){
-        MtShaderPropertiesGroup* group_ptr = MatGroups[group_i];
-        if(group_ptr->str_path.compare(group_name) == false)
-            return group_ptr;
+        MaterialTemplate* TemplatePtr = MatGroups[group_i];
+        if(TemplatePtr->str_path.compare(group_name) == false)
+            return TemplatePtr;
     }
     return nullptr;
 }
 
-MtShaderPropertiesGroup* MtShProps::getMtShaderPropertyGroupByLabel(std::string group_label){
+MaterialTemplate* MtShProps::getMtShaderPropertyGroupByLabel(std::string group_label){
     for(unsigned int group_i = 0; group_i < MatGroups.size(); group_i ++){
-        MtShaderPropertiesGroup* group_ptr = MatGroups[group_i];
-        if(group_ptr->groupCaption.compare(group_label) == false)
-            return group_ptr;
+        MaterialTemplate* TemplatePtr = MatGroups[group_i];
+        if(TemplatePtr->Label.compare(group_label) == false)
+            return TemplatePtr;
     }
     return nullptr;
 }
@@ -210,7 +209,7 @@ MtShaderPropertiesGroup* MtShProps::getMtShaderPropertyGroupByLabel(std::string 
 unsigned int MtShProps::getMaterialShaderPropertyAmount(){
     return static_cast<unsigned int>(MatGroups.size());
 }
-MtShaderPropertiesGroup* MtShProps::getMtShaderPropertiesGroupByIndex(unsigned int index){
+MaterialTemplate* MtShProps::getMaterialTemplateByIndex(unsigned int index){
     return MatGroups[index];
 }
 

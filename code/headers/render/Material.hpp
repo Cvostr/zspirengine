@@ -37,13 +37,11 @@ public:
 };
 
 
-class MtShaderPropertiesGroup{
+class MaterialTemplate {
 public:
     std::string str_path;
-    std::string groupCaption;
+    std::string Label;
     bool acceptShadows;
-    //ID of connected shader uniform buffer
-    unsigned int UB_ConnectID;
     //ID of uniform buffer
     Engine::UniformBuffer* UB_ID;
     void setUB_Data(unsigned int offset, unsigned int size, void* data);
@@ -55,30 +53,30 @@ public:
     MaterialShaderProperty* addProperty(int type);
     void loadFromFile(const char* fpath);
 
-    MtShaderPropertiesGroup(Engine::Shader* shader, const char* UB_CAPTION, unsigned int UB_ConnectID, unsigned int UB_SIZE);
+    MaterialTemplate(Engine::Shader* shader, const char* UB_CAPTION, unsigned int UB_ConnectID, unsigned int UB_SIZE);
 };
 
 class Material{
 private:
-    std::string group_str;
+    std::string mTemplateStr;
 public:
     Engine::ZSVulkanPipeline* Pipeline;
     //path to material file
     std::string file_path;
     //Pointer to shader group
-    MtShaderPropertiesGroup* group_ptr;
+    MaterialTemplate* mTemplate;
     std::vector<MaterialShaderPropertyConf*> confs;
 
     MaterialShaderPropertyConf* addPropertyConf(int type);
     void loadFromFile(std::string fpath);
     void loadFromBuffer(char* buffer, unsigned int size);
     void saveToFile();
-    void setPropertyGroup(MtShaderPropertiesGroup* group_ptr);
+    void setTemplate(MaterialTemplate* Template);
     void clear();
     void applyMatToPipeline();
 
     Material(std::string shader_group_str);
-    Material(MtShaderPropertiesGroup* _group_ptr);
+    Material(MaterialTemplate* Template);
     Material();
 
     ~Material();
@@ -88,18 +86,18 @@ namespace MtShProps {
     MaterialShaderProperty* allocateProperty(int type);
     MaterialShaderPropertyConf* allocatePropertyConf(int type);
 
-    MtShaderPropertiesGroup* genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
+    MaterialTemplate* genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
                                                  Engine::Shader* heightmap,
         Engine::Shader* water);
-    MtShaderPropertiesGroup* getDefaultMtShGroup();
+    MaterialTemplate* getDefaultMtShGroup();
 
-    void addMtShaderPropertyGroup(MtShaderPropertiesGroup* group);
-    MtShaderPropertiesGroup* getMtShaderPropertyGroup(std::string group_name);
-    MtShaderPropertiesGroup* getMtShaderPropertyGroupByLabel(std::string group_label);
+    void addMtShaderPropertyGroup(MaterialTemplate* group);
+    MaterialTemplate* getMtShaderPropertyGroup(std::string group_name);
+    MaterialTemplate* getMtShaderPropertyGroupByLabel(std::string group_label);
     //Get amount of registered material shader properties
     unsigned int getMaterialShaderPropertyAmount();
     //Get shader properties by index
-    MtShaderPropertiesGroup* getMtShaderPropertiesGroupByIndex(unsigned int index);
+    MaterialTemplate* getMaterialTemplateByIndex(unsigned int index);
 
     void clearMtShaderGroups();
 }

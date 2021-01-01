@@ -79,7 +79,7 @@ void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
         obr.obj = obj;
 
         if (mat_prop != nullptr) {
-            obr.mat = mat_prop->material_ptr;
+            obr.mat = mat_prop->mMaterial;
             if(obr.mat != nullptr)
                 obr.mat->applyMatToPipeline();
         }
@@ -105,7 +105,7 @@ void Engine::VKRenderer::InitShaders() {
 
 	TestFb = new ZSVulkanFramebuffer;
 	TestFb->PushOutputAttachment();
-    TestFb->PushDepthAttachment(640, 480);
+   TestFb->PushDepthAttachment(640, 480);
     TestFb->Create(MaterialRenderPass);
     
 
@@ -133,11 +133,6 @@ void Engine::VKRenderer::InitShaders() {
 
     vkAllocateCommandBuffers(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, &mCmdBuf);
 
-
-    VkCommandBufferBeginInfo beginInfo = {};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = 0; // Optional
-    beginInfo.pInheritanceInfo = nullptr; // Optional
 
     if (engine_ptr->desc->game_perspective == PERSP_3D) {
         MtShProps::genDefaultMtShGroup(default3d, skybox_shader, terrain_shader, water_shader);
@@ -167,14 +162,6 @@ void Engine::VKRenderer::Present() {
 
     vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
 
-
-    VkSubpassDependency dependency = {};
-    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-    dependency.dstSubpass = 0;
-    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.srcAccessMask = 0;
-    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;

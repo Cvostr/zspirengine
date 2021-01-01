@@ -6,17 +6,17 @@ namespace Engine {
 
     class MaterialProperty : public Engine::IGameObjectComponent {
     private:
-        std::string group_label;
+        std::string mTemplateLabel;
     public:
         //Pointer to picked material
-        Material* material_ptr;
-        //Path to material fil
+        Material* mMaterial;
+        //Path to material file
         std::string material_path;
         //Draw shadows on object
-        bool receiveShadows;
+        bool mReceiveShadows;
 
         void setMaterial(Material* mat);
-        void _setMaterial(MaterialResource* mat);
+        void setMaterial(MaterialResource* mat);
         void setMaterial(std::string path);
         void addPropertyInterfaceToInspector();
         void onValueChanged();
