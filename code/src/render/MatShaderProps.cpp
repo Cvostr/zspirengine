@@ -28,30 +28,66 @@ void MaterialTemplate::loadFromFile(const char* fpath){
 
     mat_shader_group.close();
 }
-MaterialTemplate::MaterialTemplate(Engine::Shader* shader, const char* UB_CAPTION, unsigned int UB_ConnectID, unsigned int UB_SIZE){
-    render_shader = shader;
-
-    acceptShadows = false;
+MaterialTemplate::MaterialTemplate(Engine::Shader* shader, unsigned int UB_ConnectID, unsigned int UB_SIZE) :
+    mShader(shader),
+    mAcceptShadows(false)
+{
+    
     properties.resize(0);
 
-    if(UB_SIZE == 0 || strlen(UB_CAPTION) == 0) return;
+    if(UB_SIZE == 0) return;
     //Generate uniform buffer
-    this->UB_ID = Engine::allocUniformBuffer();
-    this->UB_ID->init(UB_ConnectID, UB_SIZE, true);
+    mUniformBuffer = Engine::allocUniformBuffer();
+    mUniformBuffer->init(UB_ConnectID, UB_SIZE, true);
+
+}
+
+void MaterialTemplate::CreateVulkanPipeline() {
+    if (engine_ptr->engine_info->graphicsApi == VULKAN && mShader->mCreated) {
+
+        Engine::ZsVkPipelineConf Conf;
+        MakeDescrSetUniform(Conf.LayoutInfo.DescrSetLayout);
+        MakeDescrSetTextures(Conf.LayoutInfo.DescrSetLayoutSampler);
+
+       
+        Conf.hasDepth = true;
+        Conf.cullFace = true;
+        Conf.LayoutInfo.AddPushConstant(64, VK_SHADER_STAGE_VERTEX_BIT);
+        Conf.LayoutInfo.AddPushConstant(mUniformBuffer->GetBufferSize(), VK_SHADER_STAGE_FRAGMENT_BIT);
+
+        this->Pipeline = new Engine::ZSVulkanPipeline;
+        Pipeline->Create((Engine::vkShader*)mShader, game_data->vk_main->mMaterialsRenderPass, Conf);
+    }
+}
+
+void MaterialTemplate::MakeDescrSetUniform(Engine::ZSVulkanDescriptorSet* DescrSet) {
+    DescrSet->pushUniformBuffer((Engine::vkUniformBuffer*)game_data->pipeline->GetTransformUniformBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
+    DescrSet->getDescriptorSetLayout();
+}
+
+void MaterialTemplate::MakeDescrSetTextures(Engine::ZSVulkanDescriptorSet* DescrSet) {
+    for (unsigned int prop_i = 0; prop_i < properties.size(); prop_i++) {
+        MaterialShaderProperty* prop_ptr = properties[prop_i];
+        if (prop_ptr->type == MATSHPROP_TYPE_TEXTURE) {
+            //Cast pointer
+            TextureMaterialShaderProperty* texture_p = static_cast<TextureMaterialShaderProperty*>(prop_ptr);
+            DescrSet->pushImageSampler(texture_p->slotToBind);
+        }
+    }
+    DescrSet->getDescriptorSetLayout();
 }
 
 void MaterialTemplate::setUB_Data(unsigned int offset, unsigned int size, void* data){
-
-    this->UB_ID->writeDataBuffered(offset, size, data);
+    mUniformBuffer->writeDataBuffered(offset, size, data);
 }
 
 MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
                                                         Engine::Shader* heightmap,
                                                         Engine::Shader* water){
 
-    MaterialTemplate* default_group = new MaterialTemplate(shader3d, "Default3d", 50, 48);
+    MaterialTemplate* default_group = new MaterialTemplate(shader3d, 50, 48);
     {
-        default_group->acceptShadows = true;
+        default_group->mAcceptShadows = true;
         default_group->str_path = "@default";
         default_group->Label = "Default 3D";
 
@@ -106,13 +142,14 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
         uv_factor_prop->prop_identifier = "i_uv_repeat"; //Identifier to save
         uv_factor_prop->start_offset = 36;
 
+        default_group->CreateVulkanPipeline();
         MtShProps::addMtShaderPropertyGroup(default_group);
     }
     {
 
         //Water
-        MaterialTemplate* water_group = new MaterialTemplate(water, "WaterData", 51, 32);
-        water_group->acceptShadows = true;
+        MaterialTemplate* water_group = new MaterialTemplate(water, 51, 32);
+        water_group->mAcceptShadows = true;
         water_group->str_path = "@basewater";
         water_group->Label = "Water";
 
@@ -151,7 +188,7 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
     }
 
 //Default skybox material
-    MaterialTemplate* default_sky_group = new MaterialTemplate(skybox, "", 0, 0);
+    MaterialTemplate* default_sky_group = new MaterialTemplate(skybox, 0, 0);
     default_sky_group->str_path = "@skybox";
     default_sky_group->Label = "Default Skybox";
     Texture3MaterialShaderProperty* sky_texture =
@@ -163,10 +200,10 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
     MtShProps::addMtShaderPropertyGroup(default_sky_group);
 
 //Default terrain material
-    MaterialTemplate* default_heightmap_group = new MaterialTemplate(heightmap, "", 0, 0);
+    MaterialTemplate* default_heightmap_group = new MaterialTemplate(heightmap, 0, 0);
     default_heightmap_group->str_path = "@heightmap";
     default_heightmap_group->Label = "Default Heightmap";
-    default_heightmap_group->acceptShadows = true;
+    default_heightmap_group->mAcceptShadows = true;
 
     MtShProps::addMtShaderPropertyGroup(default_heightmap_group);
 

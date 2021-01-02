@@ -41,26 +41,32 @@ class MaterialTemplate {
 public:
     std::string str_path;
     std::string Label;
-    bool acceptShadows;
-    //ID of uniform buffer
-    Engine::UniformBuffer* UB_ID;
-    void setUB_Data(unsigned int offset, unsigned int size, void* data);
-
-
-    Engine::Shader* render_shader; //Pointer to shader, that binds on object render
+    bool mAcceptShadows;
+    Engine::Shader* mShader; //Pointer to shader, that binds on object render
     std::vector<MaterialShaderProperty*> properties;
+    //ID of uniform buffer
+    Engine::UniformBuffer* mUniformBuffer;
+
+    Engine::ZSVulkanPipeline* Pipeline;
+
+    void setUB_Data(unsigned int offset, unsigned int size, void* data);
 
     MaterialShaderProperty* addProperty(int type);
     void loadFromFile(const char* fpath);
 
-    MaterialTemplate(Engine::Shader* shader, const char* UB_CAPTION, unsigned int UB_ConnectID, unsigned int UB_SIZE);
+    void CreateVulkanPipeline();
+    void MakeDescrSetUniform(Engine::ZSVulkanDescriptorSet* DescrSet);
+    void MakeDescrSetTextures(Engine::ZSVulkanDescriptorSet* DescrSet);
+
+    MaterialTemplate(Engine::Shader* shader, unsigned int UB_ConnectID, unsigned int UB_SIZE);
 };
 
 class Material{
 private:
     std::string mTemplateStr;
 public:
-    Engine::ZSVulkanPipeline* Pipeline;
+    Engine::ZSVulkanDescriptorSet* DescrSetUBO;
+    Engine::ZSVulkanDescriptorSet* DescrSetTextures;
     //path to material file
     std::string file_path;
     //Pointer to shader group

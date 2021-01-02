@@ -153,21 +153,16 @@ void Material::setTemplate(MaterialTemplate* Template){
     this->mTemplate = Template;
     //store string id of picked group
     this->mTemplateStr = Template->str_path;
-    if (engine_ptr->engine_info->graphicsApi == VULKAN && Template->render_shader->mCreated) {
+    
+    if (engine_ptr->engine_info->graphicsApi == VULKAN && Template->mShader->mCreated) {
 
-        Engine::ZsVkPipelineConf Conf;
-        Conf.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)game_data->pipeline->GetTransformUniformBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
-        //Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->lightsBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
-       // Conf.DescrSetLayout->pushUniformBuffer((Engine::_vk_UniformBuffer*)this->shadowBuffer, VK_SHADER_STAGE_ALL_GRAPHICS);
-        Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(0);
-        Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(1);
-        Conf.hasDepth = true;
-        Conf.cullFace = true;
-        Conf.LayoutInfo.AddPushConstant(64, VK_SHADER_STAGE_VERTEX_BIT);
-        
-        this->Pipeline = new Engine::ZSVulkanPipeline;
-        Pipeline->Create((Engine::vkShader*)Template->render_shader, game_data->vk_main->mMaterialsRenderPass, Conf);
+        DescrSetUBO = new Engine::ZSVulkanDescriptorSet(Engine::DESCR_SET_TYPE::DESCR_SET_TYPE_UBO);
+        DescrSetTextures = new Engine::ZSVulkanDescriptorSet(Engine::DESCR_SET_TYPE::DESCR_SET_TYPE_TEXTURE);
+
+        mTemplate->MakeDescrSetUniform(DescrSetUBO);
+        mTemplate->MakeDescrSetTextures(DescrSetTextures);
     }
+
 }
 
 Material::Material(){
@@ -325,6 +320,42 @@ void Material::loadFromBuffer(char* buffer, unsigned int size) {
             }
         }
     }
+    /*
+
+    for (unsigned int prop_i = 0; prop_i < mTemplate->properties.size(); prop_i++) {
+        MaterialShaderProperty* prop_ptr = mTemplate->properties[prop_i];
+        MaterialShaderPropertyConf* conf_ptr = confs[prop_i];
+        if (prop_ptr->type == MATSHPROP_TYPE_TEXTURE) {
+       
+            //Cast pointer
+            TextureMaterialShaderProperty* texture_p = static_cast<TextureMaterialShaderProperty*>(prop_ptr);
+            TextureMtShPropConf* texture_conf = static_cast<TextureMtShPropConf*>(conf_ptr);
+
+            int db = 0;
+            //If correct path is set to texture
+            if (texture_conf->path.compare("@none")) {
+                //if texture isn't loaded
+                if (texture_conf->texture == nullptr) {
+                    //Try to find texture
+                    texture_conf->texture = game_data->resources->getTextureByLabel(texture_conf->path);
+                    if (texture_conf->texture == nullptr) break; //No resource with that name, exiting
+                }
+                //Set opengl texture
+                db = 1;
+                Engine::TextureResource* tex_ptr = static_cast<Engine::TextureResource*>(texture_conf->texture);
+               
+                if (engine_ptr->engine_info->graphicsApi == VULKAN) {
+                    this->DescrSetTextures->setTexture(texture_p->slotToBind, ((Engine::vkTexture*)tex_ptr->texture_ptr)->GetImageView(), game_data->vk_main->mDefaultTextureSampler);
+                    // this->Pipeline->GetPipelineLayout()->BindTexture(((Engine::vkTexture*)tex_ptr->texture_ptr), game_data->vk_main->mDefaultTextureSampler, texture_p->slotToBind);
+                }
+            }
+            //Set texture state
+            mTemplate->setUB_Data(texture_p->start_offset, 4, &db);
+
+            break;
+        }
+
+    }*/
 }
 
 void Material::saveToFile() {
@@ -457,10 +488,9 @@ void Material::loadFromFile(std::string fpath) {
 
 
 void Material::applyMatToPipeline() {
-    Engine::Shader* shader = this->mTemplate->render_shader;
-    if (shader == nullptr)
+    if (this->mTemplate->mShader == nullptr)
         return;
-    shader->Use();
+    this->mTemplate->mShader->Use();
 
     //iterate over all properties, send them all!
     for (unsigned int prop_i = 0; prop_i < mTemplate->properties.size(); prop_i++) {
@@ -489,7 +519,9 @@ void Material::applyMatToPipeline() {
                 Engine::TextureResource* tex_ptr = static_cast<Engine::TextureResource*>(texture_conf->texture);
                 tex_ptr->Use(texture_p->slotToBind);
                 if (engine_ptr->engine_info->graphicsApi == VULKAN) {
-                    this->Pipeline->GetPipelineLayout()->BindTexture(((Engine::vkTexture*)tex_ptr->texture_ptr), game_data->vk_main->mDefaultTextureSampler, texture_p->slotToBind);
+                    this->DescrSetTextures->setTexture(texture_p->slotToBind, ((Engine::vkTexture*)tex_ptr->texture_ptr)->GetImageView(), game_data->vk_main->mDefaultTextureSampler);
+
+                   // this->Pipeline->GetPipelineLayout()->BindTexture(((Engine::vkTexture*)tex_ptr->texture_ptr), game_data->vk_main->mDefaultTextureSampler, texture_p->slotToBind);
                 }
             }
             //Set texture state
@@ -577,8 +609,8 @@ void Material::applyMatToPipeline() {
         }
         }
     }
-    if (mTemplate->UB_ID != nullptr) {
-        mTemplate->UB_ID->bind();
-        mTemplate->UB_ID->updateBufferedData();
+    if (mTemplate->mUniformBuffer != nullptr) {
+        mTemplate->mUniformBuffer->bind();
+        mTemplate->mUniformBuffer->updateBufferedData();
     }
 }

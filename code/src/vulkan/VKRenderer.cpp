@@ -39,12 +39,20 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
         if (obj->hasMesh() && obr->mat != nullptr) {
             MeshProperty* mesh = obj->getPropertyPtr<MeshProperty>();
             if (!binded) {
-                obr->mat->Pipeline->CmdBindPipeline(mCmdBuf);
+                obr->mat->mTemplate->Pipeline->CmdBindPipeline(mCmdBuf);
                 binded = true;
             }
-                obr->mat->Pipeline->CmdBindDescriptorSets(mCmdBuf);
 
-                obr->mat->Pipeline->CmdPushConstants(this->mCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, &ObjectsToRender[i].transform);
+            VkDescriptorSet sets[2];
+            sets[0] = obr->mat->DescrSetUBO->getDescriptorSet();
+            sets[1] = obr->mat->DescrSetTextures->getDescriptorSet();
+            if (obr->mat->mTemplate->Pipeline != nullptr) {
+                vkCmdBindDescriptorSets(mCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    obr->mat->mTemplate->Pipeline->_GetPipelineLayout(), 0,
+                    2, sets, 0, nullptr);
+
+                obr->mat->mTemplate->Pipeline->CmdPushConstants(this->mCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, &ObjectsToRender[i].transform);
+            }
                 if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
                     obj->DrawMesh(this);
         }
@@ -84,7 +92,6 @@ void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
                 obr.mat->applyMatToPipeline();
         }
 
-
         this->ObjectsToRender.push_back(obr);
     }
 }
@@ -92,20 +99,34 @@ void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
 void Engine::VKRenderer::InitShaders() {
     this->default3d->compileFromFile("Shaders/vulkan_test/vert.spv", "Shaders/vulkan_test/frag.spv");
 
+    OutRenderPass = new ZSVulkanRenderPass;
+    OutRenderPass->PushColorOutputAttachment();
+    OutRenderPass->Create();
+
+
     MaterialRenderPass = new ZSVulkanRenderPass;
-    MaterialRenderPass->PushColorOutputAttachment();
+    MaterialRenderPass->PushColorAttachment(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    MaterialRenderPass->PushColorAttachment(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    MaterialRenderPass->PushColorAttachment(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     MaterialRenderPass->PushDepthAttachment();
     MaterialRenderPass->Create();
+
+
     game_data->vk_main->mMaterialsRenderPass = MaterialRenderPass;
 
     mMaterialSampler = new ZSVulkanSampler;
     mMaterialSampler->CreateSampler();
     game_data->vk_main->mDefaultTextureSampler = mMaterialSampler;
 
+    OutFb = new ZSVulkanFramebuffer;
+    OutFb->PushOutputAttachment();
+    OutFb->Create(OutRenderPass);
 
-	TestFb = new ZSVulkanFramebuffer;
-	TestFb->PushOutputAttachment();
-   TestFb->PushDepthAttachment(640, 480);
+    TestFb = new ZSVulkanFramebuffer;
+    TestFb->PushAttachment(640, 480, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+    TestFb->PushAttachment(640, 480, VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+    TestFb->PushAttachment(640, 480, VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+    TestFb->PushDepthAttachment(640, 480);
     TestFb->Create(MaterialRenderPass);
     
 

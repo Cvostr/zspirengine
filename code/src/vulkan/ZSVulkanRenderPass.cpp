@@ -6,27 +6,15 @@ using namespace Engine;
 
 extern ZSGAME_DATA* game_data;
 
-VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
-    for (VkFormat format : candidates) {
-        VkFormatProperties props;
-        vkGetPhysicalDeviceFormatProperties(game_data->vk_main->mDevice->getPhysicalDevice(), format, &props);
+ZSVulkanRenderPass::ZSVulkanRenderPass():
+    mHasDepthAttachment(false),
+    mClearValuesCount(0)
+{
 
-        if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
-            return format;
-        }
-        else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
-            return format;
-        }
-    }
-
-    throw std::runtime_error("failed to find supported format!");
 }
-VkFormat findDepthFormat() {
-    return findSupportedFormat(
-        { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
-        VK_IMAGE_TILING_OPTIMAL,
-        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
-    );
+ZSVulkanRenderPass::~ZSVulkanRenderPass() {
+    if (mCreated)
+        vkDestroyRenderPass(game_data->vk_main->mDevice->getVkDevice(), mRenderPass, nullptr);
 }
 
 void ZSVulkanRenderPass::PushColorAttachment(VkFormat Format, VkImageLayout Layout) {
@@ -56,7 +44,7 @@ void ZSVulkanRenderPass::PushColorOutputAttachment() {
 
 void ZSVulkanRenderPass::PushDepthAttachment() {
     VkAttachmentDescription colorAttachment = {};
-    colorAttachment.format = VK_FORMAT_D32_SFLOAT;
+    colorAttachment.format = VK_FORMAT_D24_UNORM_S8_UINT;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -74,6 +62,8 @@ void ZSVulkanRenderPass::PushDepthAttachment() {
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
     //Push new attachment reference
     DepthDescriptionRef = colorAttachmentRef;
+
+    mHasDepthAttachment = true;
 }
 
 bool ZSVulkanRenderPass::Create() {
@@ -89,18 +79,19 @@ bool ZSVulkanRenderPass::Create() {
     VkSubpassDependency dependencies[2];
     dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
     dependencies[0].dstSubpass = 0;
-    dependencies[0].srcAccessMask = 0;
-    dependencies[0].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-    dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-    dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+    dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
     dependencies[1].srcSubpass = 0;
     dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
-    dependencies[1].srcAccessMask = 0;
-    dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-    dependencies[1].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-    dependencies[1].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-
+    dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+    dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
     //RENDER PASS
     VkRenderPassCreateInfo renderPassInfo = {};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -117,23 +108,33 @@ bool ZSVulkanRenderPass::Create() {
     if (vkCreateRenderPass(game_data->vk_main->mDevice->getVkDevice(), &renderPassInfo, nullptr, &mRenderPass) != VK_SUCCESS) {
         return false;
     }
+
+    mClearValuesCount = mAttachmentReferences.size() + mHasDepthAttachment;
+    mClearValues = new VkClearValue[mClearValuesCount];
+
+    for(int i = 0; i < mAttachmentReferences.size(); i ++)
+        mClearValues[i].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    if(mHasDepthAttachment)
+        mClearValues[mClearValuesCount - 1].depthStencil = { 1.0f, 0 };
+
+    mCreated = true;
+
     return true;
 }
 
 void ZSVulkanRenderPass::CmdBegin(VkCommandBuffer cmdbuf, ZSVulkanFramebuffer* framebuffer) {
-    VkRenderPassBeginInfo renderPassInfo = {};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = GetRenderPass();
-    renderPassInfo.framebuffer = framebuffer->GetFramebuffer();
+    if (mCreated) {
+        VkRenderPassBeginInfo renderPassInfo = {};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = GetRenderPass();
+        renderPassInfo.framebuffer = framebuffer->GetFramebuffer();
 
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = game_data->vk_main->mSwapChain->GetExtent();
+        renderPassInfo.renderArea.offset = { 0, 0 };
+        renderPassInfo.renderArea.extent = game_data->vk_main->mSwapChain->GetExtent();
 
-    std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[1].depthStencil = { 1.0f, 0 };
-    renderPassInfo.clearValueCount = 2;
-    renderPassInfo.pClearValues = &clearValues[0];
+        renderPassInfo.clearValueCount = mClearValuesCount;
+        renderPassInfo.pClearValues = mClearValues;
 
-    vkCmdBeginRenderPass(cmdbuf, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBeginRenderPass(cmdbuf, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    }
 }

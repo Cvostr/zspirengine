@@ -156,7 +156,7 @@
     <ClCompile Include="code\src\engine\Resources.cpp" />
     <ClCompile Include="code\src\engine\Time.cpp" />
     <ClCompile Include="code\src\engine\Window.cpp" />
-    <ClCompile Include="code\src\input\zs-input.cpp" />
+    <ClCompile Include="code\src\input\Input.cpp" />
     <ClCompile Include="code\src\math\BB3.cpp" />
     <ClCompile Include="code\src\math\Mat4.cpp" />
     <ClCompile Include="code\src\math\Quat.cpp" />

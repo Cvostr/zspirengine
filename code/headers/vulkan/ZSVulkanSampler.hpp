@@ -1,14 +1,13 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
+#include "../render/GpuObject.hpp"
 
 namespace Engine {
-	class ZSVulkanSampler {
+	class ZSVulkanSampler : public GpuObject {
 	private:
 
-		
-
-		VkSampler sampler;
+		VkSampler mSampler;
 	public:
 
 		bool CreateSampler();

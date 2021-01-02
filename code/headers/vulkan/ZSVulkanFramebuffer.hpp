@@ -2,6 +2,7 @@
 
 #include "../render/Framebuffer.hpp"
 #include "../vulkan/ZSVulkanRenderPass.hpp"
+#include "../render/GpuObject.hpp"
 #include <vulkan/vulkan.hpp>
 #include <vector>
 
@@ -19,7 +20,7 @@ namespace Engine {
         VkImageView ImageView;
     }FbAttachment;
 
-	class ZSVulkanFramebuffer {
+	class ZSVulkanFramebuffer : public GpuObject {
 	private:
 		VkFramebuffer mFramebuffer;
         std::vector<FbAttachment> Attachments;
@@ -35,5 +36,6 @@ namespace Engine {
 
 		bool Create(ZSVulkanRenderPass* renderpass);
 		ZSVulkanFramebuffer();
+        ~ZSVulkanFramebuffer();
 	};
 }

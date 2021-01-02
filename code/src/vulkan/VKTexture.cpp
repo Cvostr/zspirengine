@@ -86,18 +86,18 @@ bool Engine::vkTexture::LoadDDSTextureFromBuffer(unsigned char* data){
 		}
 	}
 
-	VkDeviceMemory tmem;
+	
 
 	VkMemoryAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = memRequirements.size;
 	allocInfo.memoryTypeIndex = memoryType;
 
-	if (vkAllocateMemory(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, nullptr, &tmem) != VK_SUCCESS) {
+	if (vkAllocateMemory(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, nullptr, &mImageMem) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate image memory!");
 	}
 
-	vkBindImageMemory(game_data->vk_main->mDevice->getVkDevice(), mImage, tmem, 0);
+	vkBindImageMemory(game_data->vk_main->mDevice->getVkDevice(), mImage, mImageMem, 0);
 
 
 
@@ -107,6 +107,8 @@ bool Engine::vkTexture::LoadDDSTextureFromBuffer(unsigned char* data){
 	//Create image view
 	CreateImageView(format);
     
+	mCreated = true;
+
     return true;
 }
 //Use in rendering pipeline
@@ -114,7 +116,13 @@ void Engine::vkTexture::Use(int slot){
 	
 }
 void Engine::vkTexture::Destroy(){
-
+	if (mCreated) {
+		VkDevice device = game_data->vk_main->mDevice->getVkDevice();
+		vkDestroyImageView(device, mImageView, nullptr);
+		vkDestroyImage(device, mImage, nullptr);
+		vkFreeMemory(device, mImageMem, nullptr);
+		mCreated = false;
+	}
 }
 
 void Engine::vkTexture::Transition(VmaVkBuffer temp) {

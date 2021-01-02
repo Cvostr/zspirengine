@@ -7,6 +7,11 @@ Engine::ZSVulkanFramebuffer::ZSVulkanFramebuffer() {
 
 }
 
+Engine::ZSVulkanFramebuffer::~ZSVulkanFramebuffer() {
+	if (mCreated)
+		vkDestroyFramebuffer(game_data->vk_main->mDevice->getVkDevice(), mFramebuffer, nullptr);
+}
+
 bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
 	VkFramebufferCreateInfo framebufferInfo = {};
 	framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -20,6 +25,9 @@ bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
 	if (vkCreateFramebuffer(game_data->vk_main->mDevice->getVkDevice(), &framebufferInfo, nullptr, &mFramebuffer) != VK_SUCCESS) {
 		return false;
 	}
+
+	mCreated = true;
+
 	return true;
 }
 
@@ -47,7 +55,7 @@ void Engine::ZSVulkanFramebuffer::PushOutputAttachment() {
 	Views.push_back(game_data->vk_main->mSwapChain->GetImageViewAtIndex(0));
 }
 void Engine::ZSVulkanFramebuffer::PushDepthAttachment(unsigned int Width, unsigned int Height) {
-	FbAttachment* att = PushAttachment(Width, Height, VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
+	FbAttachment* att = PushAttachment(Width, Height, VK_FORMAT_D24_UNORM_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
 VkImageView Engine::ZSVulkanFramebuffer::getImageView(FbAttachment* attachment) {
@@ -110,8 +118,6 @@ VkImageView Engine::ZSVulkanFramebuffer::getImageView(FbAttachment* attachment) 
 	textureImageViewInfo.subresourceRange.layerCount = 1;
 	vkCreateImageView(game_data->vk_main->mDevice->getVkDevice(), &textureImageViewInfo, nullptr, &attachment->ImageView);
 
-
-	//attachment->ImageView = RpgKit::createImageView(attachment->Image, attachment->format, attachment->aspect);
 
 	return attachment->ImageView;
 }
