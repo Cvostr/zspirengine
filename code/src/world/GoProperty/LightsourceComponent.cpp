@@ -55,7 +55,7 @@ void Engine::LightsourceProperty::loadPropertyFromMemory(const char* data, GameO
     readBinaryValue(&cl_g, data + offset, offset);
     readBinaryValue(&cl_b, data + offset, offset);
 
-    color = ZSRGBCOLOR(cl_r, cl_g, cl_b);
+    color = RGBAColor(cl_r, cl_g, cl_b);
 }
 
 void Engine::LightsourceProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
@@ -75,5 +75,5 @@ void Engine::LightsourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr*
     mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float intensity", offsetof(LightsourceProperty, intensity));
     mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float range", offsetof(LightsourceProperty, range));
     mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float spot_angle", offsetof(LightsourceProperty, spot_angle));
-    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "rgbColor color", offsetof(LightsourceProperty, color));
+    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, std::string(RGBACOLOR_TYPE_NAME) + " color", offsetof(LightsourceProperty, color));
 }

@@ -210,8 +210,8 @@ int AGScriptMgr::RegisterGlobalProperty(std::string declaration, void* pointer) 
 	return mEngine->RegisterGlobalProperty(declaration.c_str(), pointer);
 }
 
-int AGScriptMgr::RegisterObjectProperty(const char* obj, const char* declaration, int byteOffset, int compositeOffset, bool isCompositeIndirect ) {
-	return mEngine->RegisterObjectProperty(obj, declaration, byteOffset, compositeOffset, isCompositeIndirect);
+int AGScriptMgr::RegisterObjectProperty(const char* obj, std::string declaration, int byteOffset, int compositeOffset, bool isCompositeIndirect ) {
+	return mEngine->RegisterObjectProperty(obj, declaration.c_str(), byteOffset, compositeOffset, isCompositeIndirect);
 }
 
 bool AGScriptMgr::RegisterGlobalFunction(std::string func_name,

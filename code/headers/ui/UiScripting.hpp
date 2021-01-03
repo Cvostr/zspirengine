@@ -21,6 +21,7 @@ namespace Engine {
         bindViewSDK<T>(mgr, obj_type);
 
         mgr->RegisterObjectMethod(obj_type, "void setText(string)", asMETHOD(T, setText), asCALL_THISCALL);
+        mgr->RegisterObjectMethod(obj_type, "void setTextColor(RGBAColor)", asMETHOD(T, setTextColor), asCALL_THISCALL);
     }
 
     template<class T>

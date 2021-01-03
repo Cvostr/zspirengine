@@ -86,7 +86,7 @@ bool Engine::ZPScriptComponent::makeFieldsList() {
 			new_CFV->InitValue(*((Vec3*)v));
 			break;
 		case AG_RGB_COLOR:
-			new_CFV->InitValue(*((ZSRGBCOLOR*)v));
+			new_CFV->InitValue(*((RGBAColor*)v));
 			break;
 		case AG_STRING:
 			new_CFV->InitValue(*((std::string*)v));

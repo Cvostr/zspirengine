@@ -1,5 +1,4 @@
-#ifndef ZSMATH
-#define ZSMATH
+#pragma once
 
 #include <typeinfo>
 
@@ -20,15 +19,14 @@
 #include "../math/RGBColor.hpp"
 
 
-    //Converts degrees into radians
-    float DegToRad(float degrees);
+//Converts degrees into radians
+float DegToRad(float degrees);
 	
 	
-    template<typename T>
-    int sign(T value){
-        if(typeid (value) == typeid (int) || typeid (value) == typeid (float))
-            return (static_cast<float>(value) > 0) ? 1 : -1;
-        return 1;
-    }
+template<typename T>
+int sign(T value){
+    if(typeid (value) == typeid (int) || typeid (value) == typeid (float))
+        return (static_cast<float>(value) > 0) ? 1 : -1;
+    return 1;
+}
 
-#endif

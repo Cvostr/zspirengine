@@ -173,7 +173,7 @@
     <ClCompile Include="code\src\ogl\GLShader.cpp" />
     <ClCompile Include="code\src\ogl\GLTexture.cpp" />
     <ClCompile Include="code\src\ogl\GLUniformBuffer.cpp" />
-    <ClCompile Include="code\src\render\MatShaderProps.cpp" />
+    <ClCompile Include="code\src\render\MaterialTemplates.cpp" />
     <ClCompile Include="code\src\render\TerrainRender.cpp" />
     <ClCompile Include="code\src\render\Animation.cpp" />
     <ClCompile Include="code\src\render\Material.cpp" />

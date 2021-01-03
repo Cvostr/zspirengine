@@ -25,7 +25,7 @@ bool isDistanceFits(const Vec3& pos1, const Vec3& pos2, float max_dist){
     return dist <= max_dist ? true : false;
 }
 
-void ZSRGBCOLOR::updateGL() {
+void RGBAColor::updateGL() {
     this->gl_r = static_cast<float>(r) / 255;
     this->gl_g = static_cast<float>(g) / 255;
     this->gl_b = static_cast<float>(b) / 255;
