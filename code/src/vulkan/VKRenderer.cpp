@@ -50,8 +50,12 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
                 vkCmdBindDescriptorSets(mCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     obr->mat->mTemplate->Pipeline->_GetPipelineLayout(), 0,
                     2, sets, 0, nullptr);
-
+                //Send object transform
                 obr->mat->mTemplate->Pipeline->CmdPushConstants(this->mCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, &ObjectsToRender[i].transform);
+                //Send material props
+                unsigned int bufsize = obr->mat->mTemplate->mUniformBuffer->GetBufferSize();
+                void* bufdata = obr->mat->mTemplate->mUniformBuffer->GetCpuBuffer();
+                obr->mat->mTemplate->Pipeline->CmdPushConstants(mCmdBuf, VK_SHADER_STAGE_FRAGMENT_BIT, 64, bufsize, bufdata);
             }
                 if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
                     obj->DrawMesh(this);

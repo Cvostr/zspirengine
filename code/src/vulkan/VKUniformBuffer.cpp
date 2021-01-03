@@ -16,7 +16,8 @@ void Engine::vkUniformBuffer::init(unsigned int slot, unsigned int size, bool Cr
     }
 }
 void Engine::vkUniformBuffer::writeData(unsigned int offset, unsigned int size, void* data){
-    writeDataBuffered(offset, size, data);
+    if(mCreated)
+        writeDataBuffered(offset, size, data);
 }
 
 void Engine::vkUniformBuffer::updateBufferedData() {
@@ -28,7 +29,10 @@ void Engine::vkUniformBuffer::bind(){
 }
 
 void Engine::vkUniformBuffer::Destroy() {
-   // vkDestroyBuffer(game_data->vk_main->mDevice->getVkDevice(), this->mVkBuffer, nullptr);
+    if (!mCreated) {
+        game_data->vk_main->mVMA->destroyBuffer(&mVkBuffer);
+        mCreated = false;
+    }
 }
 
 Engine::vkUniformBuffer::vkUniformBuffer(){

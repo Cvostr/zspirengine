@@ -15,6 +15,7 @@ namespace Engine {
         void setMeshData(ZSVERTEX* vertices, unsigned int vertices_num);
         void Draw(VkCommandBuffer CmdBuf);
         void Draw();
+        void DrawInstanced(VkCommandBuffer CmdBuf, unsigned int instances);
         void DrawInstanced(unsigned int instances);
         void Destroy();
 

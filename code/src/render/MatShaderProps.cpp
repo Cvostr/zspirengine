@@ -61,7 +61,7 @@ void MaterialTemplate::CreateVulkanPipeline() {
 }
 
 void MaterialTemplate::MakeDescrSetUniform(Engine::ZSVulkanDescriptorSet* DescrSet) {
-    DescrSet->pushUniformBuffer((Engine::vkUniformBuffer*)game_data->pipeline->GetTransformUniformBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
+    DescrSet->pushUniformBuffer((Engine::vkUniformBuffer*)game_data->pipeline->GetTransformUniformBuffer(), VK_SHADER_STAGE_ALL_GRAPHICS);
     DescrSet->getDescriptorSetLayout();
 }
 

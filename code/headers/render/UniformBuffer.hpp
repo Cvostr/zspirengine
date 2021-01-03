@@ -15,6 +15,7 @@ public:
     virtual void bind() {}
     virtual void writeData(unsigned int offset, unsigned int size, void* data) {}
     void writeDataBuffered(unsigned int offset, unsigned int size, void* data);
+    char* GetCpuBuffer() { return mCpuBuffer; }
     virtual void updateBufferedData(){}
     virtual void Destroy(){}
     unsigned int GetSlotId() { return mSlot; }

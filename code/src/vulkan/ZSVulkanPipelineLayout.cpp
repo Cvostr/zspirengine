@@ -8,12 +8,13 @@ using namespace Engine;
 
 void ZsVkPipelineLayoutConf::AddPushConstant(unsigned int size, VkShaderStageFlagBits flag) {
     VkPushConstantRange PCRange = {};
+
     PCRange.offset = mPushConstantBuffersSize;
+    mPushConstantBuffersSize += size;
+
     PCRange.size = size;
     PCRange.stageFlags = flag;
     this->mPushConstants.push_back(PCRange);
-
-    mPushConstantBuffersSize += size;
 }
 
 VkDescriptorSet* Engine::ZSVulkanPipelineLayout::GetDescriptorsSets() {

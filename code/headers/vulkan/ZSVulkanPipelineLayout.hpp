@@ -12,6 +12,7 @@ namespace Engine {
 		ZSVulkanDescriptorSet* DescrSetLayoutSampler;
 
 		unsigned int mPushConstantBuffersSize;
+
 		std::vector<VkPushConstantRange> mPushConstants;
 
 		void AddPushConstant(unsigned int size, VkShaderStageFlagBits flag);

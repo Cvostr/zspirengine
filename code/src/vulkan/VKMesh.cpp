@@ -8,7 +8,7 @@ Engine::vkMesh::vkMesh(){
 }
 
 Engine::vkMesh::~vkMesh(){
-
+    Destroy();
 }
 
 void Engine::vkMesh::Init() {
@@ -16,7 +16,12 @@ void Engine::vkMesh::Init() {
 }
 
 void Engine::vkMesh::Destroy() {
-    game_data->vk_main->mVMA->destroyBuffer(&vertexBuffer);
+    if (mCreated) {
+        game_data->vk_main->mVMA->destroyBuffer(&vertexBuffer);
+        if(this->mIndicesNum == NO_INDICES)
+            game_data->vk_main->mVMA->destroyBuffer(&indexBuffer);
+        mCreated = false;
+    }
 }
 
 void Engine::vkMesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsigned int vertices_num, unsigned int indices_num){
@@ -26,16 +31,8 @@ void Engine::vkMesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsi
     //Allocate buffer
     game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &this->vertexBuffer, vertices, vertices_num * sizeof(ZSVERTEX));
     game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, &this->indexBuffer, indices, indices_num * sizeof(unsigned int));
-    /*void* vert;
-    void* ind;
-    game_data->vk_main->mVMA->allocateCpu(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &this->vertexBuffer, vertices_num * sizeof(ZSVERTEX), (void**)&vert);
-    game_data->vk_main->mVMA->allocateCpu(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, &this->indexBuffer, indices_num * sizeof(unsigned int), (void**)&ind);
 
-    memcpy(vert, vertices, vertices_num * sizeof(ZSVERTEX));
-    memcpy(ind, indices, indices_num * sizeof(unsigned int));
-
-    game_data->vk_main->mVMA->unmap(&vertexBuffer);
-    game_data->vk_main->mVMA->unmap(&indexBuffer);*/
+    mCreated = true;
 }
 void Engine::vkMesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){
 
@@ -45,6 +42,8 @@ void Engine::vkMesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){
     game_data->vk_main->mVMA->allocateCpu(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &this->vertexBuffer, vertices_num * sizeof(ZSVERTEX), &vert);
     memcpy(vert, vertices, vertices_num * sizeof(ZSVERTEX));
     game_data->vk_main->mVMA->unmap(&vertexBuffer);
+
+    mCreated = true;
 }
 
 void Engine::vkMesh::Draw() {
@@ -52,19 +51,24 @@ void Engine::vkMesh::Draw() {
 }
 
 void Engine::vkMesh::DrawInstanced(unsigned int instances) {
-    Draw(game_data->vk_main->CurrentCmdBuffer);
+    DrawInstanced(game_data->vk_main->CurrentCmdBuffer, instances);
+}
+
+void Engine::vkMesh::DrawInstanced(VkCommandBuffer CmdBuf, unsigned int instances) {
+    VkDeviceSize offsets[] = { 0 };
+    vkCmdBindVertexBuffers(CmdBuf, 0, 1, &this->vertexBuffer.Buffer, offsets);
+
+    if (this->mIndicesNum != NO_INDICES) { //if object uses indices
+        vkCmdBindIndexBuffer(CmdBuf, indexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+        //Indexed draw
+        vkCmdDrawIndexed(CmdBuf, mIndicesNum, 1, instances, 0, 0);
+    }
+    else {
+        //Draw without indices
+        vkCmdDraw(CmdBuf, mVerticesNum, 1, instances, 0);
+    }
 }
 
 void Engine::vkMesh::Draw(VkCommandBuffer CmdBuf){
-    VkDeviceSize offsets[] = {0};
-    vkCmdBindVertexBuffers(CmdBuf, 0, 1, &this->vertexBuffer.Buffer, offsets);
-
-    if (this->mIndicesNum != NO_INDICES){ //if object uses indices
-        vkCmdBindIndexBuffer(CmdBuf, indexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
-        //Indexed draw
-        vkCmdDrawIndexed(CmdBuf, mIndicesNum, 1, 0, 0, 0);
-    }else {
-        //Draw without indices
-        vkCmdDraw(CmdBuf, mVerticesNum, 1, 0, 0);
-    }
+    DrawInstanced(game_data->vk_main->CurrentCmdBuffer, 0);
 }
