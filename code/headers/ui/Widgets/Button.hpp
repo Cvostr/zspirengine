@@ -2,21 +2,22 @@
 
 #include "../../game.h"
 #include "Widget.hpp"
-#include "../../math/Vec3.hpp"
+
 
 namespace Engine {
 
     typedef struct ButtonStyle {
-        TextureResource* default_sprite;
-        TextureResource* hovered_sprite;
+        TextureResource* mCommonSprite;
+        TextureResource* mHoveredSprite;
 
-        Vec3 text_color;
-        Vec3 text_color_hovered;
+        RGBAColor mTextColor;
+        RGBAColor mTextColorHovered;
 
         ViewSize size;
 
-        ButtonStyle() : default_sprite(nullptr),
-                        hovered_sprite(nullptr)
+        ButtonStyle() : 
+            mCommonSprite(nullptr),
+            mHoveredSprite(nullptr)
         {
             size.WIDTH = 100;
             size.HEIGHT = 50;
@@ -28,11 +29,11 @@ namespace Engine {
     private:
         
 
-        TextureResource* common_sprite;
-        TextureResource* hovered_sprite;
+        TextureResource* mCommonSprite;
+        TextureResource* mHoveredSprite;
     public:
-        void SetDefaultSprite(TextureResource* sprite) { common_sprite = sprite; }
-        void SetHoveredSprite(TextureResource* sprite) { hovered_sprite = sprite; }
+        void SetDefaultSprite(TextureResource* sprite) { mCommonSprite = sprite; }
+        void SetHoveredSprite(TextureResource* sprite) { mHoveredSprite = sprite; }
 
         void draw();
 

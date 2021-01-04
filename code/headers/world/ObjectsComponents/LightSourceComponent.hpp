@@ -22,7 +22,7 @@ namespace Engine {
         Vec3 last_pos; //transform* last position
         Vec3 last_rot; //transform* last rotation
 
-        ZSRGBCOLOR color; //Color of light
+        RGBAColor color; //Color of light
         float intensity; //Light's intensity
         float range; //Light's range
         float spot_angle;

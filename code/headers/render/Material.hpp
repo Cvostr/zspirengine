@@ -164,7 +164,7 @@ public:
 };
 class ColorMtShPropConf : public MaterialShaderPropertyConf{
 public:
-    ZSRGBCOLOR color;
+    RGBAColor color;
 
     ColorMtShPropConf();
 };

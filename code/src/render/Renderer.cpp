@@ -15,7 +15,7 @@ extern ZSpireEngine* engine_ptr;
 extern ZSGAME_DATA* game_data;
 
 void Engine::RenderSettings::defaults(){
-    ambient_light_color = ZSRGBCOLOR(255, 255, 255, 255);
+    ambient_light_color = RGBAColor(255, 255, 255, 255);
     resetPointers();
 }
 
@@ -30,7 +30,7 @@ Engine::Renderer::Renderer(){
     this->current_state = PIPELINE_STATE::PIPELINE_STATE_DEFAULT;
     this->cullFaces = false;
 
-    this->ui_shader = Engine::allocShader();
+    this->mUiShader = Engine::allocShader();
 
     if (engine_ptr->desc->game_perspective == PERSP_2D) {
         this->tile_shader = allocShader();
@@ -39,9 +39,9 @@ Engine::Renderer::Renderer(){
         this->default3d = allocShader();
         this->deffered_light = allocShader();
         this->skybox_shader = allocShader();
-        this->terrain_shader = allocShader();
+        this->mTerrainShader = allocShader();
         this->grass_shader = allocShader();
-        this->shadowMap = allocShader();
+        this->mShadowMapShader = allocShader();
         this->final_shader = allocShader();
         this->water_shader = allocShader();
 
@@ -110,7 +110,7 @@ void Engine::Renderer::destroy(){
         delete tile_shader;
     }
 
-    delete ui_shader;
+    delete mUiShader;
 
     delete lightsBuffer;
     delete transformBuffer;
@@ -123,9 +123,9 @@ void Engine::Renderer::destroy(){
         delete deffered_light;
         delete default3d;
         delete skybox_shader;
-        delete terrain_shader;
+        delete mTerrainShader;
         delete grass_shader;
-        delete shadowMap;
+        delete mShadowMapShader;
         delete water_shader;
 
         delete gbuffer;
@@ -380,7 +380,7 @@ void Engine::Renderer::renderUI() {
 }
 
 void Engine::Renderer::renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY){
-    this->ui_shader->Use();
+    this->mUiShader->Use();
     uiUniformBuffer->bind();
 
     int _render_mode = 1;
@@ -405,8 +405,8 @@ void Engine::Renderer::renderSprite(Engine::TextureResource* texture_sprite, int
     }
 }
 
-void Engine::Renderer::renderGlyph(Engine::Texture* glyph, int X, int Y, int scaleX, int scaleY, ZSRGBCOLOR color){
-    this->ui_shader->Use();
+void Engine::Renderer::renderGlyph(Engine::Texture* glyph, int X, int Y, int scaleX, int scaleY, RGBAColor color){
+    this->mUiShader->Use();
     uiUniformBuffer->bind();
     //tell shader, that we will render glyph
     int _render_mode = 2;
@@ -429,29 +429,12 @@ void Engine::Renderer::renderGlyph(Engine::Texture* glyph, int X, int Y, int sca
     Engine::getUiSpriteMesh2D()->Draw();
 }
 
-
-Engine::Shader* Engine::Renderer::getTileShader(){
-    return this->tile_shader;
-}
-
-Engine::Shader* Engine::Renderer::getShadowmapShader(){
-    return this->shadowMap;
-}
-
-Engine::Shader* Engine::Renderer::getUiShader() {
-    return this->ui_shader;
-}
-
 void Engine::Renderer::addLight(void* light_ptr){
     this->lights_ptr.push_back(light_ptr);
 }
 
 void Engine::Renderer::removeLights(){
     this->lights_ptr.clear();
-}
-
-Engine::RenderSettings* Engine::Renderer::getRenderSettings(){
-    return &this->render_settings;
 }
 
 void Engine::Renderer::TryRenderShadows(Engine::Camera* cam) {

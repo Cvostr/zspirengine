@@ -1,6 +1,6 @@
 #pragma once
 
-class ZSRGBCOLOR {
+class RGBAColor {
 public:
 	int r;
 	int g;
@@ -15,7 +15,7 @@ public:
 	void updateGL();
 
 
-	ZSRGBCOLOR& operator=(ZSRGBCOLOR r) {
+	RGBAColor& operator=(RGBAColor r) {
 		this->r = r.r;
 		g = r.g;
 		b = r.b;
@@ -24,7 +24,7 @@ public:
 		return *this;
 	}
 
-	ZSRGBCOLOR(int r, int g, int b, int a) {
+	RGBAColor(int r, int g, int b, int a) {
 		this->r = r;
 		this->g = g;
 		this->b = b;
@@ -32,7 +32,7 @@ public:
 
 		this->updateGL();
 	}
-	ZSRGBCOLOR(int r, int g, int b) {
+	RGBAColor(int r, int g, int b) {
 		this->r = r;
 		this->g = g;
 		this->b = b;
@@ -41,7 +41,7 @@ public:
 		this->updateGL();
 	}
 
-	ZSRGBCOLOR() {
+	RGBAColor() {
 		this->r = 255;
 		this->g = 255;
 		this->b = 255;

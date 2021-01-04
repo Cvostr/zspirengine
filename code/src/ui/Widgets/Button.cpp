@@ -3,11 +3,12 @@
 
 extern ZSGAME_DATA* game_data;
 
-Engine::Button::Button(unsigned int Width, unsigned int Height) {
-    this->common_sprite = nullptr;
-    this->hovered_sprite = nullptr;
+Engine::Button::Button(unsigned int Width, unsigned int Height) :
+    mCommonSprite(nullptr),
+    mHoveredSprite(nullptr)
+{
     //Call resize function
-    //resize(Width, Height);
+    resize(Width, Height);
 }
 
 Engine::Button::Button(ButtonStyle* style) {
@@ -19,24 +20,31 @@ Engine::Button::~Button(){
 }
 
 void Engine::Button::SetStyle(ButtonStyle* style) {
-    common_sprite = style->default_sprite;
-    hovered_sprite = style->hovered_sprite;
+    mCommonSprite = style->mCommonSprite;
+    mHoveredSprite = style->mHoveredSprite;
+
+    mTextColor = style->mTextColor;
+    mTextColorHovered = style->mTextColorHovered;
     //Call resize function
     resize(style->size.WIDTH, style->size.HEIGHT);
 }
 
 void Engine::Button::draw(){
+    RGBAColor TextColor;
     ViewSize pvSize;
     ViewPosition pvPos;
     __GetTransform(pvSize, pvPos);
 
-    if(IWidget::isHoveredByMouse())
-        game_data->pipeline->renderSprite(hovered_sprite, pvPos.posX, pvPos.posY, pvSize.WIDTH, pvSize.HEIGHT);
-    else
-        game_data->pipeline->renderSprite(common_sprite, pvPos.posX, pvPos.posY, pvSize.WIDTH, pvSize.HEIGHT);
-    
+    if (IWidget::isHoveredByMouse()) {
+        game_data->pipeline->renderSprite(mHoveredSprite, pvPos.posX, pvPos.posY, pvSize.WIDTH, pvSize.HEIGHT);
+        TextColor = this->mTextColorHovered;
+    }
+    else {
+        game_data->pipeline->renderSprite(mCommonSprite, pvPos.posX, pvPos.posY, pvSize.WIDTH, pvSize.HEIGHT);
+        TextColor = this->mTextColor;
+    }
     GlyphFontContainer* c = game_data->resources->getFontByLabel("LiberationMono-Regular")->font_ptr;
 
     if(TextContent != nullptr)
-        c->DrawString(this->TextContent->STR[0].c_str(), this->TextContent->STR[0].size(), Vec2(pvPos.posX, pvPos.posY));
+        c->DrawString(this->TextContent->STR[0].c_str(), this->TextContent->STR[0].size(), Vec2(pvPos.posX, pvPos.posY), TextColor);
 }

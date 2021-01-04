@@ -25,7 +25,7 @@
 
 #define VEC3_TYPE_NAME "Vec3"
 #define QUAT_TYPE_NAME "Quat"
-#define RGBCOLOR_TYPE_NAME "rgbColor"
+#define RGBACOLOR_TYPE_NAME "RGBAColor"
 #define CAM_TYPE_NAME "Camera"
 #define KEY_TYPE_NAME "Key"
 #define MOUSE_STATE_NAME "MouseState"
@@ -115,7 +115,7 @@ namespace Engine {
         int RegisterObjectType(const char* name, int byteSize, asDWORD flags);
         int RegisterObjectMethod(const char* obj, std::string declaration, const asSFuncPtr& funcPointer, asDWORD callConv, void* auxiliary = 0, int compositeOffset = 0, bool isCompositeIndirect = false);
         int RegisterGlobalProperty(std::string declaration, void* pointer);
-        int RegisterObjectProperty(const char* obj, const char* declaration, int byteOffset, int compositeOffset = 0, bool isCompositeIndirect = false);
+        int RegisterObjectProperty(const char* obj, std::string declaration, int byteOffset, int compositeOffset = 0, bool isCompositeIndirect = false);
 
         int RegisterObjectBehaviour(const char* obj, asEBehaviours behaviour, const char* declaration, const asSFuncPtr& funcPointer, asDWORD callConv, void* auxiliary = 0, int compositeOffset = 0, bool isCompositeIndirect = false);
         bool RegisterGlobalFunction(std::string func_name,
