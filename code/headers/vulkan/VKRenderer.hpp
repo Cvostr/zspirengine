@@ -29,9 +29,9 @@ namespace Engine {
 		VkCommandBuffer mCmdBuf;
 		VkCommandPool commandPool;
 
-		ZSVulkanPipeline* MainPipeline;
+		ZSVulkanPipeline* DefferedPipeline;
 
-		ZSVulkanFramebuffer* TestFb;
+		ZSVulkanFramebuffer* MaterialFb;
 		ZSVulkanRenderPass* MaterialRenderPass;
 
 		ZSVulkanFramebuffer* OutFb;

@@ -29,7 +29,7 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
 
     game_data->vk_main->CurrentCmdBuffer = mCmdBuf;
 
-    MaterialRenderPass->CmdBegin(mCmdBuf, TestFb);
+    MaterialRenderPass->CmdBegin(mCmdBuf, MaterialFb);
 
     bool binded = false;
 
@@ -101,11 +101,8 @@ void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
 }
 
 void Engine::VKRenderer::InitShaders() {
-    this->default3d->compileFromFile("Shaders/vulkan_test/vert.spv", "Shaders/vulkan_test/frag.spv");
-
-    OutRenderPass = new ZSVulkanRenderPass;
-    OutRenderPass->PushColorOutputAttachment();
-    OutRenderPass->Create();
+    this->default3d->compileFromFile("Shaders/vulkan_test/3d/vert.spv", "Shaders/vulkan_test/3d/frag.spv");
+    this->deffered_light->compileFromFile("Shaders/vulkan_test/deffered/vert.spv", "Shaders/vulkan_test/deffered/frag.spv");
 
 
     MaterialRenderPass = new ZSVulkanRenderPass;
@@ -115,24 +112,31 @@ void Engine::VKRenderer::InitShaders() {
     MaterialRenderPass->PushDepthAttachment();
     MaterialRenderPass->Create();
 
-
     game_data->vk_main->mMaterialsRenderPass = MaterialRenderPass;
 
     mMaterialSampler = new ZSVulkanSampler;
     mMaterialSampler->CreateSampler();
     game_data->vk_main->mDefaultTextureSampler = mMaterialSampler;
 
+
+    MaterialFb = new ZSVulkanFramebuffer;
+    MaterialFb->PushAttachment(640, 480, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+    MaterialFb->PushAttachment(640, 480, VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+    MaterialFb->PushAttachment(640, 480, VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+    MaterialFb->PushDepthAttachment(640, 480);
+    MaterialFb->Create(MaterialRenderPass);
+    
+
+    OutRenderPass = new ZSVulkanRenderPass;
+    OutRenderPass->PushColorOutputAttachment();
+    OutRenderPass->Create();
+
     OutFb = new ZSVulkanFramebuffer;
     OutFb->PushOutputAttachment();
     OutFb->Create(OutRenderPass);
 
-    TestFb = new ZSVulkanFramebuffer;
-    TestFb->PushAttachment(640, 480, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
-    TestFb->PushAttachment(640, 480, VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
-    TestFb->PushAttachment(640, 480, VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
-    TestFb->PushDepthAttachment(640, 480);
-    TestFb->Create(MaterialRenderPass);
-    
+
+
 
 	VkSemaphoreCreateInfo semaphoreInfo = {};
 	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
