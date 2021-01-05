@@ -16,6 +16,7 @@ void Engine::GLRenderer::InitShaders() {
     
 
     this->mUiShader->compileFromFile("Shaders/ui/ui.vert", "Shaders/ui/ui.frag");
+    this->mTextShader->compileFromFile("Shaders/ui/ui.vert", "Shaders/ui/text.frag");
 
     if (engine_ptr->desc->game_perspective == PERSP_2D) {
         this->tile_shader->compileFromFile("Shaders/2d_tile/tile2d.vert", "Shaders/2d_tile/tile2d.frag");
@@ -24,14 +25,14 @@ void Engine::GLRenderer::InitShaders() {
 
         this->deffered_light->compileFromFile("Shaders/postprocess/deffered_light/deffered.vert", "Shaders/postprocess/deffered_light/deffered.frag");
         this->default3d->compileFromFile("Shaders/3d/3d.vert", "Shaders/3d/3d.frag");
-        this->skybox_shader->compileFromFile("Shaders/skybox/skybox.vert", "Shaders/skybox/skybox.frag");
+        this->mSkyboxShader->compileFromFile("Shaders/skybox/skybox.vert", "Shaders/skybox/skybox.frag");
         this->mTerrainShader->compileFromFile("Shaders/heightmap/heightmap.vert", "Shaders/heightmap/heightmap.frag");
         this->grass_shader->compileFromFile("Shaders/heightmap/grass.vert", "Shaders/heightmap/grass.frag");
         this->mShadowMapShader->compileFromFile("Shaders/shadowmap/shadowmap.vert", "Shaders/shadowmap/shadowmap.frag", "Shaders/shadowmap/shadowmap.geom");
         this->final_shader->compileFromFile("Shaders/postprocess/final/final.vert", "Shaders/postprocess/final/final.frag");
         this->water_shader->compileFromFile("Shaders/water/water.vert", "Shaders/water/water.frag");
 
-        MtShProps::genDefaultMtShGroup(default3d, skybox_shader, mTerrainShader, water_shader);
+        MtShProps::genDefaultMtShGroup(default3d, mSkyboxShader, mTerrainShader, water_shader);
     }
 }
 

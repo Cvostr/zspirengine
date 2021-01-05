@@ -267,7 +267,7 @@
     <ClInclude Include="code\headers\engine\Time.hpp" />
     <ClInclude Include="code\headers\engine_types.h" />
     <ClInclude Include="code\headers\game.h" />
-    <ClInclude Include="code\headers\input\zs-input.h" />
+    <ClInclude Include="code\headers\input\Input.hpp" />
     <ClInclude Include="code\headers\math\BB3.hpp" />
     <ClInclude Include="code\headers\math\Mat4.hpp" />
     <ClInclude Include="code\headers\math\Quat.hpp" />

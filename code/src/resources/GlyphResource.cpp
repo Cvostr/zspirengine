@@ -25,7 +25,6 @@ void Engine::GlyphResource::load() {
         this->resource_state = RESOURCE_STATE::STATE_LOADED;
 
         font_ptr = new GlyphFontContainer(request->data, request->size, 48, game_data->glyph_manager);
-        font_ptr->loadGlyphs();
 
         delete[] request->data;
         delete this->request;

@@ -38,13 +38,13 @@ Engine::Renderer::Renderer(){
     if (engine_ptr->desc->game_perspective == PERSP_3D) {
         this->default3d = allocShader();
         this->deffered_light = allocShader();
-        this->skybox_shader = allocShader();
+        this->mSkyboxShader = allocShader();
         this->mTerrainShader = allocShader();
         this->grass_shader = allocShader();
         this->mShadowMapShader = allocShader();
         this->final_shader = allocShader();
         this->water_shader = allocShader();
-
+        this->mTextShader = allocShader();
     }
 
     //Allocate transform buffer
@@ -76,7 +76,10 @@ Engine::Renderer::Renderer(){
     skyboxTransformUniformBuffer->init(6, sizeof(Mat4) * 2);
 
     uiUniformBuffer = Engine::allocUniformBuffer();
-    uiUniformBuffer->init(7, sizeof(Mat4) * 2 + 16 + 16);
+    uiUniformBuffer->init(7, sizeof(Mat4) * 2 + 16);
+
+    TextUniformBuffer = Engine::allocUniformBuffer();
+    TextUniformBuffer->init(10, 16 * 2);
 
     {
         instancedTransformBuffer = Engine::allocUniformBuffer();
@@ -122,7 +125,7 @@ void Engine::Renderer::destroy(){
     if(engine_ptr->desc->game_perspective == PERSP_3D){
         delete deffered_light;
         delete default3d;
-        delete skybox_shader;
+        delete mSkyboxShader;
         delete mTerrainShader;
         delete grass_shader;
         delete mShadowMapShader;
@@ -384,7 +387,7 @@ void Engine::Renderer::renderSprite(Engine::Texture* texture_sprite, int X, int 
     uiUniformBuffer->bind();
 
     int _render_mode = 1;
-    uiUniformBuffer->writeData(sizeof (Mat4) * 2 , 4, &_render_mode);
+    //uiUniformBuffer->writeData(sizeof (Mat4) * 2 , 4, &_render_mode);
     //Use texture at 0 slot
     texture_sprite->Use(0);
 
@@ -405,25 +408,34 @@ void Engine::Renderer::renderSprite(Engine::TextureResource* texture_sprite, int
     }
 }
 
-void Engine::Renderer::renderGlyph(Engine::Texture* glyph, int X, int Y, int scaleX, int scaleY, RGBAColor color){
-    this->mUiShader->Use();
-    uiUniformBuffer->bind();
-    //tell shader, that we will render glyph
-    int _render_mode = 2;
-    uiUniformBuffer->writeData(sizeof (Mat4) * 2 , 4, &_render_mode);
+void Engine::Renderer::renderGlyph(CharacterGlyph* glyph, int X, int Y, int scaleX, int scaleY, RGBAColor color){
+    this->mTextShader->Use();
+    TextUniformBuffer->bind();
     //sending glyph color
-    uiUniformBuffer->writeData(sizeof (Mat4) * 2 + 16, 4, &color.gl_r);
-    uiUniformBuffer->writeData(sizeof (Mat4) * 2 + 4 + 16, 4, &color.gl_g);
-    uiUniformBuffer->writeData(sizeof (Mat4) * 2 + 8 + 16, 4, &color.gl_b);
+    TextUniformBuffer->writeData(0, 4, &color.gl_r);
+    TextUniformBuffer->writeData(4, 4, &color.gl_g);
+    TextUniformBuffer->writeData(8, 4, &color.gl_b);
     //Use texture at 0 slot
-    glyph->Use(0);
+    //glyph->Use(0);
+    Vec2 uv_start = glyph->mGlyphTextureStart;
+    Vec2 uv_end = glyph->mGlyphSize;
 
+
+    uv_start /= 2048.f;
+    uv_end /= 2048.f;
+
+    TextUniformBuffer->writeData(16, 4, &uv_start.X);
+    TextUniformBuffer->writeData(16 + 4, 4, &uv_start.Y);
+
+    TextUniformBuffer->writeData(16 + 8, 4, &uv_end.X);
+    TextUniformBuffer->writeData(16 + 12, 4, &uv_end.Y);
 
     Mat4 translation = getTranslationMat(static_cast<float>(X), static_cast<float>(Y), 0.0f);
     Mat4 scale = getScaleMat(static_cast<float>(scaleX), static_cast<float>(scaleY), 0.0f);
     Mat4 transform = scale * translation;
 
     //Push glyph transform
+    uiUniformBuffer->bind();
     uiUniformBuffer->writeData(sizeof (Mat4), sizeof (Mat4), &transform);
 
     Engine::getUiSpriteMesh2D()->Draw();

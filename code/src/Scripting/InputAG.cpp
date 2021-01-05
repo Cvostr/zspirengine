@@ -1,5 +1,5 @@
 #include "../../headers/Scripting/AngelScriptMgr.h"
-#include "../../headers/input/zs-input.h"
+#include "../../headers/input/Input.hpp"
 #include <SDL2/SDL.h>
 
 void bindKeyCodes(Engine::AGScriptMgr* mgr) {

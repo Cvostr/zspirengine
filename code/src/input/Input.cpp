@@ -1,4 +1,4 @@
-#include "../../headers/input/zs-input.h"
+#include "../../headers/input/Input.hpp"
 
 #define KEYS_QUEUE_SIZE 10
 #define KEY_NONE -200

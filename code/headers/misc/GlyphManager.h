@@ -10,6 +10,7 @@
 #include "ft2build.h"
 
 #include FT_FREETYPE_H
+#define texSize 2048
 
 class GlyphManager;
 
@@ -17,18 +18,20 @@ class CharacterGlyph{
 private:
 
 public:
-    Vec2 glyph_size;
-    Vec2 glyph_bearing;
-    Vec2 glyph_advance;
-
-    Engine::Texture* texture;
-    unsigned char* texture_buffer;
+    Vec2 mGlyphSize;
+    Vec2 mGlyphBearing;
+    Vec2 mGlyphAdvance;
+    Vec2 mGlyphTextureStart;
 
     CharacterGlyph();
 };
 
 class GlyphFontContainer{
 private:
+    unsigned char* mGlyphTextureBuffer;
+    Engine::Texture* mGlyphTexture;
+
+
     FT_Face font;
     std::map<unsigned int, CharacterGlyph*> characters;
     GlyphManager* manager_ptr;
@@ -36,8 +39,13 @@ public:
     GlyphFontContainer(unsigned char* data, unsigned int bsize, unsigned int size, GlyphManager* manager);
     ~GlyphFontContainer();
 
-    void loadGlyphs();
-    void loadGlyph(unsigned int index);
+    void loadGlyphs(unsigned int& WorkX,
+                    unsigned int& WorkY,
+                    unsigned int& MaxY);
+    void loadGlyph(unsigned int index,
+                    unsigned int& WorkX,
+                    unsigned int& WorkY,
+                    unsigned int& MaxY);
 
     void DrawChar(int _char, Vec2 pos, unsigned int* char_length, RGBAColor color);
     void DrawString(const char32_t* string, unsigned int len, Vec2 pos, RGBAColor color = RGBAColor(255,255,255));

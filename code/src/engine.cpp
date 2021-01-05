@@ -3,7 +3,7 @@
 #include "../headers/game.h"
 #include <GL/glew.h>
 #include <iostream>
-#include "../headers/input/zs-input.h"
+#include "../headers/input/Input.hpp"
 #include "../headers/engine/Logger.hpp"
 #include "../headers/ogl/GLRenderer.hpp"
 #include "../headers/vulkan/VKRenderer.hpp"

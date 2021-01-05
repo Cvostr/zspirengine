@@ -67,10 +67,11 @@ public:
     Engine::Shader* deffered_light;
     Engine::Shader* default3d;
     Engine::Shader* mTerrainShader;
-    Engine::Shader* skybox_shader;
+    Engine::Shader* mSkyboxShader;
     Engine::Shader* grass_shader;
     Engine::Shader* mShadowMapShader;
     Engine::Shader* mUiShader;
+    Engine::Shader* mTextShader;
     Engine::Shader* final_shader;
     Engine::Shader* water_shader;
 
@@ -82,7 +83,8 @@ public:
     UniformBuffer* tileBuffer;  //5
     UniformBuffer* skyboxTransformUniformBuffer; //6
     UniformBuffer* uiUniformBuffer; //7
-    UniformBuffer* instancedTransformBuffer; //8
+    UniformBuffer* instancedTransformBuffer; //9
+    UniformBuffer* TextUniformBuffer; //10
 
     RenderSettings* getRenderSettings() { return &this->render_settings; }
     Engine::Shader* getTileShader() { return tile_shader; }
@@ -103,7 +105,7 @@ public:
 
     void renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY);
     void renderSprite(Engine::TextureResource* texture_sprite, int X, int Y, int scaleX, int scaleY);
-    void renderGlyph(Engine::Texture* glyph, int X, int Y, int scaleX, int scaleY, RGBAColor color);
+    void renderGlyph(CharacterGlyph* glyph, int X, int Y, int scaleX, int scaleY, RGBAColor color);
 
     void render();
     virtual void render2D(){}
