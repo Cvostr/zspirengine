@@ -18,6 +18,13 @@ ZSVulkanRenderPass::~ZSVulkanRenderPass() {
 }
 
 void ZSVulkanRenderPass::PushColorAttachment(VkFormat Format, VkImageLayout Layout) {
+    VkImageLayout imgLayout;
+
+    //if (Layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+ //      imgLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+   // else
+        imgLayout = Layout;
+
     VkAttachmentDescription colorAttachment = {};
     colorAttachment.format = Format;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -26,9 +33,10 @@ void ZSVulkanRenderPass::PushColorAttachment(VkFormat Format, VkImageLayout Layo
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    colorAttachment.finalLayout = Layout;
+    colorAttachment.finalLayout = imgLayout;
     //Push new attachment description
     mAttachmentDescriptions.push_back(colorAttachment);
+
 
     //Create Attachment Reference for Depth Attachment
     VkAttachmentReference colorAttachmentRef = {};
@@ -74,7 +82,8 @@ bool ZSVulkanRenderPass::Create() {
     subpass.colorAttachmentCount =
         static_cast<uint32_t>(mAttachmentReferences.size());
     subpass.pColorAttachments = mAttachmentReferences.data();
-    subpass.pDepthStencilAttachment = &DepthDescriptionRef;
+    if (mHasDepthAttachment)
+        subpass.pDepthStencilAttachment = &DepthDescriptionRef;
 
     VkSubpassDependency dependencies[2];
     dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;

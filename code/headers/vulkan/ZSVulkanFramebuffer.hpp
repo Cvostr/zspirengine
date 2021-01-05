@@ -29,6 +29,7 @@ namespace Engine {
 
         VkFramebuffer GetFramebuffer() { return mFramebuffer; }
 
+        VkImageView getImageViewIndex(unsigned int i) { return Views[i]; }
         VkImageView getImageView(FbAttachment* attachment);
         FbAttachment* PushAttachment(unsigned int Width, unsigned int Height, VkFormat format, VkImageUsageFlagBits usage, VkImageAspectFlagBits aspect);
         void PushOutputAttachment();

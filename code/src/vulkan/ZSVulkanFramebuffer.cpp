@@ -60,6 +60,17 @@ void Engine::ZSVulkanFramebuffer::PushDepthAttachment(unsigned int Width, unsign
 
 VkImageView Engine::ZSVulkanFramebuffer::getImageView(FbAttachment* attachment) {
 
+	VkImageLayout imageLayout;
+
+	if (attachment->usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
+	{
+		imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	}
+	if (attachment->usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
+	{
+		imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	}
+
 	VkImageCreateInfo imageInfo{};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imageInfo.flags = 0; // Optional
@@ -71,8 +82,8 @@ VkImageView Engine::ZSVulkanFramebuffer::getImageView(FbAttachment* attachment) 
 	imageInfo.arrayLayers = 1;
 	imageInfo.format = attachment->format;
 	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-	imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	imageInfo.usage = attachment->usage;
+	imageInfo.initialLayout = imageLayout;
+	imageInfo.usage = attachment->usage | VK_IMAGE_USAGE_SAMPLED_BIT;
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 

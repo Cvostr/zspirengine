@@ -24,9 +24,12 @@ namespace Engine {
 	class VKRenderer : public Renderer{
 	private:
 		VkSemaphore imageAvailableSemaphore;
-		VkSemaphore renderFinishedSemaphore;
+		VkSemaphore MaterialsFinishedSemaphore;
+		VkSemaphore DefferedFinishedSemaphore;
 
-		VkCommandBuffer mCmdBuf;
+		VkCommandBuffer m3dCmdBuf;
+		VkCommandBuffer mDefferedCmdBuf;
+
 		VkCommandPool commandPool;
 
 		ZSVulkanPipeline* DefferedPipeline;
@@ -42,6 +45,9 @@ namespace Engine {
 		std::vector<VKObjectToRender> ObjectsToRender;
 
 		void Present();
+
+		void FillDefferedCmdBuf();
+		void Fill3dCmdBuf();
 
 	public:
 		void InitShaders();
