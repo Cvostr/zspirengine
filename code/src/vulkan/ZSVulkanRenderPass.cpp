@@ -118,7 +118,7 @@ bool ZSVulkanRenderPass::Create() {
         return false;
     }
 
-    mClearValuesCount = mAttachmentReferences.size() + mHasDepthAttachment;
+    mClearValuesCount = static_cast<int>(mAttachmentReferences.size() + mHasDepthAttachment);
     mClearValues = new VkClearValue[mClearValuesCount];
 
     for(int i = 0; i < mAttachmentReferences.size(); i ++)

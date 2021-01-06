@@ -448,7 +448,7 @@ void Engine::GameObject::DrawMeshInstanced(Renderer* pipeline, unsigned int inst
     Engine::TerrainProperty* terrain_prop = getPropertyPtr<Engine::TerrainProperty>();
     //Draw default mesh
     if (mesh_prop != nullptr) mesh_prop->mesh_ptr->DrawInstanced(inst_num);
-    if (terrain_prop != nullptr) terrain_prop->DrawMesh(pipeline);
+    if (terrain_prop != nullptr) terrain_prop->DrawMesh(pipeline, inst_num);
 }
 
 bool Engine::GameObject::isRigidbody(){

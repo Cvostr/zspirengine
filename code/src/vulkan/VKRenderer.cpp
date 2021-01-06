@@ -140,7 +140,7 @@ void Engine::VKRenderer::InitShaders() {
     FillDefferedCmdBuf();
 
     if (engine_ptr->desc->game_perspective == PERSP_3D) {
-        MtShProps::genDefaultMtShGroup(default3d, skybox_shader, mTerrainShader, water_shader);
+        MtShProps::genDefaultMtShGroup(default3d, mSkyboxShader, mTerrainShader, water_shader);
     }
 }
 

@@ -16,9 +16,7 @@ void Engine::GLframebuffer::addTexture(TextureFormat Format) {
     bind();
     //Create texture
     textures[texture_size] = new glTexture;
-
     textures[texture_size]->Create(Width, Height, Format);
-    //glTexImage2D(GL_TEXTURE_2D, 0, intFormat, Width, Height, 0, format, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + texture_size, GL_TEXTURE_2D, textures[texture_size]->TEXTURE_ID, 0);

@@ -13,17 +13,14 @@ public:
 		m[1][0] = v2.X; m[1][1] = v2.Y; m[1][2] = v2.Z; m[1][3] = v2.W;
 		m[2][0] = v3.X; m[2][1] = v3.Y; m[2][2] = v3.Z; m[2][3] = v3.W;
 		m[3][0] = v4.X; m[3][1] = v4.Y; m[3][2] = v4.Z; m[3][3] = v4.W;
-
-
 	}
 	Mat4() {
-		for (unsigned int i = 0; i < 4; i++) {
-			for (unsigned int j = 0; j < 4; j++) {
+		for (unsigned int i = 0; i < 4; i++) 
+			for (unsigned int j = 0; j < 4; j++) 
 				m[i][j] = 0;
-			}
-		}
-
 	}
+
+	const Vec3& GetPosition() { return Vec3(m[3][0], m[3][1], m[3][2]); }
 
 	//float Determinant() { return determinant(*this); }
 };

@@ -382,12 +382,10 @@ void Engine::Renderer::renderUI() {
     game_data->ui_manager->DrawRootLayout();
 }
 
-void Engine::Renderer::renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY){
+void Engine::Renderer::renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY, RGBAColor color){
     this->mUiShader->Use();
     uiUniformBuffer->bind();
 
-    int _render_mode = 1;
-    //uiUniformBuffer->writeData(sizeof (Mat4) * 2 , 4, &_render_mode);
     //Use texture at 0 slot
     texture_sprite->Use(0);
 
@@ -397,6 +395,10 @@ void Engine::Renderer::renderSprite(Engine::Texture* texture_sprite, int X, int 
 
     //Push glyph transform
     uiUniformBuffer->writeData(sizeof (Mat4), sizeof (Mat4), &transform);
+    //sending glyph color
+    uiUniformBuffer->writeData(sizeof(Mat4) * 2, 4, &color.gl_r);
+    uiUniformBuffer->writeData(sizeof(Mat4) * 2 + 4, 4, &color.gl_g);
+    uiUniformBuffer->writeData(sizeof(Mat4) * 2 + 8, 4, &color.gl_b);
 
     Engine::getUiSpriteMesh2D()->Draw();
 }

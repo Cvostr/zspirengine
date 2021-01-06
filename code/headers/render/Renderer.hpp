@@ -103,7 +103,7 @@ public:
 
     void renderUI();
 
-    void renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY);
+    void renderSprite(Engine::Texture* texture_sprite, int X, int Y, int scaleX, int scaleY, RGBAColor color = RGBAColor(255, 255, 255));
     void renderSprite(Engine::TextureResource* texture_sprite, int X, int Y, int scaleX, int scaleY);
     void renderGlyph(CharacterGlyph* glyph, int X, int Y, int scaleX, int scaleY, RGBAColor color);
 

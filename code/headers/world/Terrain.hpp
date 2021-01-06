@@ -127,7 +127,7 @@ public:
     void initPhysics();
     //Destroy GL variables
     void destroyGL();
-    void Draw(bool picking = false);
+    void Draw(bool picking = false, unsigned int instances = 1);
     void generateGLMesh();
     void processNormalsTangentSpace(HeightmapVertex* vert_array, unsigned int* indices_array, int indices_num);
     void saveToFile(const char* file_path);

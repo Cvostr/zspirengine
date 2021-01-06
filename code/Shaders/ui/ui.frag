@@ -13,7 +13,7 @@ layout (std140, binding = 7) uniform UiSprite{
 layout(binding = 0) uniform sampler2D sprite_map;
 
 void main(){
-	vec4 color = texture(sprite_map, _UV);
+	vec4 color = texture(sprite_map, _UV) * vec4(ui_color, 1.0);
 
     FragColor = color;
 }

@@ -102,7 +102,7 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
     {
         //Bind Geometry Buffer to make Deferred Shading
         ((GLframebuffer*)gbuffer)->bind();
-        setClearColor(0, 0, 0, 1);
+        setClearColor(0, 0, 0, 0);
         ClearFBufferGL(true, true);
         setFullscreenViewport(win->GetWindowWidth(), win->GetWindowHeight());
         {

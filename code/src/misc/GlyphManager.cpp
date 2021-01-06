@@ -9,7 +9,6 @@ extern ZSGAME_DATA* game_data;
 GlyphManager::GlyphManager(){
     if (FT_Init_FreeType(&this->mFtlib))
         std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
-
 }
 
 CharacterGlyph::CharacterGlyph(){
@@ -30,8 +29,7 @@ GlyphFontContainer::GlyphFontContainer(unsigned char* data, unsigned int bsize, 
     FT_New_Memory_Face(manager->getFreetypeLibraryInstance(), data, bsize, 0, &this->font);
     FT_Set_Pixel_Sizes(this->font, 0, size);
     mGlyphTexture = Engine::allocTexture();
-
-    
+    //Allocate temporary buffer
     mGlyphTextureBuffer = new unsigned char[texSize * texSize];
     memset(mGlyphTextureBuffer, 0, texSize * texSize);
 
@@ -40,11 +38,13 @@ GlyphFontContainer::GlyphFontContainer(unsigned char* data, unsigned int bsize, 
     unsigned int MaxY = 0;
     //Fill arrays and texture buffer
     loadGlyphs(WorkX, WorkY, MaxY);
-
+    //Create texture from buffer
     mGlyphTexture->LoadTextureFromBufferUByte(mGlyphTextureBuffer,
         texSize,
         texSize,
         Engine::TextureFormat::FORMAT_R);
+    //Delete temporary buffer
+    delete[] mGlyphTextureBuffer;
 }
 
 GlyphFontContainer::~GlyphFontContainer() {

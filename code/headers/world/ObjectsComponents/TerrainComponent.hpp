@@ -33,7 +33,7 @@ namespace Engine {
         void addPropertyInterfaceToInspector();
         void onRender(Engine::Renderer* pipeline);
 
-        void DrawMesh(Renderer* pipeline);
+        void DrawMesh(Renderer* pipeline, unsigned int instances = 1);
         void DrawGrass(Renderer* pipeline);
         void onValueChanged();
         void onAddToObject();
