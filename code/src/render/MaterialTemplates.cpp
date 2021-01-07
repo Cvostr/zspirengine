@@ -1,4 +1,5 @@
 #include "../../headers/render/Material.hpp"
+#include "../../headers/vulkan/VKMaterial.hpp"
 #include <fstream>
 #include <iostream>
 #include <GL/glew.h>
@@ -40,41 +41,6 @@ MaterialTemplate::MaterialTemplate(Engine::Shader* shader, unsigned int UB_Conne
     mUniformBuffer = Engine::allocUniformBuffer();
     mUniformBuffer->init(UB_ConnectID, UB_SIZE, true);
 
-}
-
-void MaterialTemplate::CreateVulkanPipeline() {
-    if (engine_ptr->engine_info->graphicsApi == VULKAN && mShader->mCreated) {
-
-        Engine::ZsVkPipelineConf Conf;
-        MakeDescrSetUniform(Conf.LayoutInfo.DescrSetLayout);
-        MakeDescrSetTextures(Conf.LayoutInfo.DescrSetLayoutSampler);
-
-       
-        Conf.hasDepth = true;
-        Conf.cullFace = true;
-        Conf.LayoutInfo.AddPushConstant(64, VK_SHADER_STAGE_VERTEX_BIT);
-        Conf.LayoutInfo.AddPushConstant(mUniformBuffer->GetBufferSize(), VK_SHADER_STAGE_FRAGMENT_BIT);
-
-        this->Pipeline = new Engine::ZSVulkanPipeline;
-        Pipeline->Create((Engine::vkShader*)mShader, game_data->vk_main->mMaterialsRenderPass, Conf);
-    }
-}
-
-void MaterialTemplate::MakeDescrSetUniform(Engine::ZSVulkanDescriptorSet* DescrSet) {
-    DescrSet->pushUniformBuffer((Engine::vkUniformBuffer*)game_data->pipeline->GetTransformUniformBuffer(), VK_SHADER_STAGE_ALL_GRAPHICS);
-    DescrSet->getDescriptorSetLayout();
-}
-
-void MaterialTemplate::MakeDescrSetTextures(Engine::ZSVulkanDescriptorSet* DescrSet) {
-    for (unsigned int prop_i = 0; prop_i < properties.size(); prop_i++) {
-        MaterialShaderProperty* prop_ptr = properties[prop_i];
-        if (prop_ptr->type == MATSHPROP_TYPE_TEXTURE) {
-            //Cast pointer
-            TextureMaterialShaderProperty* texture_p = static_cast<TextureMaterialShaderProperty*>(prop_ptr);
-            DescrSet->pushImageSampler(texture_p->slotToBind);
-        }
-    }
-    DescrSet->getDescriptorSetLayout();
 }
 
 void MaterialTemplate::setUB_Data(unsigned int offset, unsigned int size, void* data){
@@ -142,7 +108,7 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
         uv_factor_prop->prop_identifier = "i_uv_repeat"; //Identifier to save
         uv_factor_prop->start_offset = 36;
 
-        default_group->CreateVulkanPipeline();
+        ((VKMaterialTemplate*)default_group)->CreatePipeline();
         MtShProps::addMtShaderPropertyGroup(default_group);
     }
     {
@@ -208,10 +174,10 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
     MtShProps::addMtShaderPropertyGroup(default_heightmap_group);
 
     //Create default base material
-    default3dmat = new Material(default_group);
+    default3dmat = allocMaterial(default_group);
     default3dmat->file_path = "@default";
 
-    defaultTerrainMat = new Material(default_heightmap_group);
+    defaultTerrainMat = allocMaterial(default_heightmap_group);
     defaultTerrainMat->file_path = "@defaultHeightmap";
 
     return default_group;
@@ -221,6 +187,7 @@ MaterialTemplate* MtShProps::getDefaultMtShGroup(){
 }
 
 void MtShProps::addMtShaderPropertyGroup(MaterialTemplate* group){
+    
     //Check if this property already added
     if(getMtShaderPropertyGroup(group->str_path) == nullptr)
         MatGroups.push_back(group);

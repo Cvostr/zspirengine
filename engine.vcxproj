@@ -213,6 +213,7 @@
     <ClCompile Include="code\src\ui\View.cpp" />
     <ClCompile Include="code\src\ui\Widgets\Button.cpp" />
     <ClCompile Include="code\src\ui\Widgets\Widget.cpp" />
+    <ClCompile Include="code\src\vulkan\VKMaterial.cpp" />
     <ClCompile Include="code\src\vulkan\VKRenderer.cpp" />
     <ClCompile Include="code\src\vulkan\VKMesh.cpp" />
     <ClCompile Include="code\src\vulkan\VKShader.cpp" />

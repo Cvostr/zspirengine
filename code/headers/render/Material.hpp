@@ -47,33 +47,24 @@ public:
     //ID of uniform buffer
     Engine::UniformBuffer* mUniformBuffer;
 
-    Engine::ZSVulkanPipeline* Pipeline;
-
     void setUB_Data(unsigned int offset, unsigned int size, void* data);
 
     MaterialShaderProperty* addProperty(int type);
     void loadFromFile(const char* fpath);
 
-    void CreateVulkanPipeline();
-    void MakeDescrSetUniform(Engine::ZSVulkanDescriptorSet* DescrSet);
-    void MakeDescrSetTextures(Engine::ZSVulkanDescriptorSet* DescrSet);
-
-    MaterialTemplate(Engine::Shader* shader, unsigned int UB_ConnectID, unsigned int UB_SIZE);
+    explicit MaterialTemplate(Engine::Shader* shader, unsigned int UB_ConnectID, unsigned int UB_SIZE);
 };
 
 class Material{
 protected:
     std::string mTemplateStr;
 public:
-
     //path to material file
     std::string file_path;
     //Pointer to shader group
     MaterialTemplate* mTemplate;
     std::vector<MaterialShaderPropertyConf*> confs;
 
-    Engine::ZSVulkanDescriptorSet* DescrSetUBO;
-    Engine::ZSVulkanDescriptorSet* DescrSetTextures;
     unsigned char* MatData;
 
     MaterialShaderPropertyConf* addPropertyConf(int type);
@@ -83,13 +74,19 @@ public:
     void setTemplate(MaterialTemplate* Template);
     void clear();
     void applyMatToPipeline();
+    void WriteBytes(unsigned int offset, unsigned int size, void* data);
 
-    Material(std::string shader_group_str);
-    Material(MaterialTemplate* Template);
+
+    explicit Material(std::string shader_group_str);
+    explicit Material(MaterialTemplate* Template);
     Material();
 
     ~Material();
 };
+
+Material* allocMaterial();
+Material* allocMaterial(MaterialTemplate* Template);
+MaterialTemplate* allocMaterialTemplate(Engine::Shader* shader, unsigned int UB_ConnectID, unsigned int UB_SIZE);
 
 namespace MtShProps {
     MaterialShaderProperty* allocateProperty(int type);

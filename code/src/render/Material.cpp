@@ -1,4 +1,5 @@
 #include "../../headers/render/Material.hpp"
+#include "../../headers/vulkan/VKMaterial.hpp"
 #include <iostream>
 #include "../../headers/misc/misc.h"
 #include "../../headers/game.h"
@@ -6,6 +7,51 @@
 extern ZSpireEngine* engine_ptr;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
+
+Material* allocMaterial() {
+    Material* result = nullptr;
+    switch (engine_ptr->engine_info->graphicsApi) {
+    case OGL: {
+        result = new Material;
+        break;
+    }
+    case VULKAN: {
+        result = new VKMaterial;
+        break;
+    }
+    }
+    return result;
+}
+
+Material* allocMaterial(MaterialTemplate* Template) {
+    Material* result = nullptr;
+    switch (engine_ptr->engine_info->graphicsApi) {
+    case OGL: {
+        result = new Material(Template);
+        break;
+    }
+    case VULKAN: {
+        result = new VKMaterial(Template);
+        break;
+    }
+    }
+    return result;
+}
+
+MaterialTemplate* allocMaterialTemplate(Engine::Shader* shader, unsigned int UB_ConnectID, unsigned int UB_SIZE) {
+    MaterialTemplate* result = nullptr;
+    switch (engine_ptr->engine_info->graphicsApi) {
+    case OGL: {
+        result = new MaterialTemplate(shader, UB_ConnectID, UB_SIZE);
+        break;
+    }
+    case VULKAN: {
+        result = new VKMaterialTemplate(shader, UB_ConnectID, UB_SIZE);
+        break;
+    }
+    }
+    return result;
+}
 
 MaterialShaderProperty::MaterialShaderProperty(){
     type = MATSHPROP_TYPE_NONE;
@@ -140,6 +186,15 @@ void Material::clear(){
     confs.clear(); //Resize array to 0
 }
 
+void Material::WriteBytes(unsigned int offset, unsigned int size, void* data) {
+    if (engine_ptr->engine_info->graphicsApi == VULKAN) {
+        memcpy(this->MatData + offset, data, size);
+    }
+    if (engine_ptr->engine_info->graphicsApi == OGL) {
+        mTemplate->setUB_Data(offset, size, data);
+    }
+}
+
 void Material::setTemplate(MaterialTemplate* Template){
     this->clear(); //clear all confs, first
     //Iterate over all properties in group
@@ -154,15 +209,16 @@ void Material::setTemplate(MaterialTemplate* Template){
     //store string id of picked group
     this->mTemplateStr = Template->str_path;
     
+    unsigned int bytesize = 0;
+    if (mTemplate->mUniformBuffer != nullptr)
+        bytesize = mTemplate->mUniformBuffer->GetBufferSize();
+    MatData = new unsigned char[bytesize];
+
     if (engine_ptr->engine_info->graphicsApi == VULKAN && Template->mShader->mCreated) {
 
-        DescrSetUBO = new Engine::ZSVulkanDescriptorSet(Engine::DESCR_SET_TYPE::DESCR_SET_TYPE_UBO);
-        DescrSetTextures = new Engine::ZSVulkanDescriptorSet(Engine::DESCR_SET_TYPE::DESCR_SET_TYPE_TEXTURE);
-
-        mTemplate->MakeDescrSetUniform(DescrSetUBO);
-        mTemplate->MakeDescrSetTextures(DescrSetTextures);
+       ( (VKMaterial*)(this))->CreateDescriptors();
     }
-
+    
 }
 
 Material::Material(){
@@ -483,11 +539,11 @@ void Material::applyMatToPipeline() {
                 Engine::TextureResource* tex_ptr = static_cast<Engine::TextureResource*>(texture_conf->texture);
                 tex_ptr->Use(texture_p->slotToBind);
                 if (engine_ptr->engine_info->graphicsApi == VULKAN) {
-                    this->DescrSetTextures->setTexture(texture_p->slotToBind, ((Engine::vkTexture*)tex_ptr->texture_ptr)->GetImageView(), game_data->vk_main->mDefaultTextureSampler);
+                    ((VKMaterial*)(this))->SetTexture(texture_p->slotToBind, ((Engine::vkTexture*)tex_ptr->texture_ptr)->GetImageView(), game_data->vk_main->mDefaultTextureSampler);
                 }
             }
             //Set texture state
-            mTemplate->setUB_Data(texture_p->start_offset, 4, &db);
+            WriteBytes(texture_p->start_offset, 4, &db);
 
             break;
         }
@@ -495,7 +551,7 @@ void Material::applyMatToPipeline() {
             FloatMtShPropConf* float_conf = static_cast<FloatMtShPropConf*>(conf_ptr);
 
             //set float to buffer
-            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &float_conf->value);
+            WriteBytes(prop_ptr->start_offset, 4, &float_conf->value);
 
             break;
         }
@@ -503,7 +559,7 @@ void Material::applyMatToPipeline() {
             IntegerMtShPropConf* int_conf = static_cast<IntegerMtShPropConf*>(conf_ptr);
 
             //set integer to buffer
-            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &int_conf->value);
+            WriteBytes(prop_ptr->start_offset, 4, &int_conf->value);
 
             break;
         }
@@ -513,9 +569,9 @@ void Material::applyMatToPipeline() {
             color_conf->color.updateGL();
 
             //Write color to buffer
-            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &color_conf->color.gl_r);
-            mTemplate->setUB_Data(prop_ptr->start_offset + 4, 4, &color_conf->color.gl_g);
-            mTemplate->setUB_Data(prop_ptr->start_offset + 8, 4, &color_conf->color.gl_b);
+            WriteBytes(prop_ptr->start_offset, 4, &color_conf->color.gl_r);
+            WriteBytes(prop_ptr->start_offset + 4, 4, &color_conf->color.gl_g);
+            WriteBytes(prop_ptr->start_offset + 8, 4, &color_conf->color.gl_b);
 
 
             break;
@@ -524,9 +580,9 @@ void Material::applyMatToPipeline() {
             Float3MtShPropConf* fvec3_conf = static_cast<Float3MtShPropConf*>(conf_ptr);
 
             //Write vec3 to buffer
-            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &fvec3_conf->value.X);
-            mTemplate->setUB_Data(prop_ptr->start_offset + 4, 4, &fvec3_conf->value.Y);
-            mTemplate->setUB_Data(prop_ptr->start_offset + 8, 4, &fvec3_conf->value.Z);
+            WriteBytes(prop_ptr->start_offset, 4, &fvec3_conf->value.X);
+            WriteBytes(prop_ptr->start_offset + 4, 4, &fvec3_conf->value.Y);
+            WriteBytes(prop_ptr->start_offset + 8, 4, &fvec3_conf->value.Z);
 
             break;
         }
@@ -534,16 +590,16 @@ void Material::applyMatToPipeline() {
             Float2MtShPropConf* fvec2_conf = static_cast<Float2MtShPropConf*>(conf_ptr);
 
             //Write vec2 to buffer
-            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &fvec2_conf->value.X);
-            mTemplate->setUB_Data(prop_ptr->start_offset + 4, 4, &fvec2_conf->value.Y);
+            WriteBytes(prop_ptr->start_offset, 4, &fvec2_conf->value.X);
+            WriteBytes(prop_ptr->start_offset + 4, 4, &fvec2_conf->value.Y);
             break;
         }
         case MATSHPROP_TYPE_IVEC2: {
             Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
 
             //Write vec2 to buffer
-            mTemplate->setUB_Data(prop_ptr->start_offset, 4, &ivec2_conf->value[0]);
-            mTemplate->setUB_Data(prop_ptr->start_offset + 4, 4, &ivec2_conf->value[1]);
+            WriteBytes(prop_ptr->start_offset, 4, &ivec2_conf->value[0]);
+            WriteBytes(prop_ptr->start_offset + 4, 4, &ivec2_conf->value[1]);
             break;
         }
         case MATSHPROP_TYPE_TEXTURE3: {

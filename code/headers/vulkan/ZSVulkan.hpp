@@ -21,10 +21,8 @@ namespace Engine {
 
 		ZSVulkanRenderPass* mMaterialsRenderPass;
 		ZSVulkanSampler* mDefaultTextureSampler;
-		bool MaterialsBindTexturesStage;
 
 		ZSVulkan() :
-			MaterialsBindTexturesStage(false)
 		{
 
 		}

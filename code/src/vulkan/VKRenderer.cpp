@@ -48,7 +48,7 @@ void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
         obr.obj = obj;
 
         if (mat_prop != nullptr) {
-            obr.mat = mat_prop->mMaterial;
+            obr.mat = (VKMaterial*)mat_prop->mMaterial;
             if(obr.mat != nullptr)
                 obr.mat->applyMatToPipeline();
         }
@@ -156,8 +156,6 @@ void Engine::VKRenderer::Fill3dCmdBuf() {
 
     MaterialRenderPass->CmdBegin(m3dCmdBuf, MaterialFb);
 
-    //game_data->vk_main->MaterialsBindTexturesStage = false;
-
     bool binded = false;
 
     for (unsigned int i = 0; i < ObjectsToRender.size(); i++) {
@@ -165,29 +163,33 @@ void Engine::VKRenderer::Fill3dCmdBuf() {
         GameObject* obj = ObjectsToRender[i].obj;
         if (obj->hasMesh() && obr->mat != nullptr) {
             MeshProperty* mesh = obj->getPropertyPtr<MeshProperty>();
-            if (!binded) {
-                obr->mat->mTemplate->Pipeline->CmdBindPipeline(m3dCmdBuf);
-                binded = true;
-            }
+            ZSVulkanPipeline* Pipeline = ((VKMaterialTemplate*)obr->mat->mTemplate)->Pipeline;
+            if (((VKMaterialTemplate*)obr->mat->mTemplate)->mPipelineCreated) {
+                if (!binded) {
+                    Pipeline->CmdBindPipeline(m3dCmdBuf);
+                    binded = true;
+                }
 
-            VkDescriptorSet sets[2];
-            sets[0] = obr->mat->DescrSetUBO->getDescriptorSet();
-            sets[1] = obr->mat->DescrSetTextures->getDescriptorSet();
-            if (obr->mat->mTemplate->Pipeline != nullptr) {
-                
-                obr->mat->applyMatToPipeline();
-                vkCmdBindDescriptorSets(m3dCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                    obr->mat->mTemplate->Pipeline->_GetPipelineLayout(), 0,
-                    2, sets, 0, nullptr);
-                //Send object transform
-                obr->mat->mTemplate->Pipeline->CmdPushConstants(this->m3dCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, &ObjectsToRender[i].transform);
-                //Send material props
-                unsigned int bufsize = obr->mat->mTemplate->mUniformBuffer->GetBufferSize();
-                void* bufdata = obr->mat->mTemplate->mUniformBuffer->GetCpuBuffer();
-                obr->mat->mTemplate->Pipeline->CmdPushConstants(m3dCmdBuf, VK_SHADER_STAGE_FRAGMENT_BIT, 64, bufsize, bufdata);
+
+                VkDescriptorSet sets[2];
+                sets[0] = obr->mat->DescrSetUBO->getDescriptorSet();
+                sets[1] = obr->mat->DescrSetTextures->getDescriptorSet();
+                if (Pipeline != nullptr) {
+
+                    //obr->mat->applyMatToPipeline();
+                    vkCmdBindDescriptorSets(m3dCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                        Pipeline->_GetPipelineLayout(), 0,
+                        2, sets, 0, nullptr);
+                    //Send object transform
+                    Pipeline->CmdPushConstants(this->m3dCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, &ObjectsToRender[i].transform);
+                    //Send material props
+                    unsigned int bufsize = obr->mat->mTemplate->mUniformBuffer->GetBufferSize();
+                    void* bufdata = obr->mat->mTemplate->mUniformBuffer->GetCpuBuffer();
+                    Pipeline->CmdPushConstants(m3dCmdBuf, VK_SHADER_STAGE_FRAGMENT_BIT, 64, bufsize, obr->mat->MatData);
+                }
+                if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
+                    obj->DrawMesh(this);
             }
-            if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
-                obj->DrawMesh(this);
         }
     }
 
@@ -237,8 +239,6 @@ void Engine::VKRenderer::Present() {
     vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
 
 
-
-
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = &MaterialsFinishedSemaphore;
     submitInfo.pWaitDstStageMask = waitStages;
@@ -247,8 +247,6 @@ void Engine::VKRenderer::Present() {
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = &DefferedFinishedSemaphore;
     vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-
-
 
 
     VkPresentInfoKHR presentInfo = {};

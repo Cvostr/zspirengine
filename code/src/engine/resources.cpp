@@ -252,7 +252,8 @@ void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int
                 }
                 case RESOURCE_TYPE_MATERIAL: {
                     resource_ptr = new Engine::MaterialResource;
-                    static_cast<Engine::MaterialResource*>(resource_ptr)->material = new Material;
+                    //static_cast<Engine::MaterialResource*>(resource_ptr)->material = new Material;
+                    static_cast<Engine::MaterialResource*>(resource_ptr)->material = allocMaterial();
                     break;
                 }
                 case RESOURCE_TYPE_ANIMATION: {

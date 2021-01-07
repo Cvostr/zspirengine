@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.hpp>
 #include "../render/Renderer.hpp"
 #include "../render/Material.hpp"
+#include "VKMaterial.hpp"
 #include "ZSVulkanPipeline.hpp"
 #include "ZSVulkanRenderPass.hpp"
 #include "ZSVulkanFramebuffer.hpp"
@@ -17,7 +18,7 @@ namespace Engine {
 	public:
 		Engine::GameObject* obj;
 		Mat4 transform;
-		Material* mat;
+		VKMaterial* mat;
 
 		VKObjectToRender() {
 			mat = nullptr;
