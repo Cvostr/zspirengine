@@ -49,7 +49,7 @@ Engine::Renderer::Renderer(){
 
     //Allocate transform buffer
     this->transformBuffer = allocUniformBuffer();
-    transformBuffer->init(0, sizeof(Mat4) * 3 + 16 * 2);
+    transformBuffer->init(0, sizeof(Mat4) * 3 + 16);
     //allocate lights buffer
     lightsBuffer = allocUniformBuffer();
     lightsBuffer->init(1, LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16 * 2, true);
@@ -296,7 +296,8 @@ void Engine::MaterialProperty::onRender(Engine::Renderer* pipeline){
 
         //Bind shadow uniform buffer
         pipeline->shadowBuffer->bind();
-        pipeline->shadowBuffer->writeData(8, sizeof(int), &recShadows);
+        pipeline->shadowBuffer->writeDataBuffered(8, sizeof(int), &recShadows);
+        pipeline->shadowBuffer->updateBufferedData();
     }
     //Apply matrerial to shader and textures
     mMaterial->applyMatToPipeline();

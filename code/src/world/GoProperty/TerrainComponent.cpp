@@ -11,7 +11,6 @@ Engine::TerrainProperty::TerrainProperty() :
 
     range(15),
     editHeight(5),
-    edit_mode(1),
     textureid(1),
     vegetableid(1),
 

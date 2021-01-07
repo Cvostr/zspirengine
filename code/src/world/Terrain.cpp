@@ -205,7 +205,8 @@ void TerrainData::updateGrassBuffers() {
             if (texel_ptr->grass > 0) {
                 HeightmapGrass* grass = &this->grass[static_cast<unsigned int>(texel_ptr->grass - 1)];
                 Vec3 pos = Vec3(texelZ, texel_ptr->height, texelX);
-                Mat4 m = getScaleMat(Vec3(grass->scale.X, grass->scale.Y, grass->scale.X)) * getTranslationMat(pos);
+                float randomRot = GetRandomValue(10, 100);
+                Mat4 m = getScaleMat(Vec3(grass->scale.X, grass->scale.Y, grass->scale.X)) * getRotationYMat(randomRot) * getTranslationMat(pos);
                 grass->inst_transform.push_back(m);
             }
         }

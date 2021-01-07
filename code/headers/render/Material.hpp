@@ -62,16 +62,19 @@ public:
 };
 
 class Material{
-private:
+protected:
     std::string mTemplateStr;
 public:
-    Engine::ZSVulkanDescriptorSet* DescrSetUBO;
-    Engine::ZSVulkanDescriptorSet* DescrSetTextures;
+
     //path to material file
     std::string file_path;
     //Pointer to shader group
     MaterialTemplate* mTemplate;
     std::vector<MaterialShaderPropertyConf*> confs;
+
+    Engine::ZSVulkanDescriptorSet* DescrSetUBO;
+    Engine::ZSVulkanDescriptorSet* DescrSetTextures;
+    unsigned char* MatData;
 
     MaterialShaderPropertyConf* addPropertyConf(int type);
     void loadFromFile(std::string fpath);

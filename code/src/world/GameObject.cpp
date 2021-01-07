@@ -439,7 +439,9 @@ void Engine::GameObject::DrawMesh(Renderer* pipeline) {
     Engine::MeshProperty* mesh_prop = static_cast<Engine::MeshProperty*>(this->getPropertyPtrByType(PROPERTY_TYPE::GO_PROPERTY_TYPE_MESH));
     Engine::TerrainProperty* terrain_prop = getPropertyPtr<Engine::TerrainProperty>();
     //Draw default mesh
-    if (mesh_prop != nullptr) mesh_prop->mesh_ptr->Draw();
+    if (mesh_prop != nullptr) 
+        if(mesh_prop->isActive())
+            mesh_prop->mesh_ptr->Draw();
     if (terrain_prop != nullptr) terrain_prop->DrawMesh(pipeline);
 }
 

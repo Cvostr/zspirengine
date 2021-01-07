@@ -66,7 +66,7 @@ void Engine::ShadowCasterProperty::SetCascadesAmount(int CascadesNum) {
 }
 
 void Engine::ShadowCasterProperty::setTexture() {
-    glActiveTexture(GL_TEXTURE6);
+    glActiveTexture(GL_TEXTURE27);
     glBindTexture(GL_TEXTURE_2D_ARRAY, this->mShadowDepthTexture);
 }
 

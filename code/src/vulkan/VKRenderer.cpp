@@ -156,6 +156,8 @@ void Engine::VKRenderer::Fill3dCmdBuf() {
 
     MaterialRenderPass->CmdBegin(m3dCmdBuf, MaterialFb);
 
+    //game_data->vk_main->MaterialsBindTexturesStage = false;
+
     bool binded = false;
 
     for (unsigned int i = 0; i < ObjectsToRender.size(); i++) {
@@ -172,6 +174,8 @@ void Engine::VKRenderer::Fill3dCmdBuf() {
             sets[0] = obr->mat->DescrSetUBO->getDescriptorSet();
             sets[1] = obr->mat->DescrSetTextures->getDescriptorSet();
             if (obr->mat->mTemplate->Pipeline != nullptr) {
+                
+                obr->mat->applyMatToPipeline();
                 vkCmdBindDescriptorSets(m3dCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     obr->mat->mTemplate->Pipeline->_GetPipelineLayout(), 0,
                     2, sets, 0, nullptr);

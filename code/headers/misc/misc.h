@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstring>
 #include "../math/Vec3.hpp"
+#include <SDL2/SDL.h>
 
 void genRandomString(std::string* result, unsigned int len);
 void readString(std::string& str, const char* data, unsigned int& offset);
@@ -13,6 +14,14 @@ template <typename T>
 void readBinaryValue(T* out, const char* data, unsigned int& offset) {
 	memcpy(out, data, sizeof(T));
 	offset += sizeof(T);
+}
+
+template <typename T>
+T GetRandomValue(T min, T max) {
+	srand(static_cast<unsigned int>(SDL_GetPerformanceCounter()));
+
+	T v = min + rand() % (max - min);
+	return v;
 }
 
 void ProcessFileName(std::string& str);

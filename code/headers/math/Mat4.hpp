@@ -20,7 +20,7 @@ public:
 				m[i][j] = 0;
 	}
 
-	const Vec3& GetPosition() { return Vec3(m[3][0], m[3][1], m[3][2]); }
+	Vec3	 GetPosition() { return Vec3(m[3][0], m[3][1], m[3][2]); }
 
 	//float Determinant() { return determinant(*this); }
 };

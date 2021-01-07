@@ -81,27 +81,11 @@ void Engine::TerrainProperty::DrawGrass(Renderer* pipeline) {
         //Bind instanced buffer
         pipeline->instancedTransformBuffer->bind();
 
-
         Engine::TransformProperty* t_ptr = (this->go_link.updLinkPtr())->getPropertyPtr<Engine::TransformProperty>();
         //Iterate over all grass types
         for (unsigned int grass_i = 0; grass_i < data.grass.size(); grass_i++) {
             //Get a pointer to grass type
             HeightmapGrass* grass = &data.grass[grass_i];
-
-            for (unsigned int sort_i = 1; sort_i < grass->inst_transform.size(); sort_i++) {
-                Vec3 posPrev = grass->inst_transform[sort_i - 1].GetPosition();
-                Vec3 posCur = grass->inst_transform[sort_i].GetPosition();
-
-                float DistPrev = getDistance(pipeline->cam->getCameraPosition(), posPrev);
-                float DistCur = getDistance(pipeline->cam->getCameraPosition(), posCur);
-
-                if (DistCur < DistPrev) {
-                    Mat4 temp = grass->inst_transform[sort_i];
-                    grass->inst_transform[sort_i] = grass->inst_transform[sort_i - 1];
-                    grass->inst_transform[sort_i - 1] = temp;
-                }
-            }
-
 
             //if texture is specified
             if (grass->diffuse)
@@ -132,7 +116,6 @@ void Engine::TerrainProperty::DrawGrass(Renderer* pipeline) {
                 //Draw grass instanced
                 Engine::getGrassMesh()->DrawInstanced(entries);
             }
-
         }
     }
 }

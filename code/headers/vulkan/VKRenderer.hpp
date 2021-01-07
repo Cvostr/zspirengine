@@ -2,13 +2,16 @@
 
 #include <vulkan/vulkan.hpp>
 #include "../render/Renderer.hpp"
+#include "../render/Material.hpp"
 #include "ZSVulkanPipeline.hpp"
 #include "ZSVulkanRenderPass.hpp"
 #include "ZSVulkanFramebuffer.hpp"
 #include <vector>
+#include <string>
 #include "VKUniformBuffer.hpp"
 
 namespace Engine {
+
 
 	class VKObjectToRender {
 	public:

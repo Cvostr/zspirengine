@@ -9,7 +9,6 @@ namespace Engine {
 
     private:
         TerrainData data;
-        char edit_mode;
 
         btRigidBody* rigidBody;
     public:

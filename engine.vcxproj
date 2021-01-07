@@ -316,6 +316,7 @@
     <ClInclude Include="code\headers\ui\View.hpp" />
     <ClInclude Include="code\headers\ui\Widgets\Button.hpp" />
     <ClInclude Include="code\headers\ui\Widgets\Widget.hpp" />
+    <ClInclude Include="code\headers\vulkan\VKMaterial.hpp" />
     <ClInclude Include="code\headers\vulkan\VKMesh.hpp" />
     <ClInclude Include="code\headers\vulkan\VKRenderer.hpp" />
     <ClInclude Include="code\headers\vulkan\VKShader.hpp" />

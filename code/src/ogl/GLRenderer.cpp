@@ -112,6 +112,8 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
             setFaceCullState(false);
             TryRenderSkybox();
         }
+        glEnablei(GL_BLEND, 0);
+        glBlendFunci(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0);
         {
             //Render World
             setDepthState(true);

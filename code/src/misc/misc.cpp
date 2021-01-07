@@ -5,8 +5,6 @@
 #include <ctime>
 #include <cstdlib>
 
-#include <SDL2/SDL.h>
-
 #define RANDOM_VARIANTS 70
 
 static char rstring_palette[RANDOM_VARIANTS + 1] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$^&*(";
