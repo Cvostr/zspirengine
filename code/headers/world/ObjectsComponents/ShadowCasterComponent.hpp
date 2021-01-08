@@ -32,6 +32,7 @@ namespace Engine {
         void init();
         void onObjectDeleted();
         void Draw(Engine::Camera* cam, Renderer* pipeline);
+        void SendShadowParamsToShaders(Engine::Camera* cam, Renderer* pipeline);
         void setTexture();
         void setTextureSize(int TextureSize);
         void SetCascadesAmount(int CascadesNum);

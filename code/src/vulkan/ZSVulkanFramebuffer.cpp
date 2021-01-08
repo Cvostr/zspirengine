@@ -4,7 +4,7 @@
 extern ZSGAME_DATA* game_data;
 
 Engine::ZSVulkanFramebuffer::ZSVulkanFramebuffer() {
-
+	mLayersCount = 1;
 }
 
 Engine::ZSVulkanFramebuffer::~ZSVulkanFramebuffer() {
@@ -20,7 +20,8 @@ bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
 	framebufferInfo.pAttachments = Views.data();
 	framebufferInfo.width = game_data->vk_main->mSwapChain->GetExtent().width;
 	framebufferInfo.height = game_data->vk_main->mSwapChain->GetExtent().height;
-	framebufferInfo.layers = 1;
+	framebufferInfo.layers = mLayersCount;
+	
 
 	if (vkCreateFramebuffer(game_data->vk_main->mDevice->getVkDevice(), &framebufferInfo, nullptr, &mFramebuffer) != VK_SUCCESS) {
 		return false;
@@ -34,7 +35,7 @@ bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
 Engine::FbAttachment* Engine::ZSVulkanFramebuffer::PushAttachment(unsigned int Width, unsigned int Height,
 	VkFormat format,
 	VkImageUsageFlagBits usage,
-	VkImageAspectFlagBits aspect) 
+	VkImageAspectFlagBits aspect, unsigned int Layers)
 {
 	FbAttachment Attachment = {};
 	Attachment.Width = Width;
@@ -42,6 +43,7 @@ Engine::FbAttachment* Engine::ZSVulkanFramebuffer::PushAttachment(unsigned int W
 	Attachment.format = format;
 	Attachment.usage = usage;
 	Attachment.aspect = aspect;
+	Attachment.Layers = Layers;
 
 	this->Attachments.push_back(Attachment);
 
@@ -54,8 +56,8 @@ Engine::FbAttachment* Engine::ZSVulkanFramebuffer::PushAttachment(unsigned int W
 void Engine::ZSVulkanFramebuffer::PushOutputAttachment() {
 	Views.push_back(game_data->vk_main->mSwapChain->GetImageViewAtIndex(0));
 }
-void Engine::ZSVulkanFramebuffer::PushDepthAttachment(unsigned int Width, unsigned int Height) {
-	FbAttachment* att = PushAttachment(Width, Height, VK_FORMAT_D24_UNORM_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT);
+void Engine::ZSVulkanFramebuffer::PushDepthAttachment(unsigned int Width, unsigned int Height, unsigned int Layers) {
+	FbAttachment* att = PushAttachment(Width, Height, VK_FORMAT_D24_UNORM_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT, Layers);
 }
 
 VkImageView Engine::ZSVulkanFramebuffer::getImageView(FbAttachment* attachment) {
@@ -79,7 +81,8 @@ VkImageView Engine::ZSVulkanFramebuffer::getImageView(FbAttachment* attachment) 
 	imageInfo.extent.height = static_cast<uint32_t>(attachment->Height);
 	imageInfo.extent.depth = 1;
 	imageInfo.mipLevels = 1;
-	imageInfo.arrayLayers = 1;
+	imageInfo.arrayLayers = attachment->Layers;
+	
 	imageInfo.format = attachment->format;
 	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	imageInfo.initialLayout = imageLayout;
@@ -117,16 +120,19 @@ VkImageView Engine::ZSVulkanFramebuffer::getImageView(FbAttachment* attachment) 
 
 	vkBindImageMemory(game_data->vk_main->mDevice->getVkDevice(), attachment->Image, attachment->ImageMemory, 0);
 
+	VkImageViewType ImageViewType = VK_IMAGE_VIEW_TYPE_2D;
+	if (attachment->Layers > 1)
+		ImageViewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
 
 	VkImageViewCreateInfo textureImageViewInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
 	textureImageViewInfo.image = attachment->Image;
-	textureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	textureImageViewInfo.viewType = ImageViewType;
 	textureImageViewInfo.format = attachment->format;
 	textureImageViewInfo.subresourceRange.aspectMask = attachment->aspect;
 	textureImageViewInfo.subresourceRange.baseMipLevel = 0;
 	textureImageViewInfo.subresourceRange.levelCount = 1;
 	textureImageViewInfo.subresourceRange.baseArrayLayer = 0;
-	textureImageViewInfo.subresourceRange.layerCount = 1;
+	textureImageViewInfo.subresourceRange.layerCount = attachment->Layers;
 	vkCreateImageView(game_data->vk_main->mDevice->getVkDevice(), &textureImageViewInfo, nullptr, &attachment->ImageView);
 
 

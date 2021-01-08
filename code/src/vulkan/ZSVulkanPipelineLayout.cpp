@@ -49,6 +49,7 @@ bool ZSVulkanPipelineLayout::Create(ZsVkPipelineLayoutConf& conf) {
     pipeline_info.pushConstantRangeCount =
         static_cast<uint32_t>(conf.mPushConstants.size());
     pipeline_info.pPushConstantRanges = conf.mPushConstants.data();
-    vkCreatePipelineLayout(game_data->vk_main->mDevice->getVkDevice(), &pipeline_info, nullptr, &this->mPipelineLayout);
+    if (vkCreatePipelineLayout(game_data->vk_main->mDevice->getVkDevice(), &pipeline_info, nullptr, &this->mPipelineLayout) != VK_SUCCESS)
+        return false;
     return true;
 }

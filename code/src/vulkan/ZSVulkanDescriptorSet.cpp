@@ -90,7 +90,7 @@ void Engine::ZSVulkanDescriptorSet::UpdUniformBuffer(unsigned int index) {
         VkWriteDescriptorSet descriptorWrite{};
         descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         descriptorWrite.dstSet = Descr_Set;
-        descriptorWrite.dstBinding = index;
+        descriptorWrite.dstBinding = buf->GetSlotId();
         descriptorWrite.dstArrayElement = 0;
         descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         descriptorWrite.descriptorCount = 1;

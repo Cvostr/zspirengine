@@ -24,7 +24,9 @@ void VKMaterialTemplate::CreatePipeline() {
 }
 
 void VKMaterialTemplate::MakeDescrSetUniform(Engine::ZSVulkanDescriptorSet* DescrSet) {
+    Engine::UniformBuffer* shadowBuf = game_data->pipeline->GetShadowmapUniformBuffer();
     DescrSet->pushUniformBuffer((Engine::vkUniformBuffer*)game_data->pipeline->GetTransformUniformBuffer(), VK_SHADER_STAGE_ALL_GRAPHICS);
+    DescrSet->pushUniformBuffer((Engine::vkUniformBuffer*)shadowBuf, VK_SHADER_STAGE_FRAGMENT_BIT);
     DescrSet->getDescriptorSetLayout();
 }
 

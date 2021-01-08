@@ -2,6 +2,7 @@
 #include "../../headers/game.h"
 #include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
 #include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
+#include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
 
 extern ZSGAME_DATA* game_data;
 extern ZSpireEngine* engine_ptr;
@@ -17,8 +18,17 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
     World* world_ptr = game_data->world;
     ObjectsToRender.clear();
     //Fill render arrays
-    processObjects(world_ptr);
 
+    if (this->render_settings.shadowcaster_obj_ptr != nullptr) {
+        Engine::ShadowCasterProperty* shadowcast =
+            static_cast<Engine::GameObject*>(this->render_settings.shadowcaster_obj_ptr)->getPropertyPtr<Engine::ShadowCasterProperty>();
+        if (shadowcast != nullptr) { //we have shadowcaster
+            shadowcast->SendShadowParamsToShaders(cam, this); //draw shadowcaster
+        }
+    }
+
+    processObjects(world_ptr);
+    FillShadowCmdBuf();
     Fill3dCmdBuf();
     
  
@@ -60,7 +70,7 @@ void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
 void Engine::VKRenderer::InitShaders() {
     this->default3d->compileFromFile("Shaders/vulkan_test/3d/vert.spv", "Shaders/vulkan_test/3d/frag.spv");
     this->deffered_light->compileFromFile("Shaders/vulkan_test/deffered/vert.spv", "Shaders/vulkan_test/deffered/frag.spv");
-
+    this->mShadowMapShader->compileFromFile("Shaders/vulkan_test/shadowmap/vert.spv", "Shaders/vulkan_test/shadowmap/frag.spv", "Shaders/vulkan_test/shadowmap/geom.spv");
 
     MaterialRenderPass = new ZSVulkanRenderPass;
     MaterialRenderPass->PushColorAttachment(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
@@ -92,6 +102,17 @@ void Engine::VKRenderer::InitShaders() {
     OutFb->PushOutputAttachment();
     OutFb->Create(OutRenderPass);
 
+    ShadowRenderPass = new ZSVulkanRenderPass;
+    ShadowRenderPass->PushDepthAttachment();
+    //ShadowRenderPass->SetMultiview(true);
+    ShadowRenderPass->Create();
+    ShadowRenderPass->SetClearSize(4096, 4096);
+    
+
+    ShadowFb = new ZSVulkanFramebuffer;
+    ShadowFb->PushDepthAttachment(4096, 4096, 2);
+    ShadowFb->SetLayersCount(2);
+    ShadowFb->Create(ShadowRenderPass);
 
 
     Engine::ZsVkPipelineConf Conf;
@@ -112,13 +133,28 @@ void Engine::VKRenderer::InitShaders() {
     
 
 
+
+    Engine::ZsVkPipelineConf ConfShadow;
+    ConfShadow.hasDepth = true;
+    ConfShadow.cullFace = false;
+    ConfShadow.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->transformBuffer, VK_SHADER_STAGE_VERTEX_BIT);
+    ConfShadow.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->shadowBuffer, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_GEOMETRY_BIT);
+    ConfShadow.LayoutInfo.AddPushConstant(64, VK_SHADER_STAGE_VERTEX_BIT);
+    ConfShadow.Viewport.width = 4096;
+    ConfShadow.Viewport.height = 4096;
+
+    ShadowPipeline = new Engine::ZSVulkanPipeline;
+    ShadowPipeline->Create((Engine::vkShader*)mShadowMapShader, ShadowRenderPass, ConfShadow);
+
+
+
 	VkSemaphoreCreateInfo semaphoreInfo = {};
 	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
 	vkCreateSemaphore(game_data->vk_main->mDevice->getVkDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphore);
 	vkCreateSemaphore(game_data->vk_main->mDevice->getVkDevice(), &semaphoreInfo, nullptr, &MaterialsFinishedSemaphore);
     vkCreateSemaphore(game_data->vk_main->mDevice->getVkDevice(), &semaphoreInfo, nullptr, &DefferedFinishedSemaphore);
-
+    vkCreateSemaphore(game_data->vk_main->mDevice->getVkDevice(), &semaphoreInfo, nullptr, &ShadowFinishedSemaphore);
     
 
     VkCommandPoolCreateInfo poolInfo = {};
@@ -136,12 +172,50 @@ void Engine::VKRenderer::InitShaders() {
 
     vkAllocateCommandBuffers(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, &m3dCmdBuf);
     vkAllocateCommandBuffers(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, &mDefferedCmdBuf);
+    vkAllocateCommandBuffers(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, &mShadowCmdBuf);
 
     FillDefferedCmdBuf();
 
     if (engine_ptr->desc->game_perspective == PERSP_3D) {
         MtShProps::genDefaultMtShGroup(default3d, mSkyboxShader, mTerrainShader, water_shader);
     }
+}
+
+void Engine::VKRenderer::FillShadowCmdBuf() {
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = 0; // Optional
+    beginInfo.pInheritanceInfo = nullptr; // Optional
+
+    vkBeginCommandBuffer(mShadowCmdBuf, &beginInfo);
+
+    game_data->vk_main->CurrentCmdBuffer = mShadowCmdBuf;
+
+    ShadowRenderPass->CmdBegin(mShadowCmdBuf, ShadowFb);
+
+    ShadowPipeline->CmdBindPipeline(mShadowCmdBuf);
+    ShadowPipeline->CmdBindDescriptorSets(mShadowCmdBuf);
+    //SetViewport(mShadowCmdBuf, 0, 0, 4096, 4096);
+
+    for (unsigned int i = 0; i < ObjectsToRender.size(); i++) {
+        VKObjectToRender* obr = &ObjectsToRender[i];
+        GameObject* obj = ObjectsToRender[i].obj;
+        if (obj->hasMesh() && obr->mat != nullptr) {
+            MeshProperty* mesh = obj->getPropertyPtr<MeshProperty>();
+       
+                    //Send object transform
+                ShadowPipeline->CmdPushConstants(this->mShadowCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, &ObjectsToRender[i].transform);
+                    //Send material props
+
+                if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
+                    obj->DrawMeshInstanced(this, 2);
+            
+        }
+    }
+
+
+    vkCmdEndRenderPass(mShadowCmdBuf);
+    vkEndCommandBuffer(mShadowCmdBuf);
 }
 
 void Engine::VKRenderer::Fill3dCmdBuf() {
@@ -243,6 +317,16 @@ void Engine::VKRenderer::Present() {
     submitInfo.pWaitSemaphores = &MaterialsFinishedSemaphore;
     submitInfo.pWaitDstStageMask = waitStages;
     submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &mShadowCmdBuf;
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = &ShadowFinishedSemaphore;
+    vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+
+
+    submitInfo.waitSemaphoreCount = 1;
+    submitInfo.pWaitSemaphores = &ShadowFinishedSemaphore;
+    submitInfo.pWaitDstStageMask = waitStages;
+    submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &mDefferedCmdBuf;
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = &DefferedFinishedSemaphore;
@@ -262,4 +346,9 @@ void Engine::VKRenderer::Present() {
     presentInfo.pImageIndices = &imageIndex;
     presentInfo.pResults = nullptr; // Optional
     vkQueuePresentKHR(game_data->vk_main->mDevice->GetPresentQueue(), &presentInfo);
+}
+
+void Engine::VKRenderer::SetViewport(VkCommandBuffer cmdbuf, unsigned int startX, unsigned int startY, unsigned int width, unsigned int height) {
+    VkViewport viewport = {startX, startY, width, height, 0, 1};
+    vkCmdSetViewport(cmdbuf, 0, 1, &viewport);
 }

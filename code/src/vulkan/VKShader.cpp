@@ -36,10 +36,14 @@ bool Engine::vkShader::compileFromFile(std::string VSpath, std::string FSpath, s
     char* fragShaderData = nullptr;
     char* geomShaderData = nullptr;
 
+    mStages = HAS_VERT_SHADER | HAS_FRAG_SHADER;
+
     readBinaryShaderFile(VSpath, &vertShaderData, vertShaderSize);
     readBinaryShaderFile(FSpath, &fragShaderData, fragShaderSize);
-    if(!GSpath.empty())
+    if (!GSpath.empty()) {
         readBinaryShaderFile(GSpath, &geomShaderData, geomShaderSize);
+        mStages |= HAS_GEOM_SHADER;
+    }
 
     VkShaderModuleCreateInfo createVsInfo = {};
     createVsInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -55,7 +59,7 @@ bool Engine::vkShader::compileFromFile(std::string VSpath, std::string FSpath, s
     createFsInfo.pCode = reinterpret_cast<const uint32_t*>(fragShaderData);
     vkCreateShaderModule(game_data->vk_main->mDevice->getVkDevice(), &createFsInfo, nullptr, &fragmentShader);
 
-    if (!GSpath.empty()) {
+    if (mStages & HAS_GEOM_SHADER) {
         VkShaderModuleCreateInfo createGsInfo = {};
         createGsInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         createGsInfo.pNext = nullptr;

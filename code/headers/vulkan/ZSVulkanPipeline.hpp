@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
+#include "../render/GpuObject.hpp"
 #include "ZSVulkan.hpp"
 #include "VKShader.hpp"
 #include "ZSVulkanDescriptorSet.hpp"
@@ -12,19 +13,23 @@ namespace Engine {
         VkPrimitiveTopology iaTopology;
         
         VkPolygonMode polygonMode;
-
+        VkViewport Viewport;
         unsigned int cullFace;
         bool hasDepth;
+
+        void SetDefaultViewport();
 
         ZsVkPipelineLayoutConf LayoutInfo;
 
         ZsVkPipelineConf() {
+            SetDefaultViewport();
             iaTopology = VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
             polygonMode = VkPolygonMode::VK_POLYGON_MODE_FILL;
             cullFace = VK_CULL_MODE_NONE;
             hasDepth = false; 
         }
         ZsVkPipelineConf(float w, float h, float maxDepth) {
+            SetDefaultViewport();
             iaTopology = VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
             polygonMode = VkPolygonMode::VK_POLYGON_MODE_FILL;
             cullFace = VK_CULL_MODE_NONE;
@@ -32,7 +37,7 @@ namespace Engine {
         }
     }ZsVkPipelineConf;
 
-	class ZSVulkanPipeline {
+	class ZSVulkanPipeline : public GpuObject{
 	private:
 		VkPipeline pipeline; //Vulkan pipeline object
         ZSVulkanPipelineLayout* mLayout;
@@ -46,6 +51,7 @@ namespace Engine {
         void CmdBindPipeline(VkCommandBuffer cmdbuf);
         void CmdPushConstants(VkCommandBuffer cmdbuf, VkShaderStageFlagBits stage, unsigned int offset, unsigned int size, void* data);
         void CmdBindDescriptorSets(VkCommandBuffer cmdbuf);
+        void Destroy();
 
         ZSVulkanPipeline()
         {

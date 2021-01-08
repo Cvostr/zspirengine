@@ -5,6 +5,15 @@
 #define VERTEX_BUFFER_BIND 0
 extern ZSGAME_DATA* game_data;
 
+void Engine::ZsVkPipelineConf::SetDefaultViewport() {
+    Viewport.x = 0.0f;
+    Viewport.y = 0.0f;
+    Viewport.width = game_data->window->GetWindowWidth();
+    Viewport.height = game_data->window->GetWindowHeight();
+    Viewport.minDepth = 0.0f;
+    Viewport.maxDepth = 1.0f;
+}
+
 VkPipelineLayout Engine::ZSVulkanPipeline::_GetPipelineLayout() {
     return mLayout->GetPipelineLayout();
 }
@@ -28,6 +37,14 @@ void Engine::ZSVulkanPipeline::CmdBindPipeline(VkCommandBuffer cmdbuf) {
     vkCmdBindPipeline(cmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, GetPipeline());
 }
 
+void Engine::ZSVulkanPipeline::Destroy() {
+    if (mCreated) {
+        VkDevice device = game_data->vk_main->mDevice->getVkDevice();
+        vkDestroyPipeline(device, pipeline, nullptr);
+        mCreated = false;
+    }
+}
+
 VkVertexInputBindingDescription getBindingDescription() {
     VkVertexInputBindingDescription bindingDescription{};
     bindingDescription.binding = VERTEX_BUFFER_BIND;
@@ -37,39 +54,50 @@ VkVertexInputBindingDescription getBindingDescription() {
     return bindingDescription;
 }
 
-
 bool Engine::ZSVulkanPipeline::Create(vkShader* Shader, ZSVulkanRenderPass* renderPass, ZsVkPipelineConf Conf) {
     VkPipelineShaderStageCreateInfo vertexStageCreateInfo = {}, fragmentStageCreateInfo = {},
         geometryStageCreateInfo = {};
 
-    vertexStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    vertexStageCreateInfo.flags = 0;
-    vertexStageCreateInfo.pNext = nullptr;
-    vertexStageCreateInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vertexStageCreateInfo.module = Shader->vertexShader;
-    vertexStageCreateInfo.pName = "main";
+    std::vector<VkPipelineShaderStageCreateInfo> shader_stage_create_info;
 
-    fragmentStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    fragmentStageCreateInfo.flags = 0;
-    fragmentStageCreateInfo.pNext = nullptr;
-    fragmentStageCreateInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    fragmentStageCreateInfo.module = Shader->fragmentShader;
-    fragmentStageCreateInfo.pName = "main";
+    if (Shader->mStages & HAS_VERT_SHADER) {
+        vertexStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        vertexStageCreateInfo.flags = 0;
+        vertexStageCreateInfo.pNext = nullptr;
+        vertexStageCreateInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+        vertexStageCreateInfo.module = Shader->vertexShader;
+        vertexStageCreateInfo.pName = "main";
 
+        shader_stage_create_info.push_back(vertexStageCreateInfo);
+    }
 
-    VkViewport viewport;
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = game_data->window->GetWindowWidth();
-    viewport.height = game_data->window->GetWindowHeight();
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
+    if (Shader->mStages & HAS_FRAG_SHADER) {
+        fragmentStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        fragmentStageCreateInfo.flags = 0;
+        fragmentStageCreateInfo.pNext = nullptr;
+        fragmentStageCreateInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+        fragmentStageCreateInfo.module = Shader->fragmentShader;
+        fragmentStageCreateInfo.pName = "main";
+
+        shader_stage_create_info.push_back(fragmentStageCreateInfo);
+    }
+
+    if (Shader->mStages & HAS_GEOM_SHADER) {
+        geometryStageCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        geometryStageCreateInfo.flags = 0;
+        geometryStageCreateInfo.pNext = nullptr;
+        geometryStageCreateInfo.stage = VK_SHADER_STAGE_GEOMETRY_BIT;
+        geometryStageCreateInfo.module = Shader->geometryShader;
+        geometryStageCreateInfo.pName = "main";
+        //push geometry stage
+        shader_stage_create_info.push_back(geometryStageCreateInfo);
+    }
 
     VkRect2D scissor;
     //Set swap extend base params
     VkExtent2D swap_extend;
-    swap_extend.width = game_data->window->GetWindowWidth();
-    swap_extend.height = game_data->window->GetWindowHeight();
+    swap_extend.width = Conf.Viewport.width;
+    swap_extend.height = Conf.Viewport.height;
     scissor.offset = { 0, 0 };
     scissor.extent = swap_extend;
 
@@ -82,7 +110,7 @@ bool Engine::ZSVulkanPipeline::Create(vkShader* Shader, ZSVulkanRenderPass* rend
     VkPipelineViewportStateCreateInfo viewportState = {};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewportState.viewportCount = 1;
-    viewportState.pViewports = &viewport;
+    viewportState.pViewports = &Conf.Viewport;
     viewportState.scissorCount = 1;
     viewportState.pScissors = &scissor;
     //Rasterizer conf
@@ -183,9 +211,8 @@ bool Engine::ZSVulkanPipeline::Create(vkShader* Shader, ZSVulkanRenderPass* rend
     VkGraphicsPipelineCreateInfo pipeline_create_info = {};
     pipeline_create_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipeline_create_info.pNext = nullptr;
-    pipeline_create_info.stageCount = 2; //Usually, we have two shader stages (vertex and fragment)
-    VkPipelineShaderStageCreateInfo stages[2] = { vertexStageCreateInfo, fragmentStageCreateInfo };
-    pipeline_create_info.pStages = stages; //Store shader stages
+    pipeline_create_info.stageCount = static_cast<uint32_t>(shader_stage_create_info.size()); //Usually, we have two shader stages (vertex and fragment)
+    pipeline_create_info.pStages = shader_stage_create_info.data(); //Store shader stages
     //Now bind all fucking structures, that created above
     pipeline_create_info.pVertexInputState = &vertexInputInfo;
     pipeline_create_info.pInputAssemblyState = &inputAssembly;

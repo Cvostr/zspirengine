@@ -358,10 +358,6 @@ void Engine::TileProperty::onRender(Engine::Renderer* pipeline){
 void Engine::Renderer::updateShadersCameraInfo(Engine::Camera* cam_ptr){
     transformBuffer->bind();
     Mat4 proj = cam_ptr->getProjMatrix();
-
-    if(engine_ptr->engine_info->graphicsApi == VULKAN)
-        proj.m[1][1] *= -1;
-
     Mat4 view = cam_ptr->getViewMatrix();
     Vec3 cam_pos = cam_ptr->getCameraPosition();
     transformBuffer->writeData(0, sizeof (Mat4), &proj);

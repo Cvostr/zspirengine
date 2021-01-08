@@ -10,7 +10,8 @@ ZSVulkanRenderPass::ZSVulkanRenderPass():
     mHasDepthAttachment(false),
     mClearValuesCount(0)
 {
-
+    //Set default extent
+    ClearExtent = game_data->vk_main->mSwapChain->GetExtent();
 }
 ZSVulkanRenderPass::~ZSVulkanRenderPass() {
     if (mCreated)
@@ -20,9 +21,9 @@ ZSVulkanRenderPass::~ZSVulkanRenderPass() {
 void ZSVulkanRenderPass::PushColorAttachment(VkFormat Format, VkImageLayout Layout) {
     VkImageLayout imgLayout;
 
-    //if (Layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
- //      imgLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-   // else
+    if (Layout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+       imgLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    else
         imgLayout = Layout;
 
     VkAttachmentDescription colorAttachment = {};
@@ -114,6 +115,7 @@ bool ZSVulkanRenderPass::Create() {
     renderPassInfo.dependencyCount = 2;
     renderPassInfo.pDependencies = dependencies;
 
+
     if (vkCreateRenderPass(game_data->vk_main->mDevice->getVkDevice(), &renderPassInfo, nullptr, &mRenderPass) != VK_SUCCESS) {
         return false;
     }
@@ -125,10 +127,15 @@ bool ZSVulkanRenderPass::Create() {
         mClearValues[i].color = { 0.0f, 0.0f, 0.0f, 1.0f };
     if(mHasDepthAttachment)
         mClearValues[mClearValuesCount - 1].depthStencil = { 1.0f, 0 };
-
+    //Set created flag to true
     mCreated = true;
 
     return true;
+}
+
+void ZSVulkanRenderPass::SetClearSize(unsigned int Width, unsigned int Height) {
+    ClearExtent.width = Width;
+    ClearExtent.height = Height;
 }
 
 void ZSVulkanRenderPass::CmdBegin(VkCommandBuffer cmdbuf, ZSVulkanFramebuffer* framebuffer) {
@@ -139,7 +146,7 @@ void ZSVulkanRenderPass::CmdBegin(VkCommandBuffer cmdbuf, ZSVulkanFramebuffer* f
         renderPassInfo.framebuffer = framebuffer->GetFramebuffer();
 
         renderPassInfo.renderArea.offset = { 0, 0 };
-        renderPassInfo.renderArea.extent = game_data->vk_main->mSwapChain->GetExtent();
+        renderPassInfo.renderArea.extent = ClearExtent;
 
         renderPassInfo.clearValueCount = mClearValuesCount;
         renderPassInfo.pClearValues = mClearValues;

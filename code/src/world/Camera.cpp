@@ -2,6 +2,7 @@
 #include "../../headers/game.h"
 
 extern ZSGAME_DATA* game_data;
+extern ZSpireEngine* engine_ptr;
 
 Engine::Camera::Camera() : mCameraPos(0),
                            mCameraFront(1, 0, 0),
@@ -52,6 +53,12 @@ void Engine::Camera::updateProjectionMat(){
     }
     ui_proj = getOrthogonal(0, static_cast<float>(viewport.endX - viewport.startX),
                             0, static_cast<float>(viewport.endY - viewport.startY));
+
+    if (engine_ptr != nullptr) {
+        if (engine_ptr->engine_info->graphicsApi == VULKAN) {
+            mProjectionMatrix.m[1][1] *= -1;
+        }
+    }
 }
 
 void Engine::Camera::updateViewMat(){

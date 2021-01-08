@@ -22,7 +22,7 @@ namespace Engine {
 		ZSVulkanRenderPass* mMaterialsRenderPass;
 		ZSVulkanSampler* mDefaultTextureSampler;
 
-		ZSVulkan() :
+		ZSVulkan() 
 		{
 
 		}

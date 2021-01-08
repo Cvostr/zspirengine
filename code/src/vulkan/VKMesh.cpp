@@ -61,14 +61,14 @@ void Engine::vkMesh::DrawInstanced(VkCommandBuffer CmdBuf, unsigned int instance
     if (this->mIndicesNum != NO_INDICES) { //if object uses indices
         vkCmdBindIndexBuffer(CmdBuf, indexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
         //Indexed draw
-        vkCmdDrawIndexed(CmdBuf, mIndicesNum, 1, instances, 0, 0);
+        vkCmdDrawIndexed(CmdBuf, mIndicesNum, instances, 0, 0, 0);
     }
     else {
         //Draw without indices
-        vkCmdDraw(CmdBuf, mVerticesNum, 1, instances, 0);
+        vkCmdDraw(CmdBuf, mVerticesNum, instances, 0, 0);
     }
 }
 
 void Engine::vkMesh::Draw(VkCommandBuffer CmdBuf){
-    DrawInstanced(game_data->vk_main->CurrentCmdBuffer, 0);
+    DrawInstanced(game_data->vk_main->CurrentCmdBuffer, 1);
 }

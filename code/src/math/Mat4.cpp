@@ -1,5 +1,8 @@
 #include "../../headers/math/Mat4.hpp"
 #include "../../headers/render/Math.hpp"
+#include "../../headers/game.h"
+
+extern ZSpireEngine* engine_ptr;
 
 Mat4 getIdentity() {
     Mat4 Ret;
@@ -325,7 +328,6 @@ Mat4 getOrthogonal(float left, float right, float bottom, float top, float zNear
 
     out.m[3][0] = -(right + left) / (right - left);
     out.m[3][1] = -(top + bottom) / (top - bottom);
-
 
     return out;
 }

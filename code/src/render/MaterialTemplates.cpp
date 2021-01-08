@@ -51,7 +51,7 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
                                                         Engine::Shader* heightmap,
                                                         Engine::Shader* water){
 
-    MaterialTemplate* default_group = new MaterialTemplate(shader3d, 50, 48);
+    MaterialTemplate* default_group = allocMaterialTemplate(shader3d, 50, 48);
     {
         default_group->mAcceptShadows = true;
         default_group->str_path = "@default";
@@ -114,7 +114,7 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
     {
 
         //Water
-        MaterialTemplate* water_group = new MaterialTemplate(water, 51, 32);
+        MaterialTemplate* water_group = allocMaterialTemplate(water, 51, 32);
         water_group->mAcceptShadows = true;
         water_group->str_path = "@basewater";
         water_group->Label = "Water";
@@ -154,7 +154,7 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
     }
 
 //Default skybox material
-    MaterialTemplate* default_sky_group = new MaterialTemplate(skybox, 0, 0);
+    MaterialTemplate* default_sky_group = allocMaterialTemplate(skybox, 0, 0);
     default_sky_group->str_path = "@skybox";
     default_sky_group->Label = "Default Skybox";
     Texture3MaterialShaderProperty* sky_texture =
@@ -166,7 +166,7 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
     MtShProps::addMtShaderPropertyGroup(default_sky_group);
 
 //Default terrain material
-    MaterialTemplate* default_heightmap_group = new MaterialTemplate(heightmap, 0, 0);
+    MaterialTemplate* default_heightmap_group = allocMaterialTemplate(heightmap, 0, 0);
     default_heightmap_group->str_path = "@heightmap";
     default_heightmap_group->Label = "Default Heightmap";
     default_heightmap_group->mAcceptShadows = true;

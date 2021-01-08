@@ -1,6 +1,8 @@
 #include "../../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
 
+extern ZSpireEngine* engine_ptr;
+
 Engine::ShadowCasterProperty::ShadowCasterProperty() :
     TextureSize(2048),
 
@@ -147,20 +149,9 @@ void Engine::ShadowCasterProperty::onObjectDeleted() {
     glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, Renderer* pipeline) {
-    if (!isRenderAvailable()) {
-        onObjectDeleted();
-        return;
-    }
-
+void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam, Renderer* pipeline) {
     Engine::LightsourceProperty* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceProperty>();
-    //Change Framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, mShadowBuffer); //Bind framebuffer
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    glFrontFace(GL_CW);
-    glDisable(GL_CULL_FACE);
-    
+
     //Send BIAS value
     pipeline->shadowBuffer->writeDataBuffered(0, sizeof(float), &mShadowBias);
     //Send Width of shadow texture
@@ -183,9 +174,14 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, Renderer* pipeline)
         float w = static_cast<float>(40 * (1 + i));
         this->LightProjectionMat = getOrthogonal(-w, w, -w, w, nearPlane, farPlane);
 
+        if (engine_ptr != nullptr) {
+            if (engine_ptr->engine_info->graphicsApi == VULKAN) {
+                LightProjectionMat.m[1][1] *= -1;
+            }
+        }
+
         Mat4 mat = matview * LightProjectionMat;
 
-        //pipeline->shadowBuffer->bind();
         unsigned int offset = 32 + sizeof(Mat4) * i;
         pipeline->shadowBuffer->writeDataBuffered(offset, sizeof(Mat4), &mat);
         unsigned int DistOffset = 416 + sizeof(int) * i;
@@ -195,6 +191,22 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, Renderer* pipeline)
     //Bind shadow uniform buffer
     pipeline->shadowBuffer->bind();
     pipeline->shadowBuffer->updateBufferedData();
+}
+
+void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, Renderer* pipeline) {
+    if (!isRenderAvailable()) {
+        onObjectDeleted();
+        return;
+    }
+
+    //Change Framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, mShadowBuffer); //Bind framebuffer
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glFrontFace(GL_CW);
+    glDisable(GL_CULL_FACE);
+    
+    SendShadowParamsToShaders(cam, pipeline);
 
     glViewport(0, 0, TextureSize, TextureSize);
     //Render to depth all scene

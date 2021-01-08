@@ -81,14 +81,16 @@ bool Engine::glShader::compileFromFile(std::string VSpath, std::string FSpath, s
 
     readShaderFile(VSpath.c_str(), &vs_data, size);
     readShaderFile(FSpath.c_str(), &fs_data, size);
-    if(!GSpath.empty())
+
+    if (!GSpath.empty()) {
         readShaderFile(GSpath.c_str(), &gs_data, size);
+    }
 
     bool Result = compileFromStr(vs_data, fs_data, gs_data);
 
     delete[] vs_data;
     delete[] fs_data;
-    if (!GSpath.empty())
+    if (mStages & HAS_GEOM_SHADER)
         delete[] gs_data;
 
     return Result;
@@ -96,12 +98,17 @@ bool Engine::glShader::compileFromFile(std::string VSpath, std::string FSpath, s
 bool Engine::glShader::compileFromStr(const char* _VS, const char* _FS, const char* _GS) {
     if (mCreated)
         return false;
+
+    mStages = HAS_VERT_SHADER | HAS_FRAG_SHADER;
+
     this->mShaderID = glCreateProgram();
     unsigned int VS = glCreateShader(GL_VERTEX_SHADER);
     unsigned int FS = glCreateShader(GL_FRAGMENT_SHADER);
     unsigned int GS = 0;
-    if(_GS != nullptr)
+    if (_GS != nullptr) {
         GS = glCreateShader(GL_GEOMETRY_SHADER);
+        mStages |= HAS_GEOM_SHADER;
+    }
 
     glShaderSource(VS, 1, &_VS, nullptr); //Setting shader code text on vs
     glCompileShader(VS); //Compile VS shader code
@@ -113,7 +120,7 @@ bool Engine::glShader::compileFromStr(const char* _VS, const char* _FS, const ch
     GLcheckCompileErrors(FS, "FRAGMENT", "FSpath"); //Check fragment compile errors
     glAttachShader(this->mShaderID, FS);
     
-    if(_GS != nullptr){
+    if(mStages & HAS_GEOM_SHADER) {
         glShaderSource(GS, 1, &_GS, nullptr); //Setting shader code text on gs
         glCompileShader(GS); //Compile GS shader code
         GLcheckCompileErrors(GS, "Geometry", "GSpath"); //Check fragment compile errors
@@ -125,7 +132,7 @@ bool Engine::glShader::compileFromStr(const char* _VS, const char* _FS, const ch
     //Clear shaders, we don't need them anymore
     glDeleteShader(VS);
     glDeleteShader(FS);
-    if (_GS != nullptr) 
+    if (mStages & HAS_GEOM_SHADER)
         glDeleteShader(GS);
 
     this->mCreated = true; //Shader created & compiled now
@@ -147,6 +154,8 @@ bool Engine::glShader::compileComputeFromFile(std::string CSpath) {
 bool Engine::glShader::compileComputeFromStr(const char* _CS) {
     if (mCreated)
         return false;
+
+    mStages = HAS_COMP_SHADER;
 
     this->mShaderID = glCreateProgram();
     unsigned int CShader = glCreateShader(GL_COMPUTE_SHADER);

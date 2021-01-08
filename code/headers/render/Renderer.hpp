@@ -92,6 +92,7 @@ public:
     Engine::Shader* getUiShader() { return mUiShader; }
     UniformBuffer* GetTerrainUniformBuffer() { return terrainUniformBuffer; }
     UniformBuffer* GetTransformUniformBuffer() { return transformBuffer; }
+    UniformBuffer* GetShadowmapUniformBuffer() { return shadowBuffer; }
 
     void processObjects(World* world_ptr);
 
