@@ -249,7 +249,6 @@ void Engine::VKRenderer::Fill3dCmdBuf() {
                 sets[1] = obr->mat->DescrSetTextures->getDescriptorSet();
                 if (Pipeline != nullptr) {
 
-                    //obr->mat->applyMatToPipeline();
                     vkCmdBindDescriptorSets(m3dCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
                         Pipeline->_GetPipelineLayout(), 0,
                         2, sets, 0, nullptr);

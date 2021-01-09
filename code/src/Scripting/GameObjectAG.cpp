@@ -36,13 +36,14 @@ void Engine::bindWorldSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, "void removeObject(GameObject@)", asMETHOD(Engine::World, removeObject), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(GAME_OBJECT_TYPE_NAME) + "@ AddFromPrefab(PrefabResource@)", asMETHODPR(Engine::World, addObjectsFromPrefab, (PrefabResource*), GameObject*), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(CAM_TYPE_NAME) + "@ getCamera()", asMETHOD(Engine::World, getCameraPtr), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(GAME_OBJECT_TYPE_NAME) + "@ RayTestFirstObject(Vec3, Vec3, float)", asMETHOD(Engine::World, RayTestFirstObject), asCALL_THISCALL);
 
 	mgr->RegisterObjectProperty(GAME_OBJECT_TYPE_NAME, "World@ world", offsetof(Engine::GameObject, mWorld));
 }
 
 void Engine::bindGameObjectPropertiesSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(TRANSFORM_PROP_TYPE_NAME) + "@ transform()", asFUNCTION(ASGetPropertyPtr<TransformProperty>), asCALL_CDECL_OBJFIRST);
-	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(LIGHTSOURCE_PROP_TYPE_NAME) + "@ light()", asFUNCTION(ASGetPropertyPtr<LightsourceProperty>), asCALL_CDECL_OBJFIRST);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(LIGHTSOURCE_PROP_TYPE_NAME) + "@ light()", asFUNCTION(ASGetPropertyPtr<LightsourceComponent>), asCALL_CDECL_OBJFIRST);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(AUDSOURCE_PROP_TYPE_NAME) + "@ audio()", asFUNCTION(ASGetPropertyPtr<AudioSourceProperty>), asCALL_CDECL_OBJFIRST);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(CHAR_CTRL_PROP_TYPE_NAME) + "@ character()", asFUNCTION(ASGetPropertyPtr<CharacterControllerProperty>), asCALL_CDECL_OBJFIRST);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(ANIM_PROP_TYPE_NAME) + "@ anim()", asFUNCTION(ASGetPropertyPtr<AnimationProperty>), asCALL_CDECL_OBJFIRST);

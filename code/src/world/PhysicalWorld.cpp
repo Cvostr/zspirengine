@@ -57,6 +57,21 @@ void PhysicalWorld::rayTest(Vec3 pos, Vec3 dir, btCollisionWorld::RayResultCallb
     physic_world->rayTest(bvpos, bvdir, callback);
 }
 
+void* PhysicalWorld::RayTestFirstObject(Vec3 pos, Vec3 dir, float far) {
+    dir.Normalize();
+    btVector3 from = btVector3(pos.X, pos.Y, pos.Z);
+    btVector3 to = btVector3(dir.X * far, dir.Y * far, dir.Z * far) + from;
+
+    btCollisionWorld::ClosestRayResultCallback  allResults(from, to);
+    allResults.m_flags |= btTriangleRaycastCallback::kF_FilterBackfaces;
+
+    physic_world->rayTest(from, to, allResults);
+    if (allResults.hasHit())
+        return (allResults.m_collisionObject->getUserPointer());
+    else
+        return nullptr;
+}
+
 void PhysicalWorld::stepSimulation(float stepSimulation){
     //Simulate physics
     this->physic_world->stepSimulation(stepSimulation);
@@ -117,6 +132,7 @@ bool Engine::PhysicalProperty::init(){
     //Create Object rigidbody instance
     rigidBody = new btRigidBody(cInfo);
     rigidBody->setUserIndex(this->go_link.updLinkPtr()->array_index);
+    rigidBody->setUserPointer(go_link.updLinkPtr());
     //add rigidbody to world
     go_link.world_ptr->physical_world->addRidigbodyToWorld(rigidBody);
     //Set CREATED flag
@@ -143,6 +159,7 @@ void Engine::TriggerProperty::initGhost() {
     m_ghost->setCollisionFlags(m_ghost->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
     m_ghost->setCollisionShape(shape);
     m_ghost->setUserIndex(this->go_link.updLinkPtr()->array_index);
+    m_ghost->setUserPointer(go_link.updLinkPtr());
     m_ghost->setWorldTransform(startTransform);
     go_link.world_ptr->physical_world->addCollisionObjToWorld(m_ghost);
 
@@ -162,9 +179,9 @@ btTransform Engine::PhysicalProperty::getBtTransform() {
                                        btScalar(pos.Y + transform_offset.Y),
                                        btScalar(pos.Z + transform_offset.Z)));
     //Set start rotation
-    startTransform.setRotation(btQuaternion(rot.X, rot.Y, rot.Z));
-    //btQuaternion b;
-    //b.setEuler(transform->abs_rotation.Z, transform->abs_rotation.Y, transform->abs_rotation.X);
+    btQuaternion b;
+    b.setEuler(transform->abs_rotation.Y, transform->abs_rotation.X, transform->abs_rotation.Z);
+    startTransform.setRotation(b);
 
     return startTransform;
 }

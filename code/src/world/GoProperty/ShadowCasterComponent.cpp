@@ -30,7 +30,7 @@ bool Engine::ShadowCasterProperty::isRenderAvailable() {
     if (this->go_link.updLinkPtr() == nullptr)
         return false;
     //Get lightsource property of object
-    Engine::LightsourceProperty* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceProperty>();
+    Engine::LightsourceComponent* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceComponent>();
 
     if (light == nullptr)
         return false;
@@ -150,7 +150,7 @@ void Engine::ShadowCasterProperty::onObjectDeleted() {
 }
 
 void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam, Renderer* pipeline) {
-    Engine::LightsourceProperty* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceProperty>();
+    Engine::LightsourceComponent* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceComponent>();
 
     //Send BIAS value
     pipeline->shadowBuffer->writeDataBuffered(0, sizeof(float), &mShadowBias);
@@ -165,7 +165,7 @@ void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam
     //Use shadowmap shader to draw objects
     pipeline->getShadowmapShader()->Use();
 
-    int dists[] = { 0, 40, 90, 130, 170, 210 };
+    int dists[] = { 0, 40, 100, 140, 200, 250 };
     //iterate over all cascades
     for (int i = 0; i < mCascadesNum; i++) {
         Vec3 cam_pos = cam->getCameraPosition() + cam->getCameraFrontVec() * static_cast<float>(dists[i]);

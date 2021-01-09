@@ -127,7 +127,7 @@ void AGScriptMgr::create_Engine() {
 	bindFilesSDK(this);
 	bindUiSDK(this);
 	bindGameObjectPropertySDK<TransformProperty>(this, TRANSFORM_PROP_TYPE_NAME);
-	bindGameObjectPropertySDK<LightsourceProperty>(this, LIGHTSOURCE_PROP_TYPE_NAME);
+	bindGameObjectPropertySDK<LightsourceComponent>(this, LIGHTSOURCE_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<AudioSourceProperty>(this, AUDSOURCE_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<CharacterControllerProperty>(this, CHAR_CTRL_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<AnimationProperty>(this, ANIM_PROP_TYPE_NAME);

@@ -432,7 +432,7 @@ bool Engine::GameObject::hasTerrain(){
 }
 
 bool Engine::GameObject::hasLightsource() {
-    return getPropertyPtr<LightsourceProperty>() != nullptr;
+    return getPropertyPtr<LightsourceComponent>() != nullptr;
 }
 
 void Engine::GameObject::DrawMesh(Renderer* pipeline) {

@@ -13,7 +13,7 @@ namespace Engine {
         LIGHTSOURCE_TYPE_SPOT
     };
 
-    class LightsourceProperty : public Engine::IGameObjectComponent {
+    class LightsourceComponent : public Engine::IGameObjectComponent {
     public:
         LIGHTSOURCE_TYPE light_type; //type of lightsource
 
@@ -34,6 +34,6 @@ namespace Engine {
         void savePropertyToStream(ZsStream* stream, GameObject* obj);
         void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
-        LightsourceProperty();
+        LightsourceComponent();
     };
 }

@@ -14,6 +14,7 @@
 #include <BulletCollision/CollisionShapes/btCapsuleShape.h>
 #include <BulletCollision/CollisionShapes/btConvexHullShape.h>
 #include <BulletCollision/CollisionShapes/btTriangleShape.h>
+#include <BulletCollision/NarrowPhaseCollision/btRaycastCallback.h>
 #include <LinearMath/btDefaultMotionState.h>
 
 #include <BulletCollision/CollisionShapes/btTriangleIndexVertexArray.h>
@@ -49,6 +50,8 @@ public:
     void removeCollisionObjFromWorld(btCollisionObject* body);
     void rayTest(Vec3 pos, Vec3 dir, btCollisionWorld::RayResultCallback& callback);
 
+    void* RayTestFirstObject(Vec3 pos, Vec3 dir, float far);
+
     PhysicalWorld(PhysicalWorldSettings* settings);
     ~PhysicalWorld();
 };
@@ -72,5 +75,6 @@ public:
 protected:
     btRigidBody* m_me;
 };
+
 
 #endif // PHYSICS_H

@@ -1,6 +1,6 @@
 #include "../../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
 
-Engine::LightsourceProperty::LightsourceProperty() : light_type(LIGHTSOURCE_TYPE::LIGHTSOURCE_TYPE_DIRECTIONAL),
+Engine::LightsourceComponent::LightsourceComponent() : light_type(LIGHTSOURCE_TYPE::LIGHTSOURCE_TYPE_DIRECTIONAL),
                                                      intensity(1.f),
                                                      range(10.0f),
                                                      spot_angle(12.5f)
@@ -9,20 +9,20 @@ Engine::LightsourceProperty::LightsourceProperty() : light_type(LIGHTSOURCE_TYPE
 }
 
 
-void Engine::LightsourceProperty::copyTo(Engine::IGameObjectComponent* dest) {
+void Engine::LightsourceComponent::copyTo(Engine::IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't Lightsource, then exit
 
     //Do base things
     IGameObjectComponent::copyTo(dest);
 
-    LightsourceProperty* _dest = static_cast<LightsourceProperty*>(dest);
+    LightsourceComponent* _dest = static_cast<LightsourceComponent*>(dest);
     _dest->color = color;
     _dest->intensity = intensity;
     _dest->range = range;
     _dest->light_type = light_type;
 }
 
-void Engine::LightsourceProperty::onPreRender(Engine::Renderer* pipeline) {
+void Engine::LightsourceComponent::onPreRender(Engine::Renderer* pipeline) {
     Engine::TransformProperty* transform_prop = go_link.updLinkPtr()->getPropertyPtr<Engine::TransformProperty>();
 
     pipeline->addLight(this); //put light pointer to vector
@@ -37,7 +37,7 @@ void Engine::LightsourceProperty::onPreRender(Engine::Renderer* pipeline) {
     }
 }
 
-void Engine::LightsourceProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
+void Engine::LightsourceComponent::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
     //Read Type of Light Source
     readBinaryValue<LIGHTSOURCE_TYPE>(&light_type, data + offset, offset);
@@ -58,7 +58,7 @@ void Engine::LightsourceProperty::loadPropertyFromMemory(const char* data, GameO
     color = RGBAColor(cl_r, cl_g, cl_b);
 }
 
-void Engine::LightsourceProperty::savePropertyToStream(ZsStream* stream, GameObject* obj) {
+void Engine::LightsourceComponent::savePropertyToStream(ZsStream* stream, GameObject* obj) {
     stream->writeBinaryValue(&light_type);
     stream->writeBinaryValue(&intensity);
     stream->writeBinaryValue(&range);
@@ -69,11 +69,11 @@ void Engine::LightsourceProperty::savePropertyToStream(ZsStream* stream, GameObj
     stream->writeBinaryValue(&color.b);
 }
 
-void Engine::LightsourceProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+void Engine::LightsourceComponent::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
     mgr->RegisterObjectType(LIGHTSOURCE_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
 
-    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float intensity", offsetof(LightsourceProperty, intensity));
-    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float range", offsetof(LightsourceProperty, range));
-    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float spot_angle", offsetof(LightsourceProperty, spot_angle));
-    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, std::string(RGBACOLOR_TYPE_NAME) + " color", offsetof(LightsourceProperty, color));
+    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float intensity", offsetof(LightsourceComponent, intensity));
+    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float range", offsetof(LightsourceComponent, range));
+    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, "float spot_angle", offsetof(LightsourceComponent, spot_angle));
+    mgr->RegisterObjectProperty(LIGHTSOURCE_PROP_TYPE_NAME, std::string(RGBACOLOR_TYPE_NAME) + " color", offsetof(LightsourceComponent, color));
 }

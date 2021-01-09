@@ -14,6 +14,8 @@
 #include "../../../headers/world/ObjectsComponents/CharacterController.hpp"
 #include "../../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/TriggerComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/WindZoneComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/ParticleEmitterComponent.hpp"
 
 extern ZSGAME_DATA* game_data;
 
@@ -42,17 +44,6 @@ void Engine::IGameObjectComponent::savePropertyToStream(ZsStream* stream, GameOb
 void Engine::IGameObjectComponent::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
 
 }
-void Engine::IGameObjectComponent::onTrigger(Engine::GameObject* obj){
-    assert(obj);
-}
-
-void Engine::IGameObjectComponent::onTriggerEnter(Engine::GameObject* obj) {
-
-}
-
-void Engine::IGameObjectComponent::onTriggerExit(Engine::GameObject* obj) {
-
-}
 Engine::IGameObjectComponent::~IGameObjectComponent(){
 
 }
@@ -79,7 +70,7 @@ Engine::IGameObjectComponent* Engine::allocProperty(PROPERTY_TYPE type){
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_LIGHTSOURCE:{
-            _ptr = static_cast<IGameObjectComponent*>(new LightsourceProperty);
+            _ptr = static_cast<IGameObjectComponent*>(new LightsourceComponent);
             break;
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_AGSCRIPT:{
@@ -135,6 +126,14 @@ Engine::IGameObjectComponent* Engine::allocProperty(PROPERTY_TYPE type){
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_TRIGGER: {
             _ptr = static_cast<IGameObjectComponent*>(new Engine::TriggerProperty);
+            break;
+        }
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_WINDZONE: {
+            _ptr = static_cast<IGameObjectComponent*>(new Engine::WindZoneComponent);
+            break;
+        }
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_PARTICLE_EMITTER: {
+            _ptr = static_cast<IGameObjectComponent*>(new Engine::ParticleEmitterComponent);
             break;
         }
     }

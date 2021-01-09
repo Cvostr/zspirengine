@@ -104,7 +104,7 @@ void GlyphFontContainer::loadGlyph(unsigned int index,
     if (MaxY < character->mGlyphSize.Y)
         MaxY = character->mGlyphSize.Y;
 
-    character->mGlyphTextureStart = Vec2(WorkX, WorkY);
+    character->mGlyphTextureStart = Vec2(static_cast<float>(WorkX), static_cast<float>(WorkY));
 
     for (unsigned int _y = 0; _y < character->mGlyphSize.Y; _y++) {
         unsigned int Ycoord = (WorkY + _y) * texSize;
@@ -113,7 +113,7 @@ void GlyphFontContainer::loadGlyph(unsigned int index,
             mGlyphTextureBuffer[Xcoord] = font->glyph->bitmap.buffer[(int)(_y * character->mGlyphSize.X + _x)];
         }
     }
-    WorkX += character->mGlyphSize.X;
+    WorkX += static_cast<unsigned int>(character->mGlyphSize.X);
 
     this->characters.insert(std::pair<unsigned int, CharacterGlyph*>(index, character));
 }

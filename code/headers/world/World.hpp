@@ -38,6 +38,8 @@ enum class PROPERTY_TYPE{
     GO_PROPERTY_TYPE_NODE,
     GO_PROPERTY_TYPE_ANIMATION,
     GO_PROPERTY_TYPE_TRIGGER,
+    GO_PROPERTY_TYPE_WINDZONE,
+    GO_PROPERTY_TYPE_PARTICLE_EMITTER,
     GO_PROPERTY_TYPE_TILE_GROUP = 1000,
     GO_PROPERTY_TYPE_TILE = 1001
 };
@@ -96,9 +98,9 @@ public:
     virtual void loadPropertyFromMemory(const char* data, GameObject* obj);
     virtual void savePropertyToStream(ZsStream* stream, GameObject* obj);
     virtual void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
-    virtual void onTrigger(Engine::GameObject* obj);
-    virtual void onTriggerEnter(Engine::GameObject* obj);
-    virtual void onTriggerExit(Engine::GameObject* obj);
+    virtual void onTrigger(Engine::GameObject* obj){}
+    virtual void onTriggerEnter(Engine::GameObject* obj){}
+    virtual void onTriggerExit(Engine::GameObject* obj){}
     //Editor specific functions
     virtual void addPropertyInterfaceToInspector(){}
     virtual void onValueChanged(){}
@@ -161,6 +163,9 @@ public:
 
     void putToShapshot(WorldSnapshot* snapshot);
 
+    GameObject* RayTestFirstObject(Vec3 pos, Vec3 dir, float far) {
+        return static_cast<GameObject*>(physical_world->RayTestFirstObject(pos, dir, far));
+    }
 
     World();
     ~World();
