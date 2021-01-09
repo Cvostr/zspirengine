@@ -85,6 +85,8 @@ public:
     UniformBuffer* uiUniformBuffer; //7
     UniformBuffer* instancedTransformBuffer; //9
     UniformBuffer* TextUniformBuffer; //10
+    UniformBuffer* TimeUniformBuffer; //11
+    UniformBuffer* WindUniformBuffer; //12
 
     RenderSettings* getRenderSettings() { return &this->render_settings; }
     Engine::Shader* getTileShader() { return tile_shader; }

@@ -104,7 +104,6 @@ void Engine::VKRenderer::InitShaders() {
 
     ShadowRenderPass = new ZSVulkanRenderPass;
     ShadowRenderPass->PushDepthAttachment();
-    //ShadowRenderPass->SetMultiview(true);
     ShadowRenderPass->Create();
     ShadowRenderPass->SetClearSize(4096, 4096);
     

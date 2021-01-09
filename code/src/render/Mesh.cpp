@@ -265,6 +265,7 @@ void Engine::freeDefaultMeshes(){
     cube3Dmesh->Destroy();
     sphereMesh->Destroy();
     skyboxMesh->Destroy();
+    grassMesh->Destroy();
 }
 
 Engine::Mesh* Engine::getPlaneMesh2D() {

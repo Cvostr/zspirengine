@@ -1,35 +1,11 @@
-#version 430 core
+#version 450 core
 
 const int MAX_SPLITS = 4;
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
-layout (std140, binding = 2) uniform ShadowData{
-//Shadowmapping stuff
-    uniform float ShadowBias; //4
-    uniform int ShadowmapSize; //4
-    uniform bool HasShadowMap; //4
-    uniform int CascadesNum; //4
-    uniform int PcfPassNum; // 4
-    uniform float ShadowStrength; // 4
-    //32
-    uniform mat4 LightProjViewMat0; // 16 * 4
-    uniform mat4 LightProjViewMat1; // 16 * 4
-    uniform mat4 LightProjViewMat2; // 16 * 4
-    uniform mat4 LightProjViewMat3; // 16 * 4
-    uniform mat4 LightProjViewMat4; // 16 * 4
-    uniform mat4 LightProjViewMat5; // 16 * 4
-    //416   
-    uniform int CasterDistance0; //4
-    uniform int CasterDistance1; //4
-    uniform int CasterDistance2; //4
-    uniform int CasterDistance3; //4
-    uniform int CasterDistance4; //4
-    uniform int CasterDistance5; //4
-};
-
-in VS_OUTPUT
+layout (location = 0) in VS_OUTPUT
 {
 	float depth;
 	flat int instanceID;

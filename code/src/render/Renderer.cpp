@@ -81,6 +81,9 @@ Engine::Renderer::Renderer(){
     TextUniformBuffer = Engine::allocUniformBuffer();
     TextUniformBuffer->init(10, 16 * 2);
 
+    TimeUniformBuffer = Engine::allocUniformBuffer();
+    TimeUniformBuffer->init(11, sizeof(int) * 2);
+
     {
         instancedTransformBuffer = Engine::allocUniformBuffer();
         instancedTransformBuffer->init(9, sizeof(Mat4) * INSTANCED_RENDER_BUFFER_SIZE);
@@ -121,6 +124,8 @@ void Engine::Renderer::destroy(){
     delete skinningUniformBuffer;
     delete skyboxTransformUniformBuffer;
     delete instancedTransformBuffer;
+    delete TextUniformBuffer;
+    delete TimeUniformBuffer;
 
     if(engine_ptr->desc->game_perspective == PERSP_3D){
         delete deffered_light;
@@ -373,6 +378,12 @@ void Engine::Renderer::updateShadersCameraInfo(Engine::Camera* cam_ptr){
     skyboxTransformUniformBuffer->bind();
     skyboxTransformUniformBuffer->writeData(0, sizeof (Mat4), &proj);
     skyboxTransformUniformBuffer->writeData(sizeof (Mat4), sizeof (Mat4), &view);
+
+    uint32_t Frames = game_data->time->GetFramesCount();
+    float DeltaTime = game_data->time->GetDeltaTime();
+    TimeUniformBuffer->bind();
+    TimeUniformBuffer->writeData(0, sizeof(int), &Frames);
+    TimeUniformBuffer->writeData(sizeof(int), sizeof(float), &DeltaTime);
 }
 
 void Engine::Renderer::renderUI() {
