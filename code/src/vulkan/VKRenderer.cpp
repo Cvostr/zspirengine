@@ -240,18 +240,20 @@ void Engine::VKRenderer::Fill3dCmdBuf() {
             if (((VKMaterialTemplate*)obr->mat->mTemplate)->mPipelineCreated) {
                 if (!binded) {
                     Pipeline->CmdBindPipeline(m3dCmdBuf);
+
+                    ((VKMaterialTemplate*)obr->mat->mTemplate)->Pipeline->GetPipelineLayout()
+                        ->CmdBindDescriptorSets(m3dCmdBuf, 0, 1);
+
                     binded = true;
                 }
 
 
-                VkDescriptorSet sets[2];
-                sets[0] = obr->mat->DescrSetUBO->getDescriptorSet();
-                sets[1] = obr->mat->DescrSetTextures->getDescriptorSet();
+                VkDescriptorSet set = obr->mat->DescrSetTextures->getDescriptorSet();
                 if (Pipeline != nullptr) {
 
                     vkCmdBindDescriptorSets(m3dCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                        Pipeline->_GetPipelineLayout(), 0,
-                        2, sets, 0, nullptr);
+                        Pipeline->_GetPipelineLayout(), 1,
+                        1, &set, 0, nullptr);
                     //Send object transform
                     Pipeline->CmdPushConstants(this->m3dCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, &ObjectsToRender[i].transform);
                     //Send material props

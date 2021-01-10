@@ -25,7 +25,11 @@ unsigned int Engine::ZSVulkanPipelineLayout::GetDescriptorSetsCount() {
 }
 
 void Engine::ZSVulkanPipelineLayout::CmdBindDescriptorSets(VkCommandBuffer cmdbuf) {
-    vkCmdBindDescriptorSets(cmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, GetPipelineLayout(), 0, GetDescriptorSetsCount(), GetDescriptorsSets(), 0, nullptr);
+    CmdBindDescriptorSets(cmdbuf, 0, GetDescriptorSetsCount());
+}
+
+void Engine::ZSVulkanPipelineLayout::CmdBindDescriptorSets(VkCommandBuffer cmdbuf, uint32_t FirstSet, uint32_t SetsCount) {
+    vkCmdBindDescriptorSets(cmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, GetPipelineLayout(), FirstSet, SetsCount, GetDescriptorsSets() + FirstSet, 0, nullptr);
 }
 
 void Engine::ZSVulkanPipelineLayout::BindTexture(vkTexture* Texture, ZSVulkanSampler* sampler, uint32_t slot) {

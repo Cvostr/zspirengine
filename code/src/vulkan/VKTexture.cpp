@@ -41,15 +41,6 @@ bool Engine::vkTexture::LoadDDSTextureFromBuffer(unsigned char* data){
 	}
 	//Getting block size
 	unsigned int blockSize = (format == VK_FORMAT_BC1_RGBA_UNORM_BLOCK) ? 8 : 16;
-	unsigned int offset = 0;
-
-	unsigned int size = ((maxWidth + 3) / 4) * ((maxHeight + 3) / 4) * blockSize;
-
-	VmaVkBuffer temp_buf;
-	void* temp_map;
-	game_data->vk_main->mVMA->allocateCpu(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, &temp_buf, size, &temp_map);
-	memcpy(temp_map, bufferT, size);
-	game_data->vk_main->mVMA->unmap(&temp_buf);
 
 	VkImageCreateInfo imageInfo{};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -58,7 +49,7 @@ bool Engine::vkTexture::LoadDDSTextureFromBuffer(unsigned char* data){
 	imageInfo.extent.width = static_cast<uint32_t>(maxWidth);
 	imageInfo.extent.height = static_cast<uint32_t>(maxHeight);
 	imageInfo.extent.depth = 1;
-	imageInfo.mipLevels = 1;
+	imageInfo.mipLevels = mMipsCount;
 	imageInfo.arrayLayers = 1;
 	imageInfo.format = format;
 	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
@@ -99,9 +90,34 @@ bool Engine::vkTexture::LoadDDSTextureFromBuffer(unsigned char* data){
 
 	vkBindImageMemory(game_data->vk_main->mDevice->getVkDevice(), mImage, mImageMem, 0);
 
+	unsigned int size = ((maxWidth + 3) / 4) * ((maxHeight + 3) / 4) * blockSize;
 
+	VmaVkBuffer temp_buf;
+	void* temp_map;
+	game_data->vk_main->mVMA->allocateCpu(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, &temp_buf, size, &temp_map);
+	
 
-	Transition(temp_buf);
+	unsigned int offset = 0;
+	int nwidth = maxWidth;
+	int nheight = maxHeight;
+	
+
+	for (unsigned int level = 0; level < mMipsCount && (nwidth || nheight); ++level) //Iterating over mipmaps
+	{
+		size = ((nwidth + 3) / 4) * ((nheight + 3) / 4) * blockSize; //Calculating mip texture size
+		
+		game_data->vk_main->mVMA->map(&temp_buf, &temp_map);
+		memcpy(temp_map, bufferT + offset, size);
+		game_data->vk_main->mVMA->unmap(&temp_buf);
+
+		Transition(temp_buf, level, nwidth, nheight);
+
+		offset += size;
+		nwidth /= 2;
+		nheight /= 2;
+	}
+
+	game_data->vk_main->mVMA->unmap(&temp_buf);
 	//Free temporary buffer
 	game_data->vk_main->mVMA->destroyBuffer(&temp_buf);
 	//Create image view
@@ -125,7 +141,7 @@ void Engine::vkTexture::Destroy(){
 	}
 }
 
-void Engine::vkTexture::Transition(VmaVkBuffer temp) {
+void Engine::vkTexture::Transition(VmaVkBuffer temp, unsigned int MipLevel, uint32_t Width, uint32_t Height) {
 	VkCommandBuffer cmdbuf = game_data->vk_main->mVMA->GetSingleTimeCmdBuf();
 	VkCommandPool cmdpool = game_data->vk_main->mVMA->GetSingleTimeCmdPool();
 
@@ -161,8 +177,9 @@ void Engine::vkTexture::Transition(VmaVkBuffer temp) {
 	VkBufferImageCopy region = {};
 	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	region.imageSubresource.layerCount = 1;
-	region.imageExtent.width = maxWidth;
-	region.imageExtent.height = maxHeight;
+	region.imageSubresource.mipLevel = MipLevel;
+	region.imageExtent.width = Width;
+	region.imageExtent.height = Height;
 	region.imageExtent.depth = 1;
 
 	vkCmdCopyBufferToImage(cmdbuf, temp.Buffer, mImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);

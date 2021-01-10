@@ -34,6 +34,7 @@ Mat4 matrixMM(const Mat4& l, const Mat4& r);
 Vec4 matrixVecMM(const Mat4& l, const Vec4& r);
 Mat4 matrixSum(const Mat4& l, const Mat4& r);
 Mat4 getPerspective(float fovy, float aspect, float zNear, float zFar);
+Mat4 getPerspectiveVulkan(float fovy, float aspect, float zNear, float zFar);
 Mat4 getOrthogonal(float left, float right, float bottom, float top);
 Mat4 getOrthogonal(float left, float right, float bottom, float top, float zNear, float zFar);
 Mat4 matrixLookAt(const Vec3& eye, const Vec3& center, const Vec3& up);

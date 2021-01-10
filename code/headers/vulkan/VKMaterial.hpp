@@ -19,9 +19,7 @@ public:
 
 class VKMaterial : public Material {
 public:
-	Engine::ZSVulkanDescriptorSet* DescrSetUBO;
 	Engine::ZSVulkanDescriptorSet* DescrSetTextures;
-	
 
 	void CreateDescriptors();
 	void SetTexture(unsigned int slot, VkImageView view, Engine::ZSVulkanSampler* sampler);

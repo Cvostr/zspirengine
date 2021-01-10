@@ -38,6 +38,7 @@ namespace Engine {
 		unsigned int GetDescriptorSetsCount();
 
 		void CmdBindDescriptorSets(VkCommandBuffer cmdbuf);
+		void CmdBindDescriptorSets(VkCommandBuffer cmdbuf, uint32_t FirstSet, uint32_t SetsCount);
 		void BindTexture(vkTexture* Texture, ZSVulkanSampler* sampler, uint32_t slot);
 
 		VkPipelineLayout GetPipelineLayout() {

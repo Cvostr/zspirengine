@@ -45,7 +45,14 @@ void Engine::Camera::setViewport(ZSVIEWPORT viewport){
 void Engine::Camera::updateProjectionMat(){
     if(proj_type == ZSCAMERA_PROJECTION_PERSPECTIVE){
         float aspect = static_cast<float>((viewport.endX - viewport.startX)) / static_cast<float>(viewport.endY - viewport.startY);
-        mProjectionMatrix = getPerspective(FOV, aspect, nearZ, farZ);
+        if (engine_ptr != nullptr) {
+            if (engine_ptr->engine_info->graphicsApi == VULKAN) {
+                mProjectionMatrix = getPerspectiveVulkan(FOV, aspect, nearZ, farZ);
+            }
+            else
+                mProjectionMatrix = getPerspective(FOV, aspect, nearZ, farZ);
+        }else
+            mProjectionMatrix = getPerspective(FOV, aspect, nearZ, farZ);
     }else{
         mProjectionMatrix = getOrthogonal(0, static_cast<float>(viewport.endX - viewport.startX) * orthogonal_factor,
                              0, static_cast<float>(viewport.endY - viewport.startY) * orthogonal_factor,
@@ -54,11 +61,7 @@ void Engine::Camera::updateProjectionMat(){
     ui_proj = getOrthogonal(0, static_cast<float>(viewport.endX - viewport.startX),
                             0, static_cast<float>(viewport.endY - viewport.startY));
 
-    if (engine_ptr != nullptr) {
-        if (engine_ptr->engine_info->graphicsApi == VULKAN) {
-            mProjectionMatrix.m[1][1] *= -1;
-        }
-    }
+    
 }
 
 void Engine::Camera::updateViewMat(){

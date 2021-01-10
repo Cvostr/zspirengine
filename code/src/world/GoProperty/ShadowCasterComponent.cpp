@@ -7,7 +7,7 @@ Engine::ShadowCasterProperty::ShadowCasterProperty() :
     TextureSize(2048),
 
     mShadowBias(0.005f),
-    nearPlane(1.0f),
+    nearPlane(0.1f),
     farPlane(75.0f),
     projection_viewport(20),
 

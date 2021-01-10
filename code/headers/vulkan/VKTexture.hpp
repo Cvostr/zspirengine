@@ -10,7 +10,7 @@ namespace Engine {
         VkImage mImage;
         VkImageView mImageView;
         VkDeviceMemory mImageMem;
-        void Transition(VmaVkBuffer temp);
+        void Transition(VmaVkBuffer temp, unsigned int MipLevel, uint32_t Width, uint32_t Height);
         void CreateImageView(VkFormat format);
     public:
 

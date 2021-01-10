@@ -53,17 +53,27 @@ Mat4 matrixSum(const Mat4& l, const Mat4& r) {
 Mat4 getPerspective(float fovy, float aspect, float zNear, float zFar) {
     Mat4 result;
 
-    double range = tan(static_cast<double>(ZS_PI * (fovy / (2.0f * 180.f)))) * static_cast<double>(zNear);
-    double left = -range * static_cast<double>(aspect);
-    double right = range * static_cast<double>(aspect);
-    double bottom = -range;
-    double top = range;
+    double range = tan(static_cast<double>(ZS_PI * (fovy / (2.0f * 180.f))));
 
-    result.m[0][0] = (2.0f * zNear) / static_cast<float>(right - left);
-    result.m[1][1] = (2.0f * zNear) / static_cast<float>(top - bottom);
+    result.m[0][0] = (1.f) / static_cast<float>(aspect * range);
+    result.m[1][1] = (1.f) / static_cast<float>(range);
     result.m[2][2] = -(zFar + zNear) / (zFar - zNear);
     result.m[2][3] = -1.0f;
     result.m[3][2] = -(2.0f * zFar * zNear) / (zFar - zNear);
+
+    return result;
+}
+
+Mat4 getPerspectiveVulkan(float fovy, float aspect, float zNear, float zFar) {
+    Mat4 result;
+
+    double range = tan(static_cast<double>(ZS_PI * (fovy / (2.0f * 180.f))));
+
+    result.m[0][0] = (1.f) / static_cast<float>(aspect * range);
+    result.m[1][1] = (-1.f) / static_cast<float>(range);
+    result.m[2][2] = zFar / (zNear - zFar);
+    result.m[2][3] = -1.0f;
+    result.m[3][2] = -(zFar * zNear) / (zFar - zNear);
 
     return result;
 }

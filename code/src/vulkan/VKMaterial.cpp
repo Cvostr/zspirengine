@@ -50,10 +50,8 @@ void VKMaterial::SetTexture(unsigned int slot, VkImageView view, Engine::ZSVulka
 void VKMaterial::CreateDescriptors() {
     if (engine_ptr->engine_info->graphicsApi == VULKAN && mTemplate->mShader->mCreated) {
 
-        DescrSetUBO = new Engine::ZSVulkanDescriptorSet(Engine::DESCR_SET_TYPE::DESCR_SET_TYPE_UBO);
         DescrSetTextures = new Engine::ZSVulkanDescriptorSet(Engine::DESCR_SET_TYPE::DESCR_SET_TYPE_TEXTURE);
 
-        ((VKMaterialTemplate*)mTemplate)->MakeDescrSetUniform(DescrSetUBO);
         ((VKMaterialTemplate*)mTemplate)->MakeDescrSetTextures(DescrSetTextures);
     }
 }
