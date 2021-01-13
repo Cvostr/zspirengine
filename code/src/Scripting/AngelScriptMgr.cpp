@@ -12,6 +12,8 @@
 
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
+//Hack to support meshes
+extern ZSpireEngine* engine_ptr;
 
 using namespace Engine;
 
@@ -168,6 +170,8 @@ void AGScriptMgr::CreateModule() {
 	//Create module
 	mBuilder.StartNewModule(getAgScriptEngine(), "ZSPscriptCore");
 	mModule = getAgScriptEngine()->GetModule("ZSPscriptCore", asGM_ONLY_IF_EXISTS);
+	//Set builder #include callback
+	mBuilder.SetIncludeCallback(onInclude, this);
 }
 
 void AGScriptMgr::recreate_Engine() {
@@ -180,7 +184,8 @@ void AGScriptMgr::recreate_Engine() {
 
 AGScriptMgr::AGScriptMgr() :
 	CompileError(false),
-	ModuleCompiled(false)
+	ModuleCompiled(false),
+	mStreamWrite(new BytecodeStreamWriter)
 {
 	create_Engine();
 }
@@ -246,13 +251,15 @@ bool AGScriptMgr::AddScriptFiles() {
 	}
 
 	int result = mBuilder.BuildModule();
-
+	
+	//Check error
 	if (result < 0) {
 		CompileError = true;
 		game_data->out_manager->spawnRuntimeError(RuntimeErrorType::RE_TYPE_SCRIPT_ERROR);
 	}
 	else {
-		CompileError = false;
+		SaveByteCode();
+		CompileError = false;	
 		ModuleCompiled = true;
 	}
 
@@ -261,24 +268,29 @@ bool AGScriptMgr::AddScriptFiles() {
 	return (result >= 0);
 }
 
-bool AGScriptMgr::AddScriptFile(Engine::ScriptResource* res) {
+int Engine::onInclude (const char* include, const char* from, CScriptBuilder* builder, void* userParam) {
+	Engine::ScriptResource* DependencyRes = game_data->resources->getScriptByLabel(include);
+	//include dependency
+	AGScriptMgr* mgr = static_cast<AGScriptMgr*>(userParam);
+	int result = mgr->AddScriptFile(DependencyRes);
+	return result;
+}
+
+int AGScriptMgr::SaveByteCode() {
+	if (game_data->isEditor) {
+		mStreamWrite->open_for_write();
+		mModule->SaveByteCode(this->mStreamWrite, true);
+		mStreamWrite->close();
+	}
+	return 1;
+}
+
+int AGScriptMgr::AddScriptFile(Engine::ScriptResource* res) {
 	const char* script_str = res->script_content.c_str();
 	unsigned int scr_file_offset = 0;
 	int result = mBuilder.AddSectionFromMemory(res->resource_label.c_str(), script_str, res->size);
-	std::string line;
-	//read first script line
-	readLine(line, script_str, scr_file_offset);
-	bool Result = true;
-	while (startsWith(line, "//use")) {
-		const char* dep_str_c = line.c_str() + 6;
-		std::string dep_str = std::string(dep_str_c);
-		dep_str.pop_back();
-		Engine::ScriptResource* DependencyRes = game_data->resources->getScriptByLabel(dep_str);
-		//include dependency
-		Result = AddScriptFile(DependencyRes);
-		readLine(line, script_str, scr_file_offset);
-	}
-	return Result;
+	
+	return result;
 }
 
 void AGScriptMgr::UpdateClassesNames() {
@@ -362,4 +374,25 @@ ClassFieldDesc* ZPSClassDesc::GetSuitableDesc(std::string Name, int TypeID, unsi
 			return desc;
 	}
 	return nullptr;
+}
+
+void BytecodeStreamWriter::open_for_write() {
+	if (!game_data->isEditor) 
+		return;
+	std::string path = engine_ptr->desc->game_dir + "/.cache/scriptcache";
+	f = fopen(path.c_str(), "wb");
+}
+
+int BytecodeStreamWriter::Write(const void* ptr, asUINT size)
+{
+	if (size == 0 && !game_data->isEditor) return 0 ;
+	fwrite(ptr, size, 1, f);
+	//fclose(f);
+	return 1;
+}
+int BytecodeStreamWriter::Read(void* ptr, asUINT size)
+{
+	if (size == 0) return 0;
+	// fread(ptr, size, 1, f);
+	return 1;
 }

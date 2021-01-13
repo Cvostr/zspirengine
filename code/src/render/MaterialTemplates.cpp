@@ -39,7 +39,7 @@ MaterialTemplate::MaterialTemplate(Engine::Shader* shader, unsigned int UB_Conne
     if(UB_SIZE == 0) return;
     //Generate uniform buffer
     mUniformBuffer = Engine::allocUniformBuffer();
-    mUniformBuffer->init(UB_ConnectID, UB_SIZE, true);
+    mUniformBuffer->init(UB_ConnectID, UB_SIZE);
 
 }
 

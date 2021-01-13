@@ -52,17 +52,17 @@ Engine::Renderer::Renderer(){
     transformBuffer->init(0, sizeof(Mat4) * 3 + 16);
     //allocate lights buffer
     lightsBuffer = allocUniformBuffer();
-    lightsBuffer->init(1, LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16 * 2, true);
+    lightsBuffer->init(1, LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16 * 2);
     //Shadow uniform buffer
     shadowBuffer = allocUniformBuffer();
-    shadowBuffer->init(2, 448, true);
+    shadowBuffer->init(2, 448);
     //Terrain uniform buffer
     terrainUniformBuffer = allocUniformBuffer();
     terrainUniformBuffer->init(3, 12 * 16 * 2 + 4 * 3);
     {
         //Skinning uniform buffer
         skinningUniformBuffer = allocUniformBuffer();
-        skinningUniformBuffer->init(4, sizeof(Mat4) * MAX_MESH_BONES, true);
+        skinningUniformBuffer->init(4, sizeof(Mat4) * MAX_MESH_BONES);
         for (unsigned int i = 0; i < MAX_MESH_BONES; i++) {
             Mat4 m = getIdentity();
             skinningUniformBuffer->writeData(sizeof(Mat4) * i, sizeof(Mat4), &m);
@@ -83,6 +83,9 @@ Engine::Renderer::Renderer(){
 
     TimeUniformBuffer = Engine::allocUniformBuffer();
     TimeUniformBuffer->init(11, sizeof(int) * 2);
+
+    WindUniformBuffer = Engine::allocUniformBuffer();
+    WindUniformBuffer->init(12, 32 * 100 + 4);
 
     {
         instancedTransformBuffer = Engine::allocUniformBuffer();

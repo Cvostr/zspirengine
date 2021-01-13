@@ -4,14 +4,14 @@
 
 namespace Engine {
 
+
 class UniformBuffer : public GpuObject {
 protected:
     unsigned int mSlot;
     unsigned int mBufferSize;
-    bool mCpuBufferCreated;
     char* mCpuBuffer;
 public:
-    virtual void init(unsigned int slot, unsigned int size, bool CreateCpuBuffer = false) {}
+    virtual void init(unsigned int slot, unsigned int size, bool StorageBuffer = false) {}
     virtual void bind() {}
     virtual void writeData(unsigned int offset, unsigned int size, void* data) {}
     void writeDataBuffered(unsigned int offset, unsigned int size, void* data);
@@ -22,7 +22,7 @@ public:
     unsigned int GetBufferSize() { return mBufferSize; }
 
     UniformBuffer();
-    UniformBuffer(unsigned int slot, unsigned int size);
+    UniformBuffer(unsigned int slot, unsigned int size, bool StorageBuffer = false);
     virtual ~UniformBuffer();
 };
 

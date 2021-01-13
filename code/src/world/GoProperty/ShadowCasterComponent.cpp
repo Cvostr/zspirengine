@@ -165,7 +165,12 @@ void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam
     //Use shadowmap shader to draw objects
     pipeline->getShadowmapShader()->Use();
 
-    int dists[] = { 0, 40, 100, 140, 200, 250 };
+    int dists[] = { 0, 40, 100, 140, 200, 250};
+    //Send all dists
+    for (int i = 0; i < 6; i++) {
+        unsigned int DistOffset = 416 + sizeof(int) * i;
+        pipeline->shadowBuffer->writeDataBuffered(DistOffset, sizeof(int), &dists[i]);
+    }
     //iterate over all cascades
     for (int i = 0; i < mCascadesNum; i++) {
         Vec3 cam_pos = cam->getCameraPosition() + cam->getCameraFrontVec() * static_cast<float>(dists[i]);
@@ -176,7 +181,7 @@ void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam
 
         if (engine_ptr != nullptr) {
             if (engine_ptr->engine_info->graphicsApi == VULKAN) {
-                LightProjectionMat.m[1][1] *= -1;
+                LightProjectionMat = getOrthogonalVulkan(-w, w, -w, w, nearPlane, farPlane);
             }
         }
 
@@ -184,8 +189,6 @@ void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam
 
         unsigned int offset = 32 + sizeof(Mat4) * i;
         pipeline->shadowBuffer->writeDataBuffered(offset, sizeof(Mat4), &mat);
-        unsigned int DistOffset = 416 + sizeof(int) * i;
-        pipeline->shadowBuffer->writeDataBuffered(DistOffset, sizeof(int), &dists[i]);
     }
 
     //Bind shadow uniform buffer

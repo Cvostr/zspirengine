@@ -330,11 +330,35 @@ Mat4 getOrthogonal(float left, float right, float bottom, float top)
 Mat4 getOrthogonal(float left, float right, float bottom, float top, float zNear, float zFar) {
     Mat4 out = getIdentity();
 
+    /*out.m[0][0] = 2.0f / (right - left);
+    out.m[1][1] = 2.0f / (top - bottom);
+
+    out.m[2][2] = -2.0f / (zFar - zNear);
+    out.m[3][2] = -(zFar + zNear) / (zFar - zNear);
+
+    out.m[3][0] = -(right + left) / (right - left);
+    out.m[3][1] = -(top + bottom) / (top - bottom);*/
+
     out.m[0][0] = 2.0f / (right - left);
     out.m[1][1] = 2.0f / (top - bottom);
 
     out.m[2][2] = -1.0f / (zFar - zNear);
-    out.m[3][2] = -zNear / (zFar - zNear);
+    out.m[3][2] = -(zNear) / (zFar - zNear);
+
+    out.m[3][0] = -(right + left) / (right - left);
+    out.m[3][1] = -(top + bottom) / (top - bottom);
+
+    return out;
+}
+
+Mat4 getOrthogonalVulkan(float left, float right, float bottom, float top, float zNear, float zFar) {
+    Mat4 out = getIdentity();
+
+    out.m[0][0] = 2.0f / (right - left);
+    out.m[1][1] = -2.0f / (top - bottom);
+
+    out.m[2][2] = -1.0f / (zFar - zNear);
+    out.m[3][2] = -(zNear) / (zFar - zNear);
 
     out.m[3][0] = -(right + left) / (right - left);
     out.m[3][1] = -(top + bottom) / (top - bottom);

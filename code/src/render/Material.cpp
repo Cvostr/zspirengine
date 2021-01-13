@@ -527,7 +527,7 @@ void Material::applyMatToPipeline() {
 
             int db = 0;
             //If correct path is set to texture
-            if (texture_conf->path.compare("@none")) {
+            if (texture_conf->path.compare("@none") != 0) {
                 //if texture isn't loaded
                 if (texture_conf->texture == nullptr) {
                     //Try to find texture
@@ -542,6 +542,7 @@ void Material::applyMatToPipeline() {
                     ((VKMaterial*)(this))->SetTexture(texture_p->slotToBind, ((Engine::vkTexture*)tex_ptr->texture_ptr)->GetImageView(), game_data->vk_main->mDefaultTextureSampler);
                 }
             }
+            
             //Set texture state
             WriteBytes(texture_p->start_offset, 4, &db);
 

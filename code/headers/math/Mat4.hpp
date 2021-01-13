@@ -4,6 +4,12 @@
 #include "Vec3.hpp"
 #include "Quat.hpp"
 
+class Mat4;
+
+float determinant(const Mat4& mat);
+Mat4 invert(const Mat4& mat);
+Mat4 transpose(const Mat4& mat);
+
 class Mat4 {
 public:
 	float m[4][4];
@@ -22,14 +28,15 @@ public:
 
 	Vec3	 GetPosition() { return Vec3(m[3][0], m[3][1], m[3][2]); }
 
-	//float Determinant() { return determinant(*this); }
+	float Determinant() { return determinant(*this); }
+	void Invert() { *this = invert(*this); }
+	void Transpose() { *this = transpose(*this); }
 };
 
 Mat4 getIdentity();
-Mat4 transpose(const Mat4& mat);
-float determinant(const Mat4& mat);
+
+
 float determinant(float a, float b, float c, float d, float e, float f, float g, float h, float i);
-Mat4 invert(const Mat4& mat);
 Mat4 matrixMM(const Mat4& l, const Mat4& r);
 Vec4 matrixVecMM(const Mat4& l, const Vec4& r);
 Mat4 matrixSum(const Mat4& l, const Mat4& r);
@@ -37,6 +44,7 @@ Mat4 getPerspective(float fovy, float aspect, float zNear, float zFar);
 Mat4 getPerspectiveVulkan(float fovy, float aspect, float zNear, float zFar);
 Mat4 getOrthogonal(float left, float right, float bottom, float top);
 Mat4 getOrthogonal(float left, float right, float bottom, float top, float zNear, float zFar);
+Mat4 getOrthogonalVulkan(float left, float right, float bottom, float top, float zNear, float zFar);
 Mat4 matrixLookAt(const Vec3& eye, const Vec3& center, const Vec3& up);
 Mat4 removeTranslationFromViewMat(Mat4 viewMat);
 Mat4 removeRotationFromTransformMat(Mat4 transform, Mat4 view);

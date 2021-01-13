@@ -5,6 +5,7 @@
 #include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
 #include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
 #include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
+#include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
 #include "../../headers/world/ObjectsComponents/NodeComponent.hpp"
 #include "../../headers/world/ObjectsComponents/ColliderComponent.hpp"
 #include "../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
@@ -433,6 +434,16 @@ bool Engine::GameObject::hasTerrain(){
 
 bool Engine::GameObject::hasLightsource() {
     return getPropertyPtr<LightsourceComponent>() != nullptr;
+}
+
+bool Engine::GameObject::hasMaterial() {
+    bool HasMaterialComponent = getPropertyPtr<MaterialProperty>();
+    bool IsMaterialActive = false;
+    if (HasMaterialComponent)
+        if (getPropertyPtr<MaterialProperty>()->isActive())
+            IsMaterialActive = true;
+
+    return IsMaterialActive;
 }
 
 void Engine::GameObject::DrawMesh(Renderer* pipeline) {

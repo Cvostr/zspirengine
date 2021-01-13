@@ -86,12 +86,27 @@ namespace Engine {
 
     };
 
+    int onInclude(const char* include, const char* from, CScriptBuilder* builder, void* userParam);
+
+    class BytecodeStreamWriter : public asIBinaryStream {
+    private:
+        FILE* f;
+    public:
+        
+        void open_for_write();
+        void close() { fclose(f); }
+
+        int Write(const void* ptr, asUINT size);
+        int Read(void* ptr, asUINT size);
+    };
+
     class AGScriptMgr {
     private:
         asIScriptEngine* mEngine;
         asIScriptContext* mContext;
         asIScriptModule* mModule; //Module of the script
         CScriptBuilder mBuilder;
+        BytecodeStreamWriter* mStreamWrite;
 
         std::vector<ZPSClassDesc*> ZPSClassInfos;
 
@@ -105,6 +120,7 @@ namespace Engine {
         void create_Engine();
         void recreate_Engine();
 
+        int SaveByteCode();
         bool HasCompilerErrors() { return CompileError; }
 
         asIScriptEngine* getAgScriptEngine();
@@ -128,7 +144,7 @@ namespace Engine {
 
         
         bool AddScriptFiles();
-        bool AddScriptFile(Engine::ScriptResource* res);
+        int AddScriptFile(Engine::ScriptResource* res);
 
         bool CreateClass(std::string ClassName, Engine::GameObject* obj, asIScriptObject** ClassObj, asITypeInfo** ClassInfo);
         ZPSClassDesc* GetClassDesc(std::string ClassName);

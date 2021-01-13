@@ -8,9 +8,10 @@ namespace Engine{
 
 class vkUniformBuffer : public UniformBuffer{
 private:
+    VkBufferUsageFlagBits Usage;
     VmaVkBuffer mVkBuffer;
 public:
-    void init(unsigned int slot, unsigned int size, bool CreateCpuBuffer = false);
+    void init(unsigned int slot, unsigned int size, bool StorageBuffer = false);
     void writeData(unsigned int offset, unsigned int size, void* data);
     void bind();
     void updateBufferedData();

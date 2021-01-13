@@ -1,39 +1,42 @@
 #include "../../headers/ogl/GLUniformBuffer.hpp"
 #include <GL/glew.h>
 
-void Engine::glUniformBuffer::init(unsigned int slot, unsigned int size, bool CreateCpuBuffer){
+void Engine::glUniformBuffer::init(unsigned int slot, unsigned int size, bool StorageBuffer){
     if (!mCreated) {
         mSlot = slot;
         mBufferSize = size;
 
-        if (CreateCpuBuffer) {
-            mCpuBuffer = new char[mBufferSize];
-            mCpuBufferCreated = true;
-        }
+        mCpuBuffer = new char[mBufferSize];
+
+        target = GL_UNIFORM_BUFFER;
+        if (StorageBuffer)
+            target = GL_SHADER_STORAGE_BUFFER;
 
         glGenBuffers(1, &mBufferID);
-        glBindBuffer(GL_UNIFORM_BUFFER, mBufferID);
-        glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STATIC_DRAW);
+        glBindBuffer(target, mBufferID);
+        glBufferData(target, size, nullptr, GL_STATIC_DRAW);
         //Connect to point 0 (zero)
-        glBindBufferBase(GL_UNIFORM_BUFFER, slot, mBufferID);
+        glBindBufferBase(target, slot, mBufferID);
 
         mCreated = true;
     }
 }
 void Engine::glUniformBuffer::writeData(unsigned int offset, unsigned int size, void* data){
-    if(mCreated && !mCpuBufferCreated)
-        glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+    if (mCreated) {
+        glBufferSubData(target, offset, size, data);
+        writeDataBuffered(offset, size, data);
+    }
 }
 
 void Engine::glUniformBuffer::updateBufferedData() {
-    if (mCreated && mCpuBufferCreated) {
-        glBufferSubData(GL_UNIFORM_BUFFER, 0, mBufferSize, mCpuBuffer);
+    if (mCreated) {
+        glBufferSubData(target, 0, mBufferSize, mCpuBuffer);
     }
 }
 
 void Engine::glUniformBuffer::bind(){
     if (mCreated)
-        glBindBuffer(GL_UNIFORM_BUFFER, mBufferID);
+        glBindBuffer(target, mBufferID);
 }
 
 void Engine::glUniformBuffer::Destroy(){
@@ -49,7 +52,6 @@ Engine::glUniformBuffer::glUniformBuffer() :
 
 }
 Engine::glUniformBuffer::~glUniformBuffer(){
-    if (mCpuBufferCreated)
-        delete[] mCpuBuffer;
+    delete[] mCpuBuffer;
     Destroy();
 }

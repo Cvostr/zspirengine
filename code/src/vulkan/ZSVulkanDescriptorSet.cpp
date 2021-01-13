@@ -20,6 +20,23 @@ void Engine::ZSVulkanDescriptorSet::pushUniformBuffer(vkUniformBuffer* buf, VkSh
     addDescriptorPool(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
     ubuffers.push_back(buf);
 }
+void Engine::ZSVulkanDescriptorSet::pushStorageBuffer(vkUniformBuffer* buf, VkShaderStageFlags stageFlags) {
+    if (type != DESCR_SET_TYPE::DESCR_SET_TYPE_UBO)
+        return;
+
+    VkDescriptorSetLayoutBinding uboLayoutBinding{};
+    uboLayoutBinding.binding = buf->GetSlotId();
+    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.stageFlags = stageFlags;
+    uboLayoutBinding.pImmutableSamplers = nullptr;
+    //Push description
+    this->bindings.push_back(uboLayoutBinding);
+    //Add pool for this buffer
+    addDescriptorPool(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER);
+    ubuffers.push_back(buf);
+}
+
 void Engine::ZSVulkanDescriptorSet::pushImageSampler(int slot) {
 
     if (type != DESCR_SET_TYPE::DESCR_SET_TYPE_TEXTURE)
@@ -99,7 +116,6 @@ void Engine::ZSVulkanDescriptorSet::UpdUniformBuffer(unsigned int index) {
         descriptorWrite.pTexelBufferView = nullptr; // Optional
         vkUpdateDescriptorSets(game_data->vk_main->mDevice->getVkDevice(), 1, &descriptorWrite, 0, nullptr);
     }
-
 }
 
 void Engine::ZSVulkanDescriptorSet::setTexture(int index, VkImageView image, ZSVulkanSampler* sampler) {

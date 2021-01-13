@@ -109,8 +109,8 @@ void Engine::VKRenderer::InitShaders() {
     
 
     ShadowFb = new ZSVulkanFramebuffer;
-    ShadowFb->PushDepthAttachment(4096, 4096, 2);
-    ShadowFb->SetLayersCount(2);
+    ShadowFb->PushDepthAttachment(4096, 4096, 4);
+    ShadowFb->SetLayersCount(4);
     ShadowFb->Create(ShadowRenderPass);
 
 
@@ -207,7 +207,7 @@ void Engine::VKRenderer::FillShadowCmdBuf() {
                     //Send material props
 
                 if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
-                    obj->DrawMeshInstanced(this, 2);
+                    obj->DrawMeshInstanced(this, 4);
             
         }
     }

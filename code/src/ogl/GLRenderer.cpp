@@ -174,6 +174,8 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
             MeshProperty* mesh_prop = obj->getPropertyPtr<MeshProperty>();
             //Render all properties
             obj->onRender(this);
+            if (!obj->hasMaterial())
+                game_data->resources->getMaterialByLabel("@default")->material->applyMatToPipeline();
             //Draw mesh
             obj->DrawMesh(this);
         }

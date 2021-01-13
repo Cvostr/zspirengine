@@ -3,14 +3,16 @@
 
 extern ZSGAME_DATA* game_data;
 
-void Engine::vkUniformBuffer::init(unsigned int slot, unsigned int size, bool CreateCpuBuffer){
+void Engine::vkUniformBuffer::init(unsigned int slot, unsigned int size, bool StorageBuffer){
     if (!mCreated) {
         mSlot = slot;
         mBufferSize = size;
 
-        mCpuBufferCreated = true;
+        Usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+        if (StorageBuffer)
+            Usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 
-        game_data->vk_main->mVMA->allocateCpu(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, &mVkBuffer, size, (void**)&this->mCpuBuffer);
+        game_data->vk_main->mVMA->allocateCpu(Usage, &mVkBuffer, size, (void**)&this->mCpuBuffer);
 
         mCreated = true;
     }
