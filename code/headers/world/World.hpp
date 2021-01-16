@@ -274,6 +274,7 @@ public:
     void DrawMesh(Renderer* pipeline);
     void DrawMeshInstanced(Renderer* pipeline, unsigned int inst_num);
     void setSkinningMatrices(Renderer* pipeline);
+    unsigned int getBonesCount();
 
     //---------------------FOR EDITOR USE--------------------------------------------------------
     void pick(); //Mark object and its children picked

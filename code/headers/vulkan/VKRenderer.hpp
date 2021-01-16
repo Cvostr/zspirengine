@@ -2,7 +2,6 @@
 
 #include <vulkan/vulkan.hpp>
 #include "../render/Renderer.hpp"
-#include "../render/Material.hpp"
 #include "VKMaterial.hpp"
 #include "ZSVulkanPipeline.hpp"
 #include "ZSVulkanRenderPass.hpp"
@@ -16,12 +15,17 @@ namespace Engine {
 
 	class VKObjectToRender {
 	public:
+		int TransformArrayIndex;
+		int SkinningArrayIndex;
+
 		Engine::GameObject* obj;
 		Mat4 transform;
 		VKMaterial* mat;
 
 		VKObjectToRender() {
 			mat = nullptr;
+			TransformArrayIndex = 0;
+			SkinningArrayIndex = 0;
 		}
 	};
 
@@ -52,6 +56,9 @@ namespace Engine {
 
 		ZSVulkanSampler* mMaterialSampler;
 
+		vkUniformBuffer* TransformStorageBuf;
+		vkUniformBuffer* SkinningStorageBuf;
+
 		std::vector<VKObjectToRender> ObjectsToRender;
 
 		void Present();
@@ -59,8 +66,15 @@ namespace Engine {
 		void FillShadowCmdBuf();
 		void FillDefferedCmdBuf();
 		void Fill3dCmdBuf();
+
+		int LastTransformOffset;
+		int LastSkinningOffset;
 		
 	public:
+
+		vkUniformBuffer* GetTransformStorageBuffer() { return TransformStorageBuf; }
+		vkUniformBuffer* GetSkinningStorageBuffer() { return SkinningStorageBuf; }
+
 		void SetViewport(VkCommandBuffer cmdbuf, unsigned int startX, unsigned int startY, unsigned int width, unsigned int height);
 		void InitShaders();
 		void render2D();

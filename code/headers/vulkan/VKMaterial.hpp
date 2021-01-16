@@ -9,6 +9,7 @@ public:
 	void CreatePipeline();
 	void MakeDescrSetUniform(Engine::ZSVulkanDescriptorSet* DescrSet);
 	void MakeDescrSetTextures(Engine::ZSVulkanDescriptorSet* DescrSet);
+	void MakeDescrSetStorage(Engine::ZSVulkanDescriptorSet* DescrSet);
 
 	VKMaterialTemplate(Engine::Shader* shader, unsigned int UB_ConnectID, unsigned int UB_SIZE) :
 		MaterialTemplate(shader, UB_ConnectID, UB_SIZE),

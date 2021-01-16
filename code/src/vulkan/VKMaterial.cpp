@@ -1,6 +1,8 @@
-#include "../../headers/vulkan/VKMaterial.hpp"
+//#include "../../headers/vulkan/VKMaterial.hpp"
+#include "../../headers/vulkan/VKRenderer.hpp"
 #include "../../headers/game.h"
 
+using namespace Engine;
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
 extern ZSpireEngine* engine_ptr;
@@ -10,7 +12,7 @@ void VKMaterialTemplate::CreatePipeline() {
         Engine::ZsVkPipelineConf Conf;
         MakeDescrSetUniform(Conf.LayoutInfo.DescrSetLayout);
         MakeDescrSetTextures(Conf.LayoutInfo.DescrSetLayoutSampler);
-
+        MakeDescrSetStorage(Conf.LayoutInfo.DescrSetLayoutStorage);
 
         Conf.hasDepth = true;
         Conf.cullFace = true;
@@ -27,6 +29,14 @@ void VKMaterialTemplate::MakeDescrSetUniform(Engine::ZSVulkanDescriptorSet* Desc
     Engine::UniformBuffer* shadowBuf = game_data->pipeline->GetShadowmapUniformBuffer();
     DescrSet->pushUniformBuffer((Engine::vkUniformBuffer*)game_data->pipeline->GetTransformUniformBuffer(), VK_SHADER_STAGE_ALL_GRAPHICS);
     DescrSet->pushUniformBuffer((Engine::vkUniformBuffer*)shadowBuf, VK_SHADER_STAGE_FRAGMENT_BIT);
+    DescrSet->getDescriptorSetLayout();
+}
+
+void VKMaterialTemplate::MakeDescrSetStorage(Engine::ZSVulkanDescriptorSet* DescrSet) {
+    //Bind storage buffers
+    VKRenderer* renderer = static_cast<VKRenderer*>(game_data->pipeline);
+    DescrSet->pushStorageBuffer(renderer->GetTransformStorageBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
+    DescrSet->pushStorageBuffer(renderer->GetSkinningStorageBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
     DescrSet->getDescriptorSetLayout();
 }
 

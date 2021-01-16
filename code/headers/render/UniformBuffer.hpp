@@ -7,6 +7,7 @@ namespace Engine {
 
 class UniformBuffer : public GpuObject {
 protected:
+    bool mStorageBuffer;
     unsigned int mSlot;
     unsigned int mBufferSize;
     char* mCpuBuffer;
@@ -20,6 +21,7 @@ public:
     virtual void Destroy(){}
     unsigned int GetSlotId() { return mSlot; }
     unsigned int GetBufferSize() { return mBufferSize; }
+    bool isStorageBuffer() { return mStorageBuffer; }
 
     UniformBuffer();
     UniformBuffer(unsigned int slot, unsigned int size, bool StorageBuffer = false);

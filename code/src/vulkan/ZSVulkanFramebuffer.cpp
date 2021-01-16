@@ -18,8 +18,8 @@ bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
 	framebufferInfo.renderPass = renderpass->GetRenderPass();
 	framebufferInfo.attachmentCount = static_cast<uint32_t>(Views.size());
 	framebufferInfo.pAttachments = Views.data();
-	framebufferInfo.width = game_data->vk_main->mSwapChain->GetExtent().width;
-	framebufferInfo.height = game_data->vk_main->mSwapChain->GetExtent().height;
+	framebufferInfo.width = renderpass->GetClearExtent().width;
+	framebufferInfo.height = renderpass->GetClearExtent().height;
 	framebufferInfo.layers = mLayersCount;
 	
 

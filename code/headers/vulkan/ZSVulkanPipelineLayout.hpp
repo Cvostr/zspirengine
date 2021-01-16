@@ -10,6 +10,7 @@ namespace Engine {
 	struct ZsVkPipelineLayoutConf {
 		ZSVulkanDescriptorSet* DescrSetLayout;
 		ZSVulkanDescriptorSet* DescrSetLayoutSampler;
+		ZSVulkanDescriptorSet* DescrSetLayoutStorage;
 
 		unsigned int mPushConstantBuffersSize;
 
@@ -21,6 +22,7 @@ namespace Engine {
 			mPushConstantBuffersSize = 0;
 			DescrSetLayout = new ZSVulkanDescriptorSet(DESCR_SET_TYPE::DESCR_SET_TYPE_UBO);
 			DescrSetLayoutSampler = new ZSVulkanDescriptorSet(DESCR_SET_TYPE::DESCR_SET_TYPE_TEXTURE);
+			DescrSetLayoutStorage = new ZSVulkanDescriptorSet(DESCR_SET_TYPE::DESCR_SET_TYPE_UBO);
 		}
 	};
 

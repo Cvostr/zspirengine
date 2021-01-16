@@ -17,6 +17,8 @@ void Engine::VKRenderer::render2D() {
 void Engine::VKRenderer::render3D(Engine::Camera* cam) {
     World* world_ptr = game_data->world;
     ObjectsToRender.clear();
+    LastTransformOffset = 0;
+    LastSkinningOffset = 0;
     //Fill render arrays
 
     if (this->render_settings.shadowcaster_obj_ptr != nullptr) {
@@ -38,7 +40,7 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
 
 void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
 
-    
+
 
     if (current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
         //Call prerender on each property in object
@@ -51,10 +53,26 @@ void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
         Engine::MeshProperty* mesh_prop = obj->getPropertyPtr<Engine::MeshProperty>();
         Engine::MaterialProperty* mat_prop = obj->getPropertyPtr<Engine::MaterialProperty>();
 
+        
+       
         if (mesh_prop->mesh_ptr->resource_state != RESOURCE_STATE::STATE_LOADED)
             mesh_prop->mesh_ptr->load();
 
+        TransformStorageBuf->writeDataBuffered(LastTransformOffset * sizeof(Mat4), sizeof(Mat4), &transform_ptr->transform_mat);
+        obr.TransformArrayIndex = LastTransformOffset;
+        LastTransformOffset++;
+
+        unsigned int BonesCount = obj->getBonesCount();
+        if (BonesCount) {
+            obj->setSkinningMatrices(this);
+            //Send bones
+            SkinningStorageBuf->writeDataBuffered(LastSkinningOffset * sizeof(Mat4), BonesCount * sizeof(Mat4), skinningUniformBuffer->GetCpuBuffer());
+            obr.SkinningArrayIndex = LastSkinningOffset;
+            LastSkinningOffset += BonesCount;
+        }
+
         obr.transform = transform_ptr->transform_mat;
+        
         obr.obj = obj;
 
         if (mat_prop != nullptr) {
@@ -93,6 +111,11 @@ void Engine::VKRenderer::InitShaders() {
     MaterialFb->PushDepthAttachment(640, 480);
     MaterialFb->Create(MaterialRenderPass);
     
+    TransformStorageBuf = static_cast<vkUniformBuffer*>(allocUniformBuffer());
+    TransformStorageBuf->init(0, sizeof(Mat4) * 4000, true);
+
+    SkinningStorageBuf = static_cast<vkUniformBuffer*>(allocUniformBuffer());
+    SkinningStorageBuf->init(1, sizeof(Mat4) * 200 * 512, true);
 
     OutRenderPass = new ZSVulkanRenderPass;
     OutRenderPass->PushColorOutputAttachment();
@@ -109,8 +132,8 @@ void Engine::VKRenderer::InitShaders() {
     
 
     ShadowFb = new ZSVulkanFramebuffer;
-    ShadowFb->PushDepthAttachment(4096, 4096, 4);
-    ShadowFb->SetLayersCount(4);
+    ShadowFb->PushDepthAttachment(4096, 4096, 2);
+    ShadowFb->SetLayersCount(2);
     ShadowFb->Create(ShadowRenderPass);
 
 
@@ -137,7 +160,10 @@ void Engine::VKRenderer::InitShaders() {
     ConfShadow.hasDepth = true;
     ConfShadow.cullFace = false;
     ConfShadow.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->transformBuffer, VK_SHADER_STAGE_VERTEX_BIT);
-    ConfShadow.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->shadowBuffer, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_GEOMETRY_BIT);
+    ConfShadow.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->shadowBuffer, VK_SHADER_STAGE_VERTEX_BIT);
+    ConfShadow.LayoutInfo.DescrSetLayoutStorage->pushStorageBuffer(GetTransformStorageBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
+    ConfShadow.LayoutInfo.DescrSetLayoutStorage->pushStorageBuffer(GetSkinningStorageBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
+
     ConfShadow.LayoutInfo.AddPushConstant(64, VK_SHADER_STAGE_VERTEX_BIT);
     ConfShadow.Viewport.width = 4096;
     ConfShadow.Viewport.height = 4096;
@@ -202,12 +228,12 @@ void Engine::VKRenderer::FillShadowCmdBuf() {
         if (obj->hasMesh() && obr->mat != nullptr) {
             MeshProperty* mesh = obj->getPropertyPtr<MeshProperty>();
        
-                    //Send object transform
-                ShadowPipeline->CmdPushConstants(this->mShadowCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, &ObjectsToRender[i].transform);
-                    //Send material props
+            //Send object transform
+            ShadowPipeline->CmdPushConstants(mShadowCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 4, &obr->TransformArrayIndex);
+            ShadowPipeline->CmdPushConstants(mShadowCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 4, 4, &obr->SkinningArrayIndex);
 
-                if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
-                    obj->DrawMeshInstanced(this, 4);
+            if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
+                obj->DrawMeshInstanced(this, 2);
             
         }
     }
@@ -242,7 +268,7 @@ void Engine::VKRenderer::Fill3dCmdBuf() {
                     Pipeline->CmdBindPipeline(m3dCmdBuf);
 
                     ((VKMaterialTemplate*)obr->mat->mTemplate)->Pipeline->GetPipelineLayout()
-                        ->CmdBindDescriptorSets(m3dCmdBuf, 0, 1);
+                        ->CmdBindDescriptorSets(m3dCmdBuf, 0, 3);
 
                     binded = true;
                 }
@@ -255,11 +281,13 @@ void Engine::VKRenderer::Fill3dCmdBuf() {
                         Pipeline->_GetPipelineLayout(), 1,
                         1, &set, 0, nullptr);
                     //Send object transform
-                    Pipeline->CmdPushConstants(this->m3dCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, &ObjectsToRender[i].transform);
+                    Pipeline->CmdPushConstants(m3dCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 4, &obr->TransformArrayIndex);
+                    Pipeline->CmdPushConstants(m3dCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 4, 4, &obr->SkinningArrayIndex);
                     //Send material props
                     unsigned int bufsize = obr->mat->mTemplate->mUniformBuffer->GetBufferSize();
                     void* bufdata = obr->mat->mTemplate->mUniformBuffer->GetCpuBuffer();
                     Pipeline->CmdPushConstants(m3dCmdBuf, VK_SHADER_STAGE_FRAGMENT_BIT, 64, bufsize, obr->mat->MatData);
+                    
                 }
                 if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
                     obj->DrawMesh(this);
@@ -321,7 +349,7 @@ void Engine::VKRenderer::Present() {
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = &ShadowFinishedSemaphore;
     vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-
+    
 
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = &ShadowFinishedSemaphore;

@@ -164,7 +164,12 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
         obj->onPreRender(this);
     if (obj->hasMesh() || obj->hasTerrain()) {
         //Send mesh skinning matrices
-        obj->setSkinningMatrices(this);
+        if (obj->getBonesCount()) {
+            obj->setSkinningMatrices(this);
+            //Send bones
+            skinningUniformBuffer->bind();
+            skinningUniformBuffer->updateBufferedData();
+        }
         //Send transform matrix to transform buffer
         Engine::TransformProperty* transform_ptr = obj->getTransformProperty();
         transformBuffer->bind();

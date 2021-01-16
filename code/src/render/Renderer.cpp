@@ -244,7 +244,7 @@ void Engine::GameObject::setSkinningMatrices(Renderer* pipeline) {
     //Send all skinning matrices
     if (hasMesh()) {
         //Iterate over all bones
-        for (unsigned int bone_i = 0; bone_i < mesh_prop->mesh_ptr->mesh_ptr->bones.size(); bone_i++) {
+        for (unsigned int bone_i = 0; bone_i < getBonesCount(); bone_i++) {
             //Check for buffer overflow
             if (bone_i >= MAX_MESH_BONES)
                 break;
@@ -274,8 +274,6 @@ void Engine::GameObject::setSkinningMatrices(Renderer* pipeline) {
                 pipeline->skinningUniformBuffer->writeDataBuffered(sizeof(Mat4) * bone_i, sizeof(Mat4), &matrix);
             }
         }
-        pipeline->skinningUniformBuffer->bind();
-        pipeline->skinningUniformBuffer->updateBufferedData();
     }
 }
 

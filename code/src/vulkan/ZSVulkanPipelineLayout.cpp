@@ -41,10 +41,12 @@ bool ZSVulkanPipelineLayout::Create(ZsVkPipelineLayoutConf& conf) {
     pipeline_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
     mDescrSetLayouts.push_back(conf.DescrSetLayout->getDescriptorSetLayout());
-    mDescrSets.push_back(conf.DescrSetLayout->getDescriptorSet());
-
     mDescrSetLayouts.push_back(conf.DescrSetLayoutSampler->getDescriptorSetLayout());
+    mDescrSetLayouts.push_back(conf.DescrSetLayoutStorage->getDescriptorSetLayout());
+
+    mDescrSets.push_back(conf.DescrSetLayout->getDescriptorSet());
     mDescrSets.push_back(conf.DescrSetLayoutSampler->getDescriptorSet());
+    mDescrSets.push_back(conf.DescrSetLayoutStorage->getDescriptorSet());
 
     this->DescrSetLayoutSampler = conf.DescrSetLayoutSampler;
 

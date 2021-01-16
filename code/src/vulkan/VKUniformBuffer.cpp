@@ -7,6 +7,7 @@ void Engine::vkUniformBuffer::init(unsigned int slot, unsigned int size, bool St
     if (!mCreated) {
         mSlot = slot;
         mBufferSize = size;
+        mStorageBuffer = StorageBuffer;
 
         Usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
         if (StorageBuffer)

@@ -23,6 +23,7 @@ namespace Engine {
 		void PushColorOutputAttachment();
 		void PushDepthAttachment();
 		void SetClearSize(unsigned int Width, unsigned int Height);
+		VkExtent2D GetClearExtent() { return ClearExtent; }
 
 		bool Create();
 		void CmdBegin(VkCommandBuffer cmdbuf, ZSVulkanFramebuffer* framebuffer);

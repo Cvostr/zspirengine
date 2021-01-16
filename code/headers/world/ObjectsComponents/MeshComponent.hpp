@@ -16,7 +16,7 @@ namespace Engine {
         void updateMeshPtr(); //Updates pointer according to resource_relpath
         void updateRootNodePtr();
         void copyTo(IGameObjectComponent* dest);
-        void onRender(Engine::Renderer* pipeline);
+        void onPreRender(Engine::Renderer* pipeline);
         void setMeshResource(MeshResource* resource);
 
         //EDITOR STUFF

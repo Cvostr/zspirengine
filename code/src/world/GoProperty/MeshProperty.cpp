@@ -34,7 +34,7 @@ void Engine::MeshProperty::setMeshResource(MeshResource* resource) {
     updateMeshPtr();
 }
 
-void Engine::MeshProperty::onRender(Engine::Renderer* pipeline) {
+void Engine::MeshProperty::onPreRender(Engine::Renderer* pipeline) {
     if (this->skinning_root_node == nullptr && mesh_ptr->mesh_ptr->hasBones())
         updateRootNodePtr();
 }

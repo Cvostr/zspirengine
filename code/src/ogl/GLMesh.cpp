@@ -103,16 +103,14 @@ void Engine::glMesh::setMeshOffsets(){
 
     for(unsigned int i = 0; i < MAX_BONE_PER_VERTEX / 4; i ++){
         //Skinning data
-        _glVertexAttribIPointer(5 + i, 4, GL_UNSIGNED_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * (14 + i * 4)));
-    }
-
-    for(unsigned int i = 0; i < MAX_BONE_PER_VERTEX / 4; i ++){
+        _glVertexAttribIPointer(5 + i, 4, GL_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * (14 + i * 4)));
         //Weights
         _glVertexAttribPointer(8 + i, 4, GL_FLOAT, GL_FALSE, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * (26 + i * 4)));
+
     }
 
     //Bones num
-    _glVertexAttribIPointer(11, 1, GL_UNSIGNED_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 38));
+    _glVertexAttribIPointer(11, 1, GL_INT, sizeof(ZSVERTEX), reinterpret_cast<void*>(sizeof(float) * 38));
 }
 
 void Engine::glMesh::Draw(){

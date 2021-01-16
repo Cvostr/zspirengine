@@ -145,9 +145,9 @@ bool Engine::ZSVulkanPipeline::Create(vkShader* Shader, ZSVulkanRenderPass* rend
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexBindingDescriptionCount = 1;
     vertexInputInfo.pVertexBindingDescriptions = &bindingDescription; // Optional
-    vertexInputInfo.vertexAttributeDescriptionCount = 5;
+    vertexInputInfo.vertexAttributeDescriptionCount = 12;
 
-    VkVertexInputAttributeDescription attrDescr[5];
+    VkVertexInputAttributeDescription attrDescr[12];
     attrDescr[0].binding = VERTEX_BUFFER_BIND;
     attrDescr[0].location = 0;
     attrDescr[0].format = VK_FORMAT_R32G32B32_SFLOAT;
@@ -168,6 +168,23 @@ bool Engine::ZSVulkanPipeline::Create(vkShader* Shader, ZSVulkanRenderPass* rend
     attrDescr[4].location = 4;
     attrDescr[4].format = VK_FORMAT_R32G32B32_SFLOAT;
     attrDescr[4].offset = offsetof(ZSVERTEX, bitangent);
+    //Skinning
+    for (unsigned int i = 0; i < MAX_BONE_PER_VERTEX / 4; i++) {
+        attrDescr[5 + i].binding = VERTEX_BUFFER_BIND;
+        attrDescr[5 + i].location = 5 + i;
+        attrDescr[5 + i].format = VK_FORMAT_R32G32B32A32_SINT;
+        attrDescr[5 + i].offset = sizeof(float) * (14 + i * 4);
+
+        attrDescr[8 + i].binding = VERTEX_BUFFER_BIND;
+        attrDescr[8 + i].location = 8 + i;
+        attrDescr[8 + i].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        attrDescr[8 + i].offset = sizeof(float) * (26 + i * 4);
+    }
+
+    attrDescr[11].binding = VERTEX_BUFFER_BIND;
+    attrDescr[11].location = 11;
+    attrDescr[11].format = VK_FORMAT_R32_UINT;
+    attrDescr[11].offset = sizeof(float) * (38);
 
     vertexInputInfo.pVertexAttributeDescriptions = attrDescr; // Optional
 
