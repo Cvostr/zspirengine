@@ -5,7 +5,7 @@ Engine::PrefabResource::PrefabResource() {
     loadInstantly = true;
 }
 Engine::PrefabResource::~PrefabResource() {
-
+    
 }
 
 void Engine::PrefabResource::load() {

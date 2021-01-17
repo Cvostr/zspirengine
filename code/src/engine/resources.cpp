@@ -252,7 +252,6 @@ void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int
                 }
                 case RESOURCE_TYPE_MATERIAL: {
                     resource_ptr = new Engine::MaterialResource;
-                    //static_cast<Engine::MaterialResource*>(resource_ptr)->material = new Material;
                     static_cast<Engine::MaterialResource*>(resource_ptr)->material = allocMaterial();
                     break;
                 }
@@ -263,6 +262,10 @@ void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int
                 }
                 case RESOURCE_TYPE_FONT: {
                     resource_ptr = new GlyphResource;
+                    break;
+                }
+                case RESOURCE_TYPE_SCENE: {
+                    resource_ptr = new SceneResource;
                     break;
                 }
                 case RESOURCE_TYPE_PREFAB: {

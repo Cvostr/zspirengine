@@ -200,6 +200,17 @@ public:
     ~PrefabResource();
 };
 
+class SceneResource : public ZsResource {
+public:
+
+    unsigned char* data;
+    void load();
+
+    SceneResource();
+    ~SceneResource();
+};
+
+
 class LocalizedStringResource : public ZsResource {
 private:
     unsigned char* data;

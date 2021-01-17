@@ -416,7 +416,10 @@ int Engine::GameObject::getAliveChildrenAmount() {
 
 unsigned int Engine::GameObject::getBonesCount() {
     MeshProperty* mesh_prop = getPropertyPtr<MeshProperty>();
-    return static_cast<unsigned int>(mesh_prop->mesh_ptr->mesh_ptr->bones.size());
+    unsigned int result = 0;
+    if (mesh_prop != nullptr)
+        result = static_cast<unsigned int>(mesh_prop->mesh_ptr->mesh_ptr->bones.size());
+    return result;
 }
 
 bool Engine::GameObject::hasMesh(){

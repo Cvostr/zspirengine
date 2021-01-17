@@ -114,16 +114,11 @@ void ZSpireEngine::loadGame(){
     //Compile script
     game_data->script_manager->AddScriptFiles();
 
-    ZsResource* world_resource = game_data->resources->getResource<ZsResource>(desc->startup_scene);
+    SceneResource* world_resource = game_data->resources->getResource<SceneResource>(desc->startup_scene);
     //check, if World resource found
     if (world_resource) {
-        world_resource->request = new Loader::LoadRequest;
-        world_resource->request->offset = world_resource->offset;
-        world_resource->request->size = world_resource->size;
-        world_resource->request->file_path = world_resource->blob_path;
-        loadImmideately(world_resource->request);
-
-        game_data->world->loadFromMemory((const char*)world_resource->request->data, world_resource->request->size, game_data->pipeline->getRenderSettings());
+        world_resource->load();
+        game_data->world->loadFromMemory((const char*)world_resource->data, world_resource->size, game_data->pipeline->getRenderSettings());
     }
     //call onStart on all objects
     game_data->world->call_onStart();
