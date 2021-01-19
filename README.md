@@ -12,9 +12,7 @@ OpenAL
 
 SDL2
 
-Assimp
-
-Lua 5.3 (+LuaBridge)
+Angel Script
 
 FreeType
 

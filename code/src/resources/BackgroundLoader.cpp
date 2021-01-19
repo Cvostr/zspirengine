@@ -5,20 +5,14 @@
 #include <iostream>
 #include "../../headers/threading/Mutex.hpp"
 
-#define LOADER_QUEUE_SIZE 300
-
-static bool loader_thread_working = true;
-static std::string blob_root_directory;
-Engine::Loader::LoadRequest* requests[LOADER_QUEUE_SIZE];
-int queue_length = 0;
-static Engine::Mutex LoaderMutex;
+Engine::Loader::Loader _Loader;
 
 void _LDR_load(Engine::Loader::LoadRequest* req){
     std::cout << "Loading resource " << req->file_path << std::endl;
     //Declare blob loader stream
     std::ifstream stream;
     //Get absolute path to blob file
-    std::string file_path = blob_root_directory + req->file_path;
+    std::string file_path = _Loader.GetBlobRootDirectory() + req->file_path;
     //Check, if size explicitly specified
     if(req->size > 0){
         //if size explicitly specified
@@ -42,55 +36,51 @@ void _LDR_load(Engine::Loader::LoadRequest* req){
     req->done = true;
 }
 
-void loop(){
-    while(loader_thread_working){
+void Engine::Loader::Loader::THRFunc() {
+    while (mShouldRun) {
         //If there are some queues in pool
-        if(queue_length > 0){
+        if (queue_length > 0) {
             //Lock mutex in this thread
-            LoaderMutex.Lock();
+            mMutex->Lock();
             //Obtain pointer to LoadRequest
             Engine::Loader::LoadRequest* req = requests[LOADER_QUEUE_SIZE - queue_length];
             //Reduce requests pool amount
             queue_length--;
             //unlock thread
-            LoaderMutex.Release();
+            mMutex->Release();
             //Load resource by request
             _LDR_load(req);
         }
     }
 }
 
+void Engine::Loader::Loader::queryLoadingRequest(LoadRequest* req) {
+    mMutex->Lock();
+    requests[LOADER_QUEUE_SIZE - 1 - (queue_length)] = req;
+    queue_length++;
+    mMutex->Release();
+}
+
 void Engine::Loader::start(){
-    //Set loop condition to true
-    loader_thread_working = true;
-    //Start thread
-    std::thread loader_loop(loop);
-    //Send thread to background
-    loader_loop.detach();
+    _Loader.Run();
 }
 
 void Engine::Loader::stop(){
-    //Finish thread
-    loader_thread_working = false;
-    //Clear queue
-    queue_length = 0;
+    _Loader.Stop();
 }
 
 void Engine::Loader::queryLoadingRequest(LoadRequest* req){
-    LoaderMutex.Lock();
-    requests[LOADER_QUEUE_SIZE - 1 - (queue_length)] = req;
-    queue_length++;
-    LoaderMutex.Release();
+    _Loader.queryLoadingRequest(req);
 }
 
 void Engine::Loader::loadImmideately(LoadRequest* req, std::string* absolute_path){
     _LDR_load(req);
     //Get absolute path to blob file
-    std::string file_path = blob_root_directory + req->file_path;
+    std::string file_path = _Loader.GetBlobRootDirectory() + req->file_path;
     if(absolute_path != nullptr)
         *absolute_path = file_path;
 }
 
 void Engine::Loader::setBlobRootDirectory(std::string& dir){
-    blob_root_directory = dir;
+    _Loader.SetBlobRootDirectory(dir);
 }

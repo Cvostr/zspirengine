@@ -55,7 +55,10 @@ namespace Engine {
         virtual void _glVertexAttribPointer(int index, int elems_count, int format, int normalized, int structSize, void* offset){}
         virtual void _glVertexAttribIPointer(int index, int elems_count, int format, int structSize, void* offset) {}
 
-        Mesh() : mVerticesNum(0), mIndicesNum(0){}
+        Mesh() : mVerticesNum(0),
+                 mIndicesNum(0),
+                 vertices_arr(nullptr),
+                 indices_arr(nullptr){}
         virtual ~Mesh();
     };
 

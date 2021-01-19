@@ -1,5 +1,11 @@
 #include "../../headers/threading/Mutex.hpp"
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <pthread.h> //Include POSIX thread implementation
+#endif
+
 Engine::Mutex::Mutex() {
 #ifdef _WIN32
 	mMutexHandle = new CRITICAL_SECTION;

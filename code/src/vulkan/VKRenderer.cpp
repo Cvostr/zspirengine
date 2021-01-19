@@ -94,6 +94,8 @@ void Engine::VKRenderer::InitShaders() {
     MaterialRenderPass->PushColorAttachment(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     MaterialRenderPass->PushColorAttachment(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     MaterialRenderPass->PushColorAttachment(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    MaterialRenderPass->PushColorAttachment(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    MaterialRenderPass->PushColorAttachment(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     MaterialRenderPass->PushDepthAttachment();
     MaterialRenderPass->Create();
 
@@ -108,6 +110,8 @@ void Engine::VKRenderer::InitShaders() {
     MaterialFb->PushAttachment(640, 480, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
     MaterialFb->PushAttachment(640, 480, VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
     MaterialFb->PushAttachment(640, 480, VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+    MaterialFb->PushAttachment(640, 480, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+    MaterialFb->PushAttachment(640, 480, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
     MaterialFb->PushDepthAttachment(640, 480);
     MaterialFb->Create(MaterialRenderPass);
     
@@ -132,8 +136,8 @@ void Engine::VKRenderer::InitShaders() {
     
 
     ShadowFb = new ZSVulkanFramebuffer;
-    ShadowFb->PushDepthAttachment(4096, 4096, 2);
-    ShadowFb->SetLayersCount(2);
+    ShadowFb->PushDepthAttachment(4096, 4096, 4);
+    ShadowFb->SetLayersCount(4);
     ShadowFb->Create(ShadowRenderPass);
 
 
@@ -146,14 +150,16 @@ void Engine::VKRenderer::InitShaders() {
     Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(0);
     Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(1);
     Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(2);
+    Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(3);
+    Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(4);
    
     DefferedPipeline = new Engine::ZSVulkanPipeline;
     DefferedPipeline->Create((Engine::vkShader*)deffered_light, OutRenderPass, Conf);
     Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(0, MaterialFb->getImageViewIndex(0), mMaterialSampler);
     Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(1, MaterialFb->getImageViewIndex(1), mMaterialSampler);
     Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(2, MaterialFb->getImageViewIndex(2), mMaterialSampler);
-    
-
+    Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(3, MaterialFb->getImageViewIndex(3), mMaterialSampler);
+    Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(4, MaterialFb->getImageViewIndex(4), mMaterialSampler);
 
 
     Engine::ZsVkPipelineConf ConfShadow;
@@ -233,7 +239,7 @@ void Engine::VKRenderer::FillShadowCmdBuf() {
             ShadowPipeline->CmdPushConstants(mShadowCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 4, 4, &obr->SkinningArrayIndex);
 
             if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
-                obj->DrawMeshInstanced(this, 2);
+                obj->DrawMeshInstanced(this, 4);
             
         }
     }
