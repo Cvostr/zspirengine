@@ -37,6 +37,10 @@ float getDistance(const Vec3& p1, const Vec3& p2) {
     return static_cast<float>(sqrtf(dx * dx + dy * dy + dz * dz));
 }
 
+Vec3 _getDirection(const Vec3& rot) {
+    return _getDirection(rot.X, rot.Y, rot.Z);
+}
+
 Vec3 _getDirection(float pitch, float yaw, float roll) {
     Vec3 q;
 

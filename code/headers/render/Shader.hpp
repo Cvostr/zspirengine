@@ -11,6 +11,8 @@
 #define HAS_FRAG_SHADER 0x2
 #define HAS_GEOM_SHADER 0x4
 #define HAS_COMP_SHADER 0x8
+#define HAS_TESSCTRL_SHADER 0x10
+#define HAS_TESS_SHADER 0x20
 
 typedef unsigned int ShaderStages;
 
@@ -21,8 +23,17 @@ namespace Engine {
 
         ShaderStages mStages;
 
-        virtual bool compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath = "") { return false; }
-        virtual bool compileFromStr(const char* _VS, const char* _FS, const char* _GS = nullptr) { return false; }
+        virtual bool compileFromFile(std::string VSpath, std::string FSpath = "",
+                                     std::string GSpath = "",
+                                     std::string TCSpath = "",
+                                     std::string TESpath = "") 
+        { return false; }
+        virtual bool compileFromStr(const char* _VS, const char* _FS,
+                                    const char* _GS = nullptr,
+                                    const char* _TCS = nullptr,
+                                    const char* _TES = nullptr)
+        { return false; }
+
         virtual bool compileComputeFromFile(std::string CSpath) { return false; }
         virtual bool compileComputeFromStr(const char* _CS) { return false; }
         virtual void setUniformBufferBinding(const char* UB_NAME, unsigned int binding){}

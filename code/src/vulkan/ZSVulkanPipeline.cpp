@@ -55,8 +55,11 @@ VkVertexInputBindingDescription getBindingDescription() {
 }
 
 bool Engine::ZSVulkanPipeline::Create(vkShader* Shader, ZSVulkanRenderPass* renderPass, ZsVkPipelineConf Conf) {
-    VkPipelineShaderStageCreateInfo vertexStageCreateInfo = {}, fragmentStageCreateInfo = {},
-        geometryStageCreateInfo = {};
+    VkPipelineShaderStageCreateInfo vertexStageCreateInfo = {},
+        fragmentStageCreateInfo = {},
+        geometryStageCreateInfo = {},
+        tessControlCreateInfo = {},
+        tessEvalCreateInfo = {};
 
     std::vector<VkPipelineShaderStageCreateInfo> shader_stage_create_info;
 
@@ -91,6 +94,26 @@ bool Engine::ZSVulkanPipeline::Create(vkShader* Shader, ZSVulkanRenderPass* rend
         geometryStageCreateInfo.pName = "main";
         //push geometry stage
         shader_stage_create_info.push_back(geometryStageCreateInfo);
+    }
+    if (Shader->mStages & HAS_TESSCTRL_SHADER) {
+        tessControlCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        tessControlCreateInfo.flags = 0;
+        tessControlCreateInfo.pNext = nullptr;
+        tessControlCreateInfo.stage = VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+        tessControlCreateInfo.module = Shader->tessControlShader;
+        tessControlCreateInfo.pName = "main";
+        //push geometry stage
+        shader_stage_create_info.push_back(tessControlCreateInfo);
+    }
+    if (Shader->mStages & HAS_TESS_SHADER) {
+        tessEvalCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        tessEvalCreateInfo.flags = 0;
+        tessEvalCreateInfo.pNext = nullptr;
+        tessEvalCreateInfo.stage = VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+        tessEvalCreateInfo.module = Shader->tessEvalShader;
+        tessEvalCreateInfo.pName = "main";
+        //push geometry stage
+        shader_stage_create_info.push_back(tessEvalCreateInfo);
     }
 
     VkRect2D scissor;

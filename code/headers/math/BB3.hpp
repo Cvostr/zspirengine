@@ -17,6 +17,7 @@ public:
 	void CreateFromVertexArray(ZSVERTEX* Array, unsigned int VertexCount);
 	void ApplyTransform(const Vec3& pos, const Vec3& scale, const Vec3& rot);
 	void ApplyTransform(const Mat4& Transform);
+	float GetLongestDistance(const Vec3& Point);
 
 	BoundingBox3(const Vec3& Min, const Vec3& Max) : mMin(Min), mMax(Max){}
 	BoundingBox3() {

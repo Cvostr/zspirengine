@@ -88,7 +88,7 @@ void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
 void Engine::VKRenderer::InitShaders() {
     this->default3d->compileFromFile("Shaders/vulkan_test/3d/vert.spv", "Shaders/vulkan_test/3d/frag.spv");
     this->deffered_light->compileFromFile("Shaders/vulkan_test/deffered/vert.spv", "Shaders/vulkan_test/deffered/frag.spv");
-    this->mShadowMapShader->compileFromFile("Shaders/vulkan_test/shadowmap/vert.spv", "Shaders/vulkan_test/shadowmap/frag.spv", "Shaders/vulkan_test/shadowmap/geom.spv");
+    this->mShadowMapShader->compileFromFile("Shaders/vulkan_test/shadowmap/vert.spv", "", "Shaders/vulkan_test/shadowmap/geom.spv");
 
     MaterialRenderPass = new ZSVulkanRenderPass;
     MaterialRenderPass->PushColorAttachment(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
@@ -226,7 +226,6 @@ void Engine::VKRenderer::FillShadowCmdBuf() {
 
     ShadowPipeline->CmdBindPipeline(mShadowCmdBuf);
     ShadowPipeline->CmdBindDescriptorSets(mShadowCmdBuf);
-    //SetViewport(mShadowCmdBuf, 0, 0, 4096, 4096);
 
     for (unsigned int i = 0; i < ObjectsToRender.size(); i++) {
         VKObjectToRender* obr = &ObjectsToRender[i];
@@ -235,8 +234,7 @@ void Engine::VKRenderer::FillShadowCmdBuf() {
             MeshProperty* mesh = obj->getPropertyPtr<MeshProperty>();
        
             //Send object transform
-            ShadowPipeline->CmdPushConstants(mShadowCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 4, &obr->TransformArrayIndex);
-            ShadowPipeline->CmdPushConstants(mShadowCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 4, 4, &obr->SkinningArrayIndex);
+            ShadowPipeline->CmdPushConstants(mShadowCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 8, &obr->TransformArrayIndex);
 
             if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
                 obj->DrawMeshInstanced(this, 4);
@@ -287,8 +285,7 @@ void Engine::VKRenderer::Fill3dCmdBuf() {
                         Pipeline->_GetPipelineLayout(), 1,
                         1, &set, 0, nullptr);
                     //Send object transform
-                    Pipeline->CmdPushConstants(m3dCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 4, &obr->TransformArrayIndex);
-                    Pipeline->CmdPushConstants(m3dCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 4, 4, &obr->SkinningArrayIndex);
+                    Pipeline->CmdPushConstants(m3dCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 8, &obr->TransformArrayIndex);
                     //Send material props
                     unsigned int bufsize = obr->mat->mTemplate->mUniformBuffer->GetBufferSize();
                     void* bufdata = obr->mat->mTemplate->mUniformBuffer->GetCpuBuffer();

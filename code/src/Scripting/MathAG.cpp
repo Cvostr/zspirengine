@@ -57,9 +57,9 @@ void Engine::bindMathSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "Vec3 pos", offsetof(Engine::Camera, mCameraPos));
 	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "Vec3 front", offsetof(Engine::Camera, mCameraFront));
 	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "Vec3 up", offsetof(Engine::Camera, mCameraUp));
-	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float FOV", offsetof(Engine::Camera, FOV));
-	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float nearZ", offsetof(Engine::Camera, nearZ));
-	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float farZ", offsetof(Engine::Camera, farZ));
+	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float FOV", offsetof(Engine::Camera, mFOV));
+	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float nearZ", offsetof(Engine::Camera, mNearZ));
+	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float farZ", offsetof(Engine::Camera, mFarZ));
 	mgr->RegisterObjectMethod(CAM_TYPE_NAME, "void updateViewMat()", asMETHOD(Engine::Camera, updateViewMat), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAM_TYPE_NAME, "void updateProjectionMat()", asMETHOD(Engine::Camera, updateProjectionMat), asCALL_THISCALL);
 	//Base Math methods

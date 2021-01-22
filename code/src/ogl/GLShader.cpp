@@ -70,44 +70,84 @@ bool Engine::glShader::readShaderFile(const char* path, char** result, size_t& s
 }
 
 
-bool Engine::glShader::compileFromFile(std::string VSpath, std::string FSpath, std::string GSpath) {
+bool Engine::glShader::compileFromFile(std::string VSpath,
+    std::string FSpath,
+    std::string GSpath,
+    std::string TCSpath,
+    std::string TESpath) {
     std::cout << "OGL: Compiling shader " << VSpath << " " << FSpath << std::endl;
 
     GLchar* vs_data;
-    GLchar* fs_data;
+    GLchar* fs_data = nullptr;
     GLchar* gs_data = nullptr;
+    GLchar* tcs_data = nullptr;
+    GLchar* tes_data = nullptr;
 
     size_t size;
 
     readShaderFile(VSpath.c_str(), &vs_data, size);
-    readShaderFile(FSpath.c_str(), &fs_data, size);
-
+    if (!FSpath.empty()) {
+        readShaderFile(FSpath.c_str(), &fs_data, size);
+    }
     if (!GSpath.empty()) {
         readShaderFile(GSpath.c_str(), &gs_data, size);
     }
+    if (!TCSpath.empty()) {
+        readShaderFile(TCSpath.c_str(), &tcs_data, size);
+    }
+    if (!TESpath.empty()) {
+        readShaderFile(TESpath.c_str(), &tes_data, size);
+    }
 
-    bool Result = compileFromStr(vs_data, fs_data, gs_data);
+    bool Result = compileFromStr(vs_data, fs_data, gs_data, tcs_data, tes_data);
 
     delete[] vs_data;
-    delete[] fs_data;
-    if (mStages & HAS_GEOM_SHADER)
+    if (!FSpath.empty())
+        delete[] fs_data;
+    if (!GSpath.empty())
         delete[] gs_data;
+    if (!TCSpath.empty())
+        delete[] tcs_data;
+    if (!TESpath.empty())
+        delete[] tes_data;
 
     return Result;
 }
-bool Engine::glShader::compileFromStr(const char* _VS, const char* _FS, const char* _GS) {
+bool Engine::glShader::compileFromStr(const char* _VS, const char* _FS,
+                                      const char* _GS,
+                                      const char* _TCS,
+                                      const char* _TES
+) {
     if (mCreated)
         return false;
 
-    mStages = HAS_VERT_SHADER | HAS_FRAG_SHADER;
+    mStages = HAS_VERT_SHADER;
 
     this->mShaderID = glCreateProgram();
     unsigned int VS = glCreateShader(GL_VERTEX_SHADER);
-    unsigned int FS = glCreateShader(GL_FRAGMENT_SHADER);
+    unsigned int FS = 0;
     unsigned int GS = 0;
+    unsigned int TCS = 0;
+    unsigned int TES = 0;
+
+    if (_FS != nullptr) {
+        FS = glCreateShader(GL_FRAGMENT_SHADER);
+        mStages |= HAS_FRAG_SHADER;
+    }
+
     if (_GS != nullptr) {
         GS = glCreateShader(GL_GEOMETRY_SHADER);
         mStages |= HAS_GEOM_SHADER;
+    }
+
+    if (_TCS != nullptr) {
+        TCS = glCreateShader(GL_TESS_CONTROL_SHADER);
+        mStages |= HAS_TESSCTRL_SHADER;
+    }
+
+    if (_TES != nullptr) {
+        TES = glCreateShader(GL_TESS_EVALUATION_SHADER);
+        mStages |= HAS_TESS_SHADER;
     }
 
     glShaderSource(VS, 1, &_VS, nullptr); //Setting shader code text on vs
@@ -115,25 +155,43 @@ bool Engine::glShader::compileFromStr(const char* _VS, const char* _FS, const ch
     GLcheckCompileErrors(VS, "VERTEX", "VSpath"); //Check vertex errors
     glAttachShader(this->mShaderID, VS);
 
-    glShaderSource(FS, 1, &_FS, nullptr); //Setting shader code text on fs
-    glCompileShader(FS); //Compile FS shader code
-    GLcheckCompileErrors(FS, "FRAGMENT", "FSpath"); //Check fragment compile errors
-    glAttachShader(this->mShaderID, FS);
-    
+    if (mStages & HAS_FRAG_SHADER){
+        glShaderSource(FS, 1, &_FS, nullptr); //Setting shader code text on fs
+        glCompileShader(FS); //Compile FS shader code
+        GLcheckCompileErrors(FS, "FRAGMENT", "FSpath"); //Check fragment compile errors
+        glAttachShader(this->mShaderID, FS);
+    }
     if(mStages & HAS_GEOM_SHADER) {
         glShaderSource(GS, 1, &_GS, nullptr); //Setting shader code text on gs
         glCompileShader(GS); //Compile GS shader code
         GLcheckCompileErrors(GS, "Geometry", "GSpath"); //Check fragment compile errors
         glAttachShader(this->mShaderID, GS);
     }
+    if (mStages & HAS_TESSCTRL_SHADER) {
+        glShaderSource(TCS, 1, &_TCS, nullptr); //Setting shader code text on gs
+        glCompileShader(TCS); //Compile GS shader code
+        GLcheckCompileErrors(TCS, "Tesselation Control", "TCSpath"); //Check fragment compile errors
+        glAttachShader(this->mShaderID, TCS);
+    }
+    if (mStages & HAS_TESS_SHADER) {
+        glShaderSource(TES, 1, &_TES, nullptr); //Setting shader code text on gs
+        glCompileShader(TES); //Compile GS shader code
+        GLcheckCompileErrors(TES, "Tesselation Eval", "TESpath"); //Check fragment compile errors
+        glAttachShader(this->mShaderID, TES);
+    }
 
     glLinkProgram(this->mShaderID);
     GLcheckCompileErrors(mShaderID, "PROGRAM");
     //Clear shaders, we don't need them anymore
     glDeleteShader(VS);
-    glDeleteShader(FS);
+    if (mStages & HAS_FRAG_SHADER)
+        glDeleteShader(FS);
     if (mStages & HAS_GEOM_SHADER)
         glDeleteShader(GS);
+    if (mStages & HAS_TESSCTRL_SHADER)
+        glDeleteShader(TCS);
+    if (mStages & HAS_TESS_SHADER)
+        glDeleteShader(TES);
 
     this->mCreated = true; //Shader created & compiled now
     return true;

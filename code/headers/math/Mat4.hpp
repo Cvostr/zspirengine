@@ -27,6 +27,7 @@ public:
 	}
 
 	Vec3	 GetPosition() { return Vec3(m[3][0], m[3][1], m[3][2]); }
+	Vec3	 GetScale() { return Vec3(m[0][0], m[1][1], m[2][2]); }
 
 	float Determinant() { return determinant(*this); }
 	void Invert() { *this = invert(*this); }

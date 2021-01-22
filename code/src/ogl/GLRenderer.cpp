@@ -3,6 +3,7 @@
 
 #include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
 #include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
+#include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
 
 extern ZSpireEngine* engine_ptr;
 extern ZSGAME_DATA* game_data;
@@ -28,7 +29,7 @@ void Engine::GLRenderer::InitShaders() {
         this->mSkyboxShader->compileFromFile("Shaders/skybox/skybox.vert", "Shaders/skybox/skybox.frag");
         this->mTerrainShader->compileFromFile("Shaders/heightmap/heightmap.vert", "Shaders/heightmap/heightmap.frag");
         this->grass_shader->compileFromFile("Shaders/heightmap/grass.vert", "Shaders/heightmap/grass.frag");
-        this->mShadowMapShader->compileFromFile("Shaders/shadowmap/shadowmap.vert", "Shaders/shadowmap/shadowmap.frag", "Shaders/shadowmap/shadowmap.geom");
+        this->mShadowMapShader->compileFromFile("Shaders/shadowmap/shadowmap.vert", "", "Shaders/shadowmap/shadowmap.geom");
         this->final_shader->compileFromFile("Shaders/postprocess/final/final.vert", "Shaders/postprocess/final/final.frag");
         this->water_shader->compileFromFile("Shaders/water/water.vert", "Shaders/water/water.frag");
 
@@ -81,16 +82,14 @@ void Engine::GLRenderer::render2D() {
     World* world_ptr = game_data->world;
     Engine::Window* win = engine_ptr->GetWindow();
 
-    if (engine_ptr->engine_info->graphicsApi == OGL) {
-        setClearColor(0, 0, 0, 1);
-        ClearFBufferGL(true, true);
-        setBlendingState(true); //Disable blending to render Skybox and shadows
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        setFullscreenViewport(win->GetWindowWidth(), win->GetWindowHeight());
-        setDepthState(true);
-        //Render objects
-        processObjects(world_ptr);
-    }
+    setClearColor(0, 0, 0, 1);
+    ClearFBufferGL(true, true);
+    setBlendingState(true); //Disable blending to render Skybox and shadows
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    setFullscreenViewport(win->GetWindowWidth(), win->GetWindowHeight());
+    setDepthState(true);
+    //Render objects
+    processObjects(world_ptr);
 }
 
 void Engine::GLRenderer::render3D(Engine::Camera* cam) {
@@ -159,6 +158,9 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
 }
 
 void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
+    BoundingBox3 bb = obj->getBoundingBox();
+    
+
     if (current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
         //Call prerender on each property in object
         obj->onPreRender(this);
@@ -190,8 +192,16 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
             //Get castShadows boolean from several properties
             bool castShadows = (obj->hasTerrain()) ? obj->getPropertyPtr<TerrainProperty>()->castShadows : mesh_prop->castShadows;
             //If castShadows is true, then render mesh to DepthBuffer
+
+            ShadowCasterProperty* caster = getRenderSettings()->shadowcaster_obj_ptr->getPropertyPtr<ShadowCasterProperty>();
+
+            unsigned int InstNum = caster->mCascadesNum;
+
+            if (bb.GetLongestDistance(cam->getCameraPosition()) < 20)
+                InstNum = 1;
+
             if (castShadows)
-                obj->DrawMeshInstanced(this, getRenderSettings()->mShadowCascadesNum);
+                obj->DrawMeshInstanced(this, InstNum);
         }
     }
 }

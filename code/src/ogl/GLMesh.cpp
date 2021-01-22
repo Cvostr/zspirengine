@@ -76,7 +76,7 @@ void Engine::glMesh::setMeshData(void* vertices, int vertSize, unsigned int* ind
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->meshEBO); //Bind index buffer
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<unsigned int>(indices_num) * sizeof(unsigned int), indices, GL_STATIC_DRAW); //Send indices to buffer
 
-    //mBoundingBox.CreateFromVertexArray(vertices, mVerticesNum);
+   // mBoundingBox.CreateFromVertexArray(vertices, mVerticesNum);
 }
 
 void Engine::glMesh::_glVertexAttribPointer(int index, int elems_count, int format, int normalized, int structSize, void* offset) {

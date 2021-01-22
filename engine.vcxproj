@@ -303,6 +303,7 @@
     <ClCompile Include="code\src\world\GameObject.cpp" />
     <ClCompile Include="code\src\world\GoProperty\AnimationComponent.cpp" />
     <ClCompile Include="code\src\world\GoProperty\AudioSourceComponent.cpp" />
+    <ClCompile Include="code\src\world\GoProperty\CameraComponent.cpp" />
     <ClCompile Include="code\src\world\GoProperty\CharacterController.cpp" />
     <ClCompile Include="code\src\world\GoProperty\ColliderProperty.cpp" />
     <ClCompile Include="code\src\world\GoProperty\go_properties.cpp" />
@@ -410,6 +411,7 @@
     <ClInclude Include="code\headers\vulkan\ZSVulkanSwapchain.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\AnimationComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\AudioSourceComponent.hpp" />
+    <ClInclude Include="code\headers\world\ObjectsComponents\CameraComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\CharacterController.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\ColliderComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\LightSourceComponent.hpp" />

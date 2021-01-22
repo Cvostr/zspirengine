@@ -75,3 +75,17 @@ void BoundingBox3::ApplyTransform(const Mat4& Transform) {
 		Extend(v4._Vec3());
 	}
 }
+
+float getDistanceXZ(const Vec3& p1, const Vec3& p2) {
+	float dx = p1.X - p2.X;
+	float dz = p1.Z - p2.Z;
+
+	return static_cast<float>(sqrtf(dx * dx + dz * dz));
+}
+
+float BoundingBox3::GetLongestDistance(const Vec3& Point) {
+	float Dist1 = getDistance(Point, mMax);
+	float Dist2 = getDistance(Point, mMin);
+
+	return (Dist1 > Dist2) ? Dist1 : Dist2;
+}

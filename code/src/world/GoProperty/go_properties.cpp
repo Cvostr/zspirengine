@@ -16,6 +16,7 @@
 #include "../../../headers/world/ObjectsComponents/TriggerComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/WindZoneComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/ParticleEmitterComponent.hpp"
+#include "../../../headers/world/ObjectsComponents/CameraComponent.hpp"
 
 extern ZSGAME_DATA* game_data;
 
@@ -134,6 +135,10 @@ Engine::IGameObjectComponent* Engine::allocProperty(PROPERTY_TYPE type){
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_PARTICLE_EMITTER: {
             _ptr = static_cast<IGameObjectComponent*>(new Engine::ParticleEmitterComponent);
+            break;
+        }
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_CAMERA: {
+            _ptr = static_cast<IGameObjectComponent*>(new Engine::CameraComponent);
             break;
         }
     }

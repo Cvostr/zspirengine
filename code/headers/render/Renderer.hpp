@@ -29,8 +29,6 @@ struct RenderSettings {
 
     GameObject* skybox_obj_ptr;
     GameObject* shadowcaster_obj_ptr;
-        
-    unsigned int mShadowCascadesNum;
 
     void defaults();
     void resetPointers();
@@ -45,7 +43,9 @@ class World;
 class Renderer : public IEngineComponent {
 protected:
     //Vector to store lights
-    std::vector<void*> lights_ptr;
+    std::vector<void*> mLights;
+    std::vector<void*> mCameras;
+
     RenderSettings render_settings;
 
     Framebuffer* gbuffer;
@@ -99,7 +99,8 @@ public:
     void processObjects(World* world_ptr);
 
     void addLight(void* light_ptr);
-    void removeLights();
+    void addCamera(void* cam_ptr);
+    void removeLightsCameras();
 
     void TryRenderShadows(Engine::Camera* cam);
     void TryRenderSkybox();

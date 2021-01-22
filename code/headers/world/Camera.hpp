@@ -30,30 +30,26 @@ namespace Engine{
 
     }ZSVIEWPORT;
 
-    class Camera{
+    class Camera {
         protected:
             Mat4 mProjectionMatrix; //Calculated Projection matrix
-            Mat4 ui_proj;
+            Mat4 mUiProjection;
             Mat4 mViewMatrix; //Calculated View matrix
 
-            ZSCAMERAPROJECTIONTYPE proj_type;
-
-            bool isMoving;
-
         public:
+            ZSCAMERAPROJECTIONTYPE mProjectionType;
             Vec3 mCameraPos; //Camera position vector
             Vec3 mCameraUp; //Camera up direction vector
             Vec3 mCameraFront; //Camera front direction vector
+            ZSVIEWPORT mViewport; //Camera viewport
 
-            float FOV; //Field of view
-            float nearZ; //Nearest Z occlusion plane
-            float farZ;
+            float mFOV; //Field of view
+            float mNearZ; //Nearest Z occlusion plane
+            float mFarZ;
             float orthogonal_factor;
 
-            ZSVIEWPORT viewport;
-
             bool isAlListenerCamera;
-            Vec3 _dest_pos;
+            
 
             Vec3 getCameraPosition() { return mCameraPos; }
             Vec3 getCameraUpVec() { return mCameraUp; }
@@ -61,7 +57,7 @@ namespace Engine{
             Vec3 getCameraFrontVec() { return mCameraFront; }
 
             Vec3 getCameraViewCenterPos();
-            ZSVIEWPORT getViewport();
+            ZSVIEWPORT getViewport() { return mViewport; }
 
             void updateProjectionMat();
             void updateViewMat();
@@ -73,16 +69,15 @@ namespace Engine{
             void setFOV(float FOV);
             void setZplanes(float nearZ, float farZ);
             void setViewport(ZSVIEWPORT viewport);
+            void setViewport(unsigned int Width, unsigned int Height);
 
             void setProjectionType(ZSCAMERAPROJECTIONTYPE type);
-            void startMoving();
-            void stopMoving();
 
             Mat4 getViewMatrix() { return mViewMatrix; }
             Mat4 getProjMatrix() { return mProjectionMatrix; }
-            Mat4 getUiProjMatrix();
-            void updateTick(float deltaTime);
+            Mat4 getUiProjMatrix() { return mUiProjection; }
+            
 
-            Camera();
+            explicit Camera();
     };
 }

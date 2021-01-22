@@ -100,7 +100,7 @@ Engine::Renderer::Renderer(){
 
     Engine::setupDefaultMeshes();
     //to avoid memory reallocations
-    this->lights_ptr.reserve(MAX_LIGHTS_AMOUNT);
+    this->mLights.reserve(MAX_LIGHTS_AMOUNT);
 
     allowOnUpdate = true;
 }
@@ -150,8 +150,8 @@ void Engine::Renderer::setLightsToBuffer(){
     //Bind Lighting buffer to work with it
     this->lightsBuffer->bind();
     //Iterate over all lights
-    for(unsigned int light_i = 0; light_i < this->lights_ptr.size(); light_i ++){
-        LightsourceComponent* _light_ptr = static_cast<LightsourceComponent*>(lights_ptr[light_i]);
+    for(unsigned int light_i = 0; light_i < this->mLights.size(); light_i ++){
+        LightsourceComponent* _light_ptr = static_cast<LightsourceComponent*>(mLights[light_i]);
 
         LIGHTSOURCE_TYPE light_type = (_light_ptr->light_type);
 
@@ -169,7 +169,7 @@ void Engine::Renderer::setLightsToBuffer(){
         lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * light_i + 56, sizeof (int), &_light_ptr->color.gl_b);
     }
 
-    int ls = static_cast<int>(lights_ptr.size());
+    int ls = static_cast<int>(mLights.size());
     lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT, 4, &ls);
 
     Vec3 ambient_L = Vec3(render_settings.ambient_light_color.r / 255.0f,render_settings.ambient_light_color.g / 255.0f, render_settings.ambient_light_color.b / 255.0f);
@@ -177,7 +177,7 @@ void Engine::Renderer::setLightsToBuffer(){
 
     lightsBuffer->updateBufferedData();
     //free lights array
-    this->removeLights();
+    this->removeLightsCameras();
 }
 
 void Engine::Renderer::render(){
@@ -211,7 +211,6 @@ void Engine::Renderer::processObjects(World* world_ptr) {
 }
 
 void Engine::Renderer::renderShadowDepth(World* world_ptr, unsigned int CascadesNum){
-    this->render_settings.mShadowCascadesNum = CascadesNum;
     World* _world_ptr = static_cast<World*>(world_ptr);
     current_state = PIPELINE_STATE::PIPELINE_STATE_SHADOWDEPTH;
     //Iterate over all objects in the world
@@ -453,11 +452,16 @@ void Engine::Renderer::renderGlyph(CharacterGlyph* glyph, int X, int Y, int scal
 }
 
 void Engine::Renderer::addLight(void* light_ptr){
-    this->lights_ptr.push_back(light_ptr);
+    this->mLights.push_back(light_ptr);
 }
 
-void Engine::Renderer::removeLights(){
-    this->lights_ptr.clear();
+void Engine::Renderer::addCamera(void* cam_ptr) {
+    mCameras.push_back(cam_ptr);
+}
+
+void Engine::Renderer::removeLightsCameras(){
+    this->mLights.clear();
+    mCameras.clear();
 }
 
 void Engine::Renderer::TryRenderShadows(Engine::Camera* cam) {

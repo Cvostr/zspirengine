@@ -32,6 +32,8 @@ void Engine::vkMesh::setMeshData(ZSVERTEX* vertices, unsigned int* indices, unsi
     game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &this->vertexBuffer, vertices, vertices_num * sizeof(ZSVERTEX));
     game_data->vk_main->mVMA->allocate(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, &this->indexBuffer, indices, indices_num * sizeof(unsigned int));
 
+    mBoundingBox.CreateFromVertexArray(vertices, mVerticesNum);
+
     mCreated = true;
 }
 void Engine::vkMesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){
@@ -42,6 +44,8 @@ void Engine::vkMesh::setMeshData(ZSVERTEX* vertices, unsigned int vertices_num){
     game_data->vk_main->mVMA->allocateCpu(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &this->vertexBuffer, vertices_num * sizeof(ZSVERTEX), &vert);
     memcpy(vert, vertices, vertices_num * sizeof(ZSVERTEX));
     game_data->vk_main->mVMA->unmap(&vertexBuffer);
+
+    mBoundingBox.CreateFromVertexArray(vertices, mVerticesNum);
 
     mCreated = true;
 }

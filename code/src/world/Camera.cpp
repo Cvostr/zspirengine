@@ -7,59 +7,66 @@ extern ZSpireEngine* engine_ptr;
 Engine::Camera::Camera() : mCameraPos(0),
                            mCameraFront(1, 0, 0),
                            mCameraUp(0, 1, 0),
-                           proj_type(ZSCAMERA_PROJECTION_PERSPECTIVE),
-                           nearZ(0.1f),
-                           farZ(100.0f),
-                           FOV(45),
+                           mProjectionType(ZSCAMERA_PROJECTION_PERSPECTIVE),
+                           mNearZ(0.1f),
+                           mFarZ(100.0f),
+                           mFOV(45),
                            orthogonal_factor(1.f),
-                           viewport(0, 0, 640, 480)
+                           mViewport(0, 0, 640, 480)
 {
     updateProjectionMat();
     //updateViewMat();
 
-    isMoving = false;
-    isAlListenerCamera = false;
+       isAlListenerCamera = false;
 }
 
 void Engine::Camera::setFOV(float FOV){
-    this->FOV = FOV;
+    this->mFOV = FOV;
     updateProjectionMat();
 }
 
 void Engine::Camera::setZplanes(float nearZ, float farZ){
-    this->nearZ = nearZ;
-    this->farZ = farZ;
+    this->mNearZ = nearZ;
+    this->mFarZ = farZ;
     updateProjectionMat();
 }
 
 void Engine::Camera::setProjectionType(ZSCAMERAPROJECTIONTYPE type){
-    proj_type = type;
+    mProjectionType = type;
     updateProjectionMat();
 }
 
 void Engine::Camera::setViewport(ZSVIEWPORT viewport){
-    this->viewport = viewport;
+    this->mViewport = viewport;
     updateProjectionMat();
 }
 
+void Engine::Camera::setViewport(unsigned int Width, unsigned int Height) {
+    mViewport.startX = 0;
+    mViewport.startY = 0;
+
+    mViewport.endX = Width;
+    mViewport.endY = Height;
+}
+
 void Engine::Camera::updateProjectionMat(){
-    if(proj_type == ZSCAMERA_PROJECTION_PERSPECTIVE){
-        float aspect = static_cast<float>((viewport.endX - viewport.startX)) / static_cast<float>(viewport.endY - viewport.startY);
+    if(mProjectionType == ZSCAMERA_PROJECTION_PERSPECTIVE){
+        float aspect = static_cast<float>((mViewport.endX - mViewport.startX)) / static_cast<float>(mViewport.endY - mViewport.startY);
         if (engine_ptr != nullptr) {
             if (engine_ptr->engine_info->graphicsApi == VULKAN) {
-                mProjectionMatrix = getPerspectiveVulkan(FOV, aspect, nearZ, farZ);
+                mProjectionMatrix = getPerspectiveVulkan(mFOV, aspect, mNearZ, mFarZ);
             }
             else
-                mProjectionMatrix = getPerspective(FOV, aspect, nearZ, farZ);
+                mProjectionMatrix = getPerspective(mFOV, aspect, mNearZ, mFarZ);
         }else
-            mProjectionMatrix = getPerspective(FOV, aspect, nearZ, farZ);
+            mProjectionMatrix = getPerspective(mFOV, aspect, mNearZ, mFarZ);
     }else{
-        mProjectionMatrix = getOrthogonal(0, static_cast<float>(viewport.endX - viewport.startX) * orthogonal_factor,
-                             0, static_cast<float>(viewport.endY - viewport.startY) * orthogonal_factor,
-                             nearZ, farZ);
+        mProjectionMatrix = getOrthogonal(0, static_cast<float>(mViewport.endX - mViewport.startX) * orthogonal_factor,
+                             0, static_cast<float>(mViewport.endY - mViewport.startY) * orthogonal_factor,
+            mNearZ, mFarZ);
     }
-    ui_proj = getOrthogonal(0, static_cast<float>(viewport.endX - viewport.startX),
-                            0, static_cast<float>(viewport.endY - viewport.startY));
+    mUiProjection = getOrthogonal(0, static_cast<float>(mViewport.endX - mViewport.startX),
+                            0, static_cast<float>(mViewport.endY - mViewport.startY));
 
     
 }
@@ -88,24 +95,16 @@ void Engine::Camera::setUp(const Vec3& up){
     updateViewMat();
 }
 
-Mat4 Engine::Camera::getUiProjMatrix(){
-    return this->ui_proj;
-}
-
-Engine::ZSVIEWPORT Engine::Camera::getViewport(){
-    return viewport;
-}
-
 Vec3 Engine::Camera::getCameraRightVec(){
     return vCross(mCameraFront, mCameraUp);
 }
 
 
 Vec3 Engine::Camera::getCameraViewCenterPos(){
-    if(this->proj_type == ZSCAMERA_PROJECTION_ORTHOGONAL){
+    if(this->mProjectionType == ZSCAMERA_PROJECTION_ORTHOGONAL){
 
-        int viewport_y = static_cast<int>(viewport.endY - viewport.startY) / 2;
-        int viewport_x = (viewport.endX - viewport.startX) / 2;
+        int viewport_y = static_cast<int>(mViewport.endY - mViewport.startY) / 2;
+        int viewport_x = (mViewport.endX - mViewport.startX) / 2;
         viewport_x *= -1;
         Vec3 result = mCameraPos + Vec3(static_cast<float>(viewport_x), static_cast<float>(viewport_y), 0);
         return result;
@@ -113,36 +112,5 @@ Vec3 Engine::Camera::getCameraViewCenterPos(){
     return this->mCameraPos;
 }
 
-void Engine::Camera::updateTick(float deltaTime){
-    if(!isMoving) return;
 
-    Vec3 real_dest = (_dest_pos - (5) * mCameraFront);
 
-    if(getDistance(mCameraPos, real_dest) < 2){
-        isMoving = false;
-    }else{
-        Vec3 delta = real_dest - mCameraPos;
-        float dist = getDistance(mCameraPos, real_dest);
-
-        Vec3 toMove = delta / dist;
-        toMove = toMove * (deltaTime) * 80;
-        mCameraPos += toMove;
-        updateViewMat();
-    }
-}
-
-void Engine::Camera::startMoving(){
-    if(proj_type == ZSCAMERA_PROJECTION_ORTHOGONAL){
-        int viewport_size_x = static_cast<int>(viewport.endX) - static_cast<int>(viewport.startX);
-        int viewport_size_y = static_cast<int>(viewport.endY) - static_cast<int>(viewport.startY);
-        viewport_size_y *= -1;
-        Vec3 to_add = Vec3(static_cast<float>(viewport_size_x) / 2.f, static_cast<float>(viewport_size_y) / 2.f, 0);
-        _dest_pos = _dest_pos + to_add;
-    }
-
-    this->isMoving = true;
-}
-
-void Engine::Camera::stopMoving(){
-    this->isMoving = false;
-}
