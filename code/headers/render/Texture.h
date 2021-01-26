@@ -41,6 +41,9 @@ namespace Engine {
         FORMAT_BC1_UNORM,
         FORMAT_BC2_UNORM,
         FORMAT_BC3_UNORM,
+
+        FORMAT_DEPTH_24_STENCIL_8 = 120,
+        FORMAT_DEPTH_32
     };
 
 	class Texture : public GpuObject{
@@ -49,11 +52,15 @@ namespace Engine {
         uint32_t maxHeight;
         TextureFormat mFormat;
         uint32_t mMipsCount;
+        uint32_t mLayers;
 	public:
         TextureFormat GetFormat() { return mFormat; }
+        uint32_t GetMipsCount() { return mMipsCount; }
+        uint32_t GetLayersCount() { return mLayers; }
+        uint32_t GetWidth() { return maxWidth; }
+        uint32_t GetHeight() { return maxHeight; }
 		//Only for OGL : initialize texture in GL
-        virtual void Init(){}
-        virtual void Create(unsigned int Width, unsigned int Height, TextureFormat format){}
+        virtual void Create(uint32_t Width, uint32_t Height, TextureFormat format, uint32_t Layers = 1){}
 		//Loads texture from buffer
         virtual bool LoadDDSTextureFromBuffer(unsigned char* data) { return false; }
         virtual bool LoadPNGTextureFromBuffer(unsigned char* data, int size) { return false; }

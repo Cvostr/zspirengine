@@ -7,27 +7,22 @@ namespace Engine {
 
     class GLframebuffer : public Framebuffer{
     private:
-        GLuint fbuffer;
-        GLuint depthBuffer;
-
-        unsigned int texture_size;
-
-        unsigned int Width;
-        unsigned int Height;
-
-        bool Depth;
+        GLuint mFramebuffer;
 
     public:
-
-        glTexture* textures[MAX_RENDERER_ATTACHMENT_COUNT];
 
         void bind();
 
         void bindTextures(unsigned int m);
+        //Inherited from Framebuffer
+        void AddTexture(TextureFormat Format = TextureFormat::FORMAT_RGBA);
+        void AddDepth(unsigned int Layers = 1, TextureFormat Format = FORMAT_DEPTH_24_STENCIL_8);
 
-        void addTexture(TextureFormat Format);
+        void AddTexture(uint32_t Width, uint32_t Height, TextureFormat Format);
+        void AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers = 1, TextureFormat Format = FORMAT_DEPTH_24_STENCIL_8);
 
         ~GLframebuffer();
-        GLframebuffer(unsigned int width, unsigned int height, bool depth);
+        GLframebuffer(unsigned int width, unsigned int height);
+        GLframebuffer();
     };
 }

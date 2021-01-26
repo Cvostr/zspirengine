@@ -2,33 +2,15 @@
 
 #include "../render/Framebuffer.hpp"
 #include "../vulkan/ZSVulkanRenderPass.hpp"
-#include "../render/GpuObject.hpp"
+#include "../render/Texture.h"
 #include <vulkan/vulkan.hpp>
 #include <vector>
 
 namespace Engine {
 
-    typedef struct FbAttachment {
-        unsigned int Width;
-        unsigned int Height;
-        unsigned int Layers;
-        VkFormat format;
-        VkImageUsageFlagBits usage;
-        VkImageAspectFlagBits aspect;
-
-        VkImage Image;
-        VkDeviceMemory ImageMemory;
-        VkImageView ImageView;
-
-        FbAttachment() {
-            Layers = 1;
-        }
-    }FbAttachment;
-
-	class ZSVulkanFramebuffer : public GpuObject {
+	class ZSVulkanFramebuffer : public Framebuffer {
 	private:
 		VkFramebuffer mFramebuffer;
-        std::vector<FbAttachment> Attachments;
         std::vector<VkImageView> Views;
         unsigned int mLayersCount;
 	public:
@@ -36,13 +18,21 @@ namespace Engine {
         VkFramebuffer GetFramebuffer() { return mFramebuffer; }
 
         VkImageView getImageViewIndex(unsigned int i) { return Views[i]; }
-        VkImageView getImageView(FbAttachment* attachment);
-        FbAttachment* PushAttachment(unsigned int Width, unsigned int Height, VkFormat format, VkImageUsageFlagBits usage, VkImageAspectFlagBits aspect, unsigned int Layers = 1);
         void PushOutputAttachment();
-        void PushDepthAttachment(unsigned int Width, unsigned int Height, unsigned int Layers = 1);
         void SetLayersCount(unsigned int Layers) { mLayersCount = Layers; }
 		bool Create(ZSVulkanRenderPass* renderpass);
+
+
+        void AddTexture(TextureFormat Format = TextureFormat::FORMAT_RGBA);
+        void AddDepth(unsigned int Layers = 1, TextureFormat Format = FORMAT_DEPTH_24_STENCIL_8);
+
+        void AddTexture(uint32_t Width, uint32_t Height, TextureFormat Format);
+        void AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers = 1, TextureFormat Format = FORMAT_DEPTH_24_STENCIL_8);
+
+
+
 		ZSVulkanFramebuffer();
+        ZSVulkanFramebuffer(unsigned int width, unsigned int height);
         ~ZSVulkanFramebuffer();
 	};
 }

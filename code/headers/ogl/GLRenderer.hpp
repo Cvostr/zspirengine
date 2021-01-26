@@ -20,6 +20,9 @@ namespace Engine {
 		void render2D();
 		void render3D(Engine::Camera* cam);
 
+		void Render3DCamera(void* cam_prop);
+
+
 		void ClearFBufferGL(bool clearColor, bool clearDepth);
 		void setClearColor(float r, float g, float b, float a);
 

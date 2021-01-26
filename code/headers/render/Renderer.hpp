@@ -100,7 +100,7 @@ public:
 
     void addLight(void* light_ptr);
     void addCamera(void* cam_ptr);
-    void removeLightsCameras();
+    void removeLights();
 
     void TryRenderShadows(Engine::Camera* cam);
     void TryRenderSkybox();
@@ -123,7 +123,7 @@ public:
    
     void destroy();
 
-    Engine::Camera* cam;
+    Engine::Camera* mMainCamera;
 
     explicit Renderer();
     ~Renderer();

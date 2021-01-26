@@ -3,9 +3,140 @@
 
 extern ZSGAME_DATA* game_data;
 
-void Engine::vkTexture::Init(){
+VkFormat Engine::GetFormatVK(TextureFormat format) {
+	VkFormat vk_format = VK_FORMAT_UNDEFINED;
+	switch (format) {
+	case TextureFormat::FORMAT_R:
+		vk_format = VK_FORMAT_R8_UNORM;
+		break;
+	case TextureFormat::FORMAT_RG:
+		vk_format = VK_FORMAT_R8G8_UNORM;
+		break;
+	case TextureFormat::FORMAT_RGB:
+		vk_format = VK_FORMAT_R8G8B8_UNORM;
+		break;
+	case TextureFormat::FORMAT_RGBA:
+		vk_format = VK_FORMAT_R8G8B8A8_UNORM;
+		break;
+	case TextureFormat::FORMAT_R16:
+		vk_format = VK_FORMAT_R16_UNORM;
+		break;
+	case TextureFormat::FORMAT_RG16:
+		vk_format = VK_FORMAT_R16G16_UNORM;
+		break;
+	case TextureFormat::FORMAT_RGB16:
+		vk_format = VK_FORMAT_R16G16B16_UNORM;
+		break;
+	case TextureFormat::FORMAT_RGBA16:
+		vk_format = VK_FORMAT_R16G16B16A16_UNORM;
+		break;
+	case TextureFormat::FORMAT_R16F:
+		vk_format = VK_FORMAT_R16_SFLOAT;
+		break;
+	case TextureFormat::FORMAT_RG16F:
+		vk_format = VK_FORMAT_R16G16_SFLOAT;
+		break;
+	case TextureFormat::FORMAT_RGB16F:
+		vk_format = VK_FORMAT_R16G16B16_SFLOAT;
+		break;
+	case TextureFormat::FORMAT_RGBA16F:
+		vk_format = VK_FORMAT_R16G16B16A16_SFLOAT;
+		break;
+	case TextureFormat::FORMAT_DEPTH_24_STENCIL_8:
+		vk_format = VK_FORMAT_D24_UNORM_S8_UINT;
+		break;
+	case TextureFormat::FORMAT_DEPTH_32:
+		vk_format = VK_FORMAT_D32_SFLOAT;
+		break;
+	}
+
+	return vk_format;
+}
+
+void Engine::vkTexture::Create(unsigned int Width, unsigned int Height, TextureFormat format, unsigned int Layers) {
+	maxWidth = Width;
+	maxHeight = Height;
+	mFormat = format;
+	mLayers = Layers;
+	mMipsCount = 1;
+	//Convert format from universal to vulkan
+	VkFormat TexFormat = GetFormatVK(format);
+
+	VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+	if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
+	{
+		imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	}
+	if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
+	{
+		imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	}
+
+	VkImageCreateInfo imageInfo{};
+	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	imageInfo.flags = 0; // Optional
+	imageInfo.imageType = VK_IMAGE_TYPE_2D;
+	imageInfo.extent.width = static_cast<uint32_t>(maxWidth);
+	imageInfo.extent.height = static_cast<uint32_t>(maxHeight);
+	imageInfo.extent.depth = 1;
+	imageInfo.mipLevels = mMipsCount;
+	imageInfo.arrayLayers = Layers;
+	imageInfo.format = TexFormat;
+	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	imageInfo.initialLayout = imageLayout;
+	imageInfo.usage = usage | VK_IMAGE_USAGE_SAMPLED_BIT;
+	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+
+	if (vkCreateImage(game_data->vk_main->mDevice->getVkDevice(), &imageInfo, nullptr, &mImage) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create image!");
+	}
+
+
+	//Get Memory Requirements
+	VkMemoryRequirements memRequirements;
+	vkGetImageMemoryRequirements(game_data->vk_main->mDevice->getVkDevice(), mImage, &memRequirements);
+	//Get Memory Properties
+	VkPhysicalDeviceMemoryProperties memProperties;
+	vkGetPhysicalDeviceMemoryProperties(game_data->vk_main->mDevice->getPhysicalDevice(), &memProperties);
+
+	unsigned int memoryType = 0;
+	VkMemoryPropertyFlags flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+		if ((memRequirements.memoryTypeBits & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & flags) == flags) {
+			memoryType = i;
+		}
+	}
+
+	VkMemoryAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = memRequirements.size;
+	allocInfo.memoryTypeIndex = memoryType;
+	//Allocate Memory
+	if (vkAllocateMemory(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, nullptr, &mImageMem) != VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate image memory!");
+	}
+
+	vkBindImageMemory(game_data->vk_main->mDevice->getVkDevice(), mImage, mImageMem, 0);
+
+	VkImageViewType ImageViewType = VK_IMAGE_VIEW_TYPE_2D;
+	if (mLayers > 1)
+		ImageViewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+
+	VkImageViewCreateInfo textureImageViewInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
+	textureImageViewInfo.image = mImage;
+	textureImageViewInfo.viewType = ImageViewType;
+	textureImageViewInfo.format = TexFormat;
+	textureImageViewInfo.subresourceRange.aspectMask = aspect;
+	textureImageViewInfo.subresourceRange.baseMipLevel = 0;
+	textureImageViewInfo.subresourceRange.levelCount = 1;
+	textureImageViewInfo.subresourceRange.baseArrayLayer = 0;
+	textureImageViewInfo.subresourceRange.layerCount = mLayers;
+	vkCreateImageView(game_data->vk_main->mDevice->getVkDevice(), &textureImageViewInfo, nullptr, &mImageView);
 
 }
+
 //Loads texture from buffer
 bool Engine::vkTexture::LoadDDSTextureFromBuffer(unsigned char* data){
 

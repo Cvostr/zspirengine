@@ -95,9 +95,10 @@ bool Engine::Texture::LoadPNGTextureFromFile(const char* path) {
     return true;
 }
 
-Engine::Texture::Texture(){
+Engine::Texture::Texture() :
+    mMipsCount(0),
+    mLayers(1) {}
 
-}
 Engine::Texture::~Texture(){
 
 }

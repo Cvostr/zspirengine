@@ -18,6 +18,10 @@ ZSVulkanRenderPass::~ZSVulkanRenderPass() {
         vkDestroyRenderPass(game_data->vk_main->mDevice->getVkDevice(), mRenderPass, nullptr);
 }
 
+void ZSVulkanRenderPass::PushColorAttachment(TextureFormat Format, VkImageLayout Layout) {
+    PushColorAttachment(GetFormatVK(Format), Layout);
+}
+
 void ZSVulkanRenderPass::PushColorAttachment(VkFormat Format, VkImageLayout Layout) {
     VkImageLayout imgLayout;
 

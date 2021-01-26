@@ -7,6 +7,13 @@ Engine::ZSVulkanFramebuffer::ZSVulkanFramebuffer() {
 	mLayersCount = 1;
 }
 
+Engine::ZSVulkanFramebuffer::ZSVulkanFramebuffer(unsigned int width, unsigned int height) {
+	mLayersCount = 1;
+
+	Width = width;
+	Height = height;
+}
+
 Engine::ZSVulkanFramebuffer::~ZSVulkanFramebuffer() {
 	if (mCreated)
 		vkDestroyFramebuffer(game_data->vk_main->mDevice->getVkDevice(), mFramebuffer, nullptr);
@@ -32,109 +39,41 @@ bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
 	return true;
 }
 
-Engine::FbAttachment* Engine::ZSVulkanFramebuffer::PushAttachment(unsigned int Width, unsigned int Height,
-	VkFormat format,
-	VkImageUsageFlagBits usage,
-	VkImageAspectFlagBits aspect, unsigned int Layers)
-{
-	FbAttachment Attachment = {};
-	Attachment.Width = Width;
-	Attachment.Height = Height;
-	Attachment.format = format;
-	Attachment.usage = usage;
-	Attachment.aspect = aspect;
-	Attachment.Layers = Layers;
-
-	this->Attachments.push_back(Attachment);
-
-
-	VkImageView view = getImageView(&Attachments[Attachments.size() - 1]);
-	Views.push_back(view);
-
-	return &Attachments[Attachments.size() - 1];
-}
 void Engine::ZSVulkanFramebuffer::PushOutputAttachment() {
 	Views.push_back(game_data->vk_main->mSwapChain->GetImageViewAtIndex(0));
 }
-void Engine::ZSVulkanFramebuffer::PushDepthAttachment(unsigned int Width, unsigned int Height, unsigned int Layers) {
-	FbAttachment* att = PushAttachment(Width, Height, VK_FORMAT_D24_UNORM_S8_UINT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_ASPECT_DEPTH_BIT, Layers);
+
+void Engine::ZSVulkanFramebuffer::AddTexture(TextureFormat Format) {
+	AddTexture(Width, Height, Format);
+}
+void Engine::ZSVulkanFramebuffer::AddDepth(unsigned int Layers, TextureFormat Format) {
+	AddDepth(Width, Height, Layers, Format);
 }
 
-VkImageView Engine::ZSVulkanFramebuffer::getImageView(FbAttachment* attachment) {
+void Engine::ZSVulkanFramebuffer::AddTexture(uint32_t Width, uint32_t Height, TextureFormat Format) {
+	vkTexture* Texture = new vkTexture;
 
-	VkImageLayout imageLayout;
+	Texture->usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	Texture->aspect = VK_IMAGE_ASPECT_COLOR_BIT;
 
-	if (attachment->usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
-	{
-		imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-	}
-	if (attachment->usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
-	{
-		imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-	}
+	Texture->Create(Width, Height, Format);
 
-	VkImageCreateInfo imageInfo{};
-	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-	imageInfo.flags = 0; // Optional
-	imageInfo.imageType = VK_IMAGE_TYPE_2D;
-	imageInfo.extent.width = static_cast<uint32_t>(attachment->Width);
-	imageInfo.extent.height = static_cast<uint32_t>(attachment->Height);
-	imageInfo.extent.depth = 1;
-	imageInfo.mipLevels = 1;
-	imageInfo.arrayLayers = attachment->Layers;
-	
-	imageInfo.format = attachment->format;
-	imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-	imageInfo.initialLayout = imageLayout;
-	imageInfo.usage = attachment->usage | VK_IMAGE_USAGE_SAMPLED_BIT;
-	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	textures[mTexturesCount++] = Texture;
 
+	Views.push_back(Texture->GetImageView());
+}
 
-	if (vkCreateImage(game_data->vk_main->mDevice->getVkDevice(), &imageInfo, nullptr, &attachment->Image) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create image!");
-	}
-	//Get Memory Requirements
-	VkMemoryRequirements memRequirements;
-	vkGetImageMemoryRequirements(game_data->vk_main->mDevice->getVkDevice(), attachment->Image, &memRequirements);
-	//Get Memory Properties
-	VkPhysicalDeviceMemoryProperties memProperties;
-	vkGetPhysicalDeviceMemoryProperties(game_data->vk_main->mDevice->getPhysicalDevice(), &memProperties);
+void Engine::ZSVulkanFramebuffer::AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers, TextureFormat Format) {
+	Depth = true;
 
-	unsigned int memoryType = 0;
-	VkMemoryPropertyFlags flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-		if ((memRequirements.memoryTypeBits & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & flags) == flags) {
-			memoryType = i;
-		}
-	}
+	vkTexture* DepthTexture = new vkTexture;
 
-	VkMemoryAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = memoryType;
-	//Allocate Memory
-	if (vkAllocateMemory(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, nullptr, &attachment->ImageMemory) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate image memory!");
-	}
+	DepthTexture->usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+	DepthTexture->aspect = VK_IMAGE_ASPECT_DEPTH_BIT;
 
-	vkBindImageMemory(game_data->vk_main->mDevice->getVkDevice(), attachment->Image, attachment->ImageMemory, 0);
+	DepthTexture->Create(Width, Height, Format, Layers);
 
-	VkImageViewType ImageViewType = VK_IMAGE_VIEW_TYPE_2D;
-	if (attachment->Layers > 1)
-		ImageViewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+	depthTexture = DepthTexture;
 
-	VkImageViewCreateInfo textureImageViewInfo = { VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
-	textureImageViewInfo.image = attachment->Image;
-	textureImageViewInfo.viewType = ImageViewType;
-	textureImageViewInfo.format = attachment->format;
-	textureImageViewInfo.subresourceRange.aspectMask = attachment->aspect;
-	textureImageViewInfo.subresourceRange.baseMipLevel = 0;
-	textureImageViewInfo.subresourceRange.levelCount = 1;
-	textureImageViewInfo.subresourceRange.baseArrayLayer = 0;
-	textureImageViewInfo.subresourceRange.layerCount = attachment->Layers;
-	vkCreateImageView(game_data->vk_main->mDevice->getVkDevice(), &textureImageViewInfo, nullptr, &attachment->ImageView);
-
-
-	return attachment->ImageView;
+	Views.push_back(DepthTexture->GetImageView());
 }

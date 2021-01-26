@@ -91,11 +91,11 @@ void Engine::VKRenderer::InitShaders() {
     this->mShadowMapShader->compileFromFile("Shaders/vulkan_test/shadowmap/vert.spv", "", "Shaders/vulkan_test/shadowmap/geom.spv");
 
     MaterialRenderPass = new ZSVulkanRenderPass;
-    MaterialRenderPass->PushColorAttachment(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    MaterialRenderPass->PushColorAttachment(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    MaterialRenderPass->PushColorAttachment(VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    MaterialRenderPass->PushColorAttachment(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    MaterialRenderPass->PushColorAttachment(VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    MaterialRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    MaterialRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA16F, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    MaterialRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA16F, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    MaterialRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    MaterialRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
     MaterialRenderPass->PushDepthAttachment();
     MaterialRenderPass->Create();
 
@@ -107,12 +107,13 @@ void Engine::VKRenderer::InitShaders() {
 
 
     MaterialFb = new ZSVulkanFramebuffer;
-    MaterialFb->PushAttachment(640, 480, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
-    MaterialFb->PushAttachment(640, 480, VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
-    MaterialFb->PushAttachment(640, 480, VK_FORMAT_R16G16B16A16_SFLOAT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
-    MaterialFb->PushAttachment(640, 480, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
-    MaterialFb->PushAttachment(640, 480, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
-    MaterialFb->PushDepthAttachment(640, 480);
+    MaterialFb->AddTexture(640, 480, TextureFormat::FORMAT_RGBA);
+    MaterialFb->AddTexture(640, 480, TextureFormat::FORMAT_RGBA16F);
+    MaterialFb->AddTexture(640, 480, TextureFormat::FORMAT_RGBA16F);
+    MaterialFb->AddTexture(640, 480, TextureFormat::FORMAT_RGBA);
+    MaterialFb->AddTexture(640, 480, TextureFormat::FORMAT_RGBA);
+    MaterialFb->AddDepth(640, 480);
+
     MaterialFb->Create(MaterialRenderPass);
     
     TransformStorageBuf = static_cast<vkUniformBuffer*>(allocUniformBuffer());
@@ -136,7 +137,7 @@ void Engine::VKRenderer::InitShaders() {
     
 
     ShadowFb = new ZSVulkanFramebuffer;
-    ShadowFb->PushDepthAttachment(4096, 4096, 4);
+    ShadowFb->AddDepth(4096, 4096, 4, TextureFormat::FORMAT_DEPTH_32);
     ShadowFb->SetLayersCount(4);
     ShadowFb->Create(ShadowRenderPass);
 

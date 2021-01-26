@@ -11,8 +11,6 @@ Engine::ShadowCasterProperty::ShadowCasterProperty() :
     farPlane(75.0f),
     projection_viewport(20),
 
-    mShadowBuffer(0),
-    mShadowDepthTexture(0),
     mCascadesNum(3),
     mPcfNum(1),
     mShadowStrength(1.f),
@@ -68,8 +66,8 @@ void Engine::ShadowCasterProperty::SetCascadesAmount(int CascadesNum) {
 }
 
 void Engine::ShadowCasterProperty::setTexture() {
-    glActiveTexture(GL_TEXTURE27);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, this->mShadowDepthTexture);
+    if(Framebuffer)
+        Framebuffer->GetDepthTexture()->Use(27);
 }
 
 void Engine::ShadowCasterProperty::onValueChanged() {
@@ -108,44 +106,23 @@ void Engine::ShadowCasterProperty::onPreRender(Engine::Renderer* pipeline) {
 }
 
 void Engine::ShadowCasterProperty::reinitialize() {
-    glDeleteTextures(1, &mShadowDepthTexture);
-    glDeleteFramebuffers(1, &mShadowBuffer);
+    delete Framebuffer;
     //Reinitialize texture
     init();
 }
 
 void Engine::ShadowCasterProperty::init() {
-    //Generate framebuffer for texture
-    glGenFramebuffers(1, &this->mShadowBuffer);
-    //Binding framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, mShadowBuffer);
-    //Generate texture
-    glGenTextures(1, &this->mShadowDepthTexture); 
-    glBindTexture(GL_TEXTURE_2D_ARRAY, mShadowDepthTexture);
-    //Configuring texture
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, this->TextureSize, this->TextureSize, mCascadesNum, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-    
-    //Connecting depth texture to framebuffer
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, this->mShadowDepthTexture, 0);
-    //We won't render color
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    //Unbind framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    Framebuffer = new GLframebuffer(this->TextureSize, this->TextureSize);
+    //Add depth texture array
+    Framebuffer->AddDepth(mCascadesNum, TextureFormat::FORMAT_DEPTH_32);
 
     this->initialized = true;
 }
 
 void Engine::ShadowCasterProperty::onObjectDeleted() {
     glViewport(0, 0, TextureSize, TextureSize);
-    glBindFramebuffer(GL_FRAMEBUFFER, mShadowBuffer); //Bind framebuffer
+    //Bind framebuffer
+    Framebuffer->bind();
     glClear(GL_DEPTH_BUFFER_BIT);
 }
 
@@ -177,7 +154,7 @@ void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam
         Mat4 matview = matrixLookAt(cam_pos, cam_pos + light->direction * -1, Vec3(0, 1, 0));
 
         float w = static_cast<float>(40 * (1 + i));
-        this->LightProjectionMat = getOrthogonal(-w, w, -w, w, nearPlane, farPlane);
+        this->LightProjectionMat = getOrthogonal(-w, w, -w, w, -10, farPlane);
 
         if (engine_ptr != nullptr) {
             if (engine_ptr->engine_info->graphicsApi == VULKAN) {
@@ -202,14 +179,15 @@ void Engine::ShadowCasterProperty::Draw(Engine::Camera* cam, Renderer* pipeline)
         return;
     }
 
+    SendShadowParamsToShaders(cam, pipeline);
+
     //Change Framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, mShadowBuffer); //Bind framebuffer
+    Framebuffer->bind();
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CW);
     glDisable(GL_CULL_FACE);
     
-    SendShadowParamsToShaders(cam, pipeline);
 
     glViewport(0, 0, TextureSize, TextureSize);
     //Render to depth all scene

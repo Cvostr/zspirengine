@@ -9,6 +9,7 @@
 #include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
 #include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
 #include "../../headers/world/ObjectsComponents/NodeComponent.hpp"
+#include "../../headers/world/ObjectsComponents/CameraComponent.hpp"
 
 extern ZSpireEngine* engine_ptr;
 //Hack to support resources
@@ -177,7 +178,7 @@ void Engine::Renderer::setLightsToBuffer(){
 
     lightsBuffer->updateBufferedData();
     //free lights array
-    this->removeLightsCameras();
+    this->removeLights();
 }
 
 void Engine::Renderer::render(){
@@ -425,11 +426,9 @@ void Engine::Renderer::renderGlyph(CharacterGlyph* glyph, int X, int Y, int scal
     TextUniformBuffer->writeData(0, 4, &color.gl_r);
     TextUniformBuffer->writeData(4, 4, &color.gl_g);
     TextUniformBuffer->writeData(8, 4, &color.gl_b);
-    //Use texture at 0 slot
-    //glyph->Use(0);
+    
     Vec2 uv_start = glyph->mGlyphTextureStart;
     Vec2 uv_end = glyph->mGlyphSize;
-
 
     uv_start /= 2048.f;
     uv_end /= 2048.f;
@@ -452,16 +451,38 @@ void Engine::Renderer::renderGlyph(CharacterGlyph* glyph, int X, int Y, int scal
 }
 
 void Engine::Renderer::addLight(void* light_ptr){
-    this->mLights.push_back(light_ptr);
+
+    bool found = false;
+    //Check, if this light already exist
+    for (size_t i = 0; i < mLights.size(); i++) {
+        if (mLights[i] == light_ptr) {
+            found = true;
+            break;
+        }
+    }
+    //if not exist then add it to array
+    if(!found)
+        this->mLights.push_back(light_ptr);
 }
 
 void Engine::Renderer::addCamera(void* cam_ptr) {
-    mCameras.push_back(cam_ptr);
+    bool found = false;
+
+    for (size_t i = 0; i < mCameras.size(); i++) {
+        if (mCameras[i] == cam_ptr) {
+            found = true;
+            break;
+        }
+    }
+    if(!found)
+        mCameras.push_back(cam_ptr);
+    CameraComponent* CamComponent = (CameraComponent*)(cam_ptr);
+    if (CamComponent->mIsMainCamera)
+        mMainCamera = (Camera*)cam_ptr;
 }
 
-void Engine::Renderer::removeLightsCameras(){
-    this->mLights.clear();
-    mCameras.clear();
+void Engine::Renderer::removeLights(){
+    mLights.clear();
 }
 
 void Engine::Renderer::TryRenderShadows(Engine::Camera* cam) {

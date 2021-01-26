@@ -6,6 +6,8 @@
 
 namespace Engine {
 	class CameraComponent : public IGameObjectComponent, Camera {
+	private:
+		std::string TargetResourceName;
 	public:
 		bool mIsMainCamera;
 		Texture* mTarget;
@@ -17,7 +19,7 @@ namespace Engine {
 		void onUpdate(float deltaTime);
 		void loadPropertyFromMemory(const char* data, GameObject* obj);
 		void savePropertyToStream(ZsStream* stream, GameObject* obj);
-		//void bindObjectPropertyToAngel(AGScriptMgr* mgr);
+		void bindObjectPropertyToAngel(AGScriptMgr* mgr);
 
 		CameraComponent();
 	};

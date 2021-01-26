@@ -2,14 +2,17 @@
 
 #include "../World.hpp"
 #include "../../math/Mat4.hpp"
+#include "../../ogl/GLFramebuffer.hpp"
 
 namespace Engine {
     class ShadowCasterProperty : public Engine::IGameObjectComponent {
     private:
         bool initialized;
 
-        unsigned int mShadowBuffer;
-        unsigned int mShadowDepthTexture;
+        GLframebuffer* Framebuffer;
+
+        //unsigned int mShadowBuffer;
+       // unsigned int mShadowDepthTexture;
 
         Mat4 LightProjectionMat;
         Mat4 LightViewMat[3];

@@ -47,7 +47,14 @@ GLint Engine::GetInternalFormatGL(TextureFormat format) {
     case TextureFormat::FORMAT_RGBA16F:
         gl_format = GL_RGBA16F;
         break;
+    case TextureFormat::FORMAT_DEPTH_24_STENCIL_8:
+        gl_format = GL_DEPTH24_STENCIL8;
+        break;
+    case TextureFormat::FORMAT_DEPTH_32:
+        gl_format = GL_DEPTH_COMPONENT32;
+        break;
     }
+
     return gl_format;
 }
 GLenum Engine::GetFormatGL(TextureFormat format) {
@@ -61,27 +68,55 @@ GLenum Engine::GetFormatGL(TextureFormat format) {
         gl_format = GL_RG;
     if (format % 4 == 3)
         gl_format = GL_RGB;
+
+    if (format == TextureFormat::FORMAT_DEPTH_24_STENCIL_8)
+        gl_format = GL_DEPTH_STENCIL;
+    if (format == TextureFormat::FORMAT_DEPTH_32)
+        gl_format = GL_DEPTH_COMPONENT;
+
     return gl_format;
 }
 
 void glTexture::Init() {
-    if (!mCreated) {
-        glCreateTextures(GL_TEXTURE_2D, 1, &TEXTURE_ID);
-        glBindTexture(GL_TEXTURE_2D, this->TEXTURE_ID); //We now working with this texture
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    GLenum Type = GetGlType();
+
+    if (!mCreated) {
+        glCreateTextures(Type, 1, &TEXTURE_ID);
+        glBindTexture(Type, this->TEXTURE_ID); //We now working with this texture
+
+        glTexParameteri(Type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(Type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(Type, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        glTexParameteri(Type, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
         mCreated = true;
     }
 }
 
-void glTexture::Create(unsigned int Width, unsigned int Height, TextureFormat format) {
-    Init();
-    glTexImage2D(GL_TEXTURE_2D, 0, GetInternalFormatGL(format), Width, Height, 0, GetFormatGL(format), GL_UNSIGNED_BYTE, nullptr);
+void glTexture::Create(unsigned int Width, unsigned int Height, TextureFormat format, unsigned int Layers) {
+    mLayers = Layers;
+    maxWidth = Width;
+    maxHeight = Height;
+
     mFormat = format;
+
+    GLenum _type = GL_UNSIGNED_BYTE;
+
+    if (format == TextureFormat::FORMAT_DEPTH_24_STENCIL_8)
+        _type = GL_UNSIGNED_INT_24_8;
+
+    if (format == TextureFormat::FORMAT_DEPTH_32)
+        _type = GL_FLOAT;
+
+    GLenum TextureType = GetGlType();
+
+    Init();
+    if(Layers == 1)
+        glTexImage2D(GL_TEXTURE_2D, 0, GetInternalFormatGL(format), Width, Height, 0, GetFormatGL(format), _type, nullptr);
+    else if (Layers > 1)
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GetInternalFormatGL(format), Width, Height, Layers, 0, GetFormatGL(format), _type, nullptr);
+    
 }
 
 glTexture::glTexture():
@@ -122,6 +157,8 @@ bool glTexture::LoadTextureFromBufferUByte(unsigned char* data, int Width, int H
     );
 
     mFormat = format;
+    maxWidth = Width;
+    maxHeight = Height;
 
     return true;
 }
@@ -283,7 +320,9 @@ void glTexture3D::Use(int slot){
 void glTexture3D::Destroy(){
     glDeleteTextures(1, &TEXTURE_ID);
 }
-Engine::glTexture3D::glTexture3D(){
+Engine::glTexture3D::glTexture3D() :
+    TEXTURE_ID(0)
+{
 
 }
 Engine::glTexture3D::~glTexture3D(){

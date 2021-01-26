@@ -14,8 +14,12 @@ namespace Engine {
         void CreateImageView(VkFormat format);
     public:
 
+        VkImageUsageFlagBits usage;
+        VkImageAspectFlagBits aspect;
+
         VkImageView GetImageView() { return mImageView; }
-        void Init();
+
+        void Create(unsigned int Width, unsigned int Height, TextureFormat format, unsigned int Layers = 1);
         //Loads texture from buffer
         bool LoadDDSTextureFromBuffer(unsigned char* data);
         //Use in rendering pipeline
@@ -26,6 +30,7 @@ namespace Engine {
         ~vkTexture();
     };
 
+    VkFormat GetFormatVK(TextureFormat format);
 
     class vkTexture3D : public Engine::Texture3D {
     public:

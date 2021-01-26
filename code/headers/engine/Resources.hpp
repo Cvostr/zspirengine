@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "../render/Framebuffer.hpp"
 #include "../render/Texture.h"
 #include "../render/Mesh.hpp"
 #include "../render/Material.hpp"
@@ -25,6 +26,7 @@ enum RESOURCE_TYPE {RESOURCE_TYPE_NONE,
                     RESOURCE_TYPE_LOCALIZED_STR,
                     RESOURCE_TYPE_SCENE,
                     RESOURCE_TYPE_PREFAB,
+                    RESOURCE_TYPE_RENDER_TEXTURE_BUFFER,
                     RESOURCE_TYPE_FILE = 1000};
 
 enum class RESOURCE_STATE {STATE_LOADED, STATE_NOT_LOADED, STATE_LOADING_PROCESS, RESOURCE_LOAD_FAILED};
@@ -208,6 +210,16 @@ public:
 
     SceneResource();
     ~SceneResource();
+};
+
+class RenderTextureResource : public ZsResource {
+public:
+    Framebuffer* mFramebuffer;
+
+    void load();
+
+    RenderTextureResource();
+    ~RenderTextureResource();
 };
 
 

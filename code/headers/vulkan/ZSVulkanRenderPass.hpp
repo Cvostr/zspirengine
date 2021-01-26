@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 #include "../render/GpuObject.hpp"
+#include "../render/Texture.h"
 
 namespace Engine {
 	class ZSVulkanFramebuffer;
@@ -20,6 +21,7 @@ namespace Engine {
 		VkRenderPass GetRenderPass() { return mRenderPass; }
 
 		void PushColorAttachment(VkFormat Format, VkImageLayout Layout);
+		void PushColorAttachment(TextureFormat Format, VkImageLayout Layout);
 		void PushColorOutputAttachment();
 		void PushDepthAttachment();
 		void SetClearSize(unsigned int Width, unsigned int Height);

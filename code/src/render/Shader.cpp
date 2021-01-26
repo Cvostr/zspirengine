@@ -1,12 +1,6 @@
 #include "../../headers/render/Shader.hpp"
 #include <GL/glew.h>
 
-#include <cstring>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-
 #include "../../headers/ogl/GLShader.hpp"
 #include "../../headers/vulkan/VKShader.hpp"
 

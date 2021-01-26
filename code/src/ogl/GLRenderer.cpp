@@ -4,6 +4,7 @@
 #include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
 #include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
 #include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
+#include "../../headers/world/ObjectsComponents/CameraComponent.hpp"
 
 extern ZSpireEngine* engine_ptr;
 extern ZSGAME_DATA* game_data;
@@ -38,23 +39,23 @@ void Engine::GLRenderer::InitShaders() {
 }
 
 void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int height) {
-    gbuffer = new GLframebuffer(width, height, true);
+    gbuffer = new GLframebuffer(width, height);
 
     //effect = new GLScreenEffect(width, height, FORMAT_RGBA);
     //effect->CompileShaderFromFile("Shaders/postprocess/blur/blur.comp");
+    ((GLframebuffer*)gbuffer)->AddDepth();
+    ((GLframebuffer*)gbuffer)->AddTexture(FORMAT_RGBA); //Diffuse map
+    ((GLframebuffer*)gbuffer)->AddTexture(FORMAT_RGB16F); //Normal map
+    ((GLframebuffer*)gbuffer)->AddTexture(FORMAT_RGB16F); //Position map
+    ((GLframebuffer*)gbuffer)->AddTexture(FORMAT_RGBA); //Transparent map
+    ((GLframebuffer*)gbuffer)->AddTexture(FORMAT_RGBA); //Masks map
 
-    ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGBA); //Diffuse map
-    ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGB16F); //Normal map
-    ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGB16F); //Position map
-    ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGBA); //Transparent map
-    ((GLframebuffer*)gbuffer)->addTexture(FORMAT_RGBA); //Masks map
+    df_light_buffer = new GLframebuffer(width, height);
+    ((GLframebuffer*)df_light_buffer)->AddTexture(FORMAT_RGBA); //Diffuse map
+    ((GLframebuffer*)df_light_buffer)->AddTexture(FORMAT_RGBA); //Bloom map
 
-    df_light_buffer = new GLframebuffer(width, height, false);
-    ((GLframebuffer*)df_light_buffer)->addTexture(FORMAT_RGBA); //Diffuse map
-    ((GLframebuffer*)df_light_buffer)->addTexture(FORMAT_RGBA); //Bloom map
-
-    ui_buffer = new GLframebuffer(width, height, false);
-    ((GLframebuffer*)ui_buffer)->addTexture(FORMAT_RGBA); //UI Diffuse map
+    ui_buffer = new GLframebuffer(width, height);
+    ((GLframebuffer*)ui_buffer)->AddTexture(FORMAT_RGBA); //UI Diffuse map
 
     //effect->PushInputTexture(((GLframebuffer*)df_light_buffer)->textures[1]);
 }
@@ -95,9 +96,18 @@ void Engine::GLRenderer::render2D() {
 void Engine::GLRenderer::render3D(Engine::Camera* cam) {
     World* world_ptr = game_data->world;
     Engine::Window* win = engine_ptr->GetWindow();
+
+    //render cameras
+    for (unsigned int cam_i = 0; cam_i < mCameras.size(); cam_i++) {
+        Render3DCamera(mCameras[cam_i]);
+    }
+
+    updateShadersCameraInfo(cam);
+
     //Render shadows, first
     TryRenderShadows(cam);
-    this->cam = cam;
+
+    this->mMainCamera = cam;
     {
         //Bind Geometry Buffer to make Deferred Shading
         ((GLframebuffer*)gbuffer)->bind();
@@ -157,6 +167,63 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
     }
 }
 
+void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
+    CameraComponent* cc = (CameraComponent*)(cam_prop);
+
+    if (!cc->isActive())
+        return;
+
+    Camera* _cam = (Camera*)cc;
+
+    updateShadersCameraInfo(_cam);
+    World* world_ptr = game_data->world;
+    Engine::Window* win = engine_ptr->GetWindow();
+
+    {
+        //Bind Geometry Buffer to make Deferred Shading
+        ((GLframebuffer*)gbuffer)->bind();
+        setClearColor(0, 0, 0, 0);
+        ClearFBufferGL(true, true);
+        setFullscreenViewport(win->GetWindowWidth(), win->GetWindowHeight());
+        {
+            //Render Skybox
+            setDepthState(false);
+            setBlendingState(false);
+            setFaceCullState(false);
+            TryRenderSkybox();
+        }
+        glEnablei(GL_BLEND, 0);
+        glBlendFunci(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0);
+        {
+            //Render World
+            setDepthState(true);
+            setFaceCullState(true);
+            //Render whole world
+            processObjects(world_ptr);
+        }
+    }
+
+    //Process Deffered lights
+    {
+        ((GLframebuffer*)df_light_buffer)->bind();
+        ClearFBufferGL(true, false); //Clear screen
+        //Disable depth rendering to draw plane correctly
+        setDepthState(false);
+        setFaceCullState(false);
+        ((GLframebuffer*)gbuffer)->bindTextures(10); //Bind gBuffer textures
+        deffered_light->Use(); //use deffered shader
+        Engine::getPlaneMesh2D()->Draw(); //Draw screen
+    }
+
+    //cc->mTarget = ((GLframebuffer*)df_light_buffer)->textures[0];
+
+    //glTexture* _Target = (glTexture*)cc->mTarget;
+
+    //_Target->Create(win->GetWindowWidth(), win->GetWindowHeight(), TextureFormat::FORMAT_RGBA);
+
+    //glCopyTexImage2D(_Target->TEXTURE_ID, 0, GL_RGBA, 0, 0, win->GetWindowWidth(), win->GetWindowHeight(), 0);
+}
+
 void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
     BoundingBox3 bb = obj->getBoundingBox();
     
@@ -197,7 +264,7 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
 
             unsigned int InstNum = caster->mCascadesNum;
 
-            if (bb.GetLongestDistance(cam->getCameraPosition()) < 20)
+            if (bb.GetLongestDistance(mMainCamera->getCameraPosition()) < 20)
                 InstNum = 1;
 
             if (castShadows)
