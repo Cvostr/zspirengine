@@ -23,7 +23,8 @@ Engine::GameObject::GameObject() : array_index(0),
                                    mActive(true),
                                    hasParent(false),
                                    IsStatic(false),
-                                   mWorld(nullptr)
+                                   mWorld(nullptr),
+                                   mViewMask(0x1)
 {
     genRandomString(&this->str_id, 15); //Generate random string ID
     mComponents[0] = nullptr;

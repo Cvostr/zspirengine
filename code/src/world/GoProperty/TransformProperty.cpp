@@ -1,6 +1,7 @@
 #include "../../../headers/world/World.hpp"
 #include "../../../headers/world/ObjectsComponents/PhysicalComponent.hpp"
 
+
 Engine::TransformProperty::TransformProperty() : scale(1.f)
 {
     this->type = PROPERTY_TYPE::GO_PROPERTY_TYPE_TRANSFORM;
@@ -22,19 +23,23 @@ void Engine::TransformProperty::updateMatrix() {
     }
 
     abs_translation = p_translation + this->translation;
+    abs_translation = abs_translation ;
+
     abs_scale = p_scale * this->scale;
     abs_rotation = this->rotation + p_rotation;
 
     //Calculate translation matrix
     Mat4 translation_mat = getTranslationMat(abs_translation);
     //Calculate scale matrix
-    Mat4 scale_mat = getScaleMat(abs_scale);
+    Mat4 scale_mat = getScaleMat(abs_scale) ;
     //Calculate rotation matrix
     Mat4 rotation_mat1 = getIdentity();
     getAbsoluteRotationMatrix(rotation_mat1);
     Mat4 rotation_mat = getRotationMat(abs_rotation);
     //S * R * T
     this->transform_mat = scale_mat * rotation_mat * rotation_mat1 * translation_mat;
+
+    //transform_mat.m[3][2] *= Zcoeff;
 
 }
 void Engine::TransformProperty::onValueChanged() {

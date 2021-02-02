@@ -7,6 +7,7 @@ extern ZSpireEngine* engine_ptr;
 Engine::Camera::Camera() : mCameraPos(0),
                            mCameraFront(1, 0, 0),
                            mCameraUp(0, 1, 0),
+                           mViewScale(1),
                            mProjectionType(ZSCAMERA_PROJECTION_PERSPECTIVE),
                            mNearZ(0.1f),
                            mFarZ(100.0f),
@@ -76,7 +77,8 @@ void Engine::Camera::updateViewMat(){
         game_data->oal_manager->setListenerPos(mCameraPos);
         game_data->oal_manager->setListenerOri(mCameraFront, mCameraUp);
     }
-    mViewMatrix = matrixLookAt(mCameraPos, (mCameraPos + mCameraFront), mCameraUp);
+    mViewMatrix = getScaleMat(mViewScale) *
+        matrixLookAt(mCameraPos, (mCameraPos + mCameraFront), mCameraUp);
 }
 
 void Engine::Camera::setPosition(const Vec3& pos){
@@ -92,6 +94,11 @@ void Engine::Camera::setFront(const Vec3& front){
 
 void Engine::Camera::setUp(const Vec3& up){
     this->mCameraUp = up;
+    updateViewMat();
+}
+
+void Engine::Camera::setViewScale(const Vec3& scale) {
+    this->mViewScale = scale;
     updateViewMat();
 }
 
@@ -111,6 +118,3 @@ Vec3 Engine::Camera::getCameraViewCenterPos(){
     }
     return this->mCameraPos;
 }
-
-
-

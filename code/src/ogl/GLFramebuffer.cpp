@@ -44,21 +44,6 @@ void Engine::GLframebuffer::AddTexture(uint32_t Width, uint32_t Height, TextureF
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-Engine::GLframebuffer::~GLframebuffer() {
-
-    glDeleteFramebuffers(1, &this->mFramebuffer);
-
-    for (unsigned int t = 0; t < mTexturesCount; t++) {
-        textures[t]->Destroy();
-        delete textures[t];
-    }
-
-    if (Depth) {
-        depthTexture->Destroy();
-        delete depthTexture;
-    }
-}
-
 void Engine::GLframebuffer::AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers, TextureFormat Format) {
     Depth = true;
 
@@ -83,16 +68,70 @@ void Engine::GLframebuffer::AddDepth(uint32_t Width, uint32_t Height, unsigned i
     glFramebufferTexture(GL_FRAMEBUFFER, AttachmentType, ((glTexture*)depthTexture)->TEXTURE_ID, 0);
 }
 
-Engine::GLframebuffer::GLframebuffer(unsigned int width, unsigned int height)
+void Engine::GLframebuffer::SetSize(uint32_t Width, uint32_t Height) {
+    Framebuffer::SetSize(Width, Height);
 
+    std::vector<TextureFormat> Formats;
+    TextureFormat DepthFormat;
+    uint32_t DepthLayers;
+    uint32_t _TexturesCount = mTexturesCount;
+    mTexturesCount = 0;
+    //Store old textures formats and destroy them
+    for (unsigned int t = 0; t < _TexturesCount; t++) {
+        Formats.push_back(textures[t]->GetFormat());
+        textures[t]->Destroy();
+        delete textures[t];
+    }
+
+    //Store depth format
+    if (Depth) {
+        DepthFormat = depthTexture->GetFormat();
+        DepthLayers = depthTexture->GetLayersCount();
+        depthTexture->Destroy();
+        delete depthTexture;
+    }
+    //Recreate textures
+    for (unsigned int t = 0; t < _TexturesCount; t++) {
+        AddTexture(Formats[t]);
+    }
+    if (Depth) {
+        AddDepth(DepthLayers, DepthFormat);
+    }
+}
+
+void Engine::GLframebuffer::Create() {
+    glGenFramebuffers(1, &mFramebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); //return back to default
+
+    mCreated = true;
+}
+
+void Engine::GLframebuffer::Destroy() {
+    if (mCreated) {
+        glDeleteFramebuffers(1, &this->mFramebuffer);
+
+        for (unsigned int t = 0; t < mTexturesCount; t++) {
+            textures[t]->Destroy();
+            delete textures[t];
+        }
+
+        if (Depth) {
+            depthTexture->Destroy();
+            delete depthTexture;
+        }
+        mCreated = false;
+    }
+}
+
+Engine::GLframebuffer::GLframebuffer(unsigned int width, unsigned int height)
 {
     textures[0] = 0;
     Width = width;
     Height = height;
-    mTexturesCount = 0;
+}
 
-    glGenFramebuffers(1, &mFramebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0); //return back to default
+Engine::GLframebuffer::~GLframebuffer() {
+    Destroy();
 }
 
 Engine::GLframebuffer::GLframebuffer() {
@@ -100,7 +139,4 @@ Engine::GLframebuffer::GLframebuffer() {
     Width = 0;
     Height = 0;
     mTexturesCount = 0;
-
-    glGenFramebuffers(1, &mFramebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0); //return back to default
 }

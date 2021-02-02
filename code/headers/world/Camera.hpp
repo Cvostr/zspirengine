@@ -41,6 +41,7 @@ namespace Engine{
             Vec3 mCameraPos; //Camera position vector
             Vec3 mCameraUp; //Camera up direction vector
             Vec3 mCameraFront; //Camera front direction vector
+            Vec3 mViewScale;
             ZSVIEWPORT mViewport; //Camera viewport
 
             float mFOV; //Field of view
@@ -65,6 +66,7 @@ namespace Engine{
             void setPosition(const Vec3& pos);
             void setFront(const Vec3& front);
             void setUp(const Vec3& up);
+            void setViewScale(const Vec3& scale);
 
             void setFOV(float FOV);
             void setZplanes(float nearZ, float farZ);

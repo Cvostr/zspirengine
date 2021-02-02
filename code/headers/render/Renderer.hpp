@@ -27,6 +27,8 @@ class GameObject;
 struct RenderSettings {
     RGBAColor ambient_light_color;
 
+    unsigned long long CurrentViewMask;
+
     GameObject* skybox_obj_ptr;
     GameObject* shadowcaster_obj_ptr;
 
@@ -101,6 +103,7 @@ public:
     void addLight(void* light_ptr);
     void addCamera(void* cam_ptr);
     void removeLights();
+    void remove—ameras();
 
     void TryRenderShadows(Engine::Camera* cam);
     void TryRenderSkybox();

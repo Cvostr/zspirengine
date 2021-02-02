@@ -277,6 +277,7 @@ void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int
                     this->mLSResources.push_back((LocalizedStringResource*)resource_ptr);
                     break;
                 }
+                
             }
             resource_ptr->blob_path = resource.blob_path;
             resource_ptr->offset = resource.offset;

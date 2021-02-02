@@ -12,5 +12,11 @@ namespace Engine {
 		{
 			
 		}
+
+		GLScreenEffect() :
+			ScreenEffect()
+		{
+
+		}
 	};
 }

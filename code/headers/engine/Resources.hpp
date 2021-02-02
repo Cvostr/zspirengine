@@ -26,7 +26,6 @@ enum RESOURCE_TYPE {RESOURCE_TYPE_NONE,
                     RESOURCE_TYPE_LOCALIZED_STR,
                     RESOURCE_TYPE_SCENE,
                     RESOURCE_TYPE_PREFAB,
-                    RESOURCE_TYPE_RENDER_TEXTURE_BUFFER,
                     RESOURCE_TYPE_FILE = 1000};
 
 enum class RESOURCE_STATE {STATE_LOADED, STATE_NOT_LOADED, STATE_LOADING_PROCESS, RESOURCE_LOAD_FAILED};
@@ -120,6 +119,7 @@ public:
 class TextureResource : public ZsResource{
 public:
     Engine::Texture* texture_ptr;
+    bool IsRenderTarget;
 
     void load();
     void Use(int slot);
@@ -211,17 +211,6 @@ public:
     SceneResource();
     ~SceneResource();
 };
-
-class RenderTextureResource : public ZsResource {
-public:
-    Framebuffer* mFramebuffer;
-
-    void load();
-
-    RenderTextureResource();
-    ~RenderTextureResource();
-};
-
 
 class LocalizedStringResource : public ZsResource {
 private:

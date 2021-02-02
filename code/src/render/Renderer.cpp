@@ -227,7 +227,8 @@ void Engine::GameObject::processObject(Renderer* pipeline) {
     if (pipeline->allowOnUpdate && pipeline->current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
         this->onUpdate(static_cast<int>(game_data->time->GetDeltaTime()));
 
-    pipeline->DrawObject(this);
+    if(pipeline->getRenderSettings()->CurrentViewMask & this->mViewMask)
+        pipeline->DrawObject(this);
 
     for (unsigned int obj_i = 0; obj_i < this->mChildren.size(); obj_i++) {
         if (!mChildren[obj_i].isEmpty()) { //if link isn't broken
@@ -483,6 +484,10 @@ void Engine::Renderer::addCamera(void* cam_ptr) {
 
 void Engine::Renderer::removeLights(){
     mLights.clear();
+}
+
+void Engine::Renderer::remove—ameras() {
+    mCameras.clear();
 }
 
 void Engine::Renderer::TryRenderShadows(Engine::Camera* cam) {

@@ -43,6 +43,7 @@
 #define RIGIDBODY_PROP_TYPE_NAME "Rigidbody"
 #define COLLIDER_PROP_TYPE_NAME "Collider"
 #define SHADOWCAST_PROP_TYPE_NAME "ShadowCaster"
+#define CAMERA_PROP_TYPE_NAME "Camera"
 
 #define AG_STRING 67108876
 #define AG_VECTOR3 67108881
@@ -164,16 +165,7 @@ namespace Engine {
     void bindFilesSDK(AGScriptMgr* mgr);
     void bindResourceManagerSDK(AGScriptMgr* mgr);
 
-    template<class T>
-    void bindGameObjectPropertySDK(AGScriptMgr* mgr, const char* obj_type) {
-        int result = 0;
-        
-        T* prop = new T;
-        prop->bindObjectPropertyToAngel(mgr);
-        delete prop;
-
-        result = mgr->RegisterObjectMethod(obj_type, "void setActive(bool)", asMETHOD(T, setActive), asCALL_THISCALL);
-    }
+    
     template <typename T>
     static void new_as_obj_T(T* ptr) {
         new (ptr) T();

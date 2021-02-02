@@ -18,6 +18,7 @@ namespace Engine {
         void copyTo(IGameObjectComponent* dest);
         void onPreRender(Engine::Renderer* pipeline);
         void setMeshResource(MeshResource* resource);
+        bool HasBones();
 
         //EDITOR STUFF
         void addPropertyInterfaceToInspector();

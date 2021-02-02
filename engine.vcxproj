@@ -261,7 +261,6 @@
     <ClCompile Include="code\src\resources\MaterialResource.cpp" />
     <ClCompile Include="code\src\resources\MeshResource.cpp" />
     <ClCompile Include="code\src\resources\PrefabResource.cpp" />
-    <ClCompile Include="code\src\resources\RenderTextureResource.cpp" />
     <ClCompile Include="code\src\resources\SceneResource.cpp" />
     <ClCompile Include="code\src\resources\ScriptResource.cpp" />
     <ClCompile Include="code\src\resources\TextureResource.cpp" />
@@ -394,6 +393,7 @@
     <ClInclude Include="code\headers\vulkan\VKMaterial.hpp" />
     <ClInclude Include="code\headers\vulkan\VKMesh.hpp" />
     <ClInclude Include="code\headers\vulkan\VKRenderer.hpp" />
+    <ClInclude Include="code\headers\vulkan\VKScreenEffect.hpp" />
     <ClInclude Include="code\headers\vulkan\VKShader.hpp" />
     <ClInclude Include="code\headers\vulkan\VKTexture.hpp" />
     <ClInclude Include="code\headers\vulkan\VKUniformBuffer.hpp" />

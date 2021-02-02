@@ -10,6 +10,7 @@
 #include "../../headers/world/ObjectsComponents/CharacterController.hpp"
 #include "../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
 #include "../../headers/world/ObjectsComponents/ColliderComponent.hpp"
+#include "../../headers/world/ObjectsComponents/CameraComponent.hpp"
 
 void Engine::bindGameObjectSDK(AGScriptMgr* mgr) {
 	//Regiter base GameObject
@@ -25,6 +26,8 @@ void Engine::bindGameObjectSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "GameObject@ getChild(uint)", asMETHOD(Engine::GameObject, getChild), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "void addChild(GameObject@)", asMETHODPR(Engine::GameObject, addChildObject, (GameObject*, bool), void), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "void removeChild(GameObject@)", asMETHODPR(Engine::GameObject, removeChildObject, (GameObject*), void), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "void SetViewMask(uint64)", asMETHOD(Engine::GameObject, setViewMask), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, "uint64 GetViewMask()", asMETHOD(Engine::GameObject, getViewMask), asCALL_THISCALL);
 	//Register GameObjectProperty class
 	mgr->RegisterObjectType(GAME_OBJECT_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);	
 }
@@ -52,4 +55,5 @@ void Engine::bindGameObjectPropertiesSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(RIGIDBODY_PROP_TYPE_NAME) + "@ rigidbody()", asFUNCTION(ASGetPropertyPtr<RigidbodyProperty>), asCALL_CDECL_OBJFIRST);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(COLLIDER_PROP_TYPE_NAME) + "@ collider()", asFUNCTION(ASGetPropertyPtr<ColliderProperty>), asCALL_CDECL_OBJFIRST);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(SHADOWCAST_PROP_TYPE_NAME) + "@ shadow()", asFUNCTION(ASGetPropertyPtr<ShadowCasterProperty>), asCALL_CDECL_OBJFIRST);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(CAMERA_PROP_TYPE_NAME) + "@ camera()", asFUNCTION(ASGetPropertyPtr<CameraComponent>), asCALL_CDECL_OBJFIRST);
 }

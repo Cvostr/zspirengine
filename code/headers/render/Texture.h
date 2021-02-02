@@ -61,8 +61,11 @@ namespace Engine {
         uint32_t GetHeight() { return maxHeight; }
 		//Only for OGL : initialize texture in GL
         virtual void Create(uint32_t Width, uint32_t Height, TextureFormat format, uint32_t Layers = 1){}
-		//Loads texture from buffer
+		//Loads texture from buffer, guess format by header
+        bool LoadFromBuffer(unsigned char* data);
+        //Load DDS texture from buffer
         virtual bool LoadDDSTextureFromBuffer(unsigned char* data) { return false; }
+        //Load PNG texture from buffer
         virtual bool LoadPNGTextureFromBuffer(unsigned char* data, int size) { return false; }
         virtual bool LoadTextureFromBufferUByte(unsigned char* data, int Width, int Height, TextureFormat format) { return false; }
 		//Loads texture from file

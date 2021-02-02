@@ -27,17 +27,20 @@ namespace Engine {
         uint32_t GetHeight() { return Height; }
         uint32_t GetTexturesCount() { return mTexturesCount; }
 
-        /*virtual void SetSize(uint32_t Width, uint32_t Height)
+        //Recreate all textures with specified size
+        virtual void SetSize(uint32_t Width, uint32_t Height)
         {
             this->Width = Width;
             this->Height = Height;
-        }*/
+        }
 
         virtual void AddTexture(TextureFormat Format = TextureFormat::FORMAT_RGBA){}
         virtual void AddDepth(unsigned int Layers = 1, TextureFormat Format = FORMAT_DEPTH_24_STENCIL_8){}
 
         virtual void AddTexture(uint32_t Width, uint32_t Height, TextureFormat Format) {}
         virtual void AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers = 1, TextureFormat Format = FORMAT_DEPTH_24_STENCIL_8) {}
+    
+        virtual void Create(){}
     };
 
     Framebuffer* allocFramebuffer();

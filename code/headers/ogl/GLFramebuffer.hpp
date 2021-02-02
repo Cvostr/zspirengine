@@ -21,6 +21,10 @@ namespace Engine {
         void AddTexture(uint32_t Width, uint32_t Height, TextureFormat Format);
         void AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers = 1, TextureFormat Format = FORMAT_DEPTH_24_STENCIL_8);
 
+        void Create();
+        void Destroy();
+        void SetSize(uint32_t Width, uint32_t Height);
+
         ~GLframebuffer();
         GLframebuffer(unsigned int width, unsigned int height);
         GLframebuffer();

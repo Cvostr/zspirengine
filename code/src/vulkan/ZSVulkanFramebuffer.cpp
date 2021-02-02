@@ -15,8 +15,7 @@ Engine::ZSVulkanFramebuffer::ZSVulkanFramebuffer(unsigned int width, unsigned in
 }
 
 Engine::ZSVulkanFramebuffer::~ZSVulkanFramebuffer() {
-	if (mCreated)
-		vkDestroyFramebuffer(game_data->vk_main->mDevice->getVkDevice(), mFramebuffer, nullptr);
+	Destroy();
 }
 
 bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
@@ -37,6 +36,25 @@ bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
 	mCreated = true;
 
 	return true;
+}
+
+void Engine::ZSVulkanFramebuffer::Destroy() {
+	if (mCreated) {
+		vkDestroyFramebuffer(game_data->vk_main->mDevice->getVkDevice(), mFramebuffer, nullptr);
+
+		for (unsigned int t = 0; t < mTexturesCount; t++) {
+			textures[t]->Destroy();
+			delete textures[t];
+		}
+
+		if (Depth) {
+			depthTexture->Destroy();
+			delete depthTexture;
+		}
+
+		mTexturesCount = 0;
+		mCreated = false;
+	}
 }
 
 void Engine::ZSVulkanFramebuffer::PushOutputAttachment() {
@@ -76,4 +94,36 @@ void Engine::ZSVulkanFramebuffer::AddDepth(uint32_t Width, uint32_t Height, unsi
 	depthTexture = DepthTexture;
 
 	Views.push_back(DepthTexture->GetImageView());
+}
+
+void Engine::ZSVulkanFramebuffer::SetSize(uint32_t Width, uint32_t Height) {
+	/*Framebuffer::SetSize(Width, Height);
+
+	std::vector<TextureFormat> Formats;
+	TextureFormat DepthFormat;
+	uint32_t DepthLayers;
+	uint32_t _TexturesCount = mTexturesCount;
+	mTexturesCount = 0;
+	Views.clear();
+	//Store old textures formats and destroy them
+	for (unsigned int t = 0; t < _TexturesCount; t++) {
+		Formats.push_back(textures[t]->GetFormat());
+		textures[t]->Destroy();
+		delete textures[t];
+	}
+
+	//Store depth format
+	if (Depth) {
+		DepthFormat = depthTexture->GetFormat();
+		DepthLayers = depthTexture->GetLayersCount();
+		depthTexture->Destroy();
+		delete depthTexture;
+	}
+	//Recreate textures
+	for (unsigned int t = 0; t < _TexturesCount; t++) {
+		AddTexture(Formats[t]);
+	}
+	if (Depth) {
+		AddDepth(DepthLayers, DepthFormat);
+	}*/
 }

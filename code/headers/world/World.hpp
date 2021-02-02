@@ -54,6 +54,8 @@ enum class COLLIDER_TYPE {COLLIDER_TYPE_NONE,
                     COLLIDER_TYPE_CONVEX_HULL,
                     COLLIDER_TYPE_MESH};
 
+typedef unsigned long long ViewMask;
+
 namespace Engine {
 class GameObject;
 class GameObjectSnapshot;
@@ -111,6 +113,18 @@ public:
     IGameObjectComponent();
     virtual ~IGameObjectComponent();
 };
+
+template<class T>
+int bindGameObjectPropertySDK(AGScriptMgr* mgr, const char* obj_type) {
+    int result = 0;
+
+    T* prop = new T;
+    prop->bindObjectPropertyToAngel(mgr);
+    delete prop;
+
+    result = mgr->RegisterObjectMethod(obj_type, "void setActive(bool)", asMETHOD(IGameObjectComponent, setActive), asCALL_THISCALL);
+    return result;
+}
 
 class WorldSnapshot {
 public:
@@ -184,6 +198,7 @@ public:
     std::string str_id; //Object's unique string ID
     std::string* getLabelPtr();
 
+    ViewMask mViewMask;
     bool mActive; //if true, object will be active in scene
     bool mAlive; //false, if object was remove
     bool hasParent;
@@ -235,6 +250,8 @@ public:
     void setLabel(const std::string& label);
     void setActive(bool active) { mActive = active; }
     bool isActive();
+    void setViewMask(ViewMask Mask) { mViewMask = Mask; }
+    ViewMask getViewMask() { return mViewMask; }
     size_t getChildrenNum(){ return mChildren.size(); }
 
     template<typename T>
@@ -354,6 +371,9 @@ public:
 
     TransformProperty();
 };
+
+void setZcoeff(float coeff);
+
 IGameObjectComponent* allocProperty(PROPERTY_TYPE type);
 
 template <typename T>

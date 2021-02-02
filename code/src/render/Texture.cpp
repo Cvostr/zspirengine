@@ -38,6 +38,19 @@ Engine::Texture3D* Engine::allocTexture3D(){
     return result;
 }
 
+bool Engine::Texture::LoadFromBuffer(unsigned char* data) {
+    bool result = true;
+    if (data[0] == 'D' && data[1] == 'D' && data[2] == 'S') {
+        result = LoadDDSTextureFromBuffer(data);
+    }
+    if (data[0] == '\x89' && data[1] == 'P' && data[2] == 'N' && data[3] == 'G') {
+        //LoadPNGTextureFromBuffer(data);
+    }
+    if (data[0] == 'R' && data[1] == 'T' && data[2] == 'B' ) {
+        Create(512, 512, TextureFormat::FORMAT_RGBA);
+    }
+    return result;
+}
 
 //Loads texture from file
 bool Engine::Texture::LoadDDSTextureFromFile(const char* path){

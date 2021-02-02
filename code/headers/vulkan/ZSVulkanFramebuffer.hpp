@@ -21,7 +21,7 @@ namespace Engine {
         void PushOutputAttachment();
         void SetLayersCount(unsigned int Layers) { mLayersCount = Layers; }
 		bool Create(ZSVulkanRenderPass* renderpass);
-
+        void Destroy();
 
         void AddTexture(TextureFormat Format = TextureFormat::FORMAT_RGBA);
         void AddDepth(unsigned int Layers = 1, TextureFormat Format = FORMAT_DEPTH_24_STENCIL_8);
@@ -29,7 +29,7 @@ namespace Engine {
         void AddTexture(uint32_t Width, uint32_t Height, TextureFormat Format);
         void AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers = 1, TextureFormat Format = FORMAT_DEPTH_24_STENCIL_8);
 
-
+        void SetSize(uint32_t Width, uint32_t Height);
 
 		ZSVulkanFramebuffer();
         ZSVulkanFramebuffer(unsigned int width, unsigned int height);

@@ -31,7 +31,7 @@ void Engine::GLScreenEffect::Compute() {
     //Use shader
     this->mEffectShader->Use();
 
-    glDispatchCompute(mWidth, mHeight, 1);
+    glDispatchCompute(mWidth / mLocalSizeX, mHeight / mLocalSizeY, 1);
 
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 

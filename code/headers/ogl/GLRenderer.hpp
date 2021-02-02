@@ -13,6 +13,8 @@ namespace Engine {
 
 		GLScreenEffect* effect;
 
+		GLScreenEffect* CopyEffect;
+
 		void InitShaders();
 		void initManager();
 

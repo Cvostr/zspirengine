@@ -36,10 +36,15 @@ void Engine::GLRenderer::InitShaders() {
 
         MtShProps::genDefaultMtShGroup(default3d, mSkyboxShader, mTerrainShader, water_shader);
     }
+
+    CopyEffect = new GLScreenEffect();
+    CopyEffect->CompileShaderFromFile("Shaders/postprocess/copy/copy.comp");
+    CopyEffect->SetLocalSize(8, 8);
 }
 
 void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int height) {
     gbuffer = new GLframebuffer(width, height);
+    gbuffer->Create();
 
     //effect = new GLScreenEffect(width, height, FORMAT_RGBA);
     //effect->CompileShaderFromFile("Shaders/postprocess/blur/blur.comp");
@@ -51,10 +56,12 @@ void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int hei
     ((GLframebuffer*)gbuffer)->AddTexture(FORMAT_RGBA); //Masks map
 
     df_light_buffer = new GLframebuffer(width, height);
+    df_light_buffer->Create();
     ((GLframebuffer*)df_light_buffer)->AddTexture(FORMAT_RGBA); //Diffuse map
     ((GLframebuffer*)df_light_buffer)->AddTexture(FORMAT_RGBA); //Bloom map
 
     ui_buffer = new GLframebuffer(width, height);
+    ui_buffer->Create();
     ((GLframebuffer*)ui_buffer)->AddTexture(FORMAT_RGBA); //UI Diffuse map
 
     //effect->PushInputTexture(((GLframebuffer*)df_light_buffer)->textures[1]);
@@ -107,6 +114,7 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
     //Render shadows, first
     TryRenderShadows(cam);
 
+    render_settings.CurrentViewMask = 0xFFFFFFFFFFFFFFFF;
     this->mMainCamera = cam;
     {
         //Bind Geometry Buffer to make Deferred Shading
@@ -170,10 +178,19 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
 void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
     CameraComponent* cc = (CameraComponent*)(cam_prop);
 
+    glFrontFace(GL_CW);
+
     if (!cc->isActive())
         return;
 
     Camera* _cam = (Camera*)cc;
+
+    cc->UpdateTextureResource();
+    Texture* Texture = cc->mTarget->texture_ptr;
+
+    _cam->setViewport(Texture->GetWidth(), Texture->GetHeight());
+
+    render_settings.CurrentViewMask = cc->mViewMask;
 
     updateShadersCameraInfo(_cam);
     World* world_ptr = game_data->world;
@@ -215,14 +232,14 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
     }
 
-    //cc->mTarget = ((GLframebuffer*)df_light_buffer)->textures[0];
-
-    //glTexture* _Target = (glTexture*)cc->mTarget;
-
-    //_Target->Create(win->GetWindowWidth(), win->GetWindowHeight(), TextureFormat::FORMAT_RGBA);
-
-    //glCopyTexImage2D(_Target->TEXTURE_ID, 0, GL_RGBA, 0, 0, win->GetWindowWidth(), win->GetWindowHeight(), 0);
-}
+    glFrontFace(GL_CCW);
+    
+    CopyEffect->ClearInputTextures();
+    CopyEffect->PushInputTexture(df_light_buffer->GetTexture(0));
+    CopyEffect->SetOutputTexture(Texture);
+    CopyEffect->SetSize(Texture->GetWidth(), Texture->GetHeight());
+    CopyEffect->Compute();
+   }
 
 void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
     BoundingBox3 bb = obj->getBoundingBox();
@@ -275,8 +292,12 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
 
 void Engine::GLRenderer::OnUpdateWindowSize(int W, int H) {
     setFullscreenViewport(W, H);
-    delete gbuffer;
-    create_G_Buffer_GL(W, H);
+
+    if (engine_ptr->desc->game_perspective == PERSP_3D) {
+        gbuffer->SetSize(W, H);
+        df_light_buffer->SetSize(W, H);
+        ui_buffer->SetSize(W, H);
+    }
 }
 
 void Engine::GLRenderer::setFullscreenViewport(unsigned int Width, unsigned int Height) {

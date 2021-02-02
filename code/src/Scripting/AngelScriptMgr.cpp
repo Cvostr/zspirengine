@@ -9,6 +9,7 @@
 #include "../../headers/world/ObjectsComponents/CharacterController.hpp"
 #include "../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
 #include "../../headers/world/ObjectsComponents/ColliderComponent.hpp"
+#include "../../headers/world/ObjectsComponents/CameraComponent.hpp"
 
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
@@ -138,6 +139,7 @@ void AGScriptMgr::create_Engine() {
 	bindGameObjectPropertySDK<RigidbodyProperty>(this, RIGIDBODY_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<ColliderProperty>(this, COLLIDER_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<ShadowCasterProperty>(this, SHADOWCAST_PROP_TYPE_NAME);
+	bindGameObjectPropertySDK<CameraComponent>(this, CAMERA_PROP_TYPE_NAME);
 
 	bindGameObjectPropertiesSDK(this);
 
