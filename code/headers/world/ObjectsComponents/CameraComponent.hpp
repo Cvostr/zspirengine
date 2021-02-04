@@ -25,6 +25,10 @@ namespace Engine {
 		void savePropertyToStream(ZsStream* stream, GameObject* obj);
 		void bindObjectPropertyToAngel(AGScriptMgr* mgr);
 
+		void setReflectionPlane(Plane& plane) {
+			Camera::setReflectionPlane(plane);
+		}
+
 		void setUp(const Vec3& up) {
 			Camera::setUp(up);
 		}

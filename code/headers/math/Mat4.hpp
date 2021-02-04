@@ -20,6 +20,13 @@ public:
 		m[2][0] = v3.X; m[2][1] = v3.Y; m[2][2] = v3.Z; m[2][3] = v3.W;
 		m[3][0] = v4.X; m[3][1] = v4.Y; m[3][2] = v4.Z; m[3][3] = v4.W;
 	}
+	Mat4(float a) {
+		for (unsigned int i = 0; i < 4; i++)
+			for (unsigned int j = 0; j < 4; j++)
+				m[i][j] = 0;
+		for (unsigned int i = 0; i < 4; i++)
+			m[i][i] = a;
+	}
 	Mat4() {
 		for (unsigned int i = 0; i < 4; i++) 
 			for (unsigned int j = 0; j < 4; j++) 
@@ -61,6 +68,8 @@ Mat4 getRotationMat(float thetaX, float thetaY, float thetaZ);
 Mat4 getRotationMat(const Vec3& rotation);
 Mat4 getRotationMat(const Vec3& rotation, const Vec3& center);
 Mat4 getRotationMat(const ZSQUATERNION& quat);
+//Get reflection matrix over plane Ax + By + Cz + D = 0
+Mat4 GetPlaneReflectionMat(float A, float B, float C, float D);
 
 inline Mat4 operator*(const Mat4& l, const Mat4& r)
 {

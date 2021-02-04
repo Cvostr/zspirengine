@@ -32,6 +32,7 @@ Engine::Renderer::Renderer(){
     this->cullFaces = false;
 
     this->mUiShader = Engine::allocShader();
+    this->mTextShader = allocShader();
 
     if (engine_ptr->desc->game_perspective == PERSP_2D) {
         this->tile_shader = allocShader();
@@ -45,7 +46,6 @@ Engine::Renderer::Renderer(){
         this->mShadowMapShader = allocShader();
         this->final_shader = allocShader();
         this->water_shader = allocShader();
-        this->mTextShader = allocShader();
     }
 
     //Allocate transform buffer

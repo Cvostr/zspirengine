@@ -12,8 +12,8 @@ Engine::Camera::Camera() : mCameraPos(0),
                            mNearZ(0.1f),
                            mFarZ(100.0f),
                            mFOV(45),
-                           orthogonal_factor(1.f),
-                           mViewport(0, 0, 640, 480)
+                           mViewport(0, 0, 640, 480),
+                            mReflectionMatrix(1)
 {
     updateProjectionMat();
     //updateViewMat();
@@ -62,8 +62,8 @@ void Engine::Camera::updateProjectionMat(){
         }else
             mProjectionMatrix = getPerspective(mFOV, aspect, mNearZ, mFarZ);
     }else{
-        mProjectionMatrix = getOrthogonal(0, static_cast<float>(mViewport.endX - mViewport.startX) * orthogonal_factor,
-                             0, static_cast<float>(mViewport.endY - mViewport.startY) * orthogonal_factor,
+        mProjectionMatrix = getOrthogonal(0, static_cast<float>(mViewport.endX - mViewport.startX),
+                             0, static_cast<float>(mViewport.endY - mViewport.startY),
             mNearZ, mFarZ);
     }
     mUiProjection = getOrthogonal(0, static_cast<float>(mViewport.endX - mViewport.startX),
@@ -77,7 +77,7 @@ void Engine::Camera::updateViewMat(){
         game_data->oal_manager->setListenerPos(mCameraPos);
         game_data->oal_manager->setListenerOri(mCameraFront, mCameraUp);
     }
-    mViewMatrix = getScaleMat(mViewScale) *
+    mViewMatrix = mReflectionMatrix * getScaleMat(mViewScale) *
         matrixLookAt(mCameraPos, (mCameraPos + mCameraFront), mCameraUp);
 }
 
@@ -104,17 +104,4 @@ void Engine::Camera::setViewScale(const Vec3& scale) {
 
 Vec3 Engine::Camera::getCameraRightVec(){
     return vCross(mCameraFront, mCameraUp);
-}
-
-
-Vec3 Engine::Camera::getCameraViewCenterPos(){
-    if(this->mProjectionType == ZSCAMERA_PROJECTION_ORTHOGONAL){
-
-        int viewport_y = static_cast<int>(mViewport.endY - mViewport.startY) / 2;
-        int viewport_x = (mViewport.endX - mViewport.startX) / 2;
-        viewport_x *= -1;
-        Vec3 result = mCameraPos + Vec3(static_cast<float>(viewport_x), static_cast<float>(viewport_y), 0);
-        return result;
-    }
-    return this->mCameraPos;
 }

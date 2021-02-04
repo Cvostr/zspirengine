@@ -26,6 +26,7 @@
 #define VEC3_TYPE_NAME "Vec3"
 #define QUAT_TYPE_NAME "Quat"
 #define RGBACOLOR_TYPE_NAME "RGBAColor"
+#define PLANE_TYPE_NAME "Plane"
 #define CAM_TYPE_NAME "Camera"
 #define KEY_TYPE_NAME "Key"
 #define MOUSE_STATE_NAME "MouseState"

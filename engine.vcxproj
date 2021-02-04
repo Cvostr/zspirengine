@@ -228,6 +228,7 @@
     <ClCompile Include="code\src\input\Input.cpp" />
     <ClCompile Include="code\src\math\BB3.cpp" />
     <ClCompile Include="code\src\math\Mat4.cpp" />
+    <ClCompile Include="code\src\math\Plane.cpp" />
     <ClCompile Include="code\src\math\Quat.cpp" />
     <ClCompile Include="code\src\math\Vec3.cpp" />
     <ClCompile Include="code\src\misc\GlyphManager.cpp" />
@@ -344,6 +345,7 @@
     <ClInclude Include="code\headers\input\Input.hpp" />
     <ClInclude Include="code\headers\math\BB3.hpp" />
     <ClInclude Include="code\headers\math\Mat4.hpp" />
+    <ClInclude Include="code\headers\math\Plane.hpp" />
     <ClInclude Include="code\headers\math\Quat.hpp" />
     <ClInclude Include="code\headers\math\RGBColor.hpp" />
     <ClInclude Include="code\headers\math\Vec2.hpp" />

@@ -8,7 +8,10 @@ Engine::MaterialProperty::MaterialProperty() :
     mMaterial(nullptr)
 {
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_MATERIAL;
-    setMaterial(game_data->resources->getMaterialByLabel("@default"));
+
+    MaterialResource* DefaultResource = game_data->resources->getMaterialByLabel("@default");
+    if(DefaultResource != nullptr)
+        setMaterial(DefaultResource);
 }
 
 void Engine::MaterialProperty::copyTo(Engine::IGameObjectComponent* dest) {

@@ -74,7 +74,7 @@ void Engine::CameraComponent::onPreRender(Engine::Renderer* pipeline) {
 	float pitch = transform->abs_rotation.X;
 
 	mCameraFront.X = cosf(DegToRad(yaw)) * cosf(DegToRad(pitch));
-	mCameraFront.Y = sinf(DegToRad(pitch));
+	mCameraFront.Y = -sinf(DegToRad(pitch));
 	mCameraFront.Z = sinf(DegToRad(yaw)) * cosf(DegToRad(pitch));
 	mCameraFront.Normalize();
 
@@ -86,6 +86,7 @@ void Engine::CameraComponent::bindObjectPropertyToAngel(AGScriptMgr* mgr) {
 
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetUp(const Vec3 &in)", asMETHOD(CameraComponent, setUp), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetViewScale(const Vec3 &in)", asMETHOD(CameraComponent, setViewScale), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetReflectionPlane(Plane &in)", asMETHOD(CameraComponent, setReflectionPlane), asCALL_THISCALL);
 
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetViewMask(uint64)", asMETHOD(CameraComponent, SetViewMask), asCALL_THISCALL);
 

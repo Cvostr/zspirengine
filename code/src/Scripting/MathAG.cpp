@@ -18,6 +18,14 @@ static void CreateRgbColor(int r, int g, int b, RGBAColor* ptr) {
 	new (ptr) RGBAColor(r, g, b);
 }
 
+static void CreatePlane(const Vec3& Normal, float D, Engine::Plane* ptr) {
+	new (ptr) Engine::Plane(Normal, D);
+}
+
+static void CreatePlaneI(const Vec3& Normal, const Vec3& Point, Engine::Plane* ptr) {
+	new (ptr) Engine::Plane(Normal, Point);
+}
+
 void Engine::bindMathSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectType(VEC3_TYPE_NAME, sizeof(Vec3), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Vec3>());
 	mgr->RegisterObjectBehaviour(VEC3_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(new_as_obj_T<Vec3>), asCALL_CDECL_OBJLAST);
@@ -52,6 +60,14 @@ void Engine::bindMathSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectProperty(RGBACOLOR_TYPE_NAME, "int r", offsetof(RGBAColor, r));
 	mgr->RegisterObjectProperty(RGBACOLOR_TYPE_NAME, "int g", offsetof(RGBAColor, g));
 	mgr->RegisterObjectProperty(RGBACOLOR_TYPE_NAME, "int b", offsetof(RGBAColor, b));
+	//Bind Plane
+	mgr->RegisterObjectType(PLANE_TYPE_NAME, sizeof(Plane), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Plane>());
+	mgr->RegisterObjectBehaviour(PLANE_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(new_as_obj_T<Plane>), asCALL_CDECL_OBJLAST);
+	mgr->RegisterObjectBehaviour(PLANE_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(const Vec3& in, float)", asFUNCTION(CreatePlane), asCALL_CDECL_OBJLAST);
+	mgr->RegisterObjectBehaviour(PLANE_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(const Vec3& in, const Vec3 &in)", asFUNCTION(CreatePlaneI), asCALL_CDECL_OBJLAST);
+	mgr->RegisterObjectBehaviour(PLANE_TYPE_NAME, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(del_as_obj_T<Plane>), asCALL_CDECL_OBJLAST);
+	//mgr->RegisterObjectMethod(PLANE_TYPE_NAME, "RGBAColor &opAssign(RGBAColor &in)", asMETHODPR(RGBAColor, operator =, (RGBAColor), RGBAColor&), asCALL_THISCALL);
+
 	//Bind Camera
 	mgr->RegisterObjectType(CAM_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
 	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "Vec3 pos", offsetof(Engine::Camera, mCameraPos));
@@ -63,6 +79,7 @@ void Engine::bindMathSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(CAM_TYPE_NAME, "void updateViewMat()", asMETHOD(Engine::Camera, updateViewMat), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAM_TYPE_NAME, "void updateProjectionMat()", asMETHOD(Engine::Camera, updateProjectionMat), asCALL_THISCALL);
 	//Base Math methods
+	mgr->RegisterGlobalFunction("float sqrt(float)", asFUNCTION(sqrtf), asCALL_CDECL);
 	mgr->RegisterGlobalFunction("float sin(float)", asFUNCTION(sinf), asCALL_CDECL);
 	mgr->RegisterGlobalFunction("float cos(float)", asFUNCTION(cosf), asCALL_CDECL);
 	mgr->RegisterGlobalFunction("float tan(float)", asFUNCTION(tanf), asCALL_CDECL);

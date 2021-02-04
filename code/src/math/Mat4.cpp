@@ -365,3 +365,24 @@ Mat4 getOrthogonalVulkan(float left, float right, float bottom, float top, float
 
     return out;
 }
+
+Mat4 GetPlaneReflectionMat(float A, float B, float C, float D) {
+    Mat4 out = Mat4(1);
+
+    out.m[0][0] = 1.f - 2.f * A * A;
+    out.m[0][1] = -2.f * A * B;
+    out.m[0][2] = -2.f * A * C;
+    out.m[0][3] = -2.f * A * D;
+
+    out.m[1][0] = -2.f * A * B;
+    out.m[1][1] = 1.f - 2.f * B * B;
+    out.m[1][2] = -2.f * B * C;
+    out.m[1][3] = -2.f * B * D;
+
+    out.m[2][0] = -2.f * A * C;
+    out.m[2][1] = -2.f * B * C;
+    out.m[2][2] = 1.f - 2.f * C * C;
+    out.m[2][3] = -2.f * C * D;
+
+    return out;
+}

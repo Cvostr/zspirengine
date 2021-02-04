@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../render/Math.hpp"
+#include "../math/Plane.hpp"
 #include "../audio/SoundSource.hpp"
 
 enum ZSCAMERAPROJECTIONTYPE {ZSCAMERA_PROJECTION_NONE,
@@ -41,23 +42,22 @@ namespace Engine{
             Vec3 mCameraPos; //Camera position vector
             Vec3 mCameraUp; //Camera up direction vector
             Vec3 mCameraFront; //Camera front direction vector
-            Vec3 mViewScale;
+            Vec3 mViewScale; //Scale view with this vector
+            Mat4 mReflectionMatrix;
             ZSVIEWPORT mViewport; //Camera viewport
 
+            float mAspectRatio;
             float mFOV; //Field of view
             float mNearZ; //Nearest Z occlusion plane
-            float mFarZ;
-            float orthogonal_factor;
+            float mFarZ; //Fast Z occlusion plane
 
             bool isAlListenerCamera;
-            
 
             Vec3 getCameraPosition() { return mCameraPos; }
             Vec3 getCameraUpVec() { return mCameraUp; }
             Vec3 getCameraRightVec();
             Vec3 getCameraFrontVec() { return mCameraFront; }
 
-            Vec3 getCameraViewCenterPos();
             ZSVIEWPORT getViewport() { return mViewport; }
 
             void updateProjectionMat();
@@ -72,7 +72,9 @@ namespace Engine{
             void setZplanes(float nearZ, float farZ);
             void setViewport(ZSVIEWPORT viewport);
             void setViewport(unsigned int Width, unsigned int Height);
-
+            void setReflectionPlane(Plane& plane) { 
+                mReflectionMatrix = plane.GetReflectionMatrix();
+            }
             void setProjectionType(ZSCAMERAPROJECTIONTYPE type);
 
             Mat4 getViewMatrix() { return mViewMatrix; }
