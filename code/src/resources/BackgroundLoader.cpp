@@ -4,11 +4,13 @@
 #include <fstream>
 #include <iostream>
 #include "../../headers/threading/Mutex.hpp"
+#include "../../headers/engine/Logger.hpp"
 
+using namespace Engine;
 Engine::Loader::Loader _Loader;
 
 void _LDR_load(Engine::Loader::LoadRequest* req){
-    std::cout << "Loading resource " << req->file_path << std::endl;
+    Logger::Log(LogType::LOG_TYPE_INFO) << "Loading resource " << req->file_path << "\n";
     //Declare blob loader stream
     std::ifstream stream;
     //Get absolute path to blob file

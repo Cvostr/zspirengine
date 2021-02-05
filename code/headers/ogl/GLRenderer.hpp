@@ -32,6 +32,7 @@ namespace Engine {
 		void setDepthState(bool depth);
 		void setFaceCullState(bool face_cull);
 		void setFullscreenViewport(unsigned int Width, unsigned int Height);
+		void setFrontFace(CameraCullFaceDirection CCFD);
 
 		void create_G_Buffer_GL(unsigned int width, unsigned int height);
 

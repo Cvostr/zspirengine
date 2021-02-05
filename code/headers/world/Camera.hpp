@@ -9,6 +9,12 @@ enum ZSCAMERAPROJECTIONTYPE {ZSCAMERA_PROJECTION_NONE,
                             ZSCAMERA_PROJECTION_PERSPECTIVE};
 
 
+enum CameraCullFaceDirection {
+    CCF_DIRECTION_NONE,
+    CCF_DIRECTION_CW,
+    CCF_DIRECTION_CCW
+};
+
 namespace Engine{
     typedef struct ZSVIEWPORT{
         unsigned int startX;
@@ -43,7 +49,7 @@ namespace Engine{
             Vec3 mCameraUp; //Camera up direction vector
             Vec3 mCameraFront; //Camera front direction vector
             Vec3 mViewScale; //Scale view with this vector
-            Mat4 mReflectionMatrix;
+            Mat4 mReflectionMatrix; //Reflection matrix
             ZSVIEWPORT mViewport; //Camera viewport
 
             float mAspectRatio;

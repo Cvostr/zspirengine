@@ -2,7 +2,6 @@
 
 void Engine::GLframebuffer::bind() {
     glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer);
-    glViewport(0, 0, Width, Height);
 }
 
 void Engine::GLframebuffer::bindTextures(unsigned int m) {

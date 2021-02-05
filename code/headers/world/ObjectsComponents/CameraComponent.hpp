@@ -5,12 +5,15 @@
 #include "../../../headers/engine/Resources.hpp"
 
 namespace Engine {
+
 	class CameraComponent : public IGameObjectComponent, Camera {
 	private:
 		std::string TargetResourceName;
 	public:
 		bool mIsMainCamera;
+		bool mAutoViewport;
 		ViewMask mViewMask;
+		CameraCullFaceDirection mCullFaceDirection;
 		TextureResource* mTarget;
 		
 

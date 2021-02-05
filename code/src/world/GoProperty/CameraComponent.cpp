@@ -8,6 +8,8 @@ Engine::CameraComponent::CameraComponent() {
 	Camera();
 	mIsMainCamera = true;
 	mViewMask = 0xFFFFFFFFFFFFFFFF;
+	mAutoViewport = true;
+	mCullFaceDirection = CCF_DIRECTION_CCW;
 }
 
 void Engine::CameraComponent::onUpdate(float deltaTime) {
@@ -28,6 +30,7 @@ void Engine::CameraComponent::loadPropertyFromMemory(const char* data, GameObjec
 	readBinaryValue(&mFarZ, data + offset, offset);
 	readBinaryValue(&mFOV, data + offset, offset);
 	readBinaryValue(&mIsMainCamera, data + offset, offset);
+	readBinaryValue(&mCullFaceDirection, data + offset, offset);
 
 	UpdateTextureResource();
 }
@@ -47,6 +50,7 @@ void Engine::CameraComponent::copyTo(Engine::IGameObjectComponent* dest) {
 	_dest->mNearZ = this->mNearZ;
 	_dest->mFarZ = this->mFarZ;
 	_dest->mFOV = this->mFOV;
+	_dest->mCullFaceDirection = this->mCullFaceDirection;
 }
 
 void Engine::CameraComponent::savePropertyToStream(ZsStream* stream, GameObject* obj) {
@@ -61,6 +65,7 @@ void Engine::CameraComponent::savePropertyToStream(ZsStream* stream, GameObject*
     stream->writeBinaryValue(&mFarZ);
     stream->writeBinaryValue(&mFOV);
 	stream->writeBinaryValue(&mIsMainCamera);
+	stream->writeBinaryValue(&mCullFaceDirection);
 }
 
 void Engine::CameraComponent::onPreRender(Engine::Renderer* pipeline) {
@@ -87,6 +92,9 @@ void Engine::CameraComponent::bindObjectPropertyToAngel(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetUp(const Vec3 &in)", asMETHOD(CameraComponent, setUp), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetViewScale(const Vec3 &in)", asMETHOD(CameraComponent, setViewScale), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetReflectionPlane(Plane &in)", asMETHOD(CameraComponent, setReflectionPlane), asCALL_THISCALL);
+
+	mgr->RegisterObjectProperty(CAMERA_PROP_TYPE_NAME, "bool AutoViewport", offsetof(CameraComponent, mAutoViewport));
+
 
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetViewMask(uint64)", asMETHOD(CameraComponent, SetViewMask), asCALL_THISCALL);
 

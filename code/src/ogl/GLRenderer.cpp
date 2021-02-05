@@ -109,6 +109,7 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
         Render3DCamera(mCameras[cam_i]);
     }
 
+    setFrontFace(CCF_DIRECTION_CCW);
     updateShadersCameraInfo(cam);
 
     //Render shadows, first
@@ -178,7 +179,8 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
 void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
     CameraComponent* cc = (CameraComponent*)(cam_prop);
 
-    glFrontFace(GL_CW);
+
+    setFrontFace(cc->mCullFaceDirection);
 
     if (!cc->isActive())
         return;
@@ -188,7 +190,12 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
     cc->UpdateTextureResource();
     Texture* Texture = cc->mTarget->texture_ptr;
 
-    _cam->setViewport(Texture->GetWidth(), Texture->GetHeight());
+    if(cc->mAutoViewport)
+        _cam->setViewport(Texture->GetWidth(), Texture->GetHeight());
+
+    ZSVIEWPORT vp = _cam->getViewport();
+
+    //glViewport(0, 0, vp.endX, vp.endY);
 
     render_settings.CurrentViewMask = cc->mViewMask;
 
@@ -232,7 +239,7 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
     }
 
-    glFrontFace(GL_CCW);
+    //glFrontFace(GL_CCW);
     
     CopyEffect->ClearInputTextures();
     CopyEffect->PushInputTexture(df_light_buffer->GetTexture(0));
@@ -336,4 +343,14 @@ void Engine::GLRenderer::setFaceCullState(bool face_cull) {
         glEnable(GL_CULL_FACE);
     else
         glDisable(GL_CULL_FACE);
+}
+
+void Engine::GLRenderer::setFrontFace(CameraCullFaceDirection CCFD) {
+
+    GLenum mode = GL_CCW;
+
+    if (CCFD == CCF_DIRECTION_CW)
+        mode = GL_CW;
+
+    glFrontFace(mode);
 }
