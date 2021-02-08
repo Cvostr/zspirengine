@@ -3,18 +3,42 @@
 
 extern ZSGAME_DATA* game_data;
 
-bool Engine::ZSVulkanSampler::CreateSampler() {
+VkFilter GetSamplerFilterGL(Engine::TextureFilteringMode TFM) {
+	VkFilter result = VK_FILTER_NEAREST;
+
+	if (TFM == Engine::SAMPLER_FILTERING_LINEAR)
+		result = VK_FILTER_LINEAR;
+	if (TFM == Engine::SAMPLER_FILTERING_NEAREST)
+		result = VK_FILTER_NEAREST;
+
+	return result;
+}
+
+VkSamplerAddressMode GetSamplerWrapMode(Engine::TextureWrapMode TWM) {
+	VkSamplerAddressMode result = VK_SAMPLER_ADDRESS_MODE_MAX_ENUM;
+
+	if (TWM == Engine::SAMPLER_WRAP_REPEAT)
+		result = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	if (TWM == Engine::SAMPLER_WRAP_MIRRORED_REPEAT)
+		result = VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
+	if (TWM == Engine::SAMPLER_WRAP_CLAMP_TO_EDGE)
+		result = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+
+	return result;
+}
+
+void Engine::ZSVulkanSampler::CreateSampler() {
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	samplerInfo.magFilter = VK_FILTER_LINEAR;
-	samplerInfo.minFilter = VK_FILTER_LINEAR;
+	samplerInfo.magFilter = GetSamplerFilterGL(mMagFiltering);
+	samplerInfo.minFilter = GetSamplerFilterGL(mMinFiltering);
 
-	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	samplerInfo.addressModeU = GetSamplerWrapMode(mWrapU);
+	samplerInfo.addressModeV = GetSamplerWrapMode(mWrapV);
+	samplerInfo.addressModeW = GetSamplerWrapMode(mWrapW);
 
-	samplerInfo.anisotropyEnable = VK_FALSE;
-	samplerInfo.maxAnisotropy = 16.0f;
+	samplerInfo.anisotropyEnable = (mMaxAnisotropy > 1.f);
+	samplerInfo.maxAnisotropy = mMaxAnisotropy;
 
 	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
 
@@ -34,17 +58,18 @@ bool Engine::ZSVulkanSampler::CreateSampler() {
 
 	mCreated = true;
 
-	return true;
 }
 VkSampler Engine::ZSVulkanSampler::GetVkSampler() {
 	return this->mSampler;
 }
 
-Engine::ZSVulkanSampler::ZSVulkanSampler() {
-
+void Engine::ZSVulkanSampler::Destroy() {
+	if (mCreated) {
+		vkDestroySampler(game_data->vk_main->mDevice->getVkDevice(), mSampler, nullptr);
+		mCreated = false;
+	}
 }
 
 Engine::ZSVulkanSampler::~ZSVulkanSampler() {
-	if (mCreated)
-		vkDestroySampler(game_data->vk_main->mDevice->getVkDevice(), mSampler, nullptr);
+	Destroy();
 }

@@ -45,6 +45,11 @@ void Engine::Button::draw(){
     }
     GlyphFontContainer* c = game_data->resources->getFontByLabel("LiberationMono-Regular")->font_ptr;
 
-    if(TextContent != nullptr)
-        c->DrawString(this->TextContent->STR[0].c_str(), this->TextContent->STR[0].size(), Vec2(pvPos.posX, pvPos.posY), TextColor);
+    if (TextContent != nullptr) {
+        Vec2 Pos = Vec2(
+            static_cast<float>(pvPos.posX), 
+            static_cast<float>(pvPos.posY)
+        );
+        c->DrawString(this->TextContent->STR[0].c_str(), this->TextContent->STR[0].size(), Pos, TextColor);
+    }
 }

@@ -4,7 +4,7 @@
 #include "Texture.h"
 #include "GpuObject.hpp"
 
-#define MAX_RENDERER_ATTACHMENT_COUNT 7
+#define MAX_RENDERER_ATTACHMENT_COUNT 8
 
 namespace Engine {
     class Framebuffer : public GpuObject{
@@ -40,6 +40,8 @@ namespace Engine {
         virtual void AddTexture(uint32_t Width, uint32_t Height, TextureFormat Format) {}
         virtual void AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers = 1, TextureFormat Format = FORMAT_DEPTH_24_STENCIL_8) {}
     
+        virtual void AddTexture(Texture* Texture) {}
+
         virtual void Create(){}
     };
 

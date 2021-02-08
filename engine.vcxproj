@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -242,6 +242,7 @@
     <ClCompile Include="code\src\ogl\GLScreenEffect.cpp" />
     <ClCompile Include="code\src\ogl\GLShader.cpp" />
     <ClCompile Include="code\src\ogl\GLTexture.cpp" />
+    <ClCompile Include="code\src\ogl\GLTextureSampler.cpp" />
     <ClCompile Include="code\src\ogl\GLUniformBuffer.cpp" />
     <ClCompile Include="code\src\render\MaterialTemplates.cpp" />
     <ClCompile Include="code\src\render\TerrainRender.cpp" />
@@ -253,6 +254,7 @@
     <ClCompile Include="code\src\render\Framebuffer.cpp" />
     <ClCompile Include="code\src\render\Shader.cpp" />
     <ClCompile Include="code\src\render\Texture.cpp" />
+    <ClCompile Include="code\src\render\TextureSampler.cpp" />
     <ClCompile Include="code\src\render\UniformBuffer.cpp" />
     <ClCompile Include="code\src\resources\AnimationResource.cpp" />
     <ClCompile Include="code\src\resources\AudioResource.cpp" />
@@ -365,6 +367,7 @@
     <ClInclude Include="code\headers\ogl\GLScreenEffect.hpp" />
     <ClInclude Include="code\headers\ogl\GLShader.hpp" />
     <ClInclude Include="code\headers\ogl\GLTexture.hpp" />
+    <ClInclude Include="code\headers\ogl\GLTextureSampler.hpp" />
     <ClInclude Include="code\headers\ogl\GLUniformBuffer.hpp" />
     <ClInclude Include="code\headers\render\GpuObject.hpp" />
     <ClInclude Include="code\headers\render\Animation.hpp" />
@@ -376,6 +379,7 @@
     <ClInclude Include="code\headers\render\ScreenEffect.hpp" />
     <ClInclude Include="code\headers\render\Shader.hpp" />
     <ClInclude Include="code\headers\render\Texture.h" />
+    <ClInclude Include="code\headers\render\TextureSampler.hpp" />
     <ClInclude Include="code\headers\render\UniformBuffer.hpp" />
     <ClInclude Include="code\headers\Scripting\AngelScript.hpp" />
     <ClInclude Include="code\headers\Scripting\AngelScriptMgr.h" />

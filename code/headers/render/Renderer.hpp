@@ -47,6 +47,7 @@ protected:
     //Vector to store lights
     std::vector<void*> mLights;
     std::vector<void*> mCameras;
+    std::vector<void*> mWinds;
 
     RenderSettings render_settings;
 
@@ -102,7 +103,9 @@ public:
 
     void addLight(void* light_ptr);
     void addCamera(void* cam_ptr);
+    void addWind(void* wind_ptr);
     void removeLights();
+    void removeWinds();
     void remove—ameras();
 
     void TryRenderShadows(Engine::Camera* cam);

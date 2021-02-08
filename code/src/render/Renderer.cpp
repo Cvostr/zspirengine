@@ -482,6 +482,24 @@ void Engine::Renderer::addCamera(void* cam_ptr) {
         mMainCamera = (Camera*)cam_ptr;
 }
 
+void Engine::Renderer::addWind(void* wind_ptr) {
+    bool found = false;
+    //Check, if this wind already exist
+    for (size_t i = 0; i < mWinds.size(); i++) {
+        if (mWinds[i] == wind_ptr) {
+            found = true;
+            break;
+        }
+    }
+    //if not exist then add it to array
+    if (!found)
+        this->mWinds.push_back(wind_ptr);
+}
+
+void Engine::Renderer::removeWinds() {
+    mWinds.clear();
+}
+
 void Engine::Renderer::removeLights(){
     mLights.clear();
 }

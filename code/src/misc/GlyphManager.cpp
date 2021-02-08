@@ -102,7 +102,7 @@ void GlyphFontContainer::loadGlyph(unsigned int index,
         MaxY = 0;
     }
     if (MaxY < character->mGlyphSize.Y)
-        MaxY = character->mGlyphSize.Y;
+        MaxY = static_cast<unsigned int>(character->mGlyphSize.Y);
 
     character->mGlyphTextureStart = Vec2(static_cast<float>(WorkX), static_cast<float>(WorkY));
 

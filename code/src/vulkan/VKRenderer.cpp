@@ -260,6 +260,8 @@ void Engine::VKRenderer::Fill3dCmdBuf() {
 
     MaterialRenderPass->CmdBegin(m3dCmdBuf, MaterialFb);
 
+    render_settings.CurrentViewMask = 0xFFFFFFFFFFFFFFFF;
+
     bool binded = false;
 
     for (unsigned int i = 0; i < ObjectsToRender.size(); i++) {

@@ -1,5 +1,15 @@
 #include "../../headers/ogl/GLFramebuffer.hpp"
 
+unsigned int attachments[MAX_RENDERER_ATTACHMENT_COUNT] =
+{ GL_COLOR_ATTACHMENT0,
+GL_COLOR_ATTACHMENT1,
+GL_COLOR_ATTACHMENT2,
+GL_COLOR_ATTACHMENT3,
+GL_COLOR_ATTACHMENT4,
+GL_COLOR_ATTACHMENT5,
+GL_COLOR_ATTACHMENT6,
+GL_COLOR_ATTACHMENT7 };
+
 void Engine::GLframebuffer::bind() {
     glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer);
 }
@@ -29,18 +39,7 @@ void Engine::GLframebuffer::AddTexture(uint32_t Width, uint32_t Height, TextureF
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + mTexturesCount, GL_TEXTURE_2D, ((glTexture*)textures[mTexturesCount])->TEXTURE_ID, 0);
     mTexturesCount++; //Add texture
 
-    unsigned int attachments[MAX_RENDERER_ATTACHMENT_COUNT] =
-    { GL_COLOR_ATTACHMENT0,
-    GL_COLOR_ATTACHMENT1,
-    GL_COLOR_ATTACHMENT2,
-    GL_COLOR_ATTACHMENT3,
-    GL_COLOR_ATTACHMENT4,
-    GL_COLOR_ATTACHMENT5,
-    GL_COLOR_ATTACHMENT6 };
-
     glDrawBuffers(mTexturesCount, attachments);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Engine::GLframebuffer::AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers, TextureFormat Format) {
@@ -70,32 +69,40 @@ void Engine::GLframebuffer::AddDepth(uint32_t Width, uint32_t Height, unsigned i
 void Engine::GLframebuffer::SetSize(uint32_t Width, uint32_t Height) {
     Framebuffer::SetSize(Width, Height);
 
-    std::vector<TextureFormat> Formats;
-    TextureFormat DepthFormat;
-    uint32_t DepthLayers;
-    uint32_t _TexturesCount = mTexturesCount;
-    mTexturesCount = 0;
-    //Store old textures formats and destroy them
-    for (unsigned int t = 0; t < _TexturesCount; t++) {
-        Formats.push_back(textures[t]->GetFormat());
-        textures[t]->Destroy();
-        delete textures[t];
+    bind();
+
+    for (unsigned int t = 0; t < mTexturesCount; t++) {
+        textures[t]->Resize(Width, Height);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + t, GL_TEXTURE_2D, ((glTexture*)textures[t])->TEXTURE_ID, 0);
+
     }
 
-    //Store depth format
     if (Depth) {
-        DepthFormat = depthTexture->GetFormat();
-        DepthLayers = depthTexture->GetLayersCount();
-        depthTexture->Destroy();
-        delete depthTexture;
+        depthTexture->Resize(Width, Height);
+
+        GLenum Type = ((glTexture*)depthTexture)->GetGlType();
+        GLenum AttachmentType = GL_DEPTH_ATTACHMENT;
+
+        if (depthTexture->GetFormat() == TextureFormat::FORMAT_DEPTH_24_STENCIL_8)
+            AttachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
+
+        glTexParameteri(Type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(Type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameterf(Type, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameterf(Type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(Type, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+        glTexParameteri(Type, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+
+        glFramebufferTexture(GL_FRAMEBUFFER, AttachmentType, ((glTexture*)depthTexture)->TEXTURE_ID, 0);
     }
-    //Recreate textures
-    for (unsigned int t = 0; t < _TexturesCount; t++) {
-        AddTexture(Formats[t]);
-    }
-    if (Depth) {
-        AddDepth(DepthLayers, DepthFormat);
-    }
+}
+
+void Engine::GLframebuffer::AddTexture(Texture* Texture) {
+
 }
 
 void Engine::GLframebuffer::Create() {

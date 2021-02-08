@@ -89,6 +89,7 @@ void glTexture::Init() {
         glTexParameteri(Type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(Type, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
         glTexParameteri(Type, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+        
 
         mCreated = true;
     }
@@ -116,7 +117,11 @@ void glTexture::Create(unsigned int Width, unsigned int Height, TextureFormat fo
         glTexImage2D(GL_TEXTURE_2D, 0, GetInternalFormatGL(format), Width, Height, 0, GetFormatGL(format), _type, nullptr);
     else if (Layers > 1)
         glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GetInternalFormatGL(format), Width, Height, Layers, 0, GetFormatGL(format), _type, nullptr);
-    
+}
+
+void glTexture::glTexture::Resize(uint32_t Width, uint32_t Height) {
+    Destroy();
+    Create(Width, Height, mFormat, mLayers);
 }
 
 glTexture::glTexture():

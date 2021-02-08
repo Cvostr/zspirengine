@@ -15,6 +15,7 @@ namespace Engine {
         //Only for OGL : initialize texture in GL
         void Init();
         void Create(unsigned int Width, unsigned int Height, TextureFormat format, unsigned int Layers = 1);
+        void Resize(uint32_t Width, uint32_t Height);
         //Loads texture from buffer
         bool LoadDDSTextureFromBuffer(unsigned char* data);
         bool LoadPNGTextureFromBuffer(unsigned char* data, int size);

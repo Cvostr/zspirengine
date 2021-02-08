@@ -137,6 +137,11 @@ void Engine::vkTexture::Create(unsigned int Width, unsigned int Height, TextureF
 
 }
 
+void Engine::vkTexture::Resize(uint32_t Width, uint32_t Height) {
+	Destroy();
+	Create(Width, Height, mFormat, mLayers);
+}
+
 //Loads texture from buffer
 bool Engine::vkTexture::LoadDDSTextureFromBuffer(unsigned char* data){
 
