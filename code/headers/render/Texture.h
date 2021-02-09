@@ -64,7 +64,7 @@ namespace Engine {
         virtual void Resize(uint32_t Width, uint32_t Height) {}
         virtual void Destroy() {}
         //Loads texture from buffer, guess format by header
-        bool LoadFromBuffer(unsigned char* data);
+        bool LoadFromBuffer(unsigned char* data, uint32_t size);
         //Load DDS texture from buffer
         virtual bool LoadDDSTextureFromBuffer(unsigned char* data) { return false; }
         //Load PNG texture from buffer

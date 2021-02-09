@@ -15,7 +15,6 @@ namespace Engine {
 		ViewMask mViewMask;
 		CameraCullFaceDirection mCullFaceDirection;
 		TextureResource* mTarget;
-		
 
 		void addPropertyInterfaceToInspector();
 		void onValueChanged(); //Update soud buffer pointer and send source props

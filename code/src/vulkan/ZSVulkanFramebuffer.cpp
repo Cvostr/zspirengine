@@ -19,22 +19,23 @@ Engine::ZSVulkanFramebuffer::~ZSVulkanFramebuffer() {
 }
 
 bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
-	VkFramebufferCreateInfo framebufferInfo = {};
-	framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-	framebufferInfo.renderPass = renderpass->GetRenderPass();
-	framebufferInfo.attachmentCount = static_cast<uint32_t>(Views.size());
-	framebufferInfo.pAttachments = Views.data();
-	framebufferInfo.width = renderpass->GetClearExtent().width;
-	framebufferInfo.height = renderpass->GetClearExtent().height;
-	framebufferInfo.layers = mLayersCount;
-	
+	if (!mCreated) {
+		VkFramebufferCreateInfo framebufferInfo = {};
+		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		framebufferInfo.renderPass = renderpass->GetRenderPass();
+		framebufferInfo.attachmentCount = static_cast<uint32_t>(Views.size());
+		framebufferInfo.pAttachments = Views.data();
+		framebufferInfo.width = renderpass->GetClearExtent().width;
+		framebufferInfo.height = renderpass->GetClearExtent().height;
+		framebufferInfo.layers = mLayersCount;
 
-	if (vkCreateFramebuffer(game_data->vk_main->mDevice->getVkDevice(), &framebufferInfo, nullptr, &mFramebuffer) != VK_SUCCESS) {
-		return false;
+		if (vkCreateFramebuffer(game_data->vk_main->mDevice->getVkDevice(), &framebufferInfo, nullptr, &mFramebuffer) != VK_SUCCESS) {
+			return false;
+		}
+
+		mCreated = true;
+
 	}
-
-	mCreated = true;
-
 	return true;
 }
 
@@ -75,10 +76,8 @@ void Engine::ZSVulkanFramebuffer::AddTexture(uint32_t Width, uint32_t Height, Te
 	Texture->aspect = VK_IMAGE_ASPECT_COLOR_BIT;
 
 	Texture->Create(Width, Height, Format);
-
-	textures[mTexturesCount++] = Texture;
-
-	Views.push_back(Texture->GetImageView());
+	//Push new texture
+	AddTexture(Texture);
 }
 
 void Engine::ZSVulkanFramebuffer::AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers, TextureFormat Format) {
@@ -94,6 +93,12 @@ void Engine::ZSVulkanFramebuffer::AddDepth(uint32_t Width, uint32_t Height, unsi
 	depthTexture = DepthTexture;
 
 	Views.push_back(DepthTexture->GetImageView());
+}
+
+void Engine::ZSVulkanFramebuffer::AddTexture(Texture* Texture) {
+	textures[mTexturesCount++] = Texture;
+
+	Views.push_back(((vkTexture*)Texture)->GetImageView());
 }
 
 void Engine::ZSVulkanFramebuffer::SetSize(uint32_t Width, uint32_t Height) {

@@ -27,7 +27,7 @@ void Engine::TextureResource::load() {
     //Check, if texture reading process finished
     if (this->resource_state == RESOURCE_STATE::STATE_LOADING_PROCESS) {
         if (this->request->done == true) {
-            this->texture_ptr->LoadFromBuffer(request->data);
+            this->texture_ptr->LoadFromBuffer(request->data, (uint32_t)request->size);
             //Delete read data
             delete[] request->data;
             //Delete request

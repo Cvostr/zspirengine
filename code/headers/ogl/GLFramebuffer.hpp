@@ -16,7 +16,7 @@ namespace Engine {
 		
 		void AddTexture(uint32_t Width, uint32_t Height, TextureFormat Format);
 		void AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers = 1, TextureFormat Format = FORMAT_DEPTH_24_STENCIL_8);
-		
+		//Push Texture to framebuffer
 		void AddTexture(Texture* Texture);
 
 		void Create();

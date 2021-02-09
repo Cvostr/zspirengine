@@ -107,15 +107,16 @@ void Engine::ShadowCasterProperty::onPreRender(Engine::Renderer* pipeline) {
 
 void Engine::ShadowCasterProperty::reinitialize() {
     Framebuffer->Destroy();
-    Framebuffer->Create();
     Framebuffer->AddDepth(mCascadesNum, TextureFormat::FORMAT_DEPTH_32);
+    Framebuffer->Create();
 }
 
 void Engine::ShadowCasterProperty::init() {
     Framebuffer = new GLframebuffer(this->TextureSize, this->TextureSize);
-    Framebuffer->Create();
+    
     //Add depth texture array
     Framebuffer->AddDepth(mCascadesNum, TextureFormat::FORMAT_DEPTH_32);
+    Framebuffer->Create();
 
     this->initialized = true;
 }

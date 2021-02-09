@@ -37,9 +37,12 @@ namespace Engine {
 			mMagFiltering = MagFilter;
 		}
 
-		void SetWrapModes(TextureWrapMode WrapU, TextureWrapMode WrapV) {
+		void SetWrapModes(TextureWrapMode WrapU, TextureWrapMode WrapV, TextureWrapMode WrapW = SAMPLER_WRAP_NONE) {
 			mWrapU = WrapU;
 			mWrapV = WrapV;
+
+			if (WrapW != SAMPLER_WRAP_NONE)
+				mWrapW = WrapW;
 		}
 
 		void SetMaxAnisotropy(float Anisotropy) {

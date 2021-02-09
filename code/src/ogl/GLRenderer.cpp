@@ -44,25 +44,26 @@ void Engine::GLRenderer::InitShaders() {
 
 void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int height) {
     gbuffer = new GLframebuffer(width, height);
-    gbuffer->Create();
+    
 
     //effect = new GLScreenEffect(width, height, FORMAT_RGBA);
     //effect->CompileShaderFromFile("Shaders/postprocess/blur/blur.comp");
-    ((GLframebuffer*)gbuffer)->AddDepth();
-    ((GLframebuffer*)gbuffer)->AddTexture(FORMAT_RGBA); //Diffuse map
-    ((GLframebuffer*)gbuffer)->AddTexture(FORMAT_RGB16F); //Normal map
-    ((GLframebuffer*)gbuffer)->AddTexture(FORMAT_RGB16F); //Position map
-    ((GLframebuffer*)gbuffer)->AddTexture(FORMAT_RGBA); //Transparent map
-    ((GLframebuffer*)gbuffer)->AddTexture(FORMAT_RGBA); //Masks map
+    gbuffer->AddDepth();
+    gbuffer->AddTexture(FORMAT_RGBA); //Diffuse map
+    gbuffer->AddTexture(FORMAT_RGB16F); //Normal map
+    gbuffer->AddTexture(FORMAT_RGB16F); //Position map
+    gbuffer->AddTexture(FORMAT_RGBA); //Transparent map
+    gbuffer->AddTexture(FORMAT_RGBA); //Masks map
+    gbuffer->Create();
 
     df_light_buffer = new GLframebuffer(width, height);
+    df_light_buffer->AddTexture(FORMAT_RGBA); //Diffuse map
+    df_light_buffer->AddTexture(FORMAT_RGBA); //Bloom map
     df_light_buffer->Create();
-    ((GLframebuffer*)df_light_buffer)->AddTexture(FORMAT_RGBA); //Diffuse map
-    ((GLframebuffer*)df_light_buffer)->AddTexture(FORMAT_RGBA); //Bloom map
 
     ui_buffer = new GLframebuffer(width, height);
+    ui_buffer->AddTexture(FORMAT_RGBA); //UI Diffuse map
     ui_buffer->Create();
-    ((GLframebuffer*)ui_buffer)->AddTexture(FORMAT_RGBA); //UI Diffuse map
 
     //effect->PushInputTexture(((GLframebuffer*)df_light_buffer)->textures[1]);
 }
@@ -178,12 +179,12 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
 
 void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
     CameraComponent* cc = (CameraComponent*)(cam_prop);
-
-
-    setFrontFace(cc->mCullFaceDirection);
-
+    //Check, is camera active
     if (!cc->isActive())
         return;
+
+    //Set front face mode according to rendering camera
+    setFrontFace(cc->mCullFaceDirection);
 
     Camera* _cam = (Camera*)cc;
 
@@ -239,7 +240,6 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
     }
 
-    //glFrontFace(GL_CCW);
     
     CopyEffect->ClearInputTextures();
     CopyEffect->PushInputTexture(df_light_buffer->GetTexture(0));
