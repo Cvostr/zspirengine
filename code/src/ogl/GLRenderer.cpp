@@ -196,8 +196,6 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
 
     ZSVIEWPORT vp = _cam->getViewport();
 
-    //glViewport(0, 0, vp.endX, vp.endY);
-
     render_settings.CurrentViewMask = cc->mViewMask;
 
     updateShadersCameraInfo(_cam);
@@ -206,10 +204,10 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
 
     {
         //Bind Geometry Buffer to make Deferred Shading
-        ((GLframebuffer*)gbuffer)->bind();
+        ((GLframebuffer*)cc->mGBuffer)->bind();
         setClearColor(0, 0, 0, 0);
         ClearFBufferGL(true, true);
-        setFullscreenViewport(win->GetWindowWidth(), win->GetWindowHeight());
+        setFullscreenViewport(vp.endX, vp.endY);
         {
             //Render Skybox
             setDepthState(false);
@@ -230,23 +228,16 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
 
     //Process Deffered lights
     {
-        ((GLframebuffer*)df_light_buffer)->bind();
+        ((GLframebuffer*)cc->mDefferedBuffer)->bind();
         ClearFBufferGL(true, false); //Clear screen
         //Disable depth rendering to draw plane correctly
         setDepthState(false);
         setFaceCullState(false);
-        ((GLframebuffer*)gbuffer)->bindTextures(10); //Bind gBuffer textures
+        ((GLframebuffer*)cc->mGBuffer)->bindTextures(10); //Bind gBuffer textures
         deffered_light->Use(); //use deffered shader
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
     }
-
-    
-    CopyEffect->ClearInputTextures();
-    CopyEffect->PushInputTexture(df_light_buffer->GetTexture(0));
-    CopyEffect->SetOutputTexture(Texture);
-    CopyEffect->SetSize(Texture->GetWidth(), Texture->GetHeight());
-    CopyEffect->Compute();
-   }
+}
 
 void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
     BoundingBox3 bb = obj->getBoundingBox();

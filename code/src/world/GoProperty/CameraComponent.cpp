@@ -10,6 +10,11 @@ Engine::CameraComponent::CameraComponent() {
 	mViewMask = 0xFFFFFFFFFFFFFFFF;
 	mAutoViewport = true;
 	mCullFaceDirection = CCF_DIRECTION_CCW;
+
+	
+
+	mGBuffer = nullptr;
+	mDefferedBuffer = nullptr;
 }
 
 void Engine::CameraComponent::onUpdate(float deltaTime) {
@@ -17,7 +22,38 @@ void Engine::CameraComponent::onUpdate(float deltaTime) {
 }
 
 void Engine::CameraComponent::UpdateTextureResource() {
-	mTarget = game_data->resources->getTextureByLabel(TargetResourceName);
+	TextureResource* TargetResource = game_data->resources->getTextureByLabel(TargetResourceName);
+
+	if (mTarget != TargetResource) {
+		//Target is changed
+		mTarget = TargetResource;
+		//Get sizes of new target
+		uint32_t newWidth = mTarget->texture_ptr->GetWidth();
+		uint32_t newHeight = mTarget->texture_ptr->GetHeight();
+		//Resize geometry buffer
+		
+
+		if (mDefferedBuffer != nullptr)
+			delete mDefferedBuffer;
+
+		mDefferedBuffer = allocFramebuffer(newWidth, newHeight);
+		mDefferedBuffer->AddTexture(mTarget->texture_ptr);
+		mDefferedBuffer->AddTexture(FORMAT_RGBA); //Bloom map
+		mDefferedBuffer->Create();
+
+		if (mGBuffer == nullptr) {
+			mGBuffer = allocFramebuffer(newWidth, newHeight);
+			mGBuffer->AddDepth();
+			mGBuffer->AddTexture(FORMAT_RGBA); //Diffuse map
+			mGBuffer->AddTexture(FORMAT_RGB16F); //Normal map
+			mGBuffer->AddTexture(FORMAT_RGB16F); //Position map
+			mGBuffer->AddTexture(FORMAT_RGBA); //Specular map
+			mGBuffer->AddTexture(FORMAT_RGBA); //Masks map
+			mGBuffer->Create();
+		}
+
+		mGBuffer->SetSize(newWidth, newHeight);
+	}
 }
 
 void Engine::CameraComponent::loadPropertyFromMemory(const char* data, GameObject* obj) {
@@ -84,6 +120,19 @@ void Engine::CameraComponent::onPreRender(Engine::Renderer* pipeline) {
 	mCameraFront.Normalize();
 
 	updateViewMat();
+}
+
+void Engine::CameraComponent::ResizeTarget(uint32_t Width, uint32_t Height) {
+	mGBuffer->SetSize(Width, Height);
+	if(mDefferedBuffer != nullptr)
+		mDefferedBuffer->SetSize(Width, Height);
+}
+
+void Engine::CameraComponent::onObjectDeleted() {
+	if (mDefferedBuffer != nullptr)
+		delete mDefferedBuffer;
+	if (mGBuffer != nullptr)
+		delete mGBuffer;
 }
 
 void Engine::CameraComponent::bindObjectPropertyToAngel(AGScriptMgr* mgr) {

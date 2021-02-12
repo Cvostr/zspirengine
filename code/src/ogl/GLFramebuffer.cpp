@@ -32,6 +32,7 @@ void Engine::GLframebuffer::AddTexture(uint32_t Width, uint32_t Height, TextureF
     if (mTexturesCount == MAX_RENDERER_ATTACHMENT_COUNT) return;
     //Create texture
     Texture* Attachment = allocTexture();
+    Attachment->SetRenderTargetFlag(true);
     Attachment->Create(Width, Height, Format);
     
     AddTexture(Attachment);
@@ -78,12 +79,9 @@ void Engine::GLframebuffer::SetSize(uint32_t Width, uint32_t Height) {
 }
 
 void Engine::GLframebuffer::AddTexture(Texture* Texture) {
-    if (mTexturesCount == MAX_RENDERER_ATTACHMENT_COUNT) return;
+    if (mTexturesCount == MAX_RENDERER_ATTACHMENT_COUNT || !Texture->IsRenderTarget()) return;
 
     textures[mTexturesCount] = Texture;
-
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     mTexturesCount++; //Add texture
 }
@@ -125,13 +123,12 @@ void Engine::GLframebuffer::Destroy() {
         glDeleteFramebuffers(1, &this->mFramebuffer);
 
         for (unsigned int t = 0; t < mTexturesCount; t++) {
-            textures[t]->Destroy();
-            delete textures[t];
+            if(!textures[t]->IsRenderTargetResource())
+                textures[t]->Destroy();
         }
 
         if (Depth) {
             depthTexture->Destroy();
-            delete depthTexture;
         }
         mCreated = false;
     }
@@ -146,11 +143,17 @@ Engine::GLframebuffer::GLframebuffer(unsigned int width, unsigned int height)
 
 Engine::GLframebuffer::~GLframebuffer() {
     Destroy();
+
+    for (unsigned int t = 0; t < mTexturesCount; t++) {
+        if (!textures[t]->IsRenderTargetResource())
+            delete textures[t];
+    }
+
+    if (Depth) {
+        delete depthTexture;
+    }
 }
 
 Engine::GLframebuffer::GLframebuffer() {
-    textures[0] = 0;
-    Width = 0;
-    Height = 0;
-    mTexturesCount = 0;
+     
 }

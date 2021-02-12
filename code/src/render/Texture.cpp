@@ -48,6 +48,7 @@ bool Engine::Texture::LoadFromBuffer(unsigned char* data, uint32_t size) {
     }
     if (data[0] == 'R' && data[1] == 'T' && data[2] == 'B' ) {
         Create(512, 512, TextureFormat::FORMAT_RGBA);
+        SetRenderTargetFlag(true, true);
     }
     return result;
 }

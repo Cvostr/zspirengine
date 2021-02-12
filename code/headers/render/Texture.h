@@ -48,17 +48,25 @@ namespace Engine {
 
 	class Texture : public GpuObject{
     protected:
-        uint32_t maxWidth;
-        uint32_t maxHeight;
-        TextureFormat mFormat;
-        uint32_t mMipsCount;
-        uint32_t mLayers;
+        uint32_t maxWidth; //Width of most detailed mip map
+        uint32_t maxHeight; //Height of most detailed mip map 
+        TextureFormat mFormat; //Image format
+        uint32_t mMipsCount; //Amount of mip map levels
+        uint32_t mLayers; //Amount of 3D texture layers, default = 1
+        bool mIsRenderTarget; //Texture can be used by framebuffer
+        bool mIsRenderTargetResource; //Texture should not be deleted on framebuffer deletion
 	public:
         TextureFormat GetFormat() { return mFormat; }
         uint32_t GetMipsCount() { return mMipsCount; }
         uint32_t GetLayersCount() { return mLayers; }
         uint32_t GetWidth() { return maxWidth; }
         uint32_t GetHeight() { return maxHeight; }
+        void SetRenderTargetFlag(bool RenderTarget, bool RenderTargetResource = false) {
+            mIsRenderTarget = RenderTarget;
+            mIsRenderTargetResource = RenderTargetResource;
+        }
+        bool IsRenderTarget() { return mIsRenderTarget; }
+        bool IsRenderTargetResource() { return mIsRenderTargetResource; }
 		//Only for OGL : initialize texture in GL
         virtual void Create(uint32_t Width, uint32_t Height, TextureFormat format, uint32_t Layers = 1){}
         virtual void Resize(uint32_t Width, uint32_t Height) {}

@@ -43,6 +43,20 @@ namespace Engine {
         virtual void AddTexture(Texture* Texture) {}
 
         virtual void Create(){}
+
+        explicit Framebuffer() :
+            Width (0),
+            Height(0),
+            mTexturesCount(0),
+            Depth(false),
+            depthTexture(nullptr)
+        {
+            textures[0] = 0;
+        }
+
+        virtual ~Framebuffer() {
+
+        }
     };
 
     Framebuffer* allocFramebuffer();

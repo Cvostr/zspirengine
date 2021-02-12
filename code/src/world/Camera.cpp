@@ -13,7 +13,7 @@ Engine::Camera::Camera() : mCameraPos(0),
                            mFarZ(100.0f),
                            mFOV(45),
                            mViewport(0, 0, 640, 480),
-    mAspectRatio(1),
+                           mAspectRatio(640.f / 480.f),
                             mReflectionMatrix(1)
 {
     updateProjectionMat();
@@ -33,24 +33,28 @@ void Engine::Camera::setZplanes(float nearZ, float farZ){
     updateProjectionMat();
 }
 
-void Engine::Camera::setProjectionType(ZSCAMERAPROJECTIONTYPE type){
+void Engine::Camera::setProjectionType(ÑameraProjectionType type){
     mProjectionType = type;
     updateProjectionMat();
 }
 
 void Engine::Camera::setViewport(ZSVIEWPORT viewport){
     this->mViewport = viewport;
+
+    mAspectRatio = static_cast<float>((mViewport.endX - mViewport.startX)) / static_cast<float>(mViewport.endY - mViewport.startY);
+
     updateProjectionMat();
 }
 
 void Engine::Camera::setViewport(unsigned int Width, unsigned int Height) {
-    mViewport.startX = 0;
-    mViewport.startY = 0;
+    ZSVIEWPORT newv;
+    newv.startX = 0;
+    newv.startY = 0;
 
-    mViewport.endX = Width;
-    mViewport.endY = Height;
+    newv.endX = Width;
+    newv.endY = Height;
 
-    mAspectRatio = static_cast<float>((mViewport.endX - mViewport.startX)) / static_cast<float>(mViewport.endY - mViewport.startY);
+    setViewport(newv);
 }
 
 void Engine::Camera::updateProjectionMat(){

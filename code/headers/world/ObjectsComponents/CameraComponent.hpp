@@ -2,6 +2,7 @@
 
 #include "../World.hpp"
 #include "../Camera.hpp"
+#include "../../render/Framebuffer.hpp"
 #include "../../../headers/engine/Resources.hpp"
 
 namespace Engine {
@@ -16,6 +17,9 @@ namespace Engine {
 		CameraCullFaceDirection mCullFaceDirection;
 		TextureResource* mTarget;
 
+		Framebuffer* mGBuffer;
+		Framebuffer* mDefferedBuffer;
+
 		void addPropertyInterfaceToInspector();
 		void onValueChanged(); //Update soud buffer pointer and send source props
 
@@ -26,6 +30,9 @@ namespace Engine {
 		void loadPropertyFromMemory(const char* data, GameObject* obj);
 		void savePropertyToStream(ZsStream* stream, GameObject* obj);
 		void bindObjectPropertyToAngel(AGScriptMgr* mgr);
+
+		void ResizeTarget(uint32_t Width, uint32_t Height);
+		void onObjectDeleted();
 
 		void setReflectionPlane(Plane& plane) {
 			Camera::setReflectionPlane(plane);
@@ -40,7 +47,8 @@ namespace Engine {
 		}
 
 		void SetViewMask(ViewMask Mask) {
-			mViewMask = Mask; }
+			mViewMask = Mask; 
+		}
 
 		CameraComponent();
 	};

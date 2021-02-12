@@ -3,6 +3,11 @@
 void Engine::WindZoneComponent::onUpdate(float deltaTime) {
 
 }
+
+void Engine::WindZoneComponent::onPreRender(Engine::Renderer* pipeline) {
+    pipeline->addWind(pipeline);
+}
+
 void Engine::WindZoneComponent::copyTo(Engine::IGameObjectComponent* dest) {
     if (dest->type != this->type) return; //if it isn't Lightsource, then exit
 
@@ -11,12 +16,6 @@ void Engine::WindZoneComponent::copyTo(Engine::IGameObjectComponent* dest) {
 
     WindZoneComponent* _dest = static_cast<WindZoneComponent*>(dest);
     _dest->mStrength = mStrength;
-}
-void Engine::WindZoneComponent::onObjectDeleted() {
-
-}
-void Engine::WindZoneComponent::onStart() {
-
 }
 
 void Engine::WindZoneComponent::loadPropertyFromMemory(const char* data, GameObject* obj) {

@@ -4,7 +4,7 @@
 #include "../math/Plane.hpp"
 #include "../audio/SoundSource.hpp"
 
-enum ZSCAMERAPROJECTIONTYPE {ZSCAMERA_PROJECTION_NONE,
+enum ÑameraProjectionType {ZSCAMERA_PROJECTION_NONE,
                             ZSCAMERA_PROJECTION_ORTHOGONAL,
                             ZSCAMERA_PROJECTION_PERSPECTIVE};
 
@@ -22,6 +22,8 @@ namespace Engine{
 
         unsigned int endX;
         unsigned int endY;
+
+
 
         ZSVIEWPORT(unsigned int _startX, unsigned int _startY, unsigned int _endX, unsigned int _endY) : 
             startX(_startX),
@@ -44,7 +46,7 @@ namespace Engine{
             Mat4 mViewMatrix; //Calculated View matrix
 
         public:
-            ZSCAMERAPROJECTIONTYPE mProjectionType;
+            ÑameraProjectionType mProjectionType;
             Vec3 mCameraPos; //Camera position vector
             Vec3 mCameraUp; //Camera up direction vector
             Vec3 mCameraFront; //Camera front direction vector
@@ -81,7 +83,7 @@ namespace Engine{
             void setReflectionPlane(Plane& plane) { 
                 mReflectionMatrix = plane.GetReflectionMatrix();
             }
-            void setProjectionType(ZSCAMERAPROJECTIONTYPE type);
+            void setProjectionType(ÑameraProjectionType type);
 
             Mat4 getViewMatrix() { return mViewMatrix; }
             Mat4 getProjMatrix() { return mProjectionMatrix; }
