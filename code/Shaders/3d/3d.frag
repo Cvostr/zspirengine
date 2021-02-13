@@ -139,6 +139,7 @@ void main(){
 	vec3 Normal = InNormal; //defaultly, use normals from mesh
 	float result_shininess = material_shininess;
 	
+    
 	if(hasDiffuseMap)
 		result = texture(diffuse, processParallaxMapUv(uv)).xyz;
 

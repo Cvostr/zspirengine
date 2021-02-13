@@ -10,6 +10,9 @@ namespace Engine {
 	class CameraComponent : public IGameObjectComponent, Camera {
 	private:
 		std::string TargetResourceName;
+
+		uint32_t TargetWidth;
+		uint32_t TargetHeight;
 	public:
 		bool mIsMainCamera;
 		bool mAutoViewport;

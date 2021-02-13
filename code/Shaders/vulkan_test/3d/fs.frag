@@ -9,12 +9,15 @@ layout(location = 3) in mat3 TBN;
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outNormal;
 layout(location = 2) out vec4 outPos;
+layout(location = 3) out vec4 tSpec;
+layout(location = 4) out vec4 tMasks;
 
 layout(set = 1, binding = 0) uniform sampler2D diffuse;
-layout(set = 1, binding = 1) uniform sampler2D normal;
-layout(set = 1, binding = 2) uniform sampler2D spec;
-layout(set = 1, binding = 3) uniform sampler2D height;
-layout(set = 1, binding = 4) uniform sampler2D ambient;
+layout(set = 1, binding = 1) uniform sampler2D normal_map;
+layout(set = 1, binding = 2) uniform sampler2D specular_map;
+layout(set = 1, binding = 3) uniform sampler2D height_map;
+layout(set = 1, binding = 4) uniform sampler2D occlusion_map;
+layout(set = 1, binding = 27) uniform sampler2DArray shadow_map;
 
 layout (std140, binding = 2) uniform ShadowData{
 //Shadowmapping stuff
@@ -40,9 +43,17 @@ layout (std140, binding = 2) uniform ShadowData{
     uniform int CasterDistance5; //4
 };
 
+layout (std140, binding = 0) uniform CamMatrices{
+    uniform mat4 cam_projection;
+    uniform mat4 cam_view;
+    uniform mat4 object_transform;
+    //Camera position
+    uniform vec3 cam_position;
+};
+
 layout( push_constant ) uniform material_constants
 {
-	layout(offset = 64)vec3 diffuse_color;
+	layout(offset = 64) vec3 diffuse_color;
     bool hasDiffuseMap;
     bool hasNormalMap;
     bool hasSpecularMap;
@@ -55,19 +66,38 @@ layout( push_constant ) uniform material_constants
     int _v;
 } PushConstants;
 
+vec2 processParallaxMapUv(vec2 uv){
+    if(!PushConstants.hasHeightMap) return uv;
+    
+    float height = texture(height_map, uv).r;
+    vec3 camera_dir = normalize(TBN * FragPos - TBN * cam_position);
+    
+    vec2 uv_offset = camera_dir.xy / camera_dir.z * (height);
+    return uv - uv_offset;
+}
+
 void main() {
     vec3 result = vec3(1.0, 1.0, 1.0); //Default value
     vec3 Normal = InNormal;
+    float result_shininess = PushConstants.material_shininess;
+
+    vec2 uv = vec2(_uv.x * PushConstants._u, _uv.y * PushConstants._v);
+
     if(PushConstants.hasDiffuseMap)
-	    result = texture(diffuse, _uv).rgb; 
+	    result = texture(diffuse, processParallaxMapUv(uv)).rgb; 
     
     if(PushConstants.hasNormalMap){
-        Normal = texture(normal, _uv).rgb;
+        Normal = texture(normal_map, uv).rgb;
         Normal = normalize(Normal * 2 - 1);
 		Normal = normalize(TBN * Normal);
     }
 
+    if(PushConstants.hasSpecularMap)
+        result_shininess *= texture(specular_map, uv).r;
+
     outColor = vec4(result, 1.0);
     outNormal = vec4(Normal, 1);
     outPos = vec4(FragPos, 1);
+    tSpec.r = result_shininess / 255.f;
+    tMasks = vec4(1.0, 0, 0, 0);
 }

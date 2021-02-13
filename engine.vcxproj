@@ -225,6 +225,7 @@
     <ClCompile Include="code\src\engine\Resources.cpp" />
     <ClCompile Include="code\src\engine\Time.cpp" />
     <ClCompile Include="code\src\engine\Window.cpp" />
+    <ClCompile Include="code\src\hw\CpuInfo.cpp" />
     <ClCompile Include="code\src\input\Input.cpp" />
     <ClCompile Include="code\src\math\BB3.cpp" />
     <ClCompile Include="code\src\math\Mat4.cpp" />
@@ -344,6 +345,8 @@
     <ClInclude Include="code\headers\engine\Time.hpp" />
     <ClInclude Include="code\headers\engine_types.h" />
     <ClInclude Include="code\headers\game.h" />
+    <ClInclude Include="code\headers\hw\CpuInfo.hpp" />
+    <ClInclude Include="code\headers\hw\GpuInfo.hpp" />
     <ClInclude Include="code\headers\input\Input.hpp" />
     <ClInclude Include="code\headers\math\BB3.hpp" />
     <ClInclude Include="code\headers\math\Mat4.hpp" />

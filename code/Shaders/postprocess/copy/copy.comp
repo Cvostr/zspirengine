@@ -5,7 +5,7 @@
 layout (rgba8, binding=0) readonly uniform image2D sourceTex;           //Textures bound to 0 and 1 resp. that are used to
 layout (binding=1) writeonly  uniform image2D targetTex;           //acquire texture and save changes made to texture
 
-layout (local_size_x=1 , local_size_y=1) in;     //Local work-group size
+layout (local_size_x=8 , local_size_y=8) in;     //Local work-group size
 
 void main(){
 

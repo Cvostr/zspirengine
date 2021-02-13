@@ -42,6 +42,7 @@ void Engine::GLframebuffer::AddDepth(uint32_t Width, uint32_t Height, unsigned i
     Depth = true;
     
     depthTexture = new glTexture;
+    depthTexture->SetRenderTargetFlag(true);
     depthTexture->Create(Width, Height, Format, Layers);
 
     /*
@@ -80,10 +81,10 @@ void Engine::GLframebuffer::SetSize(uint32_t Width, uint32_t Height) {
 
 void Engine::GLframebuffer::AddTexture(Texture* Texture) {
     if (mTexturesCount == MAX_RENDERER_ATTACHMENT_COUNT || !Texture->IsRenderTarget()) return;
-
+    //Assign texture to array
     textures[mTexturesCount] = Texture;
-
-    mTexturesCount++; //Add texture
+    //Increase texture count
+    mTexturesCount++; 
 }
 
 void Engine::GLframebuffer::Create() {
@@ -108,10 +109,10 @@ void Engine::GLframebuffer::Create() {
 
             if (depthTexture->GetFormat() == TextureFormat::FORMAT_DEPTH_24_STENCIL_8)
                 AttachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
-
+            //Attach depth texture to framebuffer
             glFramebufferTexture(GL_FRAMEBUFFER, AttachmentType, DepthAttachment->TEXTURE_ID, 0);
         }
-
+        //Unbind framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0); //return back to default
 
         mCreated = true;
@@ -120,6 +121,7 @@ void Engine::GLframebuffer::Create() {
 
 void Engine::GLframebuffer::Destroy() {
     if (mCreated) {
+        //Destroy opengl framebuffer
         glDeleteFramebuffers(1, &this->mFramebuffer);
 
         for (unsigned int t = 0; t < mTexturesCount; t++) {
@@ -130,6 +132,7 @@ void Engine::GLframebuffer::Destroy() {
         if (Depth) {
             depthTexture->Destroy();
         }
+        //unset flag
         mCreated = false;
     }
 }

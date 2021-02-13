@@ -33,7 +33,7 @@ layout (std140, binding = 1) uniform Lights{
 };
 
 
-layout(location = 0) in vec2 _uv;
+layout(location = 0) in vec2 UVCoord;
 layout(location = 1) in vec3 FragPos;
 
 layout(location = 0) out vec4 outColor;
@@ -41,19 +41,26 @@ layout(location = 0) out vec4 outColor;
 layout(set = 1, binding = 0) uniform sampler2D tDiffuse;
 layout(set = 1, binding = 1) uniform sampler2D tNormal;
 layout(set = 1, binding = 2) uniform sampler2D tPos;
+layout(set = 1, binding = 3) uniform sampler2D tSpec;
+layout(set = 1, binding = 4) uniform sampler2D tMasks;
 
 void main() {
-	vec4 Diffuse = texture(tDiffuse, _uv);
-    vec3 FragPos = texture(tPos, _uv).rgb;
-	vec3 Normal = texture(tNormal, _uv).rgb;
+	vec4 Diffuse = texture(tDiffuse, UVCoord);
+    vec3 FragPos = texture(tPos, UVCoord).rgb;
+	vec3 Normal = texture(tNormal, UVCoord).rgb;
+    vec4 Specular = texture(tSpec, UVCoord);
+	vec4 Masks = texture(tMasks, UVCoord);  
 
     vec3 result = Diffuse.xyz;
 
     //Check, if fragment isn't skybox
-
+    if(Masks.r == 1){
+        result *= (1 - Masks.g);
         result *= ambient_light_color;
         
-        float specularFactor = Diffuse.w; //Get factor in A channel
+        bool Shadowed = Masks.g > 0.02; 
+
+        float specularFactor = Specular.r * 255.f; //Get factor in A channel
         vec3 camToFragDirection = normalize(cam_position - FragPos);
     
         for(int lg = 0; lg < lights_amount; lg ++){
@@ -64,7 +71,8 @@ void main() {
                 //Specular calculation
                 vec3 lightDirReflected = reflect(normalize(-lights[lg].dir), Normal);
                 float angle = max(dot(camToFragDirection, lightDirReflected), 0.0);
-                rlight += pow(angle, 32) * specularFactor * lights[lg].color;
+                if(!Shadowed)
+                    rlight += pow(angle, 32) * specularFactor * lights[lg].color;
 			    //add light to result color
                 result += rlight;
             }
@@ -78,9 +86,9 @@ void main() {
                 float lightcoeff = max(dot(Normal, normalize(Dir)), 0.0) * lights[lg].intensity;
                 vec3 rlight = lightcoeff * lights[lg].color;
                 //Specular calculation
-               // vec3 lightDirReflected = reflect(normalize(Dir), Normal);
-               // float angle = max(dot(camToFragDirection, lightDirReflected), 0.0);
-                //rlight += pow(angle, 32) * specularFactor * lights[lg].color;
+                vec3 lightDirReflected = reflect(normalize(-Dir), Normal);
+                float angle = max(dot(camToFragDirection, lightDirReflected), 0.0);
+                rlight += pow(angle, 32) * specularFactor * lights[lg].color;
 			    //add light to result color
                 result += rlight * factor;
             }
@@ -102,5 +110,6 @@ void main() {
                 
             }
         }
+    }
 	outColor = vec4(result, 1);
 }

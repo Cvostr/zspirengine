@@ -11,10 +11,11 @@ Engine::CameraComponent::CameraComponent() {
 	mAutoViewport = true;
 	mCullFaceDirection = CCF_DIRECTION_CCW;
 
-	
-
 	mGBuffer = nullptr;
 	mDefferedBuffer = nullptr;
+
+	TargetWidth = 640;
+	TargetHeight = 480;
 }
 
 void Engine::CameraComponent::onUpdate(float deltaTime) {
@@ -23,25 +24,26 @@ void Engine::CameraComponent::onUpdate(float deltaTime) {
 
 void Engine::CameraComponent::UpdateTextureResource() {
 	TextureResource* TargetResource = game_data->resources->getTextureByLabel(TargetResourceName);
-
+	//Check, if target texture resource is changed
 	if (mTarget != TargetResource) {
 		//Target is changed
 		mTarget = TargetResource;
 		//Get sizes of new target
 		uint32_t newWidth = mTarget->texture_ptr->GetWidth();
 		uint32_t newHeight = mTarget->texture_ptr->GetHeight();
-		//Resize geometry buffer
-		
-
+		//If deffered buffer is already created - delete it
 		if (mDefferedBuffer != nullptr)
 			delete mDefferedBuffer;
-
+		//Allocate new Deffered buffer
 		mDefferedBuffer = allocFramebuffer(newWidth, newHeight);
+		//and bind new target texture
 		mDefferedBuffer->AddTexture(mTarget->texture_ptr);
 		mDefferedBuffer->AddTexture(FORMAT_RGBA); //Bloom map
 		mDefferedBuffer->Create();
 
+		//if gbuffer isn't created
 		if (mGBuffer == nullptr) {
+			//then create one
 			mGBuffer = allocFramebuffer(newWidth, newHeight);
 			mGBuffer->AddDepth();
 			mGBuffer->AddTexture(FORMAT_RGBA); //Diffuse map
@@ -51,8 +53,9 @@ void Engine::CameraComponent::UpdateTextureResource() {
 			mGBuffer->AddTexture(FORMAT_RGBA); //Masks map
 			mGBuffer->Create();
 		}
-
-		mGBuffer->SetSize(newWidth, newHeight);
+		//if already created, then just resize it
+		else
+			mGBuffer->SetSize(newWidth, newHeight);
 	}
 }
 
@@ -68,7 +71,25 @@ void Engine::CameraComponent::loadPropertyFromMemory(const char* data, GameObjec
 	readBinaryValue(&mIsMainCamera, data + offset, offset);
 	readBinaryValue(&mCullFaceDirection, data + offset, offset);
 
-	UpdateTextureResource();
+	if(!mIsMainCamera)
+		UpdateTextureResource();
+	else
+	{
+		mGBuffer = allocFramebuffer(TargetWidth, TargetHeight);
+		mGBuffer->AddDepth();
+		mGBuffer->AddTexture(FORMAT_RGBA); //Diffuse map
+		mGBuffer->AddTexture(FORMAT_RGB16F); //Normal map
+		mGBuffer->AddTexture(FORMAT_RGB16F); //Position map
+		mGBuffer->AddTexture(FORMAT_RGBA); //Specular map
+		mGBuffer->AddTexture(FORMAT_RGBA); //Masks map
+		mGBuffer->Create();
+
+		mDefferedBuffer = allocFramebuffer(TargetWidth, TargetHeight);
+		//and bind new target texture
+		mDefferedBuffer->AddTexture(FORMAT_RGBA);
+		mDefferedBuffer->AddTexture(FORMAT_RGBA); //Bloom map
+		mDefferedBuffer->Create();
+	}
 }
 
 void Engine::CameraComponent::copyTo(Engine::IGameObjectComponent* dest) {
@@ -123,7 +144,15 @@ void Engine::CameraComponent::onPreRender(Engine::Renderer* pipeline) {
 }
 
 void Engine::CameraComponent::ResizeTarget(uint32_t Width, uint32_t Height) {
-	mGBuffer->SetSize(Width, Height);
+
+	if (Width == TargetWidth && Height == TargetHeight)
+		return;
+
+	TargetWidth = Width;
+	TargetHeight = Height;
+
+	if (mGBuffer != nullptr)
+		mGBuffer->SetSize(Width, Height);
 	if(mDefferedBuffer != nullptr)
 		mDefferedBuffer->SetSize(Width, Height);
 }

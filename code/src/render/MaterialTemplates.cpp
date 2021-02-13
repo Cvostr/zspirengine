@@ -134,10 +134,17 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
         distortion_texture_prop->prop_identifier = "t_distortion"; //Identifier to save
         distortion_texture_prop->start_offset = 4;
 
+        TextureMaterialShaderProperty* normal_texture_prop =
+            static_cast<TextureMaterialShaderProperty*>(water_group->addProperty(MATSHPROP_TYPE_TEXTURE));
+        normal_texture_prop->slotToBind = 2;
+        normal_texture_prop->prop_caption = "Normal"; //Set caption in Inspector
+        normal_texture_prop->prop_identifier = "t_normal"; //Identifier to save
+        normal_texture_prop->start_offset = 8;
+
         MaterialShaderProperty* distortion_factor_prop = (water_group->addProperty(MATSHPROP_TYPE_FLOAT));
         distortion_factor_prop->prop_caption = "Distort factor";
         distortion_factor_prop->prop_identifier = "f_distfactor"; //Identifier to save
-        distortion_factor_prop->start_offset = 8;
+        distortion_factor_prop->start_offset = 12;
 
         MaterialShaderProperty* diff_color_prop = (water_group->addProperty(MATSHPROP_TYPE_COLOR));
         diff_color_prop->prop_caption = "Color"; //Set caption in Inspector
