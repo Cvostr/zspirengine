@@ -89,24 +89,6 @@ void ZSpireEngine::loadGame(){
 
     game_data->world = new Engine::World();
 
-
-    switch(this->desc->game_perspective){
-        case PERSP_2D:{ //2D project
-
-            game_data->world->getCameraPtr()->setProjectionType(ZSCAMERA_PROJECTION_ORTHOGONAL);
-            game_data->world->getCameraPtr()->setPosition(Vec3(0,0,0));
-            game_data->world->getCameraPtr()->setFront(Vec3(0,0,1));
-            break;
-        }
-        case PERSP_3D:{ //3D project
-            game_data->world->getCameraPtr()->setProjectionType(ZSCAMERA_PROJECTION_PERSPECTIVE);
-            game_data->world->getCameraPtr()->setPosition(Vec3(0,0,0));
-            game_data->world->getCameraPtr()->setFront(Vec3(0,0,1));
-            game_data->world->getCameraPtr()->setZplanes(1, 2000);
-            break;
-        }
-    }
-
     Loader::start();
     Loader::setBlobRootDirectory(this->desc->blob_root_path);
     //Load all resources

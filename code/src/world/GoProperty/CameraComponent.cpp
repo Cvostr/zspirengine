@@ -71,25 +71,6 @@ void Engine::CameraComponent::loadPropertyFromMemory(const char* data, GameObjec
 	readBinaryValue(&mIsMainCamera, data + offset, offset);
 	readBinaryValue(&mCullFaceDirection, data + offset, offset);
 
-	if(!mIsMainCamera)
-		UpdateTextureResource();
-	else
-	{
-		mGBuffer = allocFramebuffer(TargetWidth, TargetHeight);
-		mGBuffer->AddDepth();
-		mGBuffer->AddTexture(FORMAT_RGBA); //Diffuse map
-		mGBuffer->AddTexture(FORMAT_RGB16F); //Normal map
-		mGBuffer->AddTexture(FORMAT_RGB16F); //Position map
-		mGBuffer->AddTexture(FORMAT_RGBA); //Specular map
-		mGBuffer->AddTexture(FORMAT_RGBA); //Masks map
-		mGBuffer->Create();
-
-		mDefferedBuffer = allocFramebuffer(TargetWidth, TargetHeight);
-		//and bind new target texture
-		mDefferedBuffer->AddTexture(FORMAT_RGBA);
-		mDefferedBuffer->AddTexture(FORMAT_RGBA); //Bloom map
-		mDefferedBuffer->Create();
-	}
 }
 
 void Engine::CameraComponent::copyTo(Engine::IGameObjectComponent* dest) {
@@ -126,21 +107,40 @@ void Engine::CameraComponent::savePropertyToStream(ZsStream* stream, GameObject*
 }
 
 void Engine::CameraComponent::onPreRender(Engine::Renderer* pipeline) {
-	pipeline->addCamera(this);
-
 	TransformProperty* transform = go_link.updLinkPtr()->getTransformProperty();
-
-	mCameraPos = transform->abs_translation;
 
 	float yaw = transform->abs_rotation.Y;
 	float pitch = transform->abs_rotation.X;
 
+	mCameraPos = transform->abs_translation;
 	mCameraFront.X = cosf(DegToRad(yaw)) * cosf(DegToRad(pitch));
 	mCameraFront.Y = -sinf(DegToRad(pitch));
 	mCameraFront.Z = sinf(DegToRad(yaw)) * cosf(DegToRad(pitch));
 	mCameraFront.Normalize();
 
 	updateViewMat();
+
+	if (!FramebuffersCreated()) {
+		if (mIsMainCamera) {
+			mGBuffer = allocFramebuffer(TargetWidth, TargetHeight);
+			mGBuffer->AddDepth();
+			mGBuffer->AddTexture(FORMAT_RGBA); //Diffuse map
+			mGBuffer->AddTexture(FORMAT_RGB16F); //Normal map
+			mGBuffer->AddTexture(FORMAT_RGB16F); //Position map
+			mGBuffer->AddTexture(FORMAT_RGBA); //Specular map
+			mGBuffer->AddTexture(FORMAT_RGBA); //Masks map
+			mGBuffer->Create();
+
+			mDefferedBuffer = allocFramebuffer(TargetWidth, TargetHeight);
+			//and bind new target texture
+			mDefferedBuffer->AddTexture(FORMAT_RGBA);
+			mDefferedBuffer->AddTexture(FORMAT_RGBA); //Bloom map
+			mDefferedBuffer->Create();
+		}
+		else {
+			UpdateTextureResource();
+		}
+	}
 }
 
 void Engine::CameraComponent::ResizeTarget(uint32_t Width, uint32_t Height) {
@@ -170,6 +170,11 @@ void Engine::CameraComponent::bindObjectPropertyToAngel(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetUp(const Vec3 &in)", asMETHOD(CameraComponent, setUp), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetViewScale(const Vec3 &in)", asMETHOD(CameraComponent, setViewScale), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetReflectionPlane(Plane &in)", asMETHOD(CameraComponent, setReflectionPlane), asCALL_THISCALL);
+
+	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetAspectRatio(float)", asMETHOD(CameraComponent, SetAspectRatio), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "float GetAspectRatio()", asMETHOD(CameraComponent, getAspectRatio), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "Vec3 GetUp()", asMETHOD(CameraComponent, GetUp), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "Vec3 GetFront()", asMETHOD(CameraComponent, GetFront), asCALL_THISCALL);
 
 	mgr->RegisterObjectProperty(CAMERA_PROP_TYPE_NAME, "bool AutoViewport", offsetof(CameraComponent, mAutoViewport));
 

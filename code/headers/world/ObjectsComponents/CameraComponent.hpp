@@ -23,6 +23,10 @@ namespace Engine {
 		Framebuffer* mGBuffer;
 		Framebuffer* mDefferedBuffer;
 
+		bool FramebuffersCreated() {
+			return mGBuffer != nullptr && mDefferedBuffer != nullptr;
+		}
+
 		void addPropertyInterfaceToInspector();
 		void onValueChanged(); //Update soud buffer pointer and send source props
 
@@ -45,13 +49,16 @@ namespace Engine {
 			Camera::setUp(up);
 		}
 
+		void SetAspectRatio(float AspectRatio) { mAspectRatio = AspectRatio; }
+		float getAspectRatio() { return mAspectRatio; }
+		Vec3 GetFront() { return mCameraFront; }
+		Vec3 GetUp() { return mCameraUp; }
+
 		void setViewScale(const Vec3& scale) {
 			Camera::setViewScale(scale);
 		}
 
-		void SetViewMask(ViewMask Mask) {
-			mViewMask = Mask; 
-		}
+		void SetViewMask(ViewMask Mask) { mViewMask = Mask; }
 
 		CameraComponent();
 	};

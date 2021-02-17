@@ -20,7 +20,7 @@ namespace Engine {
 
 		void DrawObject(Engine::GameObject* obj);
 		void render2D();
-		void render3D(Engine::Camera* cam);
+		void render3D();
 
 		void Render3DCamera(void* cam_prop);
 

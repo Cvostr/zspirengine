@@ -27,6 +27,7 @@ void Engine::RenderSettings::resetPointers(){
 
 Engine::Renderer::Renderer(){
     game_data->pipeline = this;
+    mMainCameraComponent = nullptr;
 
     this->current_state = PIPELINE_STATE::PIPELINE_STATE_DEFAULT;
     this->cullFaces = false;
@@ -177,15 +178,11 @@ void Engine::Renderer::setLightsToBuffer(){
     lightsBuffer->writeDataBuffered(LIGHT_STRUCT_SIZE * MAX_LIGHTS_AMOUNT + 16, 12, &ambient_L);
 
     lightsBuffer->updateBufferedData();
-    //free lights array
-    this->removeLights();
 }
 
 void Engine::Renderer::render(){
     World* world_ptr = game_data->world;
-
-    //set camera data to transform buffer
-    updateShadersCameraInfo(world_ptr->getCameraPtr());
+    lookForCameras(world_ptr);
     //send lights to uniform buffer
     setLightsToBuffer();
 
@@ -195,7 +192,7 @@ void Engine::Renderer::render(){
             break;
         }
         case PERSP_3D :{
-            render3D(world_ptr->getCameraPtr());
+            render3D();
             break;
         }
     }
@@ -223,9 +220,6 @@ void Engine::GameObject::processObject(Renderer* pipeline) {
     if (mAlive == false || mActive == false) return;
 
     Engine::TransformProperty* transform_prop = this->getTransformProperty();
-    //Call update on every property in objects
-    if (pipeline->allowOnUpdate && pipeline->current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
-        this->onUpdate(static_cast<int>(game_data->time->GetDeltaTime()));
 
     if(pipeline->getRenderSettings()->CurrentViewMask & this->mViewMask)
         pipeline->DrawObject(this);
@@ -451,35 +445,35 @@ void Engine::Renderer::renderGlyph(CharacterGlyph* glyph, int X, int Y, int scal
     Engine::getUiSpriteMesh2D()->Draw();
 }
 
-void Engine::Renderer::addLight(void* light_ptr){
+void Engine::Renderer::lookForCameras(World* world_ptr) {
+    mCameras.clear();
+    mLights.clear();
+    mWinds.clear();
 
-    bool found = false;
-    //Check, if this light already exist
-    for (size_t i = 0; i < mLights.size(); i++) {
-        if (mLights[i] == light_ptr) {
-            found = true;
-            break;
+    mMainCameraComponent = nullptr;
+    for (unsigned int object_i = 0; object_i < world_ptr->objects.size(); object_i++) {
+        GameObject* object = world_ptr->objects[object_i];
+        //Call update on every property in objects
+        if (allowOnUpdate)
+            object->onUpdate(static_cast<int>(game_data->time->GetDeltaTime()));
+
+        CameraComponent* cam = object->getPropertyPtr<CameraComponent>();
+        LightsourceComponent* light = object->getPropertyPtr<LightsourceComponent>();
+
+        if (cam != nullptr) {
+            if (cam->isActive()) {
+                mCameras.push_back(cam);
+                if (cam->mIsMainCamera)
+                    mMainCameraComponent = cam;
+            }
+        }
+
+        if (light != nullptr) {
+            if (light->isActive()) {
+                mLights.push_back(light);
+            }
         }
     }
-    //if not exist then add it to array
-    if(!found)
-        this->mLights.push_back(light_ptr);
-}
-
-void Engine::Renderer::addCamera(void* cam_ptr) {
-    bool found = false;
-
-    for (size_t i = 0; i < mCameras.size(); i++) {
-        if (mCameras[i] == cam_ptr) {
-            found = true;
-            break;
-        }
-    }
-    if(!found)
-        mCameras.push_back(cam_ptr);
-    CameraComponent* CamComponent = (CameraComponent*)(cam_ptr);
-    if (CamComponent->mIsMainCamera)
-        mMainCamera = (Camera*)cam_ptr;
 }
 
 void Engine::Renderer::addWind(void* wind_ptr) {
@@ -494,18 +488,6 @@ void Engine::Renderer::addWind(void* wind_ptr) {
     //if not exist then add it to array
     if (!found)
         this->mWinds.push_back(wind_ptr);
-}
-
-void Engine::Renderer::removeWinds() {
-    mWinds.clear();
-}
-
-void Engine::Renderer::removeLights(){
-    mLights.clear();
-}
-
-void Engine::Renderer::remove—ameras() {
-    mCameras.clear();
 }
 
 void Engine::Renderer::TryRenderShadows(Engine::Camera* cam) {

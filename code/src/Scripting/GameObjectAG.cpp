@@ -38,7 +38,7 @@ void Engine::bindWorldSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(GAME_OBJECT_TYPE_NAME) + "@ getObjectByInd(int)", asMETHOD(Engine::World, getGameObjectByArrayIndex), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, "void removeObject(GameObject@)", asMETHOD(Engine::World, removeObject), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(GAME_OBJECT_TYPE_NAME) + "@ AddFromPrefab(PrefabResource@)", asMETHODPR(Engine::World, addObjectsFromPrefab, (PrefabResource*), GameObject*), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(CAM_TYPE_NAME) + "@ getCamera()", asMETHOD(Engine::World, getCameraPtr), asCALL_THISCALL);
+	//mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(CAM_TYPE_NAME) + "@ getCamera()", asMETHOD(Engine::World, getCameraPtr), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(GAME_OBJECT_TYPE_NAME) + "@ RayTestFirstObject(Vec3, Vec3, float)", asMETHOD(Engine::World, RayTestFirstObject), asCALL_THISCALL);
 
 	mgr->RegisterObjectProperty(GAME_OBJECT_TYPE_NAME, "World@ world", offsetof(Engine::GameObject, mWorld));

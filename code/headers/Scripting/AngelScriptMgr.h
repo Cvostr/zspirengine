@@ -44,7 +44,7 @@
 #define RIGIDBODY_PROP_TYPE_NAME "Rigidbody"
 #define COLLIDER_PROP_TYPE_NAME "Collider"
 #define SHADOWCAST_PROP_TYPE_NAME "ShadowCaster"
-#define CAMERA_PROP_TYPE_NAME "Camera"
+#define CAMERA_PROP_TYPE_NAME "CameraComponent"
 
 #define AG_STRING 67108876
 #define AG_VECTOR3 67108881

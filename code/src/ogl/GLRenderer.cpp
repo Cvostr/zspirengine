@@ -101,61 +101,17 @@ void Engine::GLRenderer::render2D() {
     processObjects(world_ptr);
 }
 
-void Engine::GLRenderer::render3D(Engine::Camera* cam) {
+void Engine::GLRenderer::render3D() {
     World* world_ptr = game_data->world;
     Engine::Window* win = engine_ptr->GetWindow();
-
+    //Render shadows, first
+    TryRenderShadows(mMainCamera);
     //render cameras
     for (unsigned int cam_i = 0; cam_i < mCameras.size(); cam_i++) {
         Render3DCamera(mCameras[cam_i]);
     }
 
-    setFrontFace(CCF_DIRECTION_CCW);
-    updateShadersCameraInfo(cam);
-
-    //Render shadows, first
-    TryRenderShadows(cam);
-
-    render_settings.CurrentViewMask = 0xFFFFFFFFFFFFFFFF;
-    this->mMainCamera = cam;
-    {
-        //Bind Geometry Buffer to make Deferred Shading
-        ((GLframebuffer*)gbuffer)->bind();
-        setClearColor(0, 0, 0, 0);
-        ClearFBufferGL(true, true);
-        setFullscreenViewport(win->GetWindowWidth(), win->GetWindowHeight());
-        {
-            //Render Skybox
-            setDepthState(false);
-            setBlendingState(false);
-            setFaceCullState(false);
-            TryRenderSkybox();
-        }
-        glEnablei(GL_BLEND, 0);
-        glBlendFunci(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0);
-        {
-            //Render World
-            setDepthState(true);
-            setFaceCullState(true);
-            //Render whole world
-            processObjects(world_ptr);
-        }
-    }
-
-    //Process Deffered lights
-    {
-        ((GLframebuffer*)df_light_buffer)->bind();
-        ClearFBufferGL(true, false); //Clear screen
-        //Disable depth rendering to draw plane correctly
-        setDepthState(false);
-        setFaceCullState(false);
-        ((GLframebuffer*)gbuffer)->bindTextures(10); //Bind gBuffer textures
-        deffered_light->Use(); //use deffered shader
-        Engine::getPlaneMesh2D()->Draw(); //Draw screen
-    }
-
-    //effect->Compute();
-
+    setFullscreenViewport(win->GetWindowWidth(), win->GetWindowHeight());
     //Render ALL UI
     {
         ((GLframebuffer*)ui_buffer)->bind();
@@ -166,14 +122,18 @@ void Engine::GLRenderer::render3D(Engine::Camera* cam) {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         renderUI();
     }
+    if (mMainCameraComponent != nullptr) {
+        GLframebuffer* MainCamDefferedFB = static_cast<GLframebuffer*>(
+            static_cast<Engine::CameraComponent*>(mMainCameraComponent)->mDefferedBuffer);
 
-    //Draw result into main buffer
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        ((GLframebuffer*)df_light_buffer)->bindTextures(0);
-        ((GLframebuffer*)ui_buffer)->bindTextures(1);
-        final_shader->Use();
-        Engine::getPlaneMesh2D()->Draw(); //Draw screen
+        //Draw result into main buffer
+        if(MainCamDefferedFB){
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            MainCamDefferedFB->bindTextures(0);
+            ((GLframebuffer*)ui_buffer)->bindTextures(1);
+            final_shader->Use();
+            Engine::getPlaneMesh2D()->Draw(); //Draw screen
+        }
     }
 }
 
@@ -188,11 +148,20 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
 
     Camera* _cam = (Camera*)cc;
 
-    cc->UpdateTextureResource();
-    Texture* Texture = cc->mTarget->texture_ptr;
+    if (!cc->mIsMainCamera) {
+        cc->UpdateTextureResource();
+        Texture* Texture = cc->mTarget->texture_ptr;
 
-    if(cc->mAutoViewport)
-        _cam->setViewport(Texture->GetWidth(), Texture->GetHeight());
+        if (cc->mAutoViewport)
+            _cam->setViewport(Texture->GetWidth(), Texture->GetHeight());
+    }
+    else {
+        mMainCamera = _cam;
+        mMainCameraComponent = cc;
+        Engine::Window* win = engine_ptr->GetWindow();
+        cc->ResizeTarget(win->GetWindowWidth(), win->GetWindowHeight());
+        _cam->setViewport(win->GetWindowWidth(), win->GetWindowHeight());
+    }
 
     ZSVIEWPORT vp = _cam->getViewport();
 
@@ -200,9 +169,9 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
 
     updateShadersCameraInfo(_cam);
     World* world_ptr = game_data->world;
-    Engine::Window* win = engine_ptr->GetWindow();
+    
 
-    {
+    if(cc->FramebuffersCreated()){
         //Bind Geometry Buffer to make Deferred Shading
         ((GLframebuffer*)cc->mGBuffer)->bind();
         setClearColor(0, 0, 0, 0);
@@ -224,10 +193,10 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
             //Render whole world
             processObjects(world_ptr);
         }
-    }
+    
 
     //Process Deffered lights
-    {
+    
         ((GLframebuffer*)cc->mDefferedBuffer)->bind();
         ClearFBufferGL(true, false); //Clear screen
         //Disable depth rendering to draw plane correctly

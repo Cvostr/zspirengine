@@ -101,12 +101,9 @@ public:
 
     void processObjects(World* world_ptr);
 
-    void addLight(void* light_ptr);
-    void addCamera(void* cam_ptr);
     void addWind(void* wind_ptr);
-    void removeLights();
-    void removeWinds();
-    void remove—ameras();
+
+    void lookForCameras(World* world_ptr);
 
     void TryRenderShadows(Engine::Camera* cam);
     void TryRenderSkybox();
@@ -119,7 +116,7 @@ public:
 
     void render();
     virtual void render2D(){}
-    virtual void render3D(Engine::Camera* cam){}
+    virtual void render3D(){}
     virtual void DrawObject(Engine::GameObject* obj){}
     void renderShadowDepth(World* world_ptr, unsigned int CascadesNum);
 
@@ -130,6 +127,7 @@ public:
     void destroy();
 
     Engine::Camera* mMainCamera;
+    void* mMainCameraComponent;
 
     explicit Renderer();
     ~Renderer();

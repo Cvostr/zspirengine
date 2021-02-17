@@ -168,8 +168,6 @@ public:
     void call_onStop();
     void call_onScriptChanged();
 
-    Engine::Camera* getCameraPtr();
-    Engine::Camera world_camera;
     //Destroys all data inside
     void clear();
 
@@ -371,8 +369,6 @@ public:
 
     TransformProperty();
 };
-
-void setZcoeff(float coeff);
 
 IGameObjectComponent* allocProperty(PROPERTY_TYPE type);
 
