@@ -1,6 +1,7 @@
 #include "../../../headers/world/tile_properties.h"
 
-#include "../../../headers/world/ObjectsComponents/AudioSourceComponent.hpp"
+#include <world/ObjectsComponents/AudioSourceComponent.hpp>
+#include <world/ObjectsComponents/AudioListenerComponent.hpp>
 #include "../../../headers/world/ObjectsComponents/ZPScriptComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
 #include "../../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
@@ -139,6 +140,10 @@ Engine::IGameObjectComponent* Engine::allocProperty(PROPERTY_TYPE type){
         }
         case PROPERTY_TYPE::GO_PROPERTY_TYPE_CAMERA: {
             _ptr = static_cast<IGameObjectComponent*>(new Engine::CameraComponent);
+            break;
+        }
+        case PROPERTY_TYPE::GO_PROPERTY_TYPE_AUDIO_LISTENER: {
+            _ptr = static_cast<IGameObjectComponent*>(new Engine::AudioListenerComponent);
             break;
         }
     }

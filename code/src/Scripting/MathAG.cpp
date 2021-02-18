@@ -86,6 +86,7 @@ void Engine::bindMathSDK(AGScriptMgr* mgr) {
 	mgr->RegisterGlobalFunction("float ctg(float)", asFUNCTION(ctg), asCALL_CDECL);
 	mgr->RegisterGlobalFunction("float log(float)", asFUNCTION(logf), asCALL_CDECL);
 	mgr->RegisterGlobalFunction("float ln(float)", asFUNCTION(log10f), asCALL_CDECL);
+	mgr->RegisterGlobalFunction("float abs(float)", asFUNCTION(fabsf), asCALL_CDECL);
 	mgr->RegisterGlobalFunction("float rad(float)", asFUNCTION(DegToRad), asCALL_CDECL);
 	mgr->RegisterGlobalFunction("Vec3 cross(const Vec3&in, const Vec3&in)", asFUNCTION(vCross), asCALL_CDECL);
 	mgr->RegisterGlobalFunction("float dot(const Vec3&in, const Vec3&in)", asFUNCTION(vDot), asCALL_CDECL);

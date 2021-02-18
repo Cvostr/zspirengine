@@ -43,6 +43,7 @@ bool Engine::MeshProperty::HasBones() {
             return false;
     else
         return false;
+    return false;
 }
 
 void Engine::MeshProperty::onPreRender(Engine::Renderer* pipeline) {

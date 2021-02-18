@@ -54,12 +54,11 @@ namespace Engine{
             Mat4 mReflectionMatrix; //Reflection matrix
             ZSVIEWPORT mViewport; //Camera viewport
 
+            bool mAutoAspectRatio;
             float mAspectRatio;
             float mFOV; //Field of view
             float mNearZ; //Nearest Z occlusion plane
             float mFarZ; //Fast Z occlusion plane
-
-            bool isAlListenerCamera;
 
             Vec3 getCameraPosition() { return mCameraPos; }
             Vec3 getCameraUpVec() { return mCameraUp; }

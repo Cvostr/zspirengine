@@ -8,7 +8,6 @@ Engine::CameraComponent::CameraComponent() {
 	Camera();
 	mIsMainCamera = true;
 	mViewMask = 0xFFFFFFFFFFFFFFFF;
-	mAutoViewport = true;
 	mCullFaceDirection = CCF_DIRECTION_CCW;
 
 	mGBuffer = nullptr;
@@ -26,16 +25,17 @@ void Engine::CameraComponent::UpdateTextureResource() {
 	TextureResource* TargetResource = game_data->resources->getTextureByLabel(TargetResourceName);
 	//Check, if target texture resource is changed
 	if (mTarget != TargetResource) {
+		TargetResource->loadAndWait();
 		//Target is changed
 		mTarget = TargetResource;
 		//Get sizes of new target
-		uint32_t newWidth = mTarget->texture_ptr->GetWidth();
-		uint32_t newHeight = mTarget->texture_ptr->GetHeight();
+		TargetWidth = mTarget->texture_ptr->GetWidth();
+		TargetHeight = mTarget->texture_ptr->GetHeight();
 		//If deffered buffer is already created - delete it
 		if (mDefferedBuffer != nullptr)
 			delete mDefferedBuffer;
 		//Allocate new Deffered buffer
-		mDefferedBuffer = allocFramebuffer(newWidth, newHeight);
+		mDefferedBuffer = allocFramebuffer(TargetWidth, TargetHeight);
 		//and bind new target texture
 		mDefferedBuffer->AddTexture(mTarget->texture_ptr);
 		mDefferedBuffer->AddTexture(FORMAT_RGBA); //Bloom map
@@ -44,7 +44,7 @@ void Engine::CameraComponent::UpdateTextureResource() {
 		//if gbuffer isn't created
 		if (mGBuffer == nullptr) {
 			//then create one
-			mGBuffer = allocFramebuffer(newWidth, newHeight);
+			mGBuffer = allocFramebuffer(TargetWidth, TargetHeight);
 			mGBuffer->AddDepth();
 			mGBuffer->AddTexture(FORMAT_RGBA); //Diffuse map
 			mGBuffer->AddTexture(FORMAT_RGB16F); //Normal map
@@ -55,7 +55,7 @@ void Engine::CameraComponent::UpdateTextureResource() {
 		}
 		//if already created, then just resize it
 		else
-			mGBuffer->SetSize(newWidth, newHeight);
+			mGBuffer->SetSize(TargetWidth, TargetHeight);
 	}
 }
 
@@ -171,14 +171,16 @@ void Engine::CameraComponent::bindObjectPropertyToAngel(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetViewScale(const Vec3 &in)", asMETHOD(CameraComponent, setViewScale), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetReflectionPlane(Plane &in)", asMETHOD(CameraComponent, setReflectionPlane), asCALL_THISCALL);
 
+	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetAutoAspectRatio(bool)", asMETHOD(CameraComponent, SetAutoAspectRatio), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetAspectRatio(float)", asMETHOD(CameraComponent, SetAspectRatio), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "float GetAspectRatio()", asMETHOD(CameraComponent, getAspectRatio), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "Vec3 GetUp()", asMETHOD(CameraComponent, GetUp), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "Vec3 GetFront()", asMETHOD(CameraComponent, GetFront), asCALL_THISCALL);
 
-	mgr->RegisterObjectProperty(CAMERA_PROP_TYPE_NAME, "bool AutoViewport", offsetof(CameraComponent, mAutoViewport));
+	
 
 
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetViewMask(uint64)", asMETHOD(CameraComponent, SetViewMask), asCALL_THISCALL);
 
+	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void UpdateProjectionMatrix()", asMETHOD(CameraComponent, UpdateProjectionMatrix), asCALL_THISCALL);
 }

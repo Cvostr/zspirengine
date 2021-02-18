@@ -1,8 +1,8 @@
 #include "../../headers/game.h"
-#include "../../headers/render/Texture.h"
+#include <render/Texture.h>
 
-#include "../../headers/ogl/GLTexture.hpp"
-#include "../../headers/vulkan/VKTexture.hpp"
+#include <ogl/GLTexture.hpp>
+#include <vulkan/VKTexture.hpp>
 
 extern ZSpireEngine* engine_ptr;
 //Hack to support resources

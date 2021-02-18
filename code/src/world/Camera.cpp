@@ -14,12 +14,11 @@ Engine::Camera::Camera() : mCameraPos(0),
                            mFOV(45),
                            mViewport(0, 0, 640, 480),
                            mAspectRatio(640.f / 480.f),
+                            mAutoAspectRatio(true),
                             mReflectionMatrix(1)
 {
     updateProjectionMat();
     //updateViewMat();
-
-       isAlListenerCamera = false;
 }
 
 void Engine::Camera::setFOV(float FOV){
@@ -40,8 +39,8 @@ void Engine::Camera::setProjectionType(ÑameraProjectionType type){
 
 void Engine::Camera::setViewport(ZSVIEWPORT viewport){
     this->mViewport = viewport;
-
-    mAspectRatio = static_cast<float>((mViewport.endX - mViewport.startX)) / static_cast<float>(mViewport.endY - mViewport.startY);
+    if(mAutoAspectRatio)
+        mAspectRatio = static_cast<float>((mViewport.endX - mViewport.startX)) / static_cast<float>(mViewport.endY - mViewport.startY);
 
     updateProjectionMat();
 }
@@ -79,10 +78,6 @@ void Engine::Camera::updateProjectionMat(){
 }
 
 void Engine::Camera::updateViewMat(){
-    if(isAlListenerCamera){
-        game_data->oal_manager->setListenerPos(mCameraPos);
-        game_data->oal_manager->setListenerOri(mCameraFront, mCameraUp);
-    }
     mViewMatrix = mReflectionMatrix * getScaleMat(mViewScale) *
         matrixLookAt(mCameraPos, (mCameraPos + mCameraFront), mCameraUp);
 }

@@ -122,6 +122,7 @@ public:
     bool IsRenderTarget;
 
     void load();
+    void loadAndWait();
     void Use(int slot);
     void Release();
 

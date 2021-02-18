@@ -102,7 +102,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\LIBS;..\LIBS\BULLET;$(IncludePath)</IncludePath>
+    <IncludePath>..\LIBS;..\LIBS\BULLET;code\headers;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -306,6 +306,7 @@
     <ClCompile Include="code\src\vulkan\ZSVulkanSwapchain.cpp" />
     <ClCompile Include="code\src\world\GameObject.cpp" />
     <ClCompile Include="code\src\world\GoProperty\AnimationComponent.cpp" />
+    <ClCompile Include="code\src\world\GoProperty\AudioListenerComponent.cpp" />
     <ClCompile Include="code\src\world\GoProperty\AudioSourceComponent.cpp" />
     <ClCompile Include="code\src\world\GoProperty\CameraComponent.cpp" />
     <ClCompile Include="code\src\world\GoProperty\CharacterController.cpp" />
@@ -420,6 +421,7 @@
     <ClInclude Include="code\headers\vulkan\ZSVulkanSampler.hpp" />
     <ClInclude Include="code\headers\vulkan\ZSVulkanSwapchain.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\AnimationComponent.hpp" />
+    <ClInclude Include="code\headers\world\ObjectsComponents\AudioListenerComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\AudioSourceComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\CameraComponent.hpp" />
     <ClInclude Include="code\headers\world\ObjectsComponents\CharacterController.hpp" />

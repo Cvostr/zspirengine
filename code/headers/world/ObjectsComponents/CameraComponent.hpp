@@ -3,7 +3,7 @@
 #include "../World.hpp"
 #include "../Camera.hpp"
 #include "../../render/Framebuffer.hpp"
-#include "../../../headers/engine/Resources.hpp"
+#include <engine/Resources.hpp>
 
 namespace Engine {
 
@@ -15,7 +15,6 @@ namespace Engine {
 		uint32_t TargetHeight;
 	public:
 		bool mIsMainCamera;
-		bool mAutoViewport;
 		ViewMask mViewMask;
 		CameraCullFaceDirection mCullFaceDirection;
 		TextureResource* mTarget;
@@ -48,9 +47,18 @@ namespace Engine {
 		void setUp(const Vec3& up) {
 			Camera::setUp(up);
 		}
-
-		void SetAspectRatio(float AspectRatio) { mAspectRatio = AspectRatio; }
-		float getAspectRatio() { return mAspectRatio; }
+		void UpdateProjectionMatrix() {
+			Camera::updateProjectionMat();
+		}
+		void SetAutoAspectRatio(bool Auto) { mAutoAspectRatio = Auto; }
+		void SetAspectRatio(float AspectRatio) { 
+			mAspectRatio = AspectRatio;
+			mAutoAspectRatio = false;
+			UpdateProjectionMatrix();
+		}
+		float getAspectRatio() { 
+			return mAspectRatio; 
+		}
 		Vec3 GetFront() { return mCameraFront; }
 		Vec3 GetUp() { return mCameraUp; }
 

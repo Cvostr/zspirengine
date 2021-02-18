@@ -1,4 +1,4 @@
-#include "../../headers/engine/Resources.hpp"
+#include <engine/Resources.hpp>
 
 Engine::TextureResource::TextureResource() :
     texture_ptr(nullptr)
@@ -34,6 +34,15 @@ void Engine::TextureResource::load() {
             delete this->request;
             //Set state to "Loaded"
             this->resource_state = RESOURCE_STATE::STATE_LOADED;
+        }
+    }
+}
+
+void Engine::TextureResource::loadAndWait() {
+    if (this->resource_state == RESOURCE_STATE::STATE_NOT_LOADED) {
+        load();
+        while (this->resource_state != RESOURCE_STATE::STATE_LOADED) {
+            load();
         }
     }
 }

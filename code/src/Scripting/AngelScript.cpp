@@ -1,5 +1,5 @@
-#include "../../headers/Scripting/AngelScript.hpp"
-#include "../../headers/game.h"
+#include <Scripting/AngelScript.hpp>
+#include <game.h>
 
 using namespace Engine;
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "../World.hpp"
+#include <world/World.hpp>
 #include "../../engine/Resources.hpp"
 #include "../../audio/SoundSource.hpp"
 #include "../../game.h"

@@ -38,7 +38,7 @@ bool Engine::OALManager::initAL() {
 		Logger::Log(LogType::LOG_TYPE_ERROR) << "Can't initialize\n";
 	}
 
-	std::cout << "AL: OpenAL successfully initialized!" << std::endl;
+	Logger::Log(LogType::LOG_TYPE_INFO) << "AL: OpenAL successfully initialized!\n";
 	//Set default parameters
 	setListenerPos(Vec3(0.0f, 0.0f, 0.0f));
 	setListenerOri(Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f, 1.0f, 0.0f));

@@ -152,8 +152,7 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
         cc->UpdateTextureResource();
         Texture* Texture = cc->mTarget->texture_ptr;
 
-        if (cc->mAutoViewport)
-            _cam->setViewport(Texture->GetWidth(), Texture->GetHeight());
+        _cam->setViewport(Texture->GetWidth(), Texture->GetHeight());
     }
     else {
         mMainCamera = _cam;
@@ -258,7 +257,6 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
 }
 
 void Engine::GLRenderer::OnUpdateWindowSize(int W, int H) {
-    setFullscreenViewport(W, H);
 
     if (engine_ptr->desc->game_perspective == PERSP_3D) {
         gbuffer->SetSize(W, H);
