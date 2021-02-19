@@ -2,22 +2,22 @@
 
 #include <world/ObjectsComponents/AudioSourceComponent.hpp>
 #include <world/ObjectsComponents/AudioListenerComponent.hpp>
-#include "../../../headers/world/ObjectsComponents/ZPScriptComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/SkyboxComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/TerrainComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/MaterialComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/MeshComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/AnimationComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/NodeComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/ColliderComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/CharacterController.hpp"
-#include "../../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/TriggerComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/WindZoneComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/ParticleEmitterComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/CameraComponent.hpp"
+#include <world/ObjectsComponents/ZPScriptComponent.hpp>
+#include <world/ObjectsComponents/LightSourceComponent.hpp>
+#include <world/ObjectsComponents/ShadowCasterComponent.hpp>
+#include <world/ObjectsComponents/SkyboxComponent.hpp>
+#include <world/ObjectsComponents/TerrainComponent.hpp>
+#include <world/ObjectsComponents/MaterialComponent.hpp>
+#include <world/ObjectsComponents/MeshComponent.hpp>
+#include <world/ObjectsComponents/AnimationComponent.hpp>
+#include <world/ObjectsComponents/NodeComponent.hpp>
+#include <world/ObjectsComponents/ColliderComponent.hpp>
+#include <world/ObjectsComponents/CharacterController.hpp>
+#include <world/ObjectsComponents/RigidbodyComponent.hpp>
+#include <world/ObjectsComponents/TriggerComponent.hpp>
+#include <world/ObjectsComponents/WindZoneComponent.hpp>
+#include <world/ObjectsComponents/ParticleEmitterComponent.hpp>
+#include <world/ObjectsComponents/CameraComponent.hpp>
 
 extern ZSGAME_DATA* game_data;
 

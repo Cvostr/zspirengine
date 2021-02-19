@@ -1,8 +1,8 @@
-#include "../../headers/render/Mesh.hpp"
-#include "../../headers/game.h"
+#include <render/Mesh.hpp>
+#include <game.h>
 
-#include "../../headers/ogl/GLMesh.hpp"
-#include "../../headers/vulkan/VKMesh.hpp"
+#include <ogl/GLMesh.hpp>
+#include <vulkan/VKMesh.hpp>
 
 #define SPHERE_SECTORS 36
 #define SPHERE_STACKS 18
@@ -12,10 +12,10 @@ extern ZSpireEngine* engine_ptr;
 
 static ZSVERTEX plane_verts[] = {
     // positions              // texture coords
-    ZSVERTEX(Vec3(1.0f,  1.0f, 0.0f),		Vec2(1.0f, 1.0f)),   // top right
-    ZSVERTEX(Vec3(1.0f, -1.0f, 0.0f),		Vec2(1.0f, 0.0f)),   // bottom right
-    ZSVERTEX(Vec3(-1.0f, -1.0f, 0.0f),		Vec2(0.0f, 0.0f)),   // bottom left
-    ZSVERTEX(Vec3(-1.0f,  1.0f, 0.0f),		Vec2(0.0f, 1.0f))   // top left
+    ZSVERTEX(Vec3(1.0f,  1.0f, 0.0f),   Vec2(1.0f, 1.0f),   Vec3(0, 0, 1)),   // top right
+    ZSVERTEX(Vec3(1.0f, -1.0f, 0.0f),   Vec2(1.0f, 0.0f),   Vec3(0, 0, 1)),   // bottom right
+    ZSVERTEX(Vec3(-1.0f, -1.0f, 0.0f),  Vec2(0.0f, 0.0f),   Vec3(0, 0, 1)),   // bottom left
+    ZSVERTEX(Vec3(-1.0f,  1.0f, 0.0f),  Vec2(0.0f, 1.0f),   Vec3(0, 0, 1))   // top left
 };
 
 static ZSVERTEX ui_sprite_vertices[] = {
@@ -164,6 +164,7 @@ void Engine::setupDefaultMeshes() {
 
     picked_mesh = nullptr;
 
+    processTangentSpace(plane_verts, plane_inds, 6);
     plane2Dmesh->Init(); //Initialize mesh for GL
     plane2Dmesh->setMeshData(plane_verts, plane_inds, 4, 6); //Send plane data
 

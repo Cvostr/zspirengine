@@ -1,4 +1,4 @@
-#include "../../../headers/world/World.hpp"
+#include <world/World.hpp>
 
 
 Engine::LabelProperty::LabelProperty() {

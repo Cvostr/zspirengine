@@ -1,5 +1,5 @@
-#include "../../../headers/world/ObjectsComponents/ColliderComponent.hpp"
-#include "../../../headers/game.h"
+#include <world/ObjectsComponents/ColliderComponent.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

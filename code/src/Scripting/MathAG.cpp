@@ -66,18 +66,7 @@ void Engine::bindMathSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectBehaviour(PLANE_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(const Vec3& in, float)", asFUNCTION(CreatePlane), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(PLANE_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(const Vec3& in, const Vec3 &in)", asFUNCTION(CreatePlaneI), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(PLANE_TYPE_NAME, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(del_as_obj_T<Plane>), asCALL_CDECL_OBJLAST);
-	//mgr->RegisterObjectMethod(PLANE_TYPE_NAME, "RGBAColor &opAssign(RGBAColor &in)", asMETHODPR(RGBAColor, operator =, (RGBAColor), RGBAColor&), asCALL_THISCALL);
-
-	//Bind Camera
-	mgr->RegisterObjectType(CAM_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
-	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "Vec3 pos", offsetof(Engine::Camera, mCameraPos));
-	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "Vec3 front", offsetof(Engine::Camera, mCameraFront));
-	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "Vec3 up", offsetof(Engine::Camera, mCameraUp));
-	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float FOV", offsetof(Engine::Camera, mFOV));
-	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float nearZ", offsetof(Engine::Camera, mNearZ));
-	mgr->RegisterObjectProperty(CAM_TYPE_NAME, "float farZ", offsetof(Engine::Camera, mFarZ));
-	mgr->RegisterObjectMethod(CAM_TYPE_NAME, "void updateViewMat()", asMETHOD(Engine::Camera, updateViewMat), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(CAM_TYPE_NAME, "void updateProjectionMat()", asMETHOD(Engine::Camera, updateProjectionMat), asCALL_THISCALL);
+	
 	//Base Math methods
 	mgr->RegisterGlobalFunction("float sqrt(float)", asFUNCTION(sqrtf), asCALL_CDECL);
 	mgr->RegisterGlobalFunction("float sin(float)", asFUNCTION(sinf), asCALL_CDECL);

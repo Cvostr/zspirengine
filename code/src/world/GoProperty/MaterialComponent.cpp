@@ -1,5 +1,5 @@
-#include "../../../headers/world/ObjectsComponents/MaterialComponent.hpp"
-#include "../../../headers/game.h"
+#include <world/ObjectsComponents/MaterialComponent.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

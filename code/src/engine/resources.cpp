@@ -320,7 +320,7 @@ unsigned int Engine::ResourceManager::getResourcesSize(){
 }
 
 ZSPIRE::LocString* Engine::ResourceManager::getStringByStrId(std::string strid) {
-    unsigned int ls_resources = this->mLSResources.size();
+    uint32_t ls_resources = static_cast<uint32_t>(this->mLSResources.size());
 
     for (unsigned int i = 0; i < ls_resources; i++) {
         ZSPIRE::LocaleStringsFile* LSF = mLSResources[i]->mLSFile;

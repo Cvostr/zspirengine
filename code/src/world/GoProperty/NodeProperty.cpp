@@ -1,4 +1,4 @@
-#include "../../../headers/world/ObjectsComponents/NodeComponent.hpp"
+#include <world/ObjectsComponents/NodeComponent.hpp>
 
 Engine::NodeProperty::NodeProperty() : scale (1.f)
 {

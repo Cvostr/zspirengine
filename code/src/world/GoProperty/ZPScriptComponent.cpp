@@ -1,6 +1,6 @@
-#include "../../../headers/world/ObjectsComponents/ZPScriptComponent.hpp"
-#include "../../../headers/misc/misc.h"
-#include "../../../headers/game.h"
+#include <world/ObjectsComponents/ZPScriptComponent.hpp>
+#include <misc/misc.h>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

@@ -1,5 +1,5 @@
-#include "../../../headers/world/ObjectsComponents/CameraComponent.hpp"
-#include "../../../headers/game.h"
+#include <world/ObjectsComponents/CameraComponent.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 
@@ -176,8 +176,6 @@ void Engine::CameraComponent::bindObjectPropertyToAngel(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "float GetAspectRatio()", asMETHOD(CameraComponent, getAspectRatio), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "Vec3 GetUp()", asMETHOD(CameraComponent, GetUp), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "Vec3 GetFront()", asMETHOD(CameraComponent, GetFront), asCALL_THISCALL);
-
-	
 
 
 	mgr->RegisterObjectMethod(CAMERA_PROP_TYPE_NAME, "void SetViewMask(uint64)", asMETHOD(CameraComponent, SetViewMask), asCALL_THISCALL);

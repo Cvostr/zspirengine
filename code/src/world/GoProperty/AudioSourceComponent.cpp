@@ -1,4 +1,4 @@
-#include "../../../headers/world/ObjectsComponents/AudioSourceComponent.hpp"
+#include <world/ObjectsComponents/AudioSourceComponent.hpp>
 
 extern ZSGAME_DATA* game_data;
 

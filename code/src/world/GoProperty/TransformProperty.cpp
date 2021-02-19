@@ -1,5 +1,5 @@
-#include "../../../headers/world/World.hpp"
-#include "../../../headers/world/ObjectsComponents/PhysicalComponent.hpp"
+#include <world/World.hpp>
+#include <world/ObjectsComponents/PhysicalComponent.hpp>
 
 
 Engine::TransformProperty::TransformProperty() : scale(1.f)

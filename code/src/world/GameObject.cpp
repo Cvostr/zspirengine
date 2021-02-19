@@ -1,16 +1,16 @@
-#include "../../headers/world/World.hpp"
+#include <world/World.hpp>
 
-#include "../../headers/misc/misc.h"
-#include "../../headers/world/ObjectsComponents/ZPScriptComponent.hpp"
-#include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
-#include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
-#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
-#include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
-#include "../../headers/world/ObjectsComponents/NodeComponent.hpp"
-#include "../../headers/world/ObjectsComponents/ColliderComponent.hpp"
-#include "../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
-#include "../../headers/world/ObjectsComponents/CharacterController.hpp"
-#include "../../headers/world/ObjectsComponents/TriggerComponent.hpp"
+#include <misc/misc.h>
+#include <world/ObjectsComponents/ZPScriptComponent.hpp>
+#include <world/ObjectsComponents/LightSourceComponent.hpp>
+#include <world/ObjectsComponents/TerrainComponent.hpp>
+#include <world/ObjectsComponents/MeshComponent.hpp>
+#include <world/ObjectsComponents/MaterialComponent.hpp>
+#include <world/ObjectsComponents/NodeComponent.hpp>
+#include <world/ObjectsComponents/ColliderComponent.hpp>
+#include <world/ObjectsComponents/RigidbodyComponent.hpp>
+#include <world/ObjectsComponents/CharacterController.hpp>
+#include <world/ObjectsComponents/TriggerComponent.hpp>
 
 Engine::GameObjectLink::GameObjectLink() : ptr(nullptr),
                                            world_ptr(nullptr)

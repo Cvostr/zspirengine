@@ -1,4 +1,4 @@
-#include "../../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
+#include <world/ObjectsComponents/LightSourceComponent.hpp>
 
 Engine::LightsourceComponent::LightsourceComponent() : light_type(LIGHTSOURCE_TYPE::LIGHTSOURCE_TYPE_DIRECTIONAL),
                                                      intensity(1.f),

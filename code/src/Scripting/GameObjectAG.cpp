@@ -1,16 +1,16 @@
-#include "../../headers/Scripting/AngelScriptMgr.h"
-#include "../../headers/world/World.hpp"
+#include <Scripting/AngelScriptMgr.h>
+#include <world/World.hpp>
 
-#include "../../headers/world/ObjectsComponents/AudioSourceComponent.hpp"
-#include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
-#include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
-#include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
-#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
-#include "../../headers/world/ObjectsComponents/AnimationComponent.hpp"
-#include "../../headers/world/ObjectsComponents/CharacterController.hpp"
-#include "../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
-#include "../../headers/world/ObjectsComponents/ColliderComponent.hpp"
-#include "../../headers/world/ObjectsComponents/CameraComponent.hpp"
+#include <world/ObjectsComponents/AudioSourceComponent.hpp>
+#include <world/ObjectsComponents/LightSourceComponent.hpp>
+#include <world/ObjectsComponents/ShadowCasterComponent.hpp>
+#include <world/ObjectsComponents/MaterialComponent.hpp>
+#include <world/ObjectsComponents/MeshComponent.hpp>
+#include <world/ObjectsComponents/AnimationComponent.hpp>
+#include <world/ObjectsComponents/CharacterController.hpp>
+#include <world/ObjectsComponents/RigidbodyComponent.hpp>
+#include <world/ObjectsComponents/ColliderComponent.hpp>
+#include <world/ObjectsComponents/CameraComponent.hpp>
 
 void Engine::bindGameObjectSDK(AGScriptMgr* mgr) {
 	//Regiter base GameObject
@@ -38,9 +38,7 @@ void Engine::bindWorldSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(GAME_OBJECT_TYPE_NAME) + "@ getObjectByInd(int)", asMETHOD(Engine::World, getGameObjectByArrayIndex), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, "void removeObject(GameObject@)", asMETHOD(Engine::World, removeObject), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(GAME_OBJECT_TYPE_NAME) + "@ AddFromPrefab(PrefabResource@)", asMETHODPR(Engine::World, addObjectsFromPrefab, (PrefabResource*), GameObject*), asCALL_THISCALL);
-	//mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(CAM_TYPE_NAME) + "@ getCamera()", asMETHOD(Engine::World, getCameraPtr), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(WORLD_TYPE_NAME, std::string(GAME_OBJECT_TYPE_NAME) + "@ RayTestFirstObject(Vec3, Vec3, float)", asMETHOD(Engine::World, RayTestFirstObject), asCALL_THISCALL);
-
 	mgr->RegisterObjectProperty(GAME_OBJECT_TYPE_NAME, "World@ world", offsetof(Engine::GameObject, mWorld));
 }
 

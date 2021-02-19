@@ -4,9 +4,11 @@
 #include "../math/Plane.hpp"
 #include "../audio/SoundSource.hpp"
 
-enum ÑameraProjectionType {ZSCAMERA_PROJECTION_NONE,
-                            ZSCAMERA_PROJECTION_ORTHOGONAL,
-                            ZSCAMERA_PROJECTION_PERSPECTIVE};
+enum ÑameraProjectionType {
+    ZSCAMERA_PROJECTION_NONE,
+    ZSCAMERA_PROJECTION_ORTHOGONAL,
+    ZSCAMERA_PROJECTION_PERSPECTIVE
+};
 
 
 enum CameraCullFaceDirection {
@@ -42,11 +44,10 @@ namespace Engine{
     class Camera {
         protected:
             Mat4 mProjectionMatrix; //Calculated Projection matrix
-            Mat4 mUiProjection;
             Mat4 mViewMatrix; //Calculated View matrix
 
         public:
-            ÑameraProjectionType mProjectionType;
+            ÑameraProjectionType mProjectionType; //Type of projection
             Vec3 mCameraPos; //Camera position vector
             Vec3 mCameraUp; //Camera up direction vector
             Vec3 mCameraFront; //Camera front direction vector
@@ -55,7 +56,7 @@ namespace Engine{
             ZSVIEWPORT mViewport; //Camera viewport
 
             bool mAutoAspectRatio;
-            float mAspectRatio;
+            float mAspectRatio; //  Width / Height
             float mFOV; //Field of view
             float mNearZ; //Nearest Z occlusion plane
             float mFarZ; //Fast Z occlusion plane
@@ -86,7 +87,6 @@ namespace Engine{
 
             Mat4 getViewMatrix() { return mViewMatrix; }
             Mat4 getProjMatrix() { return mProjectionMatrix; }
-            Mat4 getUiProjMatrix() { return mUiProjection; }
             
 
             explicit Camera();

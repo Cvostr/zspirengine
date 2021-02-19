@@ -14,11 +14,10 @@ Engine::Camera::Camera() : mCameraPos(0),
                            mFOV(45),
                            mViewport(0, 0, 640, 480),
                            mAspectRatio(640.f / 480.f),
-                            mAutoAspectRatio(true),
-                            mReflectionMatrix(1)
+                           mAutoAspectRatio(true),
+                           mReflectionMatrix(1)
 {
     updateProjectionMat();
-    //updateViewMat();
 }
 
 void Engine::Camera::setFOV(float FOV){
@@ -71,9 +70,6 @@ void Engine::Camera::updateProjectionMat(){
                              0, static_cast<float>(mViewport.endY - mViewport.startY),
             mNearZ, mFarZ);
     }
-    mUiProjection = getOrthogonal(0, static_cast<float>(mViewport.endX - mViewport.startX),
-                            0, static_cast<float>(mViewport.endY - mViewport.startY));
-
     
 }
 

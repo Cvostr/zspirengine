@@ -1,10 +1,10 @@
-#include "../../headers/ogl/GLRenderer.hpp"
-#include "../../headers/game.h"
+#include <ogl/GLRenderer.hpp>
+#include <game.h>
 
-#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
-#include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
-#include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
-#include "../../headers/world/ObjectsComponents/CameraComponent.hpp"
+#include <world/ObjectsComponents/MeshComponent.hpp>
+#include <world/ObjectsComponents/TerrainComponent.hpp>
+#include <world/ObjectsComponents/ShadowCasterComponent.hpp>
+#include <world/ObjectsComponents/CameraComponent.hpp>
 
 extern ZSpireEngine* engine_ptr;
 extern ZSGAME_DATA* game_data;
@@ -246,10 +246,10 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
             ShadowCasterProperty* caster = getRenderSettings()->shadowcaster_obj_ptr->getPropertyPtr<ShadowCasterProperty>();
 
             unsigned int InstNum = caster->mCascadesNum;
-
-            if (bb.GetLongestDistance(mMainCamera->getCameraPosition()) < 20)
-                InstNum = 1;
-
+            if (mMainCamera != nullptr) {
+                if (bb.GetLongestDistance(mMainCamera->getCameraPosition()) < 20)
+                    InstNum = 1;
+            }
             if (castShadows)
                 obj->DrawMeshInstanced(this, InstNum);
         }

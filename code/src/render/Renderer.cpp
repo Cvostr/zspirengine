@@ -1,15 +1,16 @@
-#include "../../headers/render/Renderer.hpp"
-#include "../../headers/engine.h"
-#include "../../headers/game.h"
-#include "../../headers/world/tile_properties.h"
-#include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
-#include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
-#include "../../headers/world/ObjectsComponents/SkyboxComponent.hpp"
-#include "../../headers/world/ObjectsComponents/TerrainComponent.hpp"
-#include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
-#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
-#include "../../headers/world/ObjectsComponents/NodeComponent.hpp"
-#include "../../headers/world/ObjectsComponents/CameraComponent.hpp"
+#include <render/Renderer.hpp>
+#include <engine.h>
+#include <game.h>
+#include <world/tile_properties.h>
+#include <world/ObjectsComponents/LightSourceComponent.hpp>
+#include <world/ObjectsComponents/ShadowCasterComponent.hpp>
+#include <world/ObjectsComponents/SkyboxComponent.hpp>
+#include <world/ObjectsComponents/TerrainComponent.hpp>
+#include <world/ObjectsComponents/MaterialComponent.hpp>
+#include <world/ObjectsComponents/MeshComponent.hpp>
+#include <world/ObjectsComponents/NodeComponent.hpp>
+#include <world/ObjectsComponents/CameraComponent.hpp>
+#include <world/ObjectsComponents/WindZoneComponent.hpp>
 
 extern ZSpireEngine* engine_ptr;
 //Hack to support resources
@@ -365,9 +366,13 @@ void Engine::Renderer::updateShadersCameraInfo(Engine::Camera* cam_ptr){
     transformBuffer->writeData(sizeof (Mat4), sizeof (Mat4), &view);
     transformBuffer->writeData(sizeof (Mat4) * 3, sizeof(Vec3), &cam_pos);
     //Setting UI camera to UI buffer
+
+    uint32_t Width = engine_ptr->GetWindow()->GetWindowWidth();
+    uint32_t Height = engine_ptr->GetWindow()->GetWindowHeight();
+    Mat4 UImatrix = getOrthogonal(0, Width, 0, Height);
     uiUniformBuffer->bind();
-    proj = cam_ptr->getUiProjMatrix();
-    uiUniformBuffer->writeData(0, sizeof (Mat4), &proj);
+    uiUniformBuffer->writeData(0, sizeof (Mat4), &UImatrix);
+    
     //Setting cameras to skybox shader
     proj = cam_ptr->getProjMatrix();
     view = removeTranslationFromViewMat(view);
@@ -451,43 +456,42 @@ void Engine::Renderer::lookForCameras(World* world_ptr) {
     mWinds.clear();
 
     mMainCameraComponent = nullptr;
+    mMainCamera = nullptr;
     for (unsigned int object_i = 0; object_i < world_ptr->objects.size(); object_i++) {
         GameObject* object = world_ptr->objects[object_i];
-        //Call update on every property in objects
-        if (allowOnUpdate)
-            object->onUpdate(static_cast<int>(game_data->time->GetDeltaTime()));
+        if (object->mAlive && object->isActive()) {
+            //Call update on every property in objects
+            if (allowOnUpdate)
+                object->onUpdate(static_cast<int>(game_data->time->GetDeltaTime()));
 
-        CameraComponent* cam = object->getPropertyPtr<CameraComponent>();
-        LightsourceComponent* light = object->getPropertyPtr<LightsourceComponent>();
+            CameraComponent* cam = object->getPropertyPtr<CameraComponent>();
+            LightsourceComponent* light = object->getPropertyPtr<LightsourceComponent>();
+            WindZoneComponent* wind = object->getPropertyPtr<WindZoneComponent>();
 
-        if (cam != nullptr) {
-            if (cam->isActive()) {
-                mCameras.push_back(cam);
-                if (cam->mIsMainCamera)
-                    mMainCameraComponent = cam;
+            if (cam != nullptr) {
+                if (cam->isActive()) {
+                    mCameras.push_back(cam);
+                    if (cam->mIsMainCamera) {
+                        mMainCameraComponent = cam;
+                        mMainCamera = (Camera*)cam;
+                    }
+                    
+                }
             }
-        }
 
-        if (light != nullptr) {
-            if (light->isActive()) {
-                mLights.push_back(light);
+            if (light != nullptr) {
+                if (light->isActive()) {
+                    mLights.push_back(light);
+                }
+            }
+
+            if (wind != nullptr) {
+                if (wind->isActive()) {
+                    mWinds.push_back(wind);
+                }
             }
         }
     }
-}
-
-void Engine::Renderer::addWind(void* wind_ptr) {
-    bool found = false;
-    //Check, if this wind already exist
-    for (size_t i = 0; i < mWinds.size(); i++) {
-        if (mWinds[i] == wind_ptr) {
-            found = true;
-            break;
-        }
-    }
-    //if not exist then add it to array
-    if (!found)
-        this->mWinds.push_back(wind_ptr);
 }
 
 void Engine::Renderer::TryRenderShadows(Engine::Camera* cam) {

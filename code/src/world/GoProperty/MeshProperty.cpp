@@ -1,5 +1,5 @@
-#include "../../../headers/world/ObjectsComponents/MeshComponent.hpp"
-#include "../../../headers/game.h"
+#include <world/ObjectsComponents/MeshComponent.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

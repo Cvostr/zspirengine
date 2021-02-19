@@ -5,7 +5,7 @@ void Engine::WindZoneComponent::onUpdate(float deltaTime) {
 }
 
 void Engine::WindZoneComponent::onPreRender(Engine::Renderer* pipeline) {
-    pipeline->addWind(pipeline);
+
 }
 
 void Engine::WindZoneComponent::copyTo(Engine::IGameObjectComponent* dest) {

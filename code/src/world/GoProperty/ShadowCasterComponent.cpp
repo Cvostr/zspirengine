@@ -1,5 +1,5 @@
-#include "../../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
+#include <world/ObjectsComponents/LightSourceComponent.hpp>
+#include <world/ObjectsComponents/ShadowCasterComponent.hpp>
 
 extern ZSpireEngine* engine_ptr;
 
@@ -130,6 +130,10 @@ void Engine::ShadowCasterProperty::onObjectDeleted() {
 
 void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam, Renderer* pipeline) {
     Engine::LightsourceComponent* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceComponent>();
+
+    //Check camera pointer
+    if (cam == nullptr)
+        return;
 
     //Send BIAS value
     pipeline->shadowBuffer->writeDataBuffered(0, sizeof(float), &mShadowBias);

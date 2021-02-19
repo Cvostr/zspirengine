@@ -101,8 +101,6 @@ public:
 
     void processObjects(World* world_ptr);
 
-    void addWind(void* wind_ptr);
-
     void lookForCameras(World* world_ptr);
 
     void TryRenderShadows(Engine::Camera* cam);
