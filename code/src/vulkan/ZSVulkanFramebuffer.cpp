@@ -1,5 +1,5 @@
-#include "../../headers/vulkan/ZSVulkanFramebuffer.hpp"
-#include "../../headers/game.h"
+#include <vulkan/ZSVulkanFramebuffer.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 
@@ -32,6 +32,8 @@ bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
 		if (vkCreateFramebuffer(game_data->vk_main->mDevice->getVkDevice(), &framebufferInfo, nullptr, &mFramebuffer) != VK_SUCCESS) {
 			return false;
 		}
+
+		mPickedRenderPass = renderpass;
 
 		mCreated = true;
 
@@ -70,10 +72,14 @@ void Engine::ZSVulkanFramebuffer::AddDepth(unsigned int Layers, TextureFormat Fo
 }
 
 void Engine::ZSVulkanFramebuffer::AddTexture(uint32_t Width, uint32_t Height, TextureFormat Format) {
+	if (mTexturesCount == MAX_RENDERER_ATTACHMENT_COUNT) 
+		return;
+
 	vkTexture* Texture = new vkTexture;
 
 	Texture->usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 	Texture->aspect = VK_IMAGE_ASPECT_COLOR_BIT;
+	Texture->SetRenderTargetFlag(true);
 
 	Texture->Create(Width, Height, Format);
 	//Push new texture
@@ -81,54 +87,48 @@ void Engine::ZSVulkanFramebuffer::AddTexture(uint32_t Width, uint32_t Height, Te
 }
 
 void Engine::ZSVulkanFramebuffer::AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers, TextureFormat Format) {
-	Depth = true;
+	if (!Depth) {
+		Depth = true;
 
-	vkTexture* DepthTexture = new vkTexture;
+		vkTexture* DepthTexture = new vkTexture;
+		DepthTexture->SetRenderTargetFlag(true);
+		DepthTexture->usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		DepthTexture->aspect = VK_IMAGE_ASPECT_DEPTH_BIT;
 
-	DepthTexture->usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-	DepthTexture->aspect = VK_IMAGE_ASPECT_DEPTH_BIT;
+		DepthTexture->Create(Width, Height, Format, Layers);
 
-	DepthTexture->Create(Width, Height, Format, Layers);
+		depthTexture = DepthTexture;
 
-	depthTexture = DepthTexture;
-
-	Views.push_back(DepthTexture->GetImageView());
+		Views.push_back(DepthTexture->GetImageView());
+	}
 }
 
 void Engine::ZSVulkanFramebuffer::AddTexture(Texture* Texture) {
+	if (mTexturesCount == MAX_RENDERER_ATTACHMENT_COUNT || !Texture->IsRenderTarget()) return;
+
 	textures[mTexturesCount++] = Texture;
 
 	Views.push_back(((vkTexture*)Texture)->GetImageView());
 }
 
 void Engine::ZSVulkanFramebuffer::SetSize(uint32_t Width, uint32_t Height) {
-	/*Framebuffer::SetSize(Width, Height);
+	Framebuffer::SetSize(Width, Height);
 
-	std::vector<TextureFormat> Formats;
-	TextureFormat DepthFormat;
-	uint32_t DepthLayers;
-	uint32_t _TexturesCount = mTexturesCount;
-	mTexturesCount = 0;
-	Views.clear();
-	//Store old textures formats and destroy them
-	for (unsigned int t = 0; t < _TexturesCount; t++) {
-		Formats.push_back(textures[t]->GetFormat());
-		textures[t]->Destroy();
-		delete textures[t];
+	//Resize all textures
+	for (unsigned int t = 0; t < mTexturesCount; t++) {
+		textures[t]->Resize(Width, Height);
+	}
+	//Resize depth, if exists
+	if (Depth) {
+		depthTexture->Resize(Width, Height);
 	}
 
-	//Store depth format
-	if (Depth) {
-		DepthFormat = depthTexture->GetFormat();
-		DepthLayers = depthTexture->GetLayersCount();
-		depthTexture->Destroy();
-		delete depthTexture;
+	//if framebuffer already created
+	if (mCreated) {
+		//Destroy current framebuffer
+		vkDestroyFramebuffer(game_data->vk_main->mDevice->getVkDevice(), mFramebuffer, nullptr);
+
+		mCreated = false;
+		Create(mPickedRenderPass);
 	}
-	//Recreate textures
-	for (unsigned int t = 0; t < _TexturesCount; t++) {
-		AddTexture(Formats[t]);
-	}
-	if (Depth) {
-		AddDepth(DepthLayers, DepthFormat);
-	}*/
 }

@@ -1,8 +1,9 @@
-#include "../../headers/vulkan/ZSVulkanDevice.hpp"
-#include "../../headers/engine/Logger.hpp"
+#include <vulkan/ZSVulkanDevice.hpp>
+#include <engine/Logger.hpp>
 
 const std::vector<const char*> deviceExtensions = {
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    "VK_EXT_extended_dynamic_state"
 };
 
 const std::vector<const char*> validationLayers = {

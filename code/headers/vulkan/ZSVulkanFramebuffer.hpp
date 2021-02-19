@@ -13,6 +13,7 @@ namespace Engine {
 		VkFramebuffer mFramebuffer;
         std::vector<VkImageView> Views;
         unsigned int mLayersCount;
+        ZSVulkanRenderPass* mPickedRenderPass;
 	public:
 
         VkFramebuffer GetFramebuffer() { return mFramebuffer; }

@@ -58,6 +58,7 @@ namespace Engine {
 
 		vkUniformBuffer* TransformStorageBuf;
 		vkUniformBuffer* SkinningStorageBuf;
+		vkUniformBuffer* CamerasStorageBuf;
 
 		std::vector<VKObjectToRender> ObjectsToRender;
 
@@ -74,11 +75,12 @@ namespace Engine {
 
 		vkUniformBuffer* GetTransformStorageBuffer() { return TransformStorageBuf; }
 		vkUniformBuffer* GetSkinningStorageBuffer() { return SkinningStorageBuf; }
+		vkUniformBuffer* GetCamerasStorageBuffer() { return CamerasStorageBuf; }
 
 		void SetViewport(VkCommandBuffer cmdbuf, unsigned int startX, unsigned int startY, unsigned int width, unsigned int height);
 		void InitShaders();
 		void render2D();
-		void render3D(Engine::Camera* cam);
+		void render3D();
 		void DrawObject(Engine::GameObject* obj);
 
 		VKRenderer();

@@ -1,4 +1,4 @@
-#include "../../headers/vulkan/ZSVulkanPipeline.hpp"
+#include <vulkan/ZSVulkanPipeline.hpp>
 #include "../../headers/math/Vertex.hpp"
 #include "../../headers/game.h"
 
@@ -228,7 +228,9 @@ bool Engine::ZSVulkanPipeline::Create(vkShader* Shader, ZSVulkanRenderPass* rend
 
     VkDynamicState dynamicStates[] = {
         VK_DYNAMIC_STATE_VIEWPORT,
-        VK_DYNAMIC_STATE_LINE_WIDTH
+        VK_DYNAMIC_STATE_LINE_WIDTH,
+        VK_DYNAMIC_STATE_FRONT_FACE_EXT,
+        VK_DYNAMIC_STATE_CULL_MODE_EXT
     };
 
     VkPipelineDynamicStateCreateInfo dynamicState{};

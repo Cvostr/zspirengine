@@ -20,7 +20,8 @@ const std::vector<const char*> validationLayers = {
 };
 
 std::vector<const char*> extensions = {
-    VK_EXT_DEBUG_UTILS_EXTENSION_NAME
+    VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+   
     //,"VK_EXT_debug_report"
 };
 

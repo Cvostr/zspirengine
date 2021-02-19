@@ -1,8 +1,8 @@
-#include "../../headers/vulkan/VKRenderer.hpp"
-#include "../../headers/game.h"
-#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
-#include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
-#include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
+#include <vulkan/VKRenderer.hpp>
+#include <game.h>
+#include <world/ObjectsComponents/MeshComponent.hpp>
+#include <world/ObjectsComponents/MaterialComponent.hpp>
+#include <world/ObjectsComponents/ShadowCasterComponent.hpp>
 
 extern ZSGAME_DATA* game_data;
 extern ZSpireEngine* engine_ptr;
@@ -14,14 +14,14 @@ Engine::VKRenderer::VKRenderer() {
 void Engine::VKRenderer::render2D() {
 
 }
-void Engine::VKRenderer::render3D(Engine::Camera* cam) {
+void Engine::VKRenderer::render3D() {
     World* world_ptr = game_data->world;
     ObjectsToRender.clear();
     LastTransformOffset = 0;
     LastSkinningOffset = 0;
     //Fill render arrays
 
-    if (this->render_settings.shadowcaster_obj_ptr != nullptr) {
+   /* if (this->render_settings.shadowcaster_obj_ptr != nullptr) {
         Engine::ShadowCasterProperty* shadowcast =
             static_cast<Engine::GameObject*>(this->render_settings.shadowcaster_obj_ptr)->getPropertyPtr<Engine::ShadowCasterProperty>();
         if (shadowcast != nullptr) { //we have shadowcaster
@@ -33,9 +33,9 @@ void Engine::VKRenderer::render3D(Engine::Camera* cam) {
     FillShadowCmdBuf();
     Fill3dCmdBuf();
     
- 
+ */
 
-    Present();
+  //  Present();
 }
 
 void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
@@ -121,6 +121,9 @@ void Engine::VKRenderer::InitShaders() {
 
     SkinningStorageBuf = static_cast<vkUniformBuffer*>(allocUniformBuffer());
     SkinningStorageBuf->init(1, sizeof(Mat4) * 200 * 512, true);
+
+    CamerasStorageBuf = static_cast<vkUniformBuffer*>(allocUniformBuffer());
+    CamerasStorageBuf->init(2, 160 * 10, true);
 
     OutRenderPass = new ZSVulkanRenderPass;
     OutRenderPass->PushColorOutputAttachment();

@@ -1,6 +1,5 @@
-//#include "../../headers/vulkan/VKMaterial.hpp"
-#include "../../headers/vulkan/VKRenderer.hpp"
-#include "../../headers/game.h"
+#include <vulkan/VKRenderer.hpp>
+#include <game.h>
 
 using namespace Engine;
 //Hack to support resources
@@ -37,6 +36,7 @@ void VKMaterialTemplate::MakeDescrSetStorage(Engine::ZSVulkanDescriptorSet* Desc
     VKRenderer* renderer = static_cast<VKRenderer*>(game_data->pipeline);
     DescrSet->pushStorageBuffer(renderer->GetTransformStorageBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
     DescrSet->pushStorageBuffer(renderer->GetSkinningStorageBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
+    DescrSet->pushStorageBuffer(renderer->GetCamerasStorageBuffer(), VK_SHADER_STAGE_ALL_GRAPHICS);
     DescrSet->getDescriptorSetLayout();
 }
 

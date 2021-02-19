@@ -1,7 +1,7 @@
-#include "../../headers/render/Framebuffer.hpp"
+#include <render/Framebuffer.hpp>
 
-#include "../../headers/ogl/GLFramebuffer.hpp"
-#include "../../headers/vulkan/ZSVulkanFramebuffer.hpp"
+#include <ogl/GLFramebuffer.hpp>
+#include <vulkan/ZSVulkanFramebuffer.hpp>
 
 extern ZSpireEngine* engine_ptr;
 

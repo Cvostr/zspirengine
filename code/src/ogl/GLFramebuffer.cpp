@@ -1,4 +1,4 @@
-#include "../../headers/ogl/GLFramebuffer.hpp"
+#include <ogl/GLFramebuffer.hpp>
 
 unsigned int attachments[MAX_RENDERER_ATTACHMENT_COUNT] =
 { GL_COLOR_ATTACHMENT0,
@@ -39,12 +39,13 @@ void Engine::GLframebuffer::AddTexture(uint32_t Width, uint32_t Height, TextureF
 }
 
 void Engine::GLframebuffer::AddDepth(uint32_t Width, uint32_t Height, unsigned int Layers, TextureFormat Format) {
-    Depth = true;
-    
-    depthTexture = new glTexture;
-    depthTexture->SetRenderTargetFlag(true);
-    depthTexture->Create(Width, Height, Format, Layers);
+    if (!Depth) {
+        Depth = true;
 
+        depthTexture = new glTexture;
+        depthTexture->SetRenderTargetFlag(true);
+        depthTexture->Create(Width, Height, Format, Layers);
+    }
     /*
     glTexParameteri(Type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(Type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -54,7 +55,6 @@ void Engine::GLframebuffer::AddDepth(uint32_t Width, uint32_t Height, unsigned i
     glTexParameteri(Type, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
     */
 
-    
 }
 
 void Engine::GLframebuffer::SetSize(uint32_t Width, uint32_t Height) {
