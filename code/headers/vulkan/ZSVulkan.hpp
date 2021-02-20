@@ -19,7 +19,9 @@ namespace Engine {
 
 		VkCommandBuffer CurrentCmdBuffer;
 
-		ZSVulkanRenderPass* mMaterialsRenderPass;
+		ZSVulkanRenderPass* mGBufferRenderPass;
+		ZSVulkanRenderPass* mDefferedRenderPass;
+
 		ZSVulkanSampler* mDefaultTextureSampler;
 
 		ZSVulkan() 

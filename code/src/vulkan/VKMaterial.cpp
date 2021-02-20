@@ -19,7 +19,7 @@ void VKMaterialTemplate::CreatePipeline() {
         Conf.LayoutInfo.AddPushConstant(mUniformBuffer->GetBufferSize(), VK_SHADER_STAGE_FRAGMENT_BIT);
 
         Pipeline = new Engine::ZSVulkanPipeline;
-        Pipeline->Create((Engine::vkShader*)mShader, game_data->vk_main->mMaterialsRenderPass, Conf);
+        Pipeline->Create((Engine::vkShader*)mShader, game_data->vk_main->mGBufferRenderPass, Conf);
         mPipelineCreated = true;
     }
 }

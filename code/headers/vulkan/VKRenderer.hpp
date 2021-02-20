@@ -29,6 +29,24 @@ namespace Engine {
 		}
 	};
 
+	class VKCameraToRender {
+	public:
+		void* camera_prop;
+		VkCommandBuffer GBufferCmdBuf;
+		VkCommandBuffer DefferedCmdBuf;
+
+		int Index;
+
+		VKCameraToRender() {
+			camera_prop = nullptr;
+
+			GBufferCmdBuf = nullptr;
+			DefferedCmdBuf = nullptr;
+
+			Index = 0;
+		}
+	};
+
 	class VKRenderer : public Renderer{
 	private:
 		VkSemaphore imageAvailableSemaphore;
@@ -45,8 +63,8 @@ namespace Engine {
 		ZSVulkanPipeline* DefferedPipeline;
 		ZSVulkanPipeline* ShadowPipeline;
 
-		ZSVulkanFramebuffer* MaterialFb;
-		ZSVulkanRenderPass* MaterialRenderPass;
+		ZSVulkanRenderPass* GBufferRenderPass;
+		ZSVulkanRenderPass* DefferedRenderPass;
 
 		ZSVulkanFramebuffer* OutFb;
 		ZSVulkanRenderPass* OutRenderPass;
@@ -61,8 +79,10 @@ namespace Engine {
 		vkUniformBuffer* CamerasStorageBuf;
 
 		std::vector<VKObjectToRender> ObjectsToRender;
+		std::vector<VKCameraToRender> CamerasToRender;
 
 		void Present();
+		void ComputeAll();
 
 		void FillShadowCmdBuf();
 		void FillDefferedCmdBuf();
@@ -82,6 +102,9 @@ namespace Engine {
 		void render2D();
 		void render3D();
 		void DrawObject(Engine::GameObject* obj);
+
+		void Render3DCamera(void* cam_prop, uint32_t cam_index);
+
 
 		VKRenderer();
 	};

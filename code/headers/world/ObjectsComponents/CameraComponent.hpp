@@ -29,6 +29,7 @@ namespace Engine {
 		void addPropertyInterfaceToInspector();
 		void onValueChanged(); //Update soud buffer pointer and send source props
 
+		void UpdateFramebuffers();
 		void UpdateTextureResource();
 		void onPreRender(Engine::Renderer* pipeline);
 		void onUpdate(float deltaTime);

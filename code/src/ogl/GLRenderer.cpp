@@ -155,8 +155,6 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
         _cam->setViewport(Texture->GetWidth(), Texture->GetHeight());
     }
     else {
-        mMainCamera = _cam;
-        mMainCameraComponent = cc;
         Engine::Window* win = engine_ptr->GetWindow();
         cc->ResizeTarget(win->GetWindowWidth(), win->GetWindowHeight());
         _cam->setViewport(win->GetWindowWidth(), win->GetWindowHeight());
@@ -201,7 +199,7 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
         //Disable depth rendering to draw plane correctly
         setDepthState(false);
         setFaceCullState(false);
-        ((GLframebuffer*)cc->mGBuffer)->bindTextures(10); //Bind gBuffer textures
+        ((GLframebuffer*)cc->mGBuffer)->bindTextures(0); //Bind gBuffer textures
         deffered_light->Use(); //use deffered shader
         Engine::getPlaneMesh2D()->Draw(); //Draw screen
     }

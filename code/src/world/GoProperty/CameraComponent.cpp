@@ -36,6 +36,7 @@ void Engine::CameraComponent::UpdateTextureResource() {
 			delete mDefferedBuffer;
 		//Allocate new Deffered buffer
 		mDefferedBuffer = allocFramebuffer(TargetWidth, TargetHeight);
+		mDefferedBuffer->Usage = FB_USAGE_DEFERRED_PASS;
 		//and bind new target texture
 		mDefferedBuffer->AddTexture(mTarget->texture_ptr);
 		mDefferedBuffer->AddTexture(FORMAT_RGBA); //Bloom map
@@ -45,17 +46,45 @@ void Engine::CameraComponent::UpdateTextureResource() {
 		if (mGBuffer == nullptr) {
 			//then create one
 			mGBuffer = allocFramebuffer(TargetWidth, TargetHeight);
-			mGBuffer->AddDepth();
+			mGBuffer->Usage = FB_USAGE_GBUFFER_PASS;
 			mGBuffer->AddTexture(FORMAT_RGBA); //Diffuse map
 			mGBuffer->AddTexture(FORMAT_RGB16F); //Normal map
 			mGBuffer->AddTexture(FORMAT_RGB16F); //Position map
 			mGBuffer->AddTexture(FORMAT_RGBA); //Specular map
 			mGBuffer->AddTexture(FORMAT_RGBA); //Masks map
+			mGBuffer->AddDepth();
 			mGBuffer->Create();
 		}
 		//if already created, then just resize it
 		else
 			mGBuffer->SetSize(TargetWidth, TargetHeight);
+	}
+}
+
+void Engine::CameraComponent::UpdateFramebuffers() {
+	if (!FramebuffersCreated()) {
+		if (mIsMainCamera) {
+			mGBuffer = allocFramebuffer(TargetWidth, TargetHeight);
+			mGBuffer->Usage = FB_USAGE_GBUFFER_PASS;
+			
+			mGBuffer->AddTexture(FORMAT_RGBA); //Diffuse map
+			mGBuffer->AddTexture(FORMAT_RGB16F); //Normal map
+			mGBuffer->AddTexture(FORMAT_RGB16F); //Position map
+			mGBuffer->AddTexture(FORMAT_RGBA); //Specular map
+			mGBuffer->AddTexture(FORMAT_RGBA); //Masks map
+			mGBuffer->AddDepth();
+			mGBuffer->Create();
+
+			mDefferedBuffer = allocFramebuffer(TargetWidth, TargetHeight);
+			mDefferedBuffer->Usage = FB_USAGE_DEFERRED_PASS;
+			//and bind new target texture
+			mDefferedBuffer->AddTexture(FORMAT_RGBA);
+			mDefferedBuffer->AddTexture(FORMAT_RGBA); //Bloom map
+			mDefferedBuffer->Create();
+		}
+		else {
+			UpdateTextureResource();
+		}
 	}
 }
 
@@ -120,27 +149,7 @@ void Engine::CameraComponent::onPreRender(Engine::Renderer* pipeline) {
 
 	updateViewMat();
 
-	if (!FramebuffersCreated()) {
-		if (mIsMainCamera) {
-			mGBuffer = allocFramebuffer(TargetWidth, TargetHeight);
-			mGBuffer->AddDepth();
-			mGBuffer->AddTexture(FORMAT_RGBA); //Diffuse map
-			mGBuffer->AddTexture(FORMAT_RGB16F); //Normal map
-			mGBuffer->AddTexture(FORMAT_RGB16F); //Position map
-			mGBuffer->AddTexture(FORMAT_RGBA); //Specular map
-			mGBuffer->AddTexture(FORMAT_RGBA); //Masks map
-			mGBuffer->Create();
-
-			mDefferedBuffer = allocFramebuffer(TargetWidth, TargetHeight);
-			//and bind new target texture
-			mDefferedBuffer->AddTexture(FORMAT_RGBA);
-			mDefferedBuffer->AddTexture(FORMAT_RGBA); //Bloom map
-			mDefferedBuffer->Create();
-		}
-		else {
-			UpdateTextureResource();
-		}
-	}
+	
 }
 
 void Engine::CameraComponent::ResizeTarget(uint32_t Width, uint32_t Height) {

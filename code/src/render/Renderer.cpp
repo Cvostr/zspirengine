@@ -470,6 +470,7 @@ void Engine::Renderer::lookForCameras(World* world_ptr) {
 
             if (cam != nullptr) {
                 if (cam->isActive()) {
+                    cam->UpdateFramebuffers();
                     mCameras.push_back(cam);
                     if (cam->mIsMainCamera) {
                         mMainCameraComponent = cam;

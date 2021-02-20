@@ -22,6 +22,7 @@ namespace Engine {
         void PushOutputAttachment();
         void SetLayersCount(unsigned int Layers) { mLayersCount = Layers; }
 		bool Create(ZSVulkanRenderPass* renderpass);
+        void Create();
         void Destroy();
 
         void AddTexture(TextureFormat Format = TextureFormat::FORMAT_RGBA);

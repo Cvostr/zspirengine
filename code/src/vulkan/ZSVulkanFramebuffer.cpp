@@ -5,6 +5,9 @@ extern ZSGAME_DATA* game_data;
 
 Engine::ZSVulkanFramebuffer::ZSVulkanFramebuffer() {
 	mLayersCount = 1;
+
+	Width = 640;
+	Height = 480;
 }
 
 Engine::ZSVulkanFramebuffer::ZSVulkanFramebuffer(unsigned int width, unsigned int height) {
@@ -25,8 +28,8 @@ bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
 		framebufferInfo.renderPass = renderpass->GetRenderPass();
 		framebufferInfo.attachmentCount = static_cast<uint32_t>(Views.size());
 		framebufferInfo.pAttachments = Views.data();
-		framebufferInfo.width = renderpass->GetClearExtent().width;
-		framebufferInfo.height = renderpass->GetClearExtent().height;
+		framebufferInfo.width = Width;
+		framebufferInfo.height = Height;
 		framebufferInfo.layers = mLayersCount;
 
 		if (vkCreateFramebuffer(game_data->vk_main->mDevice->getVkDevice(), &framebufferInfo, nullptr, &mFramebuffer) != VK_SUCCESS) {
@@ -39,6 +42,26 @@ bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
 
 	}
 	return true;
+}
+
+void Engine::ZSVulkanFramebuffer::Create() {
+	if (Usage == FB_USAGE_DEFAULT)
+		return;
+
+	ZSVulkanRenderPass* RenderPass = nullptr;
+
+	switch (Usage) {
+	case FB_USAGE_GBUFFER_PASS: {
+		RenderPass = game_data->vk_main->mGBufferRenderPass;
+		break;
+	}
+	case FB_USAGE_DEFERRED_PASS: {
+		RenderPass = game_data->vk_main->mDefferedRenderPass;
+		break;
+	}
+	}
+
+	Create(RenderPass);
 }
 
 void Engine::ZSVulkanFramebuffer::Destroy() {
@@ -74,6 +97,9 @@ void Engine::ZSVulkanFramebuffer::AddDepth(unsigned int Layers, TextureFormat Fo
 void Engine::ZSVulkanFramebuffer::AddTexture(uint32_t Width, uint32_t Height, TextureFormat Format) {
 	if (mTexturesCount == MAX_RENDERER_ATTACHMENT_COUNT) 
 		return;
+
+	if (Format == TextureFormat::FORMAT_RGB16F)
+		Format = TextureFormat::FORMAT_RGBA16F;
 
 	vkTexture* Texture = new vkTexture;
 

@@ -85,6 +85,9 @@ bool Engine::ZSVulkanDevice::initDevice(VkPhysicalDevice Device, ZSVulkanInstanc
         QueuesToCreate.push_back(QueuePresentCreateInfo);
     }
 
+    VkPhysicalDeviceFeatures features = {};
+    features.geometryShader = true;
+
     VkDeviceCreateInfo logical_gpu_create_info = {};
     logical_gpu_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     logical_gpu_create_info.pNext = nullptr;
@@ -93,6 +96,7 @@ bool Engine::ZSVulkanDevice::initDevice(VkPhysicalDevice Device, ZSVulkanInstanc
     logical_gpu_create_info.pQueueCreateInfos = QueuesToCreate.data(); //pointer to start of queues vector
     logical_gpu_create_info.enabledExtensionCount = static_cast<unsigned int>(deviceExtensions.size());
     logical_gpu_create_info.ppEnabledExtensionNames = &deviceExtensions[0];
+    logical_gpu_create_info.pEnabledFeatures = &features;
 
     if (true) {
         logical_gpu_create_info.enabledLayerCount = static_cast<unsigned int>(validationLayers.size());

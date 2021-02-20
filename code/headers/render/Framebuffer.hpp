@@ -7,6 +7,13 @@
 #define MAX_RENDERER_ATTACHMENT_COUNT 8
 
 namespace Engine {
+    //Useful for Vulkan to describe renderpass
+    enum FramebufferUsage {
+        FB_USAGE_DEFAULT,
+        FB_USAGE_GBUFFER_PASS,
+        FB_USAGE_DEFERRED_PASS
+    };
+
     class Framebuffer : public GpuObject{
     protected:
         uint32_t Width;
@@ -20,6 +27,8 @@ namespace Engine {
         bool Depth;
 
     public:
+        FramebufferUsage Usage;
+
         Texture* GetDepthTexture() { return depthTexture; }
         Texture* GetTexture(unsigned int i) { return textures[i]; }
 
@@ -49,7 +58,8 @@ namespace Engine {
             Height(0),
             mTexturesCount(0),
             Depth(false),
-            depthTexture(nullptr)
+            depthTexture(nullptr),
+            Usage(FB_USAGE_DEFAULT)
         {
             textures[0] = 0;
         }

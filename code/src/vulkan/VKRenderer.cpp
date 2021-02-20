@@ -3,6 +3,7 @@
 #include <world/ObjectsComponents/MeshComponent.hpp>
 #include <world/ObjectsComponents/MaterialComponent.hpp>
 #include <world/ObjectsComponents/ShadowCasterComponent.hpp>
+#include <world/ObjectsComponents/CameraComponent.hpp>
 
 extern ZSGAME_DATA* game_data;
 extern ZSpireEngine* engine_ptr;
@@ -16,10 +17,38 @@ void Engine::VKRenderer::render2D() {
 }
 void Engine::VKRenderer::render3D() {
     World* world_ptr = game_data->world;
+    Engine::Window* win = engine_ptr->GetWindow();
     ObjectsToRender.clear();
     LastTransformOffset = 0;
     LastSkinningOffset = 0;
     //Fill render arrays
+
+    if (mCameras.size() != CamerasToRender.size()) {
+        CamerasToRender.resize(mCameras.size());
+
+        VkCommandBufferAllocateInfo allocInfo = {};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.commandPool = commandPool;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = (uint32_t)1;
+
+        for (unsigned int cam_i = 0; cam_i < mCameras.size(); cam_i++) {
+
+
+            vkAllocateCommandBuffers(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, &CamerasToRender[cam_i].DefferedCmdBuf);
+            vkAllocateCommandBuffers(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, &CamerasToRender[cam_i].GBufferCmdBuf);
+        }
+    }
+
+    processObjects(world_ptr);
+
+    for (unsigned int cam_i = 0; cam_i < mCameras.size(); cam_i++) {
+        CamerasToRender[cam_i].camera_prop = mCameras[cam_i];
+        CamerasToRender[cam_i].Index = cam_i;
+
+        Render3DCamera(mCameras[cam_i], cam_i);
+    }
+
 
    /* if (this->render_settings.shadowcaster_obj_ptr != nullptr) {
         Engine::ShadowCasterProperty* shadowcast =
@@ -29,13 +58,120 @@ void Engine::VKRenderer::render3D() {
         }
     }
 
-    processObjects(world_ptr);
     FillShadowCmdBuf();
     Fill3dCmdBuf();
     
  */
-
+    ComputeAll();
   //  Present();
+}
+
+void Engine::VKRenderer::Render3DCamera(void* cam_prop, uint32_t cam_index) {
+        CameraComponent* cc = (CameraComponent*)(cam_prop);
+        VKCameraToRender* CamRender = &CamerasToRender[cam_index];
+        World* world_ptr = game_data->world;
+
+        VkCommandBuffer gbuffer_cmdbuf = CamRender->GBufferCmdBuf;
+        VkCommandBuffer deffered_cmdbuf = CamRender->DefferedCmdBuf;
+
+        ZSVulkanFramebuffer* gbuffer_fb = static_cast<ZSVulkanFramebuffer*>(cc->mGBuffer);
+        ZSVulkanFramebuffer* deffered_fb = static_cast<ZSVulkanFramebuffer*>(cc->mDefferedBuffer);
+
+        //Check, is camera active
+        if (!cc->isActive())
+            return;
+
+        Camera* _cam = (Camera*)cc;
+
+        if (!cc->mIsMainCamera) {
+            cc->UpdateTextureResource();
+            Texture* Texture = cc->mTarget->texture_ptr;
+
+            _cam->setViewport(Texture->GetWidth(), Texture->GetHeight());
+        }
+        else {
+            Engine::Window* win = engine_ptr->GetWindow();
+            cc->ResizeTarget(win->GetWindowWidth(), win->GetWindowHeight());
+            _cam->setViewport(win->GetWindowWidth(), win->GetWindowHeight());
+        }
+
+        ZSVIEWPORT vp = _cam->getViewport();
+
+        Mat4 Proj = _cam->getProjMatrix();
+        Mat4 View = _cam->getViewMatrix();
+        Vec3 Pos = _cam->getCameraPosition();
+        Vec3 Front = _cam->getCameraFrontVec();
+
+        uint32_t CamSize = 160;
+
+        //Send data to storage buffer
+        CamerasStorageBuf->writeDataBuffered(cam_index * CamSize, 64, &Proj);
+        CamerasStorageBuf->writeDataBuffered(cam_index * CamSize + 64, 64, &View);
+        CamerasStorageBuf->writeDataBuffered(cam_index * CamSize + 128, 12, &Pos);
+        CamerasStorageBuf->writeDataBuffered(cam_index * CamSize + 144, 12, &Front);
+
+        
+        //GBuffer command buffer
+        VkCommandBufferBeginInfo beginInfo = {};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = 0; // Optional
+        beginInfo.pInheritanceInfo = nullptr; // Optional
+
+        vkBeginCommandBuffer(gbuffer_cmdbuf, &beginInfo);
+
+        game_data->vk_main->CurrentCmdBuffer = gbuffer_cmdbuf;
+
+        GBufferRenderPass->SetClearSize(vp.endX, vp.endY);
+        GBufferRenderPass->CmdBegin(gbuffer_cmdbuf, gbuffer_fb);
+
+        render_settings.CurrentViewMask = 0xFFFFFFFFFFFFFFFF;
+
+        bool binded = false;
+
+        
+
+        for (unsigned int i = 0; i < ObjectsToRender.size(); i++) {
+            VKObjectToRender* obr = &ObjectsToRender[i];
+            GameObject* obj = ObjectsToRender[i].obj;
+            if (obj->hasMesh() && obr->mat != nullptr) {
+                MeshProperty* mesh = obj->getPropertyPtr<MeshProperty>();
+                ZSVulkanPipeline* Pipeline = ((VKMaterialTemplate*)obr->mat->mTemplate)->Pipeline;
+                if (((VKMaterialTemplate*)obr->mat->mTemplate)->mPipelineCreated) {
+                    if (!binded) {
+                        Pipeline->CmdBindPipeline(gbuffer_cmdbuf);
+
+                        ((VKMaterialTemplate*)obr->mat->mTemplate)->Pipeline->GetPipelineLayout()
+                            ->CmdBindDescriptorSets(gbuffer_cmdbuf, 0, 3);
+
+                        binded = true;
+                    }
+
+
+                    VkDescriptorSet set = obr->mat->DescrSetTextures->getDescriptorSet();
+                    if (Pipeline != nullptr) {
+
+                        vkCmdBindDescriptorSets(gbuffer_cmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            Pipeline->_GetPipelineLayout(), 1,
+                            1, &set, 0, nullptr);
+                        //Send object transform
+                        Pipeline->CmdPushConstants(gbuffer_cmdbuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 8, &obr->TransformArrayIndex);
+                        Pipeline->CmdPushConstants(gbuffer_cmdbuf, VK_SHADER_STAGE_VERTEX_BIT, 8, 4, &cam_index);
+                        //Send material props
+                        unsigned int bufsize = obr->mat->mTemplate->mUniformBuffer->GetBufferSize();
+                        void* bufdata = obr->mat->mTemplate->mUniformBuffer->GetCpuBuffer();
+                        Pipeline->CmdPushConstants(gbuffer_cmdbuf, VK_SHADER_STAGE_FRAGMENT_BIT, 64, bufsize, obr->mat->MatData);
+
+                    }
+                    if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
+                        obj->DrawMesh(this);
+                }
+            }
+        }
+
+
+        vkCmdEndRenderPass(gbuffer_cmdbuf);
+        vkEndCommandBuffer(gbuffer_cmdbuf);
+
 }
 
 void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
@@ -90,31 +226,28 @@ void Engine::VKRenderer::InitShaders() {
     this->deffered_light->compileFromFile("Shaders/vulkan_test/deffered/vert.spv", "Shaders/vulkan_test/deffered/frag.spv");
     this->mShadowMapShader->compileFromFile("Shaders/vulkan_test/shadowmap/vert.spv", "", "Shaders/vulkan_test/shadowmap/geom.spv");
 
-    MaterialRenderPass = new ZSVulkanRenderPass;
-    MaterialRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    MaterialRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA16F, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    MaterialRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA16F, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    MaterialRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    MaterialRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-    MaterialRenderPass->PushDepthAttachment();
-    MaterialRenderPass->Create();
+    GBufferRenderPass = new ZSVulkanRenderPass;
+    GBufferRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    GBufferRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA16F, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    GBufferRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA16F, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    GBufferRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    GBufferRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    GBufferRenderPass->PushDepthAttachment();
+    GBufferRenderPass->Create();
 
-    game_data->vk_main->mMaterialsRenderPass = MaterialRenderPass;
+    DefferedRenderPass = new ZSVulkanRenderPass;
+    DefferedRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    DefferedRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    DefferedRenderPass->Create();
+
+    game_data->vk_main->mGBufferRenderPass = GBufferRenderPass;
+    game_data->vk_main->mDefferedRenderPass = DefferedRenderPass;
 
     mMaterialSampler = new ZSVulkanSampler;
     mMaterialSampler->CreateSampler();
     game_data->vk_main->mDefaultTextureSampler = mMaterialSampler;
 
 
-    MaterialFb = new ZSVulkanFramebuffer;
-    MaterialFb->AddTexture(640, 480, TextureFormat::FORMAT_RGBA);
-    MaterialFb->AddTexture(640, 480, TextureFormat::FORMAT_RGBA16F);
-    MaterialFb->AddTexture(640, 480, TextureFormat::FORMAT_RGBA16F);
-    MaterialFb->AddTexture(640, 480, TextureFormat::FORMAT_RGBA);
-    MaterialFb->AddTexture(640, 480, TextureFormat::FORMAT_RGBA);
-    MaterialFb->AddDepth(640, 480);
-
-    MaterialFb->Create(MaterialRenderPass);
     
     TransformStorageBuf = static_cast<vkUniformBuffer*>(allocUniformBuffer());
     TransformStorageBuf->init(0, sizeof(Mat4) * 4000, true);
@@ -159,11 +292,11 @@ void Engine::VKRenderer::InitShaders() {
    
     DefferedPipeline = new Engine::ZSVulkanPipeline;
     DefferedPipeline->Create((Engine::vkShader*)deffered_light, OutRenderPass, Conf);
-    Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(0, MaterialFb->getImageViewIndex(0), mMaterialSampler);
+    /*Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(0, MaterialFb->getImageViewIndex(0), mMaterialSampler);
     Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(1, MaterialFb->getImageViewIndex(1), mMaterialSampler);
     Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(2, MaterialFb->getImageViewIndex(2), mMaterialSampler);
     Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(3, MaterialFb->getImageViewIndex(3), mMaterialSampler);
-    Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(4, MaterialFb->getImageViewIndex(4), mMaterialSampler);
+    Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(4, MaterialFb->getImageViewIndex(4), mMaterialSampler);*/
 
 
     Engine::ZsVkPipelineConf ConfShadow;
@@ -195,7 +328,7 @@ void Engine::VKRenderer::InitShaders() {
     VkCommandPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = game_data->vk_main->mDevice->GetGraphicsQueueFamilyIndex();
-    poolInfo.flags = 0; // Optional
+    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // Optional
 
     vkCreateCommandPool(game_data->vk_main->mDevice->getVkDevice(), &poolInfo, nullptr, &commandPool);
 
@@ -261,7 +394,7 @@ void Engine::VKRenderer::Fill3dCmdBuf() {
 
     game_data->vk_main->CurrentCmdBuffer = m3dCmdBuf;
 
-    MaterialRenderPass->CmdBegin(m3dCmdBuf, MaterialFb);
+   // GBufferRenderPass->CmdBegin(m3dCmdBuf, MaterialFb);
 
     render_settings.CurrentViewMask = 0xFFFFFFFFFFFFFFFF;
 
@@ -383,6 +516,51 @@ void Engine::VKRenderer::Present() {
     presentInfo.pImageIndices = &imageIndex;
     presentInfo.pResults = nullptr; // Optional
     vkQueuePresentKHR(game_data->vk_main->mDevice->GetPresentQueue(), &presentInfo);
+}
+
+void Engine::VKRenderer::ComputeAll() {
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+    uint32_t _imageIndex;
+    vkAcquireNextImageKHR(game_data->vk_main->mDevice->getVkDevice(),
+        game_data->vk_main->mSwapChain->GetSwapChain(), UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &_imageIndex);
+    _imageIndex = 0;
+
+    VkSemaphore Wait = imageAvailableSemaphore;
+
+    for (uint32_t Camera_i = 0; Camera_i < CamerasToRender.size(); Camera_i++) {
+
+        VKCameraToRender* CR = &CamerasToRender[Camera_i];
+
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = &Wait;
+        submitInfo.pWaitDstStageMask = waitStages;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &CR->GBufferCmdBuf;
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = &MaterialsFinishedSemaphore;
+        vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+
+        Wait = MaterialsFinishedSemaphore;
+
+    }
+
+    VkPresentInfoKHR presentInfo = {};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores = &Wait;
+
+    VkSwapchainKHR swapChains[] = { game_data->vk_main->mSwapChain->GetSwapChain() };
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = swapChains;
+    uint32_t imageIndex = 0;
+    presentInfo.pImageIndices = &imageIndex;
+    presentInfo.pResults = nullptr; // Optional
+    vkQueuePresentKHR(game_data->vk_main->mDevice->GetPresentQueue(), &presentInfo);
+
 }
 
 void Engine::VKRenderer::SetViewport(VkCommandBuffer cmdbuf, unsigned int startX, unsigned int startY, unsigned int width, unsigned int height) {

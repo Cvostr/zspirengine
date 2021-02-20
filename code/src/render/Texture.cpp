@@ -47,6 +47,12 @@ bool Engine::Texture::LoadFromBuffer(unsigned char* data, uint32_t size) {
         LoadPNGTextureFromBuffer(data, (int)size);
     }
     if (data[0] == 'R' && data[1] == 'T' && data[2] == 'B' ) {
+        if (engine_ptr->engine_info->graphicsApi == VULKAN) {
+            vkTexture* vkt = static_cast<vkTexture*>(this);
+
+            vkt->usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+            vkt->aspect = VK_IMAGE_ASPECT_COLOR_BIT;
+        }
         Create(512, 512, TextureFormat::FORMAT_RGBA);
         SetRenderTargetFlag(true, true);
     }
