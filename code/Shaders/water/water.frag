@@ -12,12 +12,20 @@ layout(location = 0) in vec4 ClipSpace;
 layout(location = 1) in vec2 DistortionUV;
 layout(location = 2) in vec2 UV;
 layout(location = 3) in vec3 FragPos;
-layout(location = 4) in mat3 TBN;
+layout(location = 4) in vec3 OrigNormal;
+layout(location = 5) in mat3 TBN;
 
 //Textures
 layout(binding = 0) uniform sampler2D reflectionMap;
 layout(binding = 1) uniform sampler2D distortionMap;
 layout(binding = 2) uniform sampler2D normalMap;
+
+layout (std140, binding = 0) uniform CamMatrices{
+    uniform mat4 cam_projection;
+    uniform mat4 cam_view;
+    uniform mat4 object_transform;
+    uniform vec3 cam_position;
+};
 
 layout (std140, binding = 51) uniform WaterData{
     bool hasReflectionMap; //0
@@ -47,9 +55,12 @@ void main(){
 		Normal = normalize(TBN * Normal);
 	}
 
+    vec3 CamToWater = normalize(cam_position - FragPos);
+    float angle = max(dot(CamToWater, vec3(0,1,0)), 0.0);
+
     color = Reflection;
-    color *= DiffuseColor;
-    color.a = 0.67;
+    color += DiffuseColor;
+    color.a = (1 - angle);
 
     tDiffuse = color;
     tNormal = Normal;

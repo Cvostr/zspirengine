@@ -1,6 +1,8 @@
 #version 450
+
 #extension GL_ARB_separate_shader_objects : enable
 
+#include "../HEADER.glsl"
 
 layout(location = 0) out vec3 FragPos;
 layout(location = 1) out vec3 InNormal;
@@ -27,6 +29,7 @@ layout( push_constant ) uniform constants
 {
     int TransformMatIndex;
     int SkinningMatIndex;
+    int CameraIndex;
 } PushConstants;
 
 layout(std140, set = 2, binding = 0) readonly buffer TransformBuffer{   
@@ -36,6 +39,10 @@ layout(std140, set = 2, binding = 0) readonly buffer TransformBuffer{
 layout(std140, set = 2, binding = 1) readonly buffer BonesBuffer{   
 	mat4 bone_transform[];
 } bonesBuffer;
+
+layout(std140, set = 2, binding = 2) readonly buffer CamsBuffer{   
+	CameraInfo cameras[];
+} camsBuffer;
 
 layout (std140, binding = 0) uniform CamMatrices{
     uniform mat4 cam_projection;
@@ -103,6 +110,9 @@ void main() {
 	vec3 NormalVec = normalize(vec3(Transform * vec4(normal, 0)));
 	TBN = transpose(mat3(TangentVec, BiTangentVec, NormalVec));
 
-    gl_Position = cam_projection * cam_view * vertpos;
+    mat4 CamProjection = camsBuffer.cameras[PushConstants.CameraIndex].Projection;
+    mat4 CamView = camsBuffer.cameras[PushConstants.CameraIndex].View;
+
+    gl_Position = CamProjection * CamView * vertpos;
     _uv = uv;
 }

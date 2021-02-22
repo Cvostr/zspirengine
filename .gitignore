@@ -1,4 +1,4 @@
 *.user 
-*.filters
+*.exe
 x64/
 .vs/

@@ -1,0 +1,845 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Исходные файлы\engine">
+      <UniqueIdentifier>{2442b0c3-2f5e-46c3-bdb3-f453e33dee17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\input">
+      <UniqueIdentifier>{e324acdc-09ce-4b00-bb22-5bf722e8fc42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\misc">
+      <UniqueIdentifier>{6d4108b1-e102-4e27-8342-257c7a7a66bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\ogl">
+      <UniqueIdentifier>{278eb23b-833c-4d20-8f02-4155995f849e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\vk">
+      <UniqueIdentifier>{e22cd322-6858-4302-9ea4-92a9002fa6c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\render">
+      <UniqueIdentifier>{433f3fb0-d5b7-41ed-ad05-25d60a36354e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\world">
+      <UniqueIdentifier>{4dc897d8-bb27-4518-8f54-48d41c814e6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\world\GoProperty">
+      <UniqueIdentifier>{67557a6a-f61a-470e-9cbf-713f56b0bbd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\ui">
+      <UniqueIdentifier>{ee9d3a75-4901-4d2c-a05a-5143c9fd35f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{73b2ce98-2eda-4c04-93bd-f5b07a4343ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\3d">
+      <UniqueIdentifier>{0214c88a-4252-458f-b5f4-03e8de954d04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\heightmap">
+      <UniqueIdentifier>{d5e4a9c3-8aa4-46ab-8a45-38ec6f1e9a7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\input">
+      <UniqueIdentifier>{ab5c2f24-55ce-45a3-89e3-b50791961bd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\misc">
+      <UniqueIdentifier>{08ea2bf8-33c4-41b7-b711-aa25edec0704}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\ui">
+      <UniqueIdentifier>{8733492f-36e3-4ba3-a57a-3b829ede474a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\world">
+      <UniqueIdentifier>{69def86a-085a-4f07-bbb4-82c5673d3f39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\render">
+      <UniqueIdentifier>{fb8d5fc7-b9cc-410d-8f84-fa5057a85b54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\ogl">
+      <UniqueIdentifier>{1c64d0fa-c4b3-4717-a4f4-c6098873a15f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Scripting">
+      <UniqueIdentifier>{04ad958a-b164-4c99-a263-453555d16b99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Scripting">
+      <UniqueIdentifier>{436d468c-bca7-4796-88ed-6fa1c68b9a34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\vulkan">
+      <UniqueIdentifier>{98d35f59-2d00-4a11-a98e-4ebcda9afea9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\math">
+      <UniqueIdentifier>{060aa0a4-0401-4816-8f56-a02bb9f142df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\math">
+      <UniqueIdentifier>{ab47b518-65ee-4e66-b221-bf55400baafc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Scripting\Types">
+      <UniqueIdentifier>{ec2673ab-06aa-4ff9-a614-3e50d8fd5375}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Scripting\Types">
+      <UniqueIdentifier>{bff3f216-f105-4329-be9f-d5a641bdcd4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\ui\Widgets">
+      <UniqueIdentifier>{8b53fbb4-7b9c-4057-bf3a-4c30091d603d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\ui\Layouts">
+      <UniqueIdentifier>{f029b1ba-75d9-45ea-95ed-3fcc505c3d43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\ui\Widgets">
+      <UniqueIdentifier>{e6a7a1c3-6995-40f0-8691-7389cb414ac7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\ui\Layouts">
+      <UniqueIdentifier>{15b03d52-b978-4372-bff0-d9938b4c5aea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\threading">
+      <UniqueIdentifier>{f9a3efc8-a8f6-494e-8dc4-cdbfa9b6190f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\audio">
+      <UniqueIdentifier>{5902ed53-d0ca-4b7c-b0fa-d091bb5c0e78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\audio">
+      <UniqueIdentifier>{b14854d0-4e36-4f08-b303-b95170585b41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\world\ObjectComponents">
+      <UniqueIdentifier>{b323d809-f907-4ca7-9abb-a8b9b773d8b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\resources">
+      <UniqueIdentifier>{029b9e6d-99a6-4dd2-979a-8d04823466e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\render\ScreenEffect">
+      <UniqueIdentifier>{da0d0025-b978-4fd3-bb40-3fb732c90b4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\threading">
+      <UniqueIdentifier>{08ea8008-fb33-41bd-b994-62f1988e4b61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\engine">
+      <UniqueIdentifier>{1eee113a-b2c6-4c42-bf77-fe775abc7308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\hw">
+      <UniqueIdentifier>{239348dc-515b-42f9-8ac4-448a271f77ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\hw">
+      <UniqueIdentifier>{a6e79e15-03ab-4961-8c89-f79c490f2308}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="code\src\engine.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\misc\GlyphManager.cpp">
+      <Filter>Исходные файлы\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\misc\zs3m-master.cpp">
+      <Filter>Исходные файлы\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GameObject.cpp">
+      <Filter>Исходные файлы\world</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\PhysicalWorld.cpp">
+      <Filter>Исходные файлы\world</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\Terrain.cpp">
+      <Filter>Исходные файлы\world</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\World.cpp">
+      <Filter>Исходные файлы\world</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\go_properties.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\TerrainComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\tile_properties.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\resources\TextureResource.cpp">
+      <Filter>Исходные файлы\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\resources\MeshResource.cpp">
+      <Filter>Исходные файлы\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\resources\AudioResource.cpp">
+      <Filter>Исходные файлы\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\resources\AnimationResource.cpp">
+      <Filter>Исходные файлы\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\resources\MaterialResource.cpp">
+      <Filter>Исходные файлы\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\AnimationComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\resources\GlyphResource.cpp">
+      <Filter>Исходные файлы\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\CharacterController.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\TransformProperty.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\engine\LocaleStringsFile.cpp">
+      <Filter>Исходные файлы\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\MeshProperty.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\Scripting\AngelScript.cpp">
+      <Filter>Исходные файлы\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\Scripting\AngelScriptMgr.cpp">
+      <Filter>Исходные файлы\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\Scripting\GameObjectAG.cpp">
+      <Filter>Исходные файлы\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\misc\output.cpp">
+      <Filter>Исходные файлы\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\NodeProperty.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\ColliderProperty.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\Scripting\InputAG.cpp">
+      <Filter>Исходные файлы\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\Scripting\MathAG.cpp">
+      <Filter>Исходные файлы\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\Scripting\ResourcesAG.cpp">
+      <Filter>Исходные файлы\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\misc\misc.cpp">
+      <Filter>Исходные файлы\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\Scripting\FilesAG.cpp">
+      <Filter>Исходные файлы\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\misc\KeyValueFile.cpp">
+      <Filter>Исходные файлы\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\LabelProperty.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\resources\ScriptResource.cpp">
+      <Filter>Исходные файлы\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\Camera.cpp">
+      <Filter>Исходные файлы\world</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\engine\EngineComponent.cpp">
+      <Filter>Исходные файлы\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\Math.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\Shader.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\Texture.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\Mesh.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\math\Vec3.cpp">
+      <Filter>Исходные файлы\math</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\math\Mat4.cpp">
+      <Filter>Исходные файлы\math</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\math\BB3.cpp">
+      <Filter>Исходные файлы\math</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\Animation.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\UniformBuffer.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\Material.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\Scripting\Types\StdString.cpp">
+      <Filter>Исходные файлы\Scripting\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\math\Quat.cpp">
+      <Filter>Исходные файлы\math</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ui\Widgets\Button.cpp">
+      <Filter>Исходные файлы\ui\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ui\Widgets\Widget.cpp">
+      <Filter>Исходные файлы\ui\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ui\View.cpp">
+      <Filter>Исходные файлы\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ui\Layouts\FreeLayout.cpp">
+      <Filter>Исходные файлы\ui\Layouts</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ui\Layouts\LinearLayout.cpp">
+      <Filter>Исходные файлы\ui\Layouts</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ui\Layouts\ILayout.cpp">
+      <Filter>Исходные файлы\ui\Layouts</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\Framebuffer.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\TerrainRender.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\engine\Resources.cpp">
+      <Filter>Исходные файлы\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ui\UiManager.cpp">
+      <Filter>Исходные файлы\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\Renderer.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\resources\BackgroundLoader.cpp">
+      <Filter>Исходные файлы\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\Scripting\Types\ASFile.cpp">
+      <Filter>Исходные файлы\Scripting\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\engine\Logger.cpp">
+      <Filter>Исходные файлы\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\ZSVulkanInstance.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\ZSVulkanDevice.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\ZSVulkanSwapchain.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\audio\SoundBuffer.cpp">
+      <Filter>Исходные файлы\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\audio\SoundSource.cpp">
+      <Filter>Исходные файлы\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\audio\OALManager.cpp">
+      <Filter>Исходные файлы\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ogl\GLRenderer.cpp">
+      <Filter>Исходные файлы\ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\ZSVulkanPipeline.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\VKRenderer.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\ZSVulkanFramebuffer.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\ZSVMA.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ogl\GLFramebuffer.cpp">
+      <Filter>Исходные файлы\ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ui\UiScripting.cpp">
+      <Filter>Исходные файлы\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\ZSVulkanCmdBuf.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\ZSVulkanSampler.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\ZSVulkanDescriptorSet.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\engine\Time.cpp">
+      <Filter>Исходные файлы\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\engine\Window.cpp">
+      <Filter>Исходные файлы\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\engine\EngineComponentManager.cpp">
+      <Filter>Исходные файлы\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\ZSVulkanRenderPass.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\ZSVulkanPipelineLayout.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ogl\GLMesh.cpp">
+      <Filter>Исходные файлы\ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ogl\GLShader.cpp">
+      <Filter>Исходные файлы\ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ogl\GLTexture.cpp">
+      <Filter>Исходные файлы\ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ogl\GLUniformBuffer.cpp">
+      <Filter>Исходные файлы\ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ogl\GLScreenEffect.cpp">
+      <Filter>Исходные файлы\ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\VKMesh.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\VKShader.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\VKTexture.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\VKUniformBuffer.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\resources\PrefabResource.cpp">
+      <Filter>Исходные файлы\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\resources\LocalizedStringResource.cpp">
+      <Filter>Исходные файлы\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\ZPScriptComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\LightsourceComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\AudioSourceComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\RigidbodyComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\ShadowCasterComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\TriggerComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\MaterialComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\input\Input.cpp">
+      <Filter>Исходные файлы\input</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\MaterialTemplates.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\threading\Mutex.cpp">
+      <Filter>Исходные файлы\threading</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\threading\Thread.cpp">
+      <Filter>Исходные файлы\threading</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\VKMaterial.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\WindZoneComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\ParticleEmitterComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\resources\SceneResource.cpp">
+      <Filter>Исходные файлы\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\CameraComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\math\Plane.cpp">
+      <Filter>Исходные файлы\math</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\ogl\GLTextureSampler.cpp">
+      <Filter>Исходные файлы\ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\render\TextureSampler.cpp">
+      <Filter>Исходные файлы\render</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\hw\CpuInfo.cpp">
+      <Filter>Исходные файлы\hw</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\world\GoProperty\AudioListenerComponent.cpp">
+      <Filter>Исходные файлы\world\GoProperty</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="code\headers\world\Physics.h">
+      <Filter>Файлы заголовков\world</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\tile_properties.h">
+      <Filter>Файлы заголовков\world</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\misc\GlyphManager.h">
+      <Filter>Файлы заголовков\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\misc\zs3m-master.h">
+      <Filter>Файлы заголовков\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\engine.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\engine\LocaleStringsFile.h">
+      <Filter>Файлы заголовков\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\Scripting\AngelScript.hpp">
+      <Filter>Файлы заголовков\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\Scripting\AngelScriptMgr.h">
+      <Filter>Файлы заголовков\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\game.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\misc\RefCounter.hpp">
+      <Filter>Файлы заголовков\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\misc\output.hpp">
+      <Filter>Файлы заголовков\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\misc\misc.h">
+      <Filter>Файлы заголовков\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\misc\KeyValueFile.hpp">
+      <Filter>Файлы заголовков\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\Camera.hpp">
+      <Filter>Файлы заголовков\world</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\World.hpp">
+      <Filter>Файлы заголовков\world</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\Terrain.hpp">
+      <Filter>Файлы заголовков\world</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\misc\SmArray.hpp">
+      <Filter>Файлы заголовков\misc</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\engine\EngineComponent.h">
+      <Filter>Файлы заголовков\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\Math.hpp">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\Texture.h">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\Shader.hpp">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\Animation.hpp">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\UniformBuffer.hpp">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\math\BB3.hpp">
+      <Filter>Файлы заголовков\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\math\Mat4.hpp">
+      <Filter>Файлы заголовков\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\math\Vec3.hpp">
+      <Filter>Файлы заголовков\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\math\Vec4.hpp">
+      <Filter>Файлы заголовков\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\math\Quat.hpp">
+      <Filter>Файлы заголовков\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\math\Vec2.hpp">
+      <Filter>Файлы заголовков\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\math\Vertex.hpp">
+      <Filter>Файлы заголовков\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\math\RGBColor.hpp">
+      <Filter>Файлы заголовков\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\Mesh.hpp">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\Material.hpp">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\Scripting\Types\StdString.hpp">
+      <Filter>Файлы заголовков\Scripting\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ui\View.hpp">
+      <Filter>Файлы заголовков\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ui\Widgets\Button.hpp">
+      <Filter>Файлы заголовков\ui\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ui\Widgets\Widget.hpp">
+      <Filter>Файлы заголовков\ui\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ui\Layouts\LinearLayout.hpp">
+      <Filter>Файлы заголовков\ui\Layouts</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ui\Layouts\ILayout.hpp">
+      <Filter>Файлы заголовков\ui\Layouts</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ui\Layouts\FreeLayout.hpp">
+      <Filter>Файлы заголовков\ui\Layouts</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ui\UI.hpp">
+      <Filter>Файлы заголовков\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\Framebuffer.hpp">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ui\UiManager.hpp">
+      <Filter>Файлы заголовков\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\engine\BackgroundLoader.hpp">
+      <Filter>Файлы заголовков\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\Renderer.hpp">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\Scripting\Types\ASFile.hpp">
+      <Filter>Файлы заголовков\Scripting\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\engine_types.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\engine\Resources.hpp">
+      <Filter>Файлы заголовков\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\engine\Logger.hpp">
+      <Filter>Файлы заголовков\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkanInstance.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkanDevice.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkanSwapchain.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\audio\SoundSource.hpp">
+      <Filter>Файлы заголовков\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\audio\SoundBuffer.hpp">
+      <Filter>Файлы заголовков\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\audio\OALManager.hpp">
+      <Filter>Файлы заголовков\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ogl\GLRenderer.hpp">
+      <Filter>Файлы заголовков\ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\GpuObject.hpp">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkanPipeline.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\VKRenderer.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ogl\GLFramebuffer.hpp">
+      <Filter>Файлы заголовков\ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkanFramebuffer.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVMA.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkan.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\engine\Time.hpp">
+      <Filter>Файлы заголовков\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\AudioSourceComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\ShadowCasterComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\ZPScriptComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\LightSourceComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\TerrainComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\MaterialComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\MeshComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\AnimationComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\NodeComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ui\UiScripting.hpp">
+      <Filter>Файлы заголовков\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\CharacterController.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\PhysicalComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\ColliderComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\RigidbodyComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\TriggerComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\SkyboxComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkanCmdBuf.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkanDescriptorSet.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkanSampler.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkanBuffer.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\engine\Window.hpp">
+      <Filter>Файлы заголовков\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\engine\EngineComponentManager.hpp">
+      <Filter>Файлы заголовков\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkanRenderPass.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\ZSVulkanPipelineLayout.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\ScreenEffect.hpp">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ogl\GLTexture.hpp">
+      <Filter>Файлы заголовков\ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ogl\GLMesh.hpp">
+      <Filter>Файлы заголовков\ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ogl\GLScreenEffect.hpp">
+      <Filter>Файлы заголовков\ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ogl\GLShader.hpp">
+      <Filter>Файлы заголовков\ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ogl\GLUniformBuffer.hpp">
+      <Filter>Файлы заголовков\ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\VKTexture.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\VKMesh.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\VKShader.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\VKUniformBuffer.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\threading\Mutex.hpp">
+      <Filter>Файлы заголовков\threading</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\threading\Thread.hpp">
+      <Filter>Файлы заголовков\threading</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\input\Input.hpp">
+      <Filter>Файлы заголовков\input</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\VKMaterial.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\WindZoneComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\ParticleEmitterComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\CameraComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\vulkan\VKScreenEffect.hpp">
+      <Filter>Файлы заголовков\vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\math\Plane.hpp">
+      <Filter>Файлы заголовков\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\render\TextureSampler.hpp">
+      <Filter>Файлы заголовков\render</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ogl\GLTextureSampler.hpp">
+      <Filter>Файлы заголовков\ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\hw\CpuInfo.hpp">
+      <Filter>Файлы заголовков\hw</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\hw\GpuInfo.hpp">
+      <Filter>Файлы заголовков\hw</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\ObjectsComponents\AudioListenerComponent.hpp">
+      <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="code\Shaders\3d\3d.frag">
+      <Filter>Shaders\3d</Filter>
+    </None>
+    <None Include="code\Shaders\3d\3d.vert">
+      <Filter>Shaders\3d</Filter>
+    </None>
+    <None Include="code\Shaders\3d\3d_unskinned.vert">
+      <Filter>Shaders\3d</Filter>
+    </None>
+    <None Include="code\Shaders\heightmap\grass.frag">
+      <Filter>Shaders\heightmap</Filter>
+    </None>
+    <None Include="code\Shaders\heightmap\grass.vert">
+      <Filter>Shaders\heightmap</Filter>
+    </None>
+    <None Include="code\Shaders\heightmap\heightmap.frag">
+      <Filter>Shaders\heightmap</Filter>
+    </None>
+    <None Include="code\Shaders\heightmap\heightmap.vert">
+      <Filter>Shaders\heightmap</Filter>
+    </None>
+  </ItemGroup>
+</Project>

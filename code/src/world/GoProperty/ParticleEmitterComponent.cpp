@@ -1,4 +1,4 @@
-#include "../../../headers/world/ObjectsComponents/ParticleEmitterComponent.hpp"
+#include <world/ObjectsComponents/ParticleEmitterComponent.hpp>
 
 void Engine::ParticleEmitterComponent::onUpdate(float deltaTime) {
 
@@ -36,8 +36,8 @@ Engine::ParticleEmitterComponent::ParticleEmitterComponent() :
 	mPrewarm(true),
 	mLifetime(2),
 	mMaxParticles(100),
-	mStartSpeed(5),
-	mStartSize(10),
+	mSpeed(5),
+	mSize(10.f),
 	mStartRotation(0)
 {
 	type = PROPERTY_TYPE::GO_PROPERTY_TYPE_PARTICLE_EMITTER;

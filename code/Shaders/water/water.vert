@@ -17,14 +17,17 @@ layout (location = 0) out vec4 ClipSpace;
 layout (location = 1) out vec2 DistortionUV;
 layout (location = 2) out vec2 UV;
 layout (location = 3) out vec3 FragPos;
-layout (location = 4) out mat3 TBN;
+layout (location = 4) out vec3 OrigNormal;
+layout (location = 5) out mat3 TBN;
 
 void main(){
     vec4 FragPos4 = object_transform * vec4(position, 1.0);
 	gl_Position = cam_projection * cam_view * FragPos4;
+    
 	ClipSpace = gl_Position;
     UV = uv;
     FragPos = FragPos4.xyz;
+    OrigNormal = normal;
 
     DistortionUV = vec2(position.x, position.y) / 2 + 0.5;
 
