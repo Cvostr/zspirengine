@@ -1,8 +1,10 @@
 #pragma once
 
-#include "../render/Framebuffer.hpp"
-#include "../vulkan/ZSVulkanRenderPass.hpp"
-#include "../render/Texture.h"
+#include <render/Framebuffer.hpp>
+#include "ZSVulkanRenderPass.hpp"
+#include "ZSVulkanDescriptorSet.hpp"
+#include "ZSVulkanPipelineLayout.hpp"
+#include <render/Texture.h>
 #include <vulkan/vulkan.hpp>
 #include <vector>
 
@@ -12,6 +14,7 @@ namespace Engine {
 	private:
 		VkFramebuffer mFramebuffer;
         std::vector<VkImageView> Views;
+        ZSVulkanDescriptorSet* AttachmentsDescrSet;
         unsigned int mLayersCount;
         ZSVulkanRenderPass* mPickedRenderPass;
 	public:
@@ -34,6 +37,8 @@ namespace Engine {
         void AddTexture(Texture* Texture);
 
         void SetSize(uint32_t Width, uint32_t Height);
+
+        void BindAttachmentsDescrSet(uint32_t Slot, VkCommandBuffer cmdbuf, ZSVulkanPipelineLayout* Layout);
 
 		ZSVulkanFramebuffer();
         ZSVulkanFramebuffer(unsigned int width, unsigned int height);

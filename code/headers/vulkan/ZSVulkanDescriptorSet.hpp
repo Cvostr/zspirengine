@@ -31,6 +31,7 @@ namespace Engine {
 		void pushUniformBuffer(vkUniformBuffer* buf, VkShaderStageFlags stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS);
 		void pushStorageBuffer(vkUniformBuffer* buf, VkShaderStageFlags stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS);
 		void pushImageSampler(int slot);
+		void pushImageSamplers(int FirstSlot, int LastSlot);
 
 		void setTexture(int index, VkImageView image, ZSVulkanSampler* sampler);
 

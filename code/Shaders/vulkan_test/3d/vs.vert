@@ -44,13 +44,6 @@ layout(std140, set = 2, binding = 2) readonly buffer CamsBuffer{
 	CameraInfo cameras[];
 } camsBuffer;
 
-layout (std140, binding = 0) uniform CamMatrices{
-    uniform mat4 cam_projection;
-    uniform mat4 cam_view;
-    uniform mat4 object_transform;
-    uniform vec3 cam_position;
-};
-
 mat4 getBoneTransform(){
     int _ids[12];
     float _weights[12];

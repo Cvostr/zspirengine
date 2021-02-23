@@ -1,4 +1,4 @@
-#include "../../headers/ogl/GLMesh.hpp"
+#include <ogl/GLMesh.hpp>
 
 
 Engine::glMesh::glMesh():

@@ -49,7 +49,7 @@ void RemoveExtension(std::string& str) {
 void GetFileName(std::string& str) {
     std::string old = str;
     str.clear();
-    int last_slash = old.size() - 1;
+    int last_slash = static_cast<int>(old.size()) - 1;
     while (old[last_slash] != '/')
         last_slash--;
     for (int i = last_slash + 1; i < old.size(); i++) {

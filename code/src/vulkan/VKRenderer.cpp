@@ -59,11 +59,9 @@ void Engine::VKRenderer::render3D() {
     }
 
     FillShadowCmdBuf();
-    Fill3dCmdBuf();
     
  */
     ComputeAll();
-  //  Present();
 }
 
 void Engine::VKRenderer::Render3DCamera(void* cam_prop, uint32_t cam_index) {
@@ -172,6 +170,23 @@ void Engine::VKRenderer::Render3DCamera(void* cam_prop, uint32_t cam_index) {
         vkCmdEndRenderPass(gbuffer_cmdbuf);
         vkEndCommandBuffer(gbuffer_cmdbuf);
 
+
+        //Deffered cmdbuf
+        vkBeginCommandBuffer(deffered_cmdbuf, &beginInfo);
+
+        game_data->vk_main->CurrentCmdBuffer = deffered_cmdbuf;
+
+        DefferedRenderPass->SetClearSize(vp.endX, vp.endY);
+        DefferedRenderPass->CmdBegin(deffered_cmdbuf, deffered_fb);
+
+        DefferedPipeline->CmdBindPipeline(deffered_cmdbuf);
+        DefferedPipeline->CmdBindDescriptorSets(deffered_cmdbuf);
+        gbuffer_fb->BindAttachmentsDescrSet(1, deffered_cmdbuf, DefferedPipeline->GetPipelineLayout());
+
+        Engine::getPlaneMesh2D()->Draw();
+
+        vkCmdEndRenderPass(deffered_cmdbuf);
+        vkEndCommandBuffer(deffered_cmdbuf);
 }
 
 void Engine::VKRenderer::DrawObject(Engine::GameObject* obj) {
@@ -283,21 +298,10 @@ void Engine::VKRenderer::InitShaders() {
     Conf.cullFace = false;
     Conf.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->transformBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
     Conf.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->lightsBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
-
-    Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(0);
-    Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(1);
-    Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(2);
-    Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(3);
-    Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(4);
+    Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSamplers(0, 5);
    
     DefferedPipeline = new Engine::ZSVulkanPipeline;
-    DefferedPipeline->Create((Engine::vkShader*)deffered_light, OutRenderPass, Conf);
-    /*Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(0, MaterialFb->getImageViewIndex(0), mMaterialSampler);
-    Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(1, MaterialFb->getImageViewIndex(1), mMaterialSampler);
-    Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(2, MaterialFb->getImageViewIndex(2), mMaterialSampler);
-    Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(3, MaterialFb->getImageViewIndex(3), mMaterialSampler);
-    Conf.LayoutInfo.DescrSetLayoutSampler->setTexture(4, MaterialFb->getImageViewIndex(4), mMaterialSampler);*/
-
+    DefferedPipeline->Create((Engine::vkShader*)deffered_light, DefferedRenderPass, Conf);
 
     Engine::ZsVkPipelineConf ConfShadow;
     ConfShadow.hasDepth = true;
@@ -342,8 +346,6 @@ void Engine::VKRenderer::InitShaders() {
     vkAllocateCommandBuffers(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, &mDefferedCmdBuf);
     vkAllocateCommandBuffers(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, &mShadowCmdBuf);
 
-    FillDefferedCmdBuf();
-
     if (engine_ptr->desc->game_perspective == PERSP_3D) {
         MtShProps::genDefaultMtShGroup(default3d, mSkyboxShader, mTerrainShader, water_shader);
     }
@@ -384,140 +386,6 @@ void Engine::VKRenderer::FillShadowCmdBuf() {
     vkEndCommandBuffer(mShadowCmdBuf);
 }
 
-void Engine::VKRenderer::Fill3dCmdBuf() {
-    VkCommandBufferBeginInfo beginInfo = {};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = 0; // Optional
-    beginInfo.pInheritanceInfo = nullptr; // Optional
-
-    vkBeginCommandBuffer(m3dCmdBuf, &beginInfo);
-
-    game_data->vk_main->CurrentCmdBuffer = m3dCmdBuf;
-
-   // GBufferRenderPass->CmdBegin(m3dCmdBuf, MaterialFb);
-
-    render_settings.CurrentViewMask = 0xFFFFFFFFFFFFFFFF;
-
-    bool binded = false;
-
-    for (unsigned int i = 0; i < ObjectsToRender.size(); i++) {
-        VKObjectToRender* obr = &ObjectsToRender[i];
-        GameObject* obj = ObjectsToRender[i].obj;
-        if (obj->hasMesh() && obr->mat != nullptr) {
-            MeshProperty* mesh = obj->getPropertyPtr<MeshProperty>();
-            ZSVulkanPipeline* Pipeline = ((VKMaterialTemplate*)obr->mat->mTemplate)->Pipeline;
-            if (((VKMaterialTemplate*)obr->mat->mTemplate)->mPipelineCreated) {
-                if (!binded) {
-                    Pipeline->CmdBindPipeline(m3dCmdBuf);
-
-                    ((VKMaterialTemplate*)obr->mat->mTemplate)->Pipeline->GetPipelineLayout()
-                        ->CmdBindDescriptorSets(m3dCmdBuf, 0, 3);
-
-                    binded = true;
-                }
-
-
-                VkDescriptorSet set = obr->mat->DescrSetTextures->getDescriptorSet();
-                if (Pipeline != nullptr) {
-
-                    vkCmdBindDescriptorSets(m3dCmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                        Pipeline->_GetPipelineLayout(), 1,
-                        1, &set, 0, nullptr);
-                    //Send object transform
-                    Pipeline->CmdPushConstants(m3dCmdBuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 8, &obr->TransformArrayIndex);
-                    //Send material props
-                    unsigned int bufsize = obr->mat->mTemplate->mUniformBuffer->GetBufferSize();
-                    void* bufdata = obr->mat->mTemplate->mUniformBuffer->GetCpuBuffer();
-                    Pipeline->CmdPushConstants(m3dCmdBuf, VK_SHADER_STAGE_FRAGMENT_BIT, 64, bufsize, obr->mat->MatData);
-                    
-                }
-                if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
-                    obj->DrawMesh(this);
-            }
-        }
-    }
-
-
-    vkCmdEndRenderPass(m3dCmdBuf);
-    vkEndCommandBuffer(m3dCmdBuf);
-}
-
-void Engine::VKRenderer::FillDefferedCmdBuf() {
-    VkCommandBufferBeginInfo beginInfo = {};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = 0; // Optional
-    beginInfo.pInheritanceInfo = nullptr; // Optional
-
-    vkBeginCommandBuffer(mDefferedCmdBuf, &beginInfo);
-
-    game_data->vk_main->CurrentCmdBuffer = mDefferedCmdBuf;
-
-    OutRenderPass->CmdBegin(mDefferedCmdBuf, OutFb);
-
-    DefferedPipeline->CmdBindPipeline(mDefferedCmdBuf);
-    DefferedPipeline->CmdBindDescriptorSets(mDefferedCmdBuf);
-
-    Engine::getPlaneMesh2D()->Draw();
-
-    vkCmdEndRenderPass(mDefferedCmdBuf);
-    vkEndCommandBuffer(mDefferedCmdBuf);
-}
-
-void Engine::VKRenderer::Present() {
-    uint32_t _imageIndex;
-    vkAcquireNextImageKHR(game_data->vk_main->mDevice->getVkDevice(), game_data->vk_main->mSwapChain->GetSwapChain(), UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &_imageIndex);
-    _imageIndex = 0;
-
-
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-    VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-    submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = &imageAvailableSemaphore;
-    submitInfo.pWaitDstStageMask = waitStages;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &m3dCmdBuf;
-    submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores = &MaterialsFinishedSemaphore;
-    vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-
-
-    submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = &MaterialsFinishedSemaphore;
-    submitInfo.pWaitDstStageMask = waitStages;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &mShadowCmdBuf;
-    submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores = &ShadowFinishedSemaphore;
-    vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-    
-
-    submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = &ShadowFinishedSemaphore;
-    submitInfo.pWaitDstStageMask = waitStages;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &mDefferedCmdBuf;
-    submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores = &DefferedFinishedSemaphore;
-    vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-
-
-    VkPresentInfoKHR presentInfo = {};
-    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
-    presentInfo.waitSemaphoreCount = 1;
-    presentInfo.pWaitSemaphores = &DefferedFinishedSemaphore;
-
-    VkSwapchainKHR swapChains[] = { game_data->vk_main->mSwapChain->GetSwapChain() };
-    presentInfo.swapchainCount = 1;
-    presentInfo.pSwapchains = swapChains;
-    uint32_t imageIndex = 0;
-    presentInfo.pImageIndices = &imageIndex;
-    presentInfo.pResults = nullptr; // Optional
-    vkQueuePresentKHR(game_data->vk_main->mDevice->GetPresentQueue(), &presentInfo);
-}
-
 void Engine::VKRenderer::ComputeAll() {
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -543,8 +411,17 @@ void Engine::VKRenderer::ComputeAll() {
         submitInfo.pSignalSemaphores = &MaterialsFinishedSemaphore;
         vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
 
-        Wait = MaterialsFinishedSemaphore;
+        
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = &MaterialsFinishedSemaphore;
+        submitInfo.pWaitDstStageMask = waitStages;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &CR->DefferedCmdBuf;
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = &DefferedFinishedSemaphore;
+        vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
 
+        Wait = DefferedFinishedSemaphore;
     }
 
     VkPresentInfoKHR presentInfo = {};

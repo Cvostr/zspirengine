@@ -81,12 +81,9 @@ namespace Engine {
 		std::vector<VKObjectToRender> ObjectsToRender;
 		std::vector<VKCameraToRender> CamerasToRender;
 
-		void Present();
 		void ComputeAll();
 
 		void FillShadowCmdBuf();
-		void FillDefferedCmdBuf();
-		void Fill3dCmdBuf();
 
 		int LastTransformOffset;
 		int LastSkinningOffset;

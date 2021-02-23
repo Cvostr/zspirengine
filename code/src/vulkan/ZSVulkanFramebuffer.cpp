@@ -31,12 +31,22 @@ bool Engine::ZSVulkanFramebuffer::Create(ZSVulkanRenderPass* renderpass) {
 		framebufferInfo.width = Width;
 		framebufferInfo.height = Height;
 		framebufferInfo.layers = mLayersCount;
-
+		//Try to create framebuffer
 		if (vkCreateFramebuffer(game_data->vk_main->mDevice->getVkDevice(), &framebufferInfo, nullptr, &mFramebuffer) != VK_SUCCESS) {
 			return false;
 		}
-
+		//Store picked renderpass
 		mPickedRenderPass = renderpass;
+
+
+		AttachmentsDescrSet = new ZSVulkanDescriptorSet(DESCR_SET_TYPE::DESCR_SET_TYPE_TEXTURE);
+		for (unsigned int attachment_i = 0; attachment_i < Views.size(); attachment_i++)
+			AttachmentsDescrSet->pushImageSampler(attachment_i);
+
+		AttachmentsDescrSet->getDescriptorSetLayout();
+
+		for (unsigned int attachment_i = 0; attachment_i < Views.size(); attachment_i++)
+			AttachmentsDescrSet->setTexture(attachment_i, Views[attachment_i], game_data->vk_main->mDefaultTextureSampler);
 
 		mCreated = true;
 
@@ -157,4 +167,9 @@ void Engine::ZSVulkanFramebuffer::SetSize(uint32_t Width, uint32_t Height) {
 		mCreated = false;
 		Create(mPickedRenderPass);
 	}
+}
+
+void Engine::ZSVulkanFramebuffer::BindAttachmentsDescrSet(uint32_t Slot, VkCommandBuffer cmdbuf, ZSVulkanPipelineLayout* Layout) {
+	VkDescriptorSet Set = AttachmentsDescrSet->getDescriptorSet();
+	vkCmdBindDescriptorSets(cmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, Layout->GetPipelineLayout(), Slot, 1, &Set, 0, nullptr);
 }

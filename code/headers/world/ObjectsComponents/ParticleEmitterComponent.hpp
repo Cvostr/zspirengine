@@ -7,9 +7,11 @@
 
 namespace Engine {
 
-    enum OverLifeCurve {
-        OLC_DIRECT,
-        OLC_INDIRECT
+    enum ParticleEmitterShape {
+        PE_SHAPE_NONE,
+        PE_SHAPE_SPHERE,
+        PE_SHAPE_BOX,
+        PE_SHAPE_CONE
     };
 
     template <typename T>
@@ -59,6 +61,7 @@ namespace Engine {
         Vec3 Position; //Current position of particle
         Vec3 Velocity; //Current velocity of particle
         Vec2 Size; // Current size of particle
+        RGBAColor Color; //Current color of particle
         float mTimePassed; //Time, elapsed from creation
 
         Particle() :
@@ -71,30 +74,28 @@ namespace Engine {
 
         std::vector<Particle> mParticles;
 
+        ParticleEmitterShape mShape;
         float mDuration; //single cycle duration
         bool mLooping; //Does particle system loop
         bool mPrewarm;
         float mLifetime; //Lifetime of single particle
         int32_t mMaxParticles; //Limit particles amount
 
-        float mSpeed;
+        DeltaValue<float> mVelocity;
         DeltaValue<float> mSize;
         float mStartRotation;
 
-        struct {
-            bool mEnabled;
-            RGBAColor mStartColor;
-            RGBAColor mEndColor;
-        }ColorOverLifetime;
+        DeltaValue<RGBAColor> Color;
 
-        struct {
-            Vec3 mDirection;
-        }VelocityOverLifetime;
+        bool mSimulating;
+
+        void StepSimulation();
+        void StartSimulation();
+        void StopSimulation();
 
         void addPropertyInterfaceToInspector();
         void onUpdate(float deltaTime);
         void copyTo(Engine::IGameObjectComponent* dest);
-        void onObjectDeleted(); //unregister in world
         void onStart();
 
         void loadPropertyFromMemory(const char* data, GameObject* obj);

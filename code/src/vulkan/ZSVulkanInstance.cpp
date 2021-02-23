@@ -21,8 +21,6 @@ const std::vector<const char*> validationLayers = {
 
 std::vector<const char*> extensions = {
     VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-   
-    //,"VK_EXT_debug_report"
 };
 
 bool Engine::ZSVulkanInstance::init(bool validate, const char* app_name, int app_ver, SDL_Window* window){

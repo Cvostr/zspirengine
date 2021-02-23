@@ -37,6 +37,12 @@ void Engine::ZSVulkanDescriptorSet::pushStorageBuffer(vkUniformBuffer* buf, VkSh
     ubuffers.push_back(buf);
 }
 
+void Engine::ZSVulkanDescriptorSet::pushImageSamplers(int FirstSlot, int LastSlot) {
+    for (int i = FirstSlot; i < LastSlot; i++) {
+        pushImageSampler(i);
+    }
+}
+
 void Engine::ZSVulkanDescriptorSet::pushImageSampler(int slot) {
 
     if (type != DESCR_SET_TYPE::DESCR_SET_TYPE_TEXTURE)

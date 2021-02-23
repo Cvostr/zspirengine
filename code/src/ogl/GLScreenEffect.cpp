@@ -6,7 +6,7 @@ void Engine::GLScreenEffect::Compute() {
 		glTexture* tex = static_cast<glTexture*>(mInputTextures[i]);
 
         glBindImageTexture(
-            i,                          //Always bind to slot 0
+            static_cast<GLuint>(i),                          //Always bind to slot 0
             tex->TEXTURE_ID,
             0,
             GL_FALSE,

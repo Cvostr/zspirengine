@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <GL/glew.h>
-#include "../../headers/ogl/GLTexture.hpp"
+#include <ogl/GLTexture.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
