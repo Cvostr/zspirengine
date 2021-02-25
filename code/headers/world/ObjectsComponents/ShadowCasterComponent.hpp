@@ -11,12 +11,6 @@ namespace Engine {
 
         GLframebuffer* Framebuffer;
 
-        //unsigned int mShadowBuffer;
-       // unsigned int mShadowDepthTexture;
-
-        Mat4 LightProjectionMat;
-        Mat4 LightViewMat[3];
-
         void reinitialize();
     public:
         int TextureSize;
@@ -33,7 +27,6 @@ namespace Engine {
         void copyTo(Engine::IGameObjectComponent* dest);
         void onValueChanged();
         void init();
-        void onObjectDeleted();
         void Draw(Engine::Camera* cam, Renderer* pipeline);
         void SendShadowParamsToShaders(Engine::Camera* cam, Renderer* pipeline);
         void setTexture();

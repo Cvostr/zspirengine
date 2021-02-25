@@ -1,4 +1,4 @@
-#include "../../headers/misc/misc.h"
+#include <misc/misc.h>
 #ifdef __linux__
 #include <sys/time.h>
 #endif

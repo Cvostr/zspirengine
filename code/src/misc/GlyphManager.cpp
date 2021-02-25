@@ -1,5 +1,5 @@
-#include "../../headers/misc/GlyphManager.h"
-#include "../../headers/game.h"
+#include <misc/GlyphManager.h>
+#include <game.h>
 
 #include <GL/glew.h>
 #include <iostream>

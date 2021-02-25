@@ -1,4 +1,7 @@
 #include <world/ObjectsComponents/ParticleEmitterComponent.hpp>
+#include <game.h>
+
+extern ZSGAME_DATA* game_data;
 
 void Engine::ParticleEmitterComponent::onUpdate(float deltaTime) {
 
@@ -48,17 +51,30 @@ void Engine::ParticleEmitterComponent::StartSimulation() {
 
 	TransformProperty* transform = go_link.updLinkPtr()->getTransformProperty();
 
+	Vec3 BaseVelocity = _getDirection(transform->abs_rotation);
+	BaseVelocity.Normalize();
+	this->mVelocity.OriginalValue = BaseVelocity;
+
 	for (unsigned int particle_i = 0; particle_i < mMaxParticles; particle_i++) {
 		Particle* particlePtr = &mParticles[particle_i];
 
 		particlePtr->Size = this->mSize.OriginalValue;
-		particlePtr->Velocity = this->mVelocity.OriginalValue;
+		particlePtr->Velocity = this->mVelocity.OriginalValue + Vec3(GetRandomValue(1.f, 100.f) / 100);
 		particlePtr->Position = transform->abs_translation;
 		particlePtr->Color = this->Color.OriginalValue;
 	}
 
 	mSimulating = true;
 }
+
+void Engine::ParticleEmitterComponent::EmitNewParticle() {
+
+}
+
+void Engine::ParticleEmitterComponent::DestroyParticle(Particle* Particle) {
+	
+}
+
 void Engine::ParticleEmitterComponent::StopSimulation() {
 	mParticles.clear();
 
@@ -69,8 +85,21 @@ void Engine::ParticleEmitterComponent::StepSimulation() {
 	if (!mSimulating)
 		return;
 
+	float DeltaTime = game_data->time->GetDeltaTime();
+
 	for (unsigned int particle_i = 0; particle_i < mMaxParticles; particle_i++) {
 		Particle* particlePtr = &mParticles[particle_i];
+
+		if (particlePtr->mTimePassed >= mLifetime)
+			DestroyParticle(particlePtr);
+
+		particlePtr->Velocity += Vec3(mVelocity.Add * DeltaTime);
+		particlePtr->Velocity *= mVelocity.Mul * DeltaTime;
+
+
+		particlePtr->Position += mVelocity.OriginalValue * DeltaTime;
+
+		particlePtr->mTimePassed += DeltaTime;
 	}
 }
 
@@ -82,7 +111,7 @@ Engine::ParticleEmitterComponent::ParticleEmitterComponent() :
 	mPrewarm(true),
 	mLifetime(2),
 	mMaxParticles(100),
-	mVelocity(5),
+	mVelocity(Vec3(0.f, 1.f, 0.f)),
 	mSize(10.f),
 	mStartRotation(0)
 {

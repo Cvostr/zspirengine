@@ -46,6 +46,8 @@
 #define SHADOWCAST_PROP_TYPE_NAME "ShadowCaster"
 #define CAMERA_PROP_TYPE_NAME "CameraComponent"
 
+#define MATERIAL_PROP_TYPE_NAME "MaterialShaderPropertyConf"
+
 #define AG_STRING 67108876
 #define AG_VECTOR3 67108881
 #define AG_QUAT 67108882

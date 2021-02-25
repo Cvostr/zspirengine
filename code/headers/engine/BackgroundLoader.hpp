@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
-#include "../threading/Thread.hpp"
-#include "../threading/Mutex.hpp"
+#include <threading/Thread.hpp>
+#include <threading/Mutex.hpp>
 
 #define LOADER_QUEUE_SIZE 300
 

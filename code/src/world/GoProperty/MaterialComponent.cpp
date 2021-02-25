@@ -42,6 +42,13 @@ void Engine::MaterialProperty::setMaterial(MaterialResource* mat) {
     setMaterial(mat->material);
 }
 
+MaterialShaderPropertyConf* Engine::MaterialProperty::GetPropertyConf(std::string Identifier) {
+    if (mMaterial != nullptr) {
+        return mMaterial->GetPropertyConf(Identifier);
+    }
+    return nullptr;
+}
+
 void Engine::MaterialProperty::loadPropertyFromMemory(const char* data, GameObject* obj) {
     unsigned int offset = 1;
     //Read material path
@@ -67,7 +74,12 @@ void Engine::MaterialProperty::savePropertyToStream(ZsStream* stream, GameObject
 }
 
 void Engine::MaterialProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+    mgr->RegisterObjectType(MATERIAL_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+    mgr->RegisterObjectMethod(MATERIAL_PROP_TYPE_NAME, "void SetInt(int)", asMETHOD(MaterialShaderPropertyConf, SetIntValue), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(MATERIAL_PROP_TYPE_NAME, "void SetFloat(float)", asMETHOD(MaterialShaderPropertyConf, SetFloatValue), asCALL_THISCALL);
+    
     mgr->RegisterObjectType(MAT_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     mgr->RegisterObjectMethod(MAT_PROP_TYPE_NAME, "void setMaterial(MaterialResource@)", asMETHODPR(MaterialProperty, setMaterial, (MaterialResource*), void), asCALL_THISCALL);
+    mgr->RegisterObjectMethod(MAT_PROP_TYPE_NAME, "MaterialShaderPropertyConf@ GetPropertyConf(string)", asMETHOD(MaterialProperty, GetPropertyConf), asCALL_THISCALL);
 }

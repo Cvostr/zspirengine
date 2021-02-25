@@ -1,8 +1,8 @@
-#include "../../headers/render/UniformBuffer.hpp"
-#include "../../headers/game.h"
+#include <render/UniformBuffer.hpp>
+#include <game.h>
 
-#include "../../headers/ogl/GLUniformBuffer.hpp"
-#include "../../headers/vulkan/VKUniformBuffer.hpp"
+#include <ogl/GLUniformBuffer.hpp>
+#include <vulkan/VKUniformBuffer.hpp>
 
 extern ZSpireEngine* engine_ptr;
 

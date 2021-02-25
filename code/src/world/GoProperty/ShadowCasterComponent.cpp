@@ -121,13 +121,6 @@ void Engine::ShadowCasterProperty::init() {
     this->initialized = true;
 }
 
-void Engine::ShadowCasterProperty::onObjectDeleted() {
-    glViewport(0, 0, TextureSize, TextureSize);
-    //Bind framebuffer
-    Framebuffer->bind();
-    glClear(GL_DEPTH_BUFFER_BIT);
-}
-
 void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam, Renderer* pipeline) {
     Engine::LightsourceComponent* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceComponent>();
 
@@ -160,7 +153,7 @@ void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam
         Mat4 matview = matrixLookAt(cam_pos, cam_pos + light->direction * -1, Vec3(0, 1, 0));
 
         float w = static_cast<float>(40 * (1 + i));
-        this->LightProjectionMat = getOrthogonal(-w, w, -w, w, -10, farPlane);
+        Mat4 LightProjectionMat = getOrthogonal(-w, w, -w, w, -10, farPlane);
 
         if (engine_ptr != nullptr) {
             if (engine_ptr->engine_info->graphicsApi == VULKAN) {

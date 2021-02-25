@@ -33,33 +33,15 @@ void Engine::GLRenderer::InitShaders() {
         this->mShadowMapShader->compileFromFile("Shaders/shadowmap/shadowmap.vert", "", "Shaders/shadowmap/shadowmap.geom");
         this->final_shader->compileFromFile("Shaders/postprocess/final/final.vert", "Shaders/postprocess/final/final.frag");
         this->water_shader->compileFromFile("Shaders/water/water.vert", "Shaders/water/water.frag");
+        this->default_particle->compileFromFile("Shaders/default_particle/particle.vert", "Shaders/default_particle/particle.frag");
 
         MtShProps::genDefaultMtShGroup(default3d, mSkyboxShader, mTerrainShader, water_shader);
     }
-
-    CopyEffect = new GLScreenEffect();
-    CopyEffect->CompileShaderFromFile("Shaders/postprocess/copy/copy.comp");
-    CopyEffect->SetLocalSize(8, 8);
 }
 
 void Engine::GLRenderer::create_G_Buffer_GL(unsigned int width, unsigned int height) {
-    gbuffer = new GLframebuffer(width, height);
-    
-
     //effect = new GLScreenEffect(width, height, FORMAT_RGBA);
     //effect->CompileShaderFromFile("Shaders/postprocess/blur/blur.comp");
-    gbuffer->AddDepth();
-    gbuffer->AddTexture(FORMAT_RGBA); //Diffuse map
-    gbuffer->AddTexture(FORMAT_RGB16F); //Normal map
-    gbuffer->AddTexture(FORMAT_RGB16F); //Position map
-    gbuffer->AddTexture(FORMAT_RGBA); //Transparent map
-    gbuffer->AddTexture(FORMAT_RGBA); //Masks map
-    gbuffer->Create();
-
-    df_light_buffer = new GLframebuffer(width, height);
-    df_light_buffer->AddTexture(FORMAT_RGBA); //Diffuse map
-    df_light_buffer->AddTexture(FORMAT_RGBA); //Bloom map
-    df_light_buffer->Create();
 
     ui_buffer = new GLframebuffer(width, height);
     ui_buffer->AddTexture(FORMAT_RGBA); //UI Diffuse map
@@ -244,10 +226,10 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
             ShadowCasterProperty* caster = getRenderSettings()->shadowcaster_obj_ptr->getPropertyPtr<ShadowCasterProperty>();
 
             unsigned int InstNum = caster->mCascadesNum;
-            if (mMainCamera != nullptr) {
-                if (bb.GetLongestDistance(mMainCamera->getCameraPosition()) < 20)
-                    InstNum = 1;
-            }
+            //if (mMainCamera != nullptr) {
+           //     if (bb.GetLongestDistance(mMainCamera->getCameraPosition()) < 20)
+            //        InstNum = 1;
+            //}
             if (castShadows)
                 obj->DrawMeshInstanced(this, InstNum);
         }
@@ -255,12 +237,7 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
 }
 
 void Engine::GLRenderer::OnUpdateWindowSize(int W, int H) {
-
-    if (engine_ptr->desc->game_perspective == PERSP_3D) {
-        gbuffer->SetSize(W, H);
-        df_light_buffer->SetSize(W, H);
-        ui_buffer->SetSize(W, H);
-    }
+    ui_buffer->SetSize(W, H);
 }
 
 void Engine::GLRenderer::setFullscreenViewport(unsigned int Width, unsigned int Height) {

@@ -1,9 +1,9 @@
-#include "../../headers/render/TextureSampler.hpp"
+#include <render/TextureSampler.hpp>
 
-#include "../../headers/ogl/GLTextureSampler.hpp"
-#include "../../headers/vulkan/ZSVulkanSampler.hpp"
+#include <ogl/GLTextureSampler.hpp>
+#include <vulkan/ZSVulkanSampler.hpp>
 
-#include "../../headers/game.h"
+#include <game.h>
 
 extern ZSpireEngine* engine_ptr;
 

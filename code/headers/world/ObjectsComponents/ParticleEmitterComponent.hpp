@@ -56,8 +56,11 @@ namespace Engine {
 
     };
 
+    class ParticleEmitterComponent;
+
     class Particle {
     public:
+        bool mAlive;
         Vec3 Position; //Current position of particle
         Vec3 Velocity; //Current velocity of particle
         Vec2 Size; // Current size of particle
@@ -65,6 +68,7 @@ namespace Engine {
         float mTimePassed; //Time, elapsed from creation
 
         Particle() :
+            mAlive(true),
             mTimePassed(0)
         {}
     };
@@ -81,7 +85,7 @@ namespace Engine {
         float mLifetime; //Lifetime of single particle
         int32_t mMaxParticles; //Limit particles amount
 
-        DeltaValue<float> mVelocity;
+        DeltaValue<Vec3> mVelocity;
         DeltaValue<float> mSize;
         float mStartRotation;
 
@@ -89,6 +93,8 @@ namespace Engine {
 
         bool mSimulating;
 
+        void DestroyParticle(Particle* Particle);
+        void EmitNewParticle();
         void StepSimulation();
         void StartSimulation();
         void StopSimulation();

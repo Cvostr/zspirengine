@@ -1,10 +1,9 @@
-#include "../../headers/engine/BackgroundLoader.hpp"
+#include <engine/BackgroundLoader.hpp>
 #include <thread>
 #include <list>
 #include <fstream>
 #include <iostream>
-#include "../../headers/threading/Mutex.hpp"
-#include "../../headers/engine/Logger.hpp"
+#include <engine/Logger.hpp>
 
 using namespace Engine;
 Engine::Loader::Loader _Loader;

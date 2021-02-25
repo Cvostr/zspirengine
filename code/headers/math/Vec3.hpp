@@ -53,6 +53,10 @@ public:
 		return Vec3(X + r.X, Y + r.Y, Z + r.Z);
 	}
 
+	Vec3 operator-(const Vec3& r) const {
+		return Vec3(X - r.X, Y - r.Y, Z - r.Z);
+	}
+
 	bool operator ==(const Vec3& r) const {
 		return X == r.X && Y == r.Y && Z == r.Z;
 	}
@@ -64,13 +68,6 @@ public:
 	Vec3(float v) : X(v), Y(v), Z(v) {}
 
 };
-
-inline Vec3 operator-(const Vec3& l, const Vec3& r)
-{
-	Vec3 Ret(l.X - r.X, l.Y - r.Y, l.Z - r.Z);
-
-	return Ret;
-}
 
 inline Vec3 operator/(const Vec3& l, const float& d)
 {
@@ -89,13 +86,6 @@ inline Vec3 operator/(const Vec3& l, const Vec3& r)
 	Vec3 Ret(l.X / r.X, l.Y / r.Y, l.Z / r.Z);
 
 	return Ret;
-}
-inline bool operator==(const Vec3& l, const Vec3& r)
-{
-	bool result = false;
-	if (REAL_NUM_EQ(l.X, r.X) && REAL_NUM_EQ(l.Y, r.Y) && REAL_NUM_EQ(l.Z, r.Z)) result = true;
-
-	return result;
 }
 inline bool operator!=(const Vec3& l, const Vec3& r)
 {

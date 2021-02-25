@@ -48,6 +48,7 @@ Engine::Renderer::Renderer(){
         this->mShadowMapShader = allocShader();
         this->final_shader = allocShader();
         this->water_shader = allocShader();
+        this->default_particle = allocShader();
     }
 
     //Allocate transform buffer
@@ -142,8 +143,7 @@ void Engine::Renderer::destroy(){
         delete mShadowMapShader;
         delete water_shader;
 
-        delete gbuffer;
-        delete df_light_buffer;
+
     }
 
     MtShProps::clearMtShaderGroups();

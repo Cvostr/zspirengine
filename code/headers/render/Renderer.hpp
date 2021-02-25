@@ -51,8 +51,7 @@ protected:
 
     RenderSettings render_settings;
 
-    Framebuffer* gbuffer;
-    Framebuffer* df_light_buffer;
+
     Framebuffer* ui_buffer;
 
     void setLightsToBuffer();
@@ -77,6 +76,7 @@ public:
     Engine::Shader* mTextShader;
     Engine::Shader* final_shader;
     Engine::Shader* water_shader;
+    Engine::Shader* default_particle;
 
     UniformBuffer* transformBuffer; //0
     UniformBuffer* lightsBuffer;    //1

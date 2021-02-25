@@ -16,11 +16,11 @@ void Engine::GLframebuffer::bind() {
 
 void Engine::GLframebuffer::bindTextures(unsigned int m) {
     for (unsigned int t = 0; t < mTexturesCount; t++) {
-        textures[t]->Use(t);
+        textures[t]->Use(m + t);
     }
 
     if (Depth)
-        depthTexture->Use(mTexturesCount);
+        depthTexture->Use(m + mTexturesCount);
 }
 
 void Engine::GLframebuffer::AddTexture(TextureFormat Format) {

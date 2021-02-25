@@ -1,6 +1,6 @@
-#include "../../headers/Scripting/AngelScriptMgr.h"
-#include "../../headers/engine/Resources.hpp"
-#include "../../headers/game.h"
+#include <Scripting/AngelScriptMgr.h>
+#include <engine/Resources.hpp>
+#include <game.h>
 
 //Hack to support resources
 extern ZSGAME_DATA* game_data;

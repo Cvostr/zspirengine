@@ -1,8 +1,8 @@
-#include "../../headers/render/Shader.hpp"
+#include <render/Shader.hpp>
 #include <GL/glew.h>
 
-#include "../../headers/ogl/GLShader.hpp"
-#include "../../headers/vulkan/VKShader.hpp"
+#include <ogl/GLShader.hpp>
+#include <vulkan/VKShader.hpp>
 
 extern ZSpireEngine* engine_ptr;
 

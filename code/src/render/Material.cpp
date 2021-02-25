@@ -1,8 +1,8 @@
-#include "../../headers/render/Material.hpp"
-#include "../../headers/vulkan/VKMaterial.hpp"
+#include <render/Material.hpp>
+#include <vulkan/VKMaterial.hpp>
 #include <iostream>
-#include "../../headers/misc/misc.h"
-#include "../../headers/game.h"
+#include <misc/misc.h>
+#include <game.h>
 
 extern ZSpireEngine* engine_ptr;
 //Hack to support resources
@@ -54,12 +54,13 @@ MaterialTemplate* allocMaterialTemplate(Engine::Shader* shader, unsigned int UB_
 }
 
 MaterialShaderProperty::MaterialShaderProperty(){
-    type = MATSHPROP_TYPE_NONE;
+    mType = MATSHPROP_TYPE_NONE;
     start_offset = 0;
 }
 
 MaterialShaderPropertyConf::MaterialShaderPropertyConf(){
     type = MATSHPROP_TYPE_NONE;
+    mProperty = nullptr;
 }
 
 IntegerMtShPropConf::IntegerMtShPropConf(){
@@ -91,7 +92,7 @@ ColorMtShPropConf::ColorMtShPropConf(){
 }
 //Textures3D stuff
 Texture3MaterialShaderProperty::Texture3MaterialShaderProperty(){
-    type = MATSHPROP_TYPE_TEXTURE3;
+    mType = MATSHPROP_TYPE_TEXTURE3;
     this->slotToBind = 0;
 }
 //Configuration class
@@ -106,7 +107,7 @@ Texture3MtShPropConf::Texture3MtShPropConf(){
 }
 //Textures stuff
 TextureMaterialShaderProperty::TextureMaterialShaderProperty(){
-    type = MATSHPROP_TYPE_TEXTURE;
+    mType = MATSHPROP_TYPE_TEXTURE;
 
     this->slotToBind = 0;
 }
@@ -132,7 +133,7 @@ MaterialShaderProperty* MtShProps::allocateProperty(int type){
         }
         default:{ //If type is transfrom
             _ptr = new MaterialShaderProperty; //Allocation of transform in heap
-            _ptr->type = (MATSHPROP_TYPE)type;
+            _ptr->mType = (MATSHPROP_TYPE)type;
             break;
         }
 
@@ -202,7 +203,8 @@ void Material::setTemplate(MaterialTemplate* Template){
         //Obtain pointer to property in group
         MaterialShaderProperty* prop_ptr = Template->properties[prop_i];
         //Add PropertyConf with the same type
-        this->addPropertyConf(prop_ptr->type);
+        MaterialShaderPropertyConf* Conf = this->AddPropertyConf(prop_ptr->mType);
+        Conf->mProperty = prop_ptr;
     }
     //store pointer of picked group
     this->mTemplate = Template;
@@ -237,7 +239,7 @@ Material::~Material(){
 
 }
 
-MaterialShaderPropertyConf* Material::addPropertyConf(int type){
+MaterialShaderPropertyConf* Material::AddPropertyConf(int type){
     //Allocate new property
     MaterialShaderPropertyConf* newprop_ptr =
             static_cast<MaterialShaderPropertyConf*>(MtShProps::allocatePropertyConf(type));
@@ -245,6 +247,18 @@ MaterialShaderPropertyConf* Material::addPropertyConf(int type){
     this->confs.push_back(newprop_ptr);
 
     return confs[confs.size() - 1];
+}
+
+MaterialShaderPropertyConf* Material::GetPropertyConf(std::string Identifier) {
+    for (unsigned int conf_i = 0; conf_i < confs.size(); conf_i++) {
+        MaterialShaderPropertyConf* Conf = confs[conf_i];
+        if (Conf->mProperty == nullptr)
+            continue;
+        if (Conf->mProperty->mPropId.compare(Identifier) == 0) {
+            return Conf;
+        }
+    }
+    return nullptr;
 }
 
 void Material::loadFromBuffer(char* buffer, unsigned int size) {
@@ -287,8 +301,8 @@ void Material::loadFromBuffer(char* buffer, unsigned int size) {
                 MaterialShaderProperty* prop_ptr = mTemplate->properties[prop_i];
                 MaterialShaderPropertyConf* conf_ptr = this->confs[prop_i];
                 //check if compare
-                if (prop_identifier.compare(prop_ptr->prop_identifier) == 0) {
-                    switch (prop_ptr->type) {
+                if (prop_identifier.compare(prop_ptr->mPropId) == 0) {
+                    switch (prop_ptr->mType) {
                     case MATSHPROP_TYPE_NONE: {
                         break;
                     }
@@ -402,9 +416,9 @@ void Material::saveToFile() {
         MaterialShaderPropertyConf* conf_ptr = this->confs[prop_i];
         //write entry header
         mat_stream << "_ENTRY ";
-        mat_stream.writeString(prop_ptr->prop_identifier); //Write identifier
+        mat_stream.writeString(prop_ptr->mPropId); //Write identifier
 
-        switch (prop_ptr->type) {
+        switch (prop_ptr->mType) {
             case MATSHPROP_TYPE_NONE: {
                 break;
             }
@@ -516,7 +530,7 @@ void Material::applyMatToPipeline() {
     for (unsigned int prop_i = 0; prop_i < mTemplate->properties.size(); prop_i++) {
         MaterialShaderProperty* prop_ptr = mTemplate->properties[prop_i];
         MaterialShaderPropertyConf* conf_ptr = confs[prop_i];
-        switch (prop_ptr->type) {
+        switch (prop_ptr->mType) {
         case MATSHPROP_TYPE_NONE: {
             break;
         }

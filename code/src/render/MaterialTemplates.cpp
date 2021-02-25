@@ -1,10 +1,10 @@
-#include "../../headers/render/Material.hpp"
-#include "../../headers/vulkan/VKMaterial.hpp"
+#include <render/Material.hpp>
+#include <vulkan/VKMaterial.hpp>
 #include <fstream>
 #include <iostream>
 #include <GL/glew.h>
-#include "../../headers/game.h"
-#include "../../headers/engine/Resources.hpp"
+#include <game.h>
+#include <engine/Resources.hpp>
 
 Material* default3dmat;
 Material* defaultTerrainMat;
@@ -58,54 +58,54 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
         default_group->Label = "Default 3D";
 
         MaterialShaderProperty* diff_color_prop = (default_group->addProperty(MATSHPROP_TYPE_COLOR));
-        diff_color_prop->prop_caption = "Color"; //Set caption in Inspector
-        diff_color_prop->prop_identifier = "c_diffuse"; //Identifier to save
+        diff_color_prop->mPropCaption = "Color"; //Set caption in Inspector
+        diff_color_prop->mPropId = "c_diffuse"; //Identifier to save
         diff_color_prop->start_offset = 0;
 
         TextureMaterialShaderProperty* diff_texture_prop =
                 static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
         diff_texture_prop->slotToBind = 0;
-        diff_texture_prop->prop_caption = "Diffuse"; //Set caption in Inspector
-        diff_texture_prop->prop_identifier = "t_diffuse"; //Identifier to save
+        diff_texture_prop->mPropCaption = "Diffuse"; //Set caption in Inspector
+        diff_texture_prop->mPropId = "t_diffuse"; //Identifier to save
         diff_texture_prop->start_offset = 12;
 
         TextureMaterialShaderProperty* normal_texture_prop =
                 static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
         normal_texture_prop->slotToBind = 1;
-        normal_texture_prop->prop_caption = "Normal";
-        normal_texture_prop->prop_identifier = "t_normal"; //Identifier to save
+        normal_texture_prop->mPropCaption = "Normal";
+        normal_texture_prop->mPropId = "t_normal"; //Identifier to save
         normal_texture_prop->start_offset = 16;
 
         TextureMaterialShaderProperty* specular_texture_prop =
                 static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
         specular_texture_prop->slotToBind = 2;
-        specular_texture_prop->prop_caption = "Specular";
-        specular_texture_prop->prop_identifier = "t_specular"; //Identifier to save
+        specular_texture_prop->mPropCaption = "Specular";
+        specular_texture_prop->mPropId = "t_specular"; //Identifier to save
         specular_texture_prop->start_offset = 20;
 
 
         TextureMaterialShaderProperty* height_texture_prop =
                 static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
         height_texture_prop->slotToBind = 3;
-        height_texture_prop->prop_caption = "Height";
-        height_texture_prop->prop_identifier = "t_height"; //Identifier to save
+        height_texture_prop->mPropCaption = "Height";
+        height_texture_prop->mPropId = "t_height"; //Identifier to save
         height_texture_prop->start_offset = 24;
 
         TextureMaterialShaderProperty* ao_texture_prop =
             static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
         ao_texture_prop->slotToBind = 4;
-        ao_texture_prop->prop_caption = "Amb Occlusion";
-        ao_texture_prop->prop_identifier = "t_occlusion"; //Identifier to save
+        ao_texture_prop->mPropCaption = "Amb Occlusion";
+        ao_texture_prop->mPropId = "t_occlusion"; //Identifier to save
         ao_texture_prop->start_offset = 28;
 
         MaterialShaderProperty* shininess_factor_prop = default_group->addProperty(MATSHPROP_TYPE_FLOAT);
-        shininess_factor_prop->prop_caption = "Shininess";
-        shininess_factor_prop->prop_identifier = "f_shininess"; //Identifier to save
+        shininess_factor_prop->mPropCaption = "Shininess";
+        shininess_factor_prop->mPropId = "f_shininess"; //Identifier to save
         shininess_factor_prop->start_offset = 32;
 
         MaterialShaderProperty* uv_factor_prop = default_group->addProperty(MATSHPROP_TYPE_IVEC2);
-        uv_factor_prop->prop_caption = "UV repeat";
-        uv_factor_prop->prop_identifier = "i_uv_repeat"; //Identifier to save
+        uv_factor_prop->mPropCaption = "UV repeat";
+        uv_factor_prop->mPropId = "i_uv_repeat"; //Identifier to save
         uv_factor_prop->start_offset = 36;
 
         ((VKMaterialTemplate*)default_group)->CreatePipeline();
@@ -122,33 +122,33 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
         TextureMaterialShaderProperty* reflection_texture_prop =
             static_cast<TextureMaterialShaderProperty*>(water_group->addProperty(MATSHPROP_TYPE_TEXTURE));
         reflection_texture_prop->slotToBind = 0;
-        reflection_texture_prop->prop_caption = "Reflection"; //Set caption in Inspector
-        reflection_texture_prop->prop_identifier = "t_reflection"; //Identifier to save
+        reflection_texture_prop->mPropCaption = "Reflection"; //Set caption in Inspector
+        reflection_texture_prop->mPropId = "t_reflection"; //Identifier to save
         reflection_texture_prop->start_offset = 0;
 
 
         TextureMaterialShaderProperty* distortion_texture_prop =
             static_cast<TextureMaterialShaderProperty*>(water_group->addProperty(MATSHPROP_TYPE_TEXTURE));
         distortion_texture_prop->slotToBind = 1;
-        distortion_texture_prop->prop_caption = "Distortion"; //Set caption in Inspector
-        distortion_texture_prop->prop_identifier = "t_distortion"; //Identifier to save
+        distortion_texture_prop->mPropCaption = "Distortion"; //Set caption in Inspector
+        distortion_texture_prop->mPropId = "t_distortion"; //Identifier to save
         distortion_texture_prop->start_offset = 4;
 
         TextureMaterialShaderProperty* normal_texture_prop =
             static_cast<TextureMaterialShaderProperty*>(water_group->addProperty(MATSHPROP_TYPE_TEXTURE));
         normal_texture_prop->slotToBind = 2;
-        normal_texture_prop->prop_caption = "Normal"; //Set caption in Inspector
-        normal_texture_prop->prop_identifier = "t_normal"; //Identifier to save
+        normal_texture_prop->mPropCaption = "Normal"; //Set caption in Inspector
+        normal_texture_prop->mPropId = "t_normal"; //Identifier to save
         normal_texture_prop->start_offset = 8;
 
         MaterialShaderProperty* distortion_factor_prop = (water_group->addProperty(MATSHPROP_TYPE_FLOAT));
-        distortion_factor_prop->prop_caption = "Distort factor";
-        distortion_factor_prop->prop_identifier = "f_distfactor"; //Identifier to save
+        distortion_factor_prop->mPropCaption = "Distort factor";
+        distortion_factor_prop->mPropId = "f_distfactor"; //Identifier to save
         distortion_factor_prop->start_offset = 12;
 
         MaterialShaderProperty* diff_color_prop = (water_group->addProperty(MATSHPROP_TYPE_COLOR));
-        diff_color_prop->prop_caption = "Color"; //Set caption in Inspector
-        diff_color_prop->prop_identifier = "c_diffuse"; //Identifier to save
+        diff_color_prop->mPropCaption = "Color"; //Set caption in Inspector
+        diff_color_prop->mPropId = "c_diffuse"; //Identifier to save
         diff_color_prop->start_offset = 16;
 
         MtShProps::addMtShaderPropertyGroup(water_group);
@@ -161,8 +161,8 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
     Texture3MaterialShaderProperty* sky_texture =
             static_cast<Texture3MaterialShaderProperty*>(default_sky_group->addProperty(MATSHPROP_TYPE_TEXTURE3));
     sky_texture->slotToBind = 0;
-    sky_texture->prop_caption = "Sky";
-    sky_texture->prop_identifier = "skytexture3"; //Identifier to save
+    sky_texture->mPropCaption = "Sky";
+    sky_texture->mPropId = "skytexture3"; //Identifier to save
 
     MtShProps::addMtShaderPropertyGroup(default_sky_group);
 

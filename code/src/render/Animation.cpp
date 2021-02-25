@@ -1,4 +1,4 @@
-#include "../../headers/render/Animation.hpp"
+#include <render/Animation.hpp>
 #include <cassert>
 
 Engine::Animation::Animation() :

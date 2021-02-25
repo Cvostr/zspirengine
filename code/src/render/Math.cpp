@@ -1,4 +1,4 @@
-#include "../../headers/render/Math.hpp"
+#include <render/Math.hpp>
 
 
 float DegToRad(float degrees){

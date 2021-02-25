@@ -43,7 +43,7 @@ void VKMaterialTemplate::MakeDescrSetStorage(Engine::ZSVulkanDescriptorSet* Desc
 void VKMaterialTemplate::MakeDescrSetTextures(Engine::ZSVulkanDescriptorSet* DescrSet) {
     for (unsigned int prop_i = 0; prop_i < properties.size(); prop_i++) {
         MaterialShaderProperty* prop_ptr = properties[prop_i];
-        if (prop_ptr->type == MATSHPROP_TYPE_TEXTURE) {
+        if (prop_ptr->mType == MATSHPROP_TYPE_TEXTURE) {
             //Cast pointer
             TextureMaterialShaderProperty* texture_p = static_cast<TextureMaterialShaderProperty*>(prop_ptr);
             DescrSet->pushImageSampler(texture_p->slotToBind);

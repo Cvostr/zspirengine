@@ -21,9 +21,9 @@ enum MATSHPROP_TYPE{
 //This class describes the property
 class MaterialShaderProperty{
 public:
-    MATSHPROP_TYPE type; //type of property
-    std::string prop_caption;
-    std::string prop_identifier; //String identifier, that will appear in material file
+    MATSHPROP_TYPE mType; //type of property
+    std::string mPropCaption;
+    std::string mPropId; //String identifier, that will appear in material file
     unsigned int start_offset;
 
     MaterialShaderProperty();
@@ -32,6 +32,12 @@ public:
 class MaterialShaderPropertyConf{
 public:
     MATSHPROP_TYPE type;
+    MaterialShaderProperty* mProperty;
+
+    virtual void SetIntValue(int value){}
+    virtual void SetFloatValue(float value){}
+    virtual void SetVec3Value(Vec3 value) {}
+    virtual void SetTexture(void* texture) {}
 
     MaterialShaderPropertyConf();
 };
@@ -67,7 +73,8 @@ public:
 
     unsigned char* MatData;
 
-    MaterialShaderPropertyConf* addPropertyConf(int type);
+    MaterialShaderPropertyConf* AddPropertyConf(int type);
+    MaterialShaderPropertyConf* GetPropertyConf(std::string Identifier);
     void loadFromFile(std::string fpath);
     void loadFromBuffer(char* buffer, unsigned int size);
     void saveToFile();
@@ -75,7 +82,6 @@ public:
     void clear();
     void applyMatToPipeline();
     void WriteBytes(unsigned int offset, unsigned int size, void* data);
-
 
     explicit Material(std::string shader_group_str);
     explicit Material(MaterialTemplate* Template);
@@ -118,7 +124,6 @@ public:
 class Texture3MaterialShaderProperty : public MaterialShaderProperty{
 public:
     int slotToBind; //Slot to texture
-    //std::string ToggleUniform; //Uniform to set to 1
 
     Texture3MaterialShaderProperty();
 };
@@ -135,18 +140,33 @@ public:
 class IntegerMtShPropConf : public MaterialShaderPropertyConf{
 public:
     int value;
+
+    void SetIntValue(int value) {
+        this->value = value;
+    }
+
     //Construct
     IntegerMtShPropConf();
 };
 class FloatMtShPropConf : public MaterialShaderPropertyConf{
 public:
     float value;
+
+    void SetFloatValue(float value) {
+        this->value = value;
+    }
+
     //Construct
     FloatMtShPropConf();
 };
 class Float3MtShPropConf : public MaterialShaderPropertyConf{
 public:
     Vec3 value;
+
+    void SetVec3Value(Vec3 value) {
+        this->value = value;
+    }
+
     //Construct
     Float3MtShPropConf();
 };

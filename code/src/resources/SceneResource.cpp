@@ -1,4 +1,4 @@
-#include "../../headers/engine/Resources.hpp"
+#include <engine/Resources.hpp>
 
 void Engine::SceneResource::load() {
     if (this->resource_state == RESOURCE_STATE::STATE_NOT_LOADED) {

@@ -20,7 +20,7 @@ template <typename T>
 T GetRandomValue(T min, T max) {
 	srand(static_cast<unsigned int>(SDL_GetPerformanceCounter()));
 
-	T v = min + rand() % (max - min);
+	T v = min + rand() % (int)(max - min);
 	return v;
 }
 

@@ -23,6 +23,8 @@ namespace Engine {
         void copyTo(Engine::IGameObjectComponent* dest);
         void onRender(Engine::Renderer* pipeline);
 
+        MaterialShaderPropertyConf* GetPropertyConf(std::string Identifier);
+
         void loadPropertyFromMemory(const char* data, GameObject* obj);
         void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
         void savePropertyToStream(ZsStream* stream, GameObject* obj);
