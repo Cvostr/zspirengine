@@ -1,5 +1,5 @@
-#include "../../headers/vulkan/VKMesh.hpp"
-#include "../../headers/game.h"
+#include <vulkan/VKMesh.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

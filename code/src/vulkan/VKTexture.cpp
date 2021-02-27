@@ -1,5 +1,5 @@
-#include "../../headers/vulkan/VKTexture.hpp"
-#include "../../headers/game.h"
+#include <vulkan/VKTexture.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

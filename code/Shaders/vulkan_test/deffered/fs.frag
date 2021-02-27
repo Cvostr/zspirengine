@@ -1,4 +1,7 @@
 #version 450
+
+#include "../HEADER.glsl"
+
 #extension GL_ARB_separate_shader_objects : enable
 
 #define LIGHTSOURCE_NONE 0
@@ -18,12 +21,14 @@ struct Light{ //size = 64
 	vec3 color; //size = 16, offset = 48
 };
 
-layout (std140, binding = 0) uniform CamMatrices{
-    uniform mat4 cam_projection;
-    uniform mat4 cam_view;
-    uniform mat4 object_transform;
-    uniform vec3 cam_position;
-};
+layout( push_constant ) uniform constants
+{
+    int CameraIndex;
+} PushConstants;
+
+layout(std140, set = 0, binding = 2) readonly buffer CamsBuffer{   
+	CameraInfo cameras[];
+} camsBuffer;
 
 
 layout (std140, binding = 1) uniform Lights{
@@ -53,6 +58,8 @@ void main() {
 
     vec3 result = Diffuse.xyz;
 
+    vec3 CamPos = camsBuffer.cameras[PushConstants.CameraIndex].Pos;
+
     //Check, if fragment isn't skybox
     if(Masks.r == 1){
         result *= (1 - Masks.g);
@@ -61,7 +68,7 @@ void main() {
         bool Shadowed = Masks.g > 0.02; 
 
         float specularFactor = Specular.r * 255.f; //Get factor in A channel
-        vec3 camToFragDirection = normalize(cam_position - FragPos);
+        vec3 camToFragDirection = normalize(CamPos - FragPos);
     
         for(int lg = 0; lg < lights_amount; lg ++){
         

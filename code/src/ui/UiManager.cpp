@@ -1,4 +1,4 @@
-#include "../../headers/ui/UiManager.hpp"
+#include <ui/UiManager.hpp>
 #include <algorithm>
 
 using namespace Engine;

@@ -1,4 +1,4 @@
-#include "../../headers/threading/Mutex.hpp"
+#include <threading/Mutex.hpp>
 
 #ifdef _WIN32
 #include <windows.h>

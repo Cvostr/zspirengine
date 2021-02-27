@@ -215,6 +215,12 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
                 game_data->resources->getMaterialByLabel("@default")->material->applyMatToPipeline();
             //Draw mesh
             obj->DrawMesh(this);
+            
+            //TESTING
+            /*transformBuffer->bind();
+            Mat4 BBTransform = bb.GetMatrix();
+            transformBuffer->writeData(sizeof(Mat4) * 2, sizeof(Mat4), &BBTransform);
+            Engine::getCubeMesh3D()->Draw();*/
         }
 
         if (current_state == PIPELINE_STATE::PIPELINE_STATE_SHADOWDEPTH) {
@@ -224,14 +230,9 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
             //If castShadows is true, then render mesh to DepthBuffer
 
             ShadowCasterProperty* caster = getRenderSettings()->shadowcaster_obj_ptr->getPropertyPtr<ShadowCasterProperty>();
-
-            unsigned int InstNum = caster->mCascadesNum;
-            //if (mMainCamera != nullptr) {
-           //     if (bb.GetLongestDistance(mMainCamera->getCameraPosition()) < 20)
-            //        InstNum = 1;
-            //}
+            
             if (castShadows)
-                obj->DrawMeshInstanced(this, InstNum);
+                obj->DrawMeshInstanced(this, caster->GetSuitableCascadesAmount(bb));
         }
     }
 }

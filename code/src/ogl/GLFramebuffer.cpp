@@ -134,6 +134,7 @@ void Engine::GLframebuffer::Destroy() {
 
         if (Depth) {
             depthTexture->Destroy();
+            Depth = false;
         }
         //unset flag
         mCreated = false;

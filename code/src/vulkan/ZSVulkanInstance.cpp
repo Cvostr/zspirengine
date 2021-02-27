@@ -1,5 +1,5 @@
 
-#include "../../headers/vulkan/ZSVulkanInstance.hpp"
+#include <vulkan/ZSVulkanInstance.hpp>
 #include <iostream>
 
 Engine::ZSVulkanInstance::ZSVulkanInstance(){

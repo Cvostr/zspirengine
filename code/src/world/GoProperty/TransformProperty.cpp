@@ -39,8 +39,6 @@ void Engine::TransformProperty::updateMatrix() {
     //S * R * T
     this->transform_mat = scale_mat * rotation_mat * rotation_mat1 * translation_mat;
 
-    //transform_mat.m[3][2] *= Zcoeff;
-
 }
 void Engine::TransformProperty::onValueChanged() {
     if ((this->go_link.updLinkPtr()) == nullptr) return;

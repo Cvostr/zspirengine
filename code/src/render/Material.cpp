@@ -83,8 +83,6 @@ Float2MtShPropConf::Float2MtShPropConf(){
 
 Int2MtShPropConf::Int2MtShPropConf(){
     type = MATSHPROP_TYPE_IVEC2;
-    value[0] = 0;
-    value[1] = 0;
 }
 
 ColorMtShPropConf::ColorMtShPropConf(){
@@ -368,8 +366,8 @@ void Material::loadFromBuffer(char* buffer, unsigned int size) {
                         //Cast pointer
                         Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
                         //Read float vector values
-                        readBinaryValue(&ivec2_conf->value[0], buffer + position, position);
-                        readBinaryValue(&ivec2_conf->value[1], buffer + position, position);
+                        readBinaryValue(&ivec2_conf->value.X, buffer + position, position);
+                        readBinaryValue(&ivec2_conf->value.Y, buffer + position, position);
 
                         position += 1;
                         break;
@@ -473,8 +471,8 @@ void Material::saveToFile() {
                 //Cast pointer
                 Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
                 //Write value
-                mat_stream.writeBinaryValue(&ivec2_conf->value[0]);
-                mat_stream.writeBinaryValue(&ivec2_conf->value[1]);
+                mat_stream.writeBinaryValue(&ivec2_conf->value.X);
+                mat_stream.writeBinaryValue(&ivec2_conf->value.Y);
                 break;
             }
             case MATSHPROP_TYPE_TEXTURE3: {
@@ -613,8 +611,8 @@ void Material::applyMatToPipeline() {
             Int2MtShPropConf* ivec2_conf = static_cast<Int2MtShPropConf*>(conf_ptr);
 
             //Write vec2 to buffer
-            WriteBytes(prop_ptr->start_offset, 4, &ivec2_conf->value[0]);
-            WriteBytes(prop_ptr->start_offset + 4, 4, &ivec2_conf->value[1]);
+            WriteBytes(prop_ptr->start_offset, 4, &ivec2_conf->value.X);
+            WriteBytes(prop_ptr->start_offset + 4, 4, &ivec2_conf->value.Y);
             break;
         }
         case MATSHPROP_TYPE_TEXTURE3: {

@@ -1,5 +1,5 @@
-#include "../../headers/vulkan/VKShader.hpp"
-#include "../../headers/game.h"
+#include <vulkan/VKShader.hpp>
+#include <game.h>
 #include <fstream>
 #include <iostream>
 

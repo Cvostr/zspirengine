@@ -15,7 +15,7 @@ void VKMaterialTemplate::CreatePipeline() {
 
         Conf.hasDepth = true;
         Conf.cullFace = true;
-        Conf.LayoutInfo.AddPushConstant(64, VK_SHADER_STAGE_VERTEX_BIT);
+        Conf.LayoutInfo.AddPushConstant(64, VK_SHADER_STAGE_ALL_GRAPHICS);
         Conf.LayoutInfo.AddPushConstant(mUniformBuffer->GetBufferSize(), VK_SHADER_STAGE_FRAGMENT_BIT);
 
         Pipeline = new Engine::ZSVulkanPipeline;
@@ -26,7 +26,11 @@ void VKMaterialTemplate::CreatePipeline() {
 
 void VKMaterialTemplate::MakeDescrSetUniform(Engine::ZSVulkanDescriptorSet* DescrSet) {
     Engine::UniformBuffer* shadowBuf = game_data->pipeline->GetShadowmapUniformBuffer();
-    DescrSet->pushUniformBuffer((Engine::vkUniformBuffer*)game_data->pipeline->GetTransformUniformBuffer(), VK_SHADER_STAGE_ALL_GRAPHICS);
+    
+    VKRenderer* renderer = static_cast<VKRenderer*>(game_data->pipeline);
+
+    DescrSet->pushStorageBuffer(renderer->GetTransformStorageBuffer(), VK_SHADER_STAGE_ALL_GRAPHICS);
+    DescrSet->pushStorageBuffer(renderer->GetSkinningStorageBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
     DescrSet->pushUniformBuffer((Engine::vkUniformBuffer*)shadowBuf, VK_SHADER_STAGE_FRAGMENT_BIT);
     DescrSet->getDescriptorSetLayout();
 }
@@ -34,8 +38,7 @@ void VKMaterialTemplate::MakeDescrSetUniform(Engine::ZSVulkanDescriptorSet* Desc
 void VKMaterialTemplate::MakeDescrSetStorage(Engine::ZSVulkanDescriptorSet* DescrSet) {
     //Bind storage buffers
     VKRenderer* renderer = static_cast<VKRenderer*>(game_data->pipeline);
-    DescrSet->pushStorageBuffer(renderer->GetTransformStorageBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
-    DescrSet->pushStorageBuffer(renderer->GetSkinningStorageBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
+
     DescrSet->pushStorageBuffer(renderer->GetCamerasStorageBuffer(), VK_SHADER_STAGE_ALL_GRAPHICS);
     DescrSet->getDescriptorSetLayout();
 }

@@ -1,5 +1,5 @@
-#include "../../../headers/world/tile_properties.h"
-#include "../../../headers/game.h"
+#include <world/tile_properties.h>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

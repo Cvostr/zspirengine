@@ -14,6 +14,8 @@ public:
 	void PrepareForExtend();
 	bool IsIntersects(const BoundingBox3& Box);
 	Vec3 GetCenter();
+	Vec3 GetSize();
+	Mat4 GetMatrix();
 	void CreateFromVertexArray(ZSVERTEX* Array, unsigned int VertexCount);
 	void ApplyTransform(const Vec3& pos, const Vec3& scale, const Vec3& rot);
 	void ApplyTransform(const Mat4& Transform);

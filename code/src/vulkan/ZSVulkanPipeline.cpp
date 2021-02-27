@@ -1,6 +1,6 @@
 #include <vulkan/ZSVulkanPipeline.hpp>
-#include "../../headers/math/Vertex.hpp"
-#include "../../headers/game.h"
+#include <math/Vertex.hpp>
+#include <game.h>
 
 #define VERTEX_BUFFER_BIND 0
 extern ZSGAME_DATA* game_data;
@@ -8,8 +8,8 @@ extern ZSGAME_DATA* game_data;
 void Engine::ZsVkPipelineConf::SetDefaultViewport() {
     Viewport.x = 0.0f;
     Viewport.y = 0.0f;
-    Viewport.width = game_data->window->GetWindowWidth();
-    Viewport.height = game_data->window->GetWindowHeight();
+    Viewport.width = static_cast<float>(game_data->window->GetWindowWidth());
+    Viewport.height = static_cast<float>(game_data->window->GetWindowHeight());
     Viewport.minDepth = 0.0f;
     Viewport.maxDepth = 1.0f;
 }
@@ -119,8 +119,8 @@ bool Engine::ZSVulkanPipeline::Create(vkShader* Shader, ZSVulkanRenderPass* rend
     VkRect2D scissor;
     //Set swap extend base params
     VkExtent2D swap_extend;
-    swap_extend.width = Conf.Viewport.width;
-    swap_extend.height = Conf.Viewport.height;
+    swap_extend.width = static_cast<uint32_t>(Conf.Viewport.width);
+    swap_extend.height = static_cast<uint32_t>(Conf.Viewport.height);
     scissor.offset = { 0, 0 };
     scissor.extent = swap_extend;
 

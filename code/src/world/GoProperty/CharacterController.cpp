@@ -1,4 +1,4 @@
-#include "../../../headers/world/ObjectsComponents/CharacterController.hpp"
+#include <world/ObjectsComponents/CharacterController.hpp>
 
 Engine::CharacterControllerProperty::CharacterControllerProperty() {
     type = PROPERTY_TYPE::GO_PROPERTY_TYPE_CHARACTER_CONTROLLER;

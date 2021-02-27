@@ -1,6 +1,6 @@
-#include "../../headers/vulkan/ZSVMA.hpp"
-#include "../../headers/vulkan/ZSVulkanCmdBuf.hpp"
-#include "../../headers/game.h"
+#include <vulkan/ZSVMA.hpp>
+#include <vulkan/ZSVulkanCmdBuf.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

@@ -1,6 +1,6 @@
-#include "../../headers/vulkan/ZSVulkanRenderPass.hpp"
-#include "../../headers/vulkan/ZSVulkanFramebuffer.hpp"
-#include "../../headers/game.h"
+#include <vulkan/ZSVulkanRenderPass.hpp>
+#include <vulkan/ZSVulkanFramebuffer.hpp>
+#include <game.h>
 
 using namespace Engine;
 

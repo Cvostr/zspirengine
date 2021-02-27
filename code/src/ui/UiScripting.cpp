@@ -1,9 +1,9 @@
-#include "../../headers/ui/UiManager.hpp"
-#include "../../headers/ui/Layouts/ILayout.hpp"
-#include "../../headers/ui/UiScripting.hpp"
+#include <ui/UiManager.hpp>
+#include <ui/Layouts/ILayout.hpp>
+#include <ui/UiScripting.hpp>
 
-#include "../../headers/ui/Widgets/Button.hpp"
-#include "../../headers/ui/Layouts/LinearLayout.hpp"
+#include <ui/Widgets/Button.hpp>
+#include <ui/Layouts/LinearLayout.hpp>
 
 #define VIEWSIZE_TYPE_NAME "ViewSize"
 #define VIEWMARGIN_TYPE_NAME "ViewMargin"

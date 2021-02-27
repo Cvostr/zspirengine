@@ -1,4 +1,4 @@
-#include "../../../headers/world/ObjectsComponents/WindZoneComponent.hpp"
+#include <world/ObjectsComponents/WindZoneComponent.hpp>
 
 void Engine::WindZoneComponent::onUpdate(float deltaTime) {
 

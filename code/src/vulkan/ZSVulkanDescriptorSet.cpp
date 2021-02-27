@@ -1,5 +1,5 @@
-#include "../../headers/vulkan/ZSVulkanDescriptorSet.hpp"
-#include "../../headers/game.h"
+#include <vulkan/ZSVulkanDescriptorSet.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 
@@ -38,7 +38,7 @@ void Engine::ZSVulkanDescriptorSet::pushStorageBuffer(vkUniformBuffer* buf, VkSh
 }
 
 void Engine::ZSVulkanDescriptorSet::pushImageSamplers(int FirstSlot, int LastSlot) {
-    for (int i = FirstSlot; i < LastSlot; i++) {
+    for (int i = FirstSlot; i <= LastSlot; i++) {
         pushImageSampler(i);
     }
 }

@@ -1,5 +1,5 @@
-#include "../../headers/vulkan/ZSVulkanSwapchain.hpp"
-#include "../../headers/engine/Logger.hpp"
+#include <vulkan/ZSVulkanSwapchain.hpp>
+#include <engine/Logger.hpp>
 
 VkImageView Engine::ZSVulkanSwapChain::GetImageViewAtIndex(unsigned int Index) {
     if (Index > this->mSwapChainImageViews.size())

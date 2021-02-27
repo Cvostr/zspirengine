@@ -32,11 +32,11 @@ layout( push_constant ) uniform constants
     int CameraIndex;
 } PushConstants;
 
-layout(std140, set = 2, binding = 0) readonly buffer TransformBuffer{   
+layout(std140, set = 0, binding = 0) readonly buffer TransformBuffer{   
 	mat4 transforms[];
 } transformBuffer;
 
-layout(std140, set = 2, binding = 1) readonly buffer BonesBuffer{   
+layout(std140, set = 0, binding = 4) readonly buffer BonesBuffer{   
 	mat4 bone_transform[];
 } bonesBuffer;
 

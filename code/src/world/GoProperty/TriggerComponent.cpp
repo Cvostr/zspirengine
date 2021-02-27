@@ -1,4 +1,4 @@
-#include "../../../headers/world/ObjectsComponents/TriggerComponent.hpp"
+#include <world/ObjectsComponents/TriggerComponent.hpp>
 
 #define MAX_TRIGGER_OBJS_SIZE 11
 

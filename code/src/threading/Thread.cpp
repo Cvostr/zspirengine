@@ -1,4 +1,4 @@
-#include "../../headers/threading/Thread.hpp"
+#include <threading/Thread.hpp>
 
 #ifdef _WIN32
 #include <windows.h>

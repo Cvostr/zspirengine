@@ -3,6 +3,8 @@
 
 extern ZSpireEngine* engine_ptr;
 
+int sizes[] = {20, 50, 80, 130, 160, 190};
+
 Engine::ShadowCasterProperty::ShadowCasterProperty() :
     TextureSize(2048),
 
@@ -121,8 +123,29 @@ void Engine::ShadowCasterProperty::init() {
     this->initialized = true;
 }
 
+int Engine::ShadowCasterProperty::GetSuitableCascadesAmount(BoundingBox3& ObjectBB) {
+
+    float longestDistance = ObjectBB.GetLongestDistance(mCamera->getCameraPosition());
+
+    int InstNum = mCascadesNum;
+
+    if (mCamera != nullptr) {
+
+        for (int cascade_i = 0; 0 < mCascadesNum; cascade_i++) {
+            if (longestDistance < sizes[cascade_i] * 2) {
+                InstNum = cascade_i + 1;
+                break;
+            }
+        }
+    }
+
+
+    return InstNum;
+}
+
 void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam, Renderer* pipeline) {
     Engine::LightsourceComponent* light = this->go_link.updLinkPtr()->getPropertyPtr<Engine::LightsourceComponent>();
+    this->mCamera = cam;
 
     //Check camera pointer
     if (cam == nullptr)
@@ -141,18 +164,19 @@ void Engine::ShadowCasterProperty::SendShadowParamsToShaders(Engine::Camera* cam
     //Use shadowmap shader to draw objects
     pipeline->getShadowmapShader()->Use();
 
-    int dists[] = { 0, 40, 100, 140, 200, 250};
+ 
     //Send all dists
     for (int i = 0; i < 6; i++) {
         unsigned int DistOffset = 416 + sizeof(int) * i;
-        pipeline->shadowBuffer->writeDataBuffered(DistOffset, sizeof(int), &dists[i]);
+        int Dist = sizes[i] * 2 - 2;
+        pipeline->shadowBuffer->writeDataBuffered(DistOffset, sizeof(int), &Dist);
     }
     //iterate over all cascades
     for (int i = 0; i < mCascadesNum; i++) {
-        Vec3 cam_pos = cam->getCameraPosition() + cam->getCameraFrontVec() * static_cast<float>(dists[i]);
+        Vec3 cam_pos = cam->getCameraPosition() + cam->getCameraFrontVec() * static_cast<float>(sizes[i]);
         Mat4 matview = matrixLookAt(cam_pos, cam_pos + light->direction * -1, Vec3(0, 1, 0));
 
-        float w = static_cast<float>(40 * (1 + i));
+        float w = sizes[i];
         Mat4 LightProjectionMat = getOrthogonal(-w, w, -w, w, -10, farPlane);
 
         if (engine_ptr != nullptr) {

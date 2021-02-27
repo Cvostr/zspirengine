@@ -1,9 +1,9 @@
-#include "../../headers/ui/View.hpp"
+#include <ui/View.hpp>
 
-#include "../../headers/ui/Layouts/ILayout.hpp"
-#include "../../headers/ui/Layouts/LinearLayout.hpp"
+#include <ui/Layouts/ILayout.hpp>
+#include <ui/Layouts/LinearLayout.hpp>
 
-#include "../../headers/game.h"
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

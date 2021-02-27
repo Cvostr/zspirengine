@@ -1,6 +1,6 @@
-#include "../../../headers/world/ObjectsComponents/AnimationComponent.hpp"
-#include "../../../headers/world/ObjectsComponents/NodeComponent.hpp"
-#include "../../../headers/game.h"
+#include <world/ObjectsComponents/AnimationComponent.hpp>
+#include <world/ObjectsComponents/NodeComponent.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

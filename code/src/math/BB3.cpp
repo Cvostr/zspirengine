@@ -46,6 +46,14 @@ Vec3 BoundingBox3::GetCenter() {
 	return (mMin + mMax) * 0.5f;
 }
 
+Vec3 BoundingBox3::GetSize() {
+	return (mMax - mMin) * 0.5;
+}
+
+Mat4 BoundingBox3::GetMatrix() {
+	return getScaleMat(GetSize()) * getTranslationMat(GetCenter());
+}
+
 void BoundingBox3::CreateFromVertexArray(ZSVERTEX* Array, unsigned int VertexCount) {
 	PrepareForExtend();
 	for (unsigned int v_i = 0; v_i < VertexCount; v_i++) {
@@ -84,8 +92,25 @@ float getDistanceXZ(const Vec3& p1, const Vec3& p2) {
 }
 
 float BoundingBox3::GetLongestDistance(const Vec3& Point) {
-	float Dist1 = getDistance(Point, mMax);
-	float Dist2 = getDistance(Point, mMin);
 
-	return (Dist1 > Dist2) ? Dist1 : Dist2;
+	float MaxDist = 0;
+
+	Vec3 corners[8];
+	corners[0] = mMin;
+	corners[1] = Vec3(mMin.X, mMax.Y, mMin.Z);
+	corners[2] = Vec3(mMin.X, mMax.Y, mMax.Z);
+	corners[3] = Vec3(mMin.X, mMin.Y, mMax.Z);
+	corners[4] = Vec3(mMax.X, mMin.Y, mMin.Z);
+	corners[5] = Vec3(mMax.X, mMax.Y, mMin.Z);
+	corners[6] = mMax;
+	corners[7] = Vec3(mMax.X, mMin.Y, mMax.Z);
+
+	for (int i = 0; i < 8; i++) {
+		float Dist = getDistance(Point, corners[i]);
+		if (Dist > MaxDist)
+			MaxDist = Dist;
+	}
+
+
+	return MaxDist;
 }

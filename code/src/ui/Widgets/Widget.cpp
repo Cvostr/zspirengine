@@ -1,7 +1,7 @@
-#include "../../../headers/ui/Widgets/Widget.hpp"
-#include "../../../headers/input/Input.hpp"
-#include "../../../headers/game.h"
-#include "../../../headers/engine.h"
+#include <ui/Widgets/Widget.hpp>
+#include <input/Input.hpp>
+#include <game.h>
+#include <engine.h>
 
 extern ZSpireEngine* engine_ptr;
 extern ZSGAME_DATA* game_data;

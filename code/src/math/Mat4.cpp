@@ -18,10 +18,10 @@ Mat4 getIdentity() {
 Vec4 matrixVecMM(const Mat4& l, const Vec4& r) {
     Vec4 Ret;
     
-    Ret.X = r.X * l.m[0][0] + r.Y * l.m[0][1] + r.Z * l.m[0][2] + r.W * l.m[0][3];
-    Ret.Y = r.X * l.m[1][0] + r.Y * l.m[1][1] + r.Z * l.m[1][2] + r.W * l.m[1][3];
-    Ret.Z = r.X * l.m[2][0] + r.Y * l.m[2][1] + r.Z * l.m[2][2] + r.W * l.m[2][3];
-    Ret.W = r.X * l.m[3][0] + r.Y * l.m[3][1] + r.Z * l.m[3][2] + r.W * l.m[3][3];
+    Ret.X = r.X * l.m[0][0] + r.Y * l.m[1][0] + r.Z * l.m[2][0] + r.W * l.m[3][0];
+    Ret.Y = r.X * l.m[0][1] + r.Y * l.m[1][1] + r.Z * l.m[2][1] + r.W * l.m[3][1];
+    Ret.Z = r.X * l.m[0][2] + r.Y * l.m[1][2] + r.Z * l.m[2][2] + r.W * l.m[3][2];
+    Ret.W = r.X * l.m[0][3] + r.Y * l.m[1][3] + r.Z * l.m[2][3] + r.W * l.m[3][3];
 
     return Ret;
 }

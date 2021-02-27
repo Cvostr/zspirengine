@@ -10,6 +10,7 @@ namespace Engine {
         bool initialized;
 
         GLframebuffer* Framebuffer;
+        Camera* mCamera;
 
         void reinitialize();
     public:
@@ -33,6 +34,8 @@ namespace Engine {
         void setTextureSize(int TextureSize);
         void SetCascadesAmount(int CascadesNum);
         bool isRenderAvailable();
+
+        int GetSuitableCascadesAmount(BoundingBox3& ObjectBB);
 
         //function to read shadowcaster property from memory
         void loadPropertyFromMemory(const char* data, GameObject* obj);

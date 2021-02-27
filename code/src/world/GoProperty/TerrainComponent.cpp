@@ -1,5 +1,5 @@
-#include "../../../headers/world/ObjectsComponents/TerrainComponent.hpp"
-#include "../../../headers/game.h"
+#include <world/ObjectsComponents/TerrainComponent.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 extern ZSpireEngine* engine_ptr;

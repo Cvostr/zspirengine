@@ -152,8 +152,8 @@ void Engine::VKRenderer::Render3DCamera(void* cam_prop, uint32_t cam_index) {
                             Pipeline->_GetPipelineLayout(), 1,
                             1, &set, 0, nullptr);
                         //Send object transform
-                        Pipeline->CmdPushConstants(gbuffer_cmdbuf, VK_SHADER_STAGE_VERTEX_BIT, 0, 8, &obr->TransformArrayIndex);
-                        Pipeline->CmdPushConstants(gbuffer_cmdbuf, VK_SHADER_STAGE_VERTEX_BIT, 8, 4, &cam_index);
+                        Pipeline->CmdPushConstants(gbuffer_cmdbuf, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 8, &obr->TransformArrayIndex);
+                        Pipeline->CmdPushConstants(gbuffer_cmdbuf, VK_SHADER_STAGE_ALL_GRAPHICS, 8, 4, &cam_index); 
                         //Send material props
                         unsigned int bufsize = obr->mat->mTemplate->mUniformBuffer->GetBufferSize();
                         void* bufdata = obr->mat->mTemplate->mUniformBuffer->GetCpuBuffer();
@@ -181,6 +181,7 @@ void Engine::VKRenderer::Render3DCamera(void* cam_prop, uint32_t cam_index) {
 
         DefferedPipeline->CmdBindPipeline(deffered_cmdbuf);
         DefferedPipeline->CmdBindDescriptorSets(deffered_cmdbuf);
+        DefferedPipeline->CmdPushConstants(deffered_cmdbuf, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 4, &cam_index);
         gbuffer_fb->BindAttachmentsDescrSet(1, deffered_cmdbuf, DefferedPipeline->GetPipelineLayout());
 
         Engine::getPlaneMesh2D()->Draw();
@@ -268,7 +269,7 @@ void Engine::VKRenderer::InitShaders() {
     TransformStorageBuf->init(0, sizeof(Mat4) * 4000, true);
 
     SkinningStorageBuf = static_cast<vkUniformBuffer*>(allocUniformBuffer());
-    SkinningStorageBuf->init(1, sizeof(Mat4) * 200 * 512, true);
+    SkinningStorageBuf->init(4, sizeof(Mat4) * 200 * 512, true);
 
     CamerasStorageBuf = static_cast<vkUniformBuffer*>(allocUniformBuffer());
     CamerasStorageBuf->init(2, 160 * 10, true);
@@ -296,9 +297,11 @@ void Engine::VKRenderer::InitShaders() {
     Engine::ZsVkPipelineConf Conf;
     Conf.hasDepth = false;
     Conf.cullFace = false;
-    Conf.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->transformBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
+    Conf.LayoutInfo.DescrSetLayout->pushStorageBuffer(GetCamerasStorageBuffer(), VK_SHADER_STAGE_ALL_GRAPHICS);
+    //Conf.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->transformBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
     Conf.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->lightsBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
     Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSamplers(0, 5);
+    Conf.LayoutInfo.AddPushConstant(4, VK_SHADER_STAGE_ALL_GRAPHICS);
    
     DefferedPipeline = new Engine::ZSVulkanPipeline;
     DefferedPipeline->Create((Engine::vkShader*)deffered_light, DefferedRenderPass, Conf);

@@ -1,4 +1,4 @@
-#include "../../../headers/world/tile_properties.h"
+#include <world/tile_properties.h>
 
 #include <world/ObjectsComponents/AudioSourceComponent.hpp>
 #include <world/ObjectsComponents/AudioListenerComponent.hpp>

@@ -77,7 +77,8 @@ void Engine::MaterialProperty::bindObjectPropertyToAngel(Engine::AGScriptMgr* mg
     mgr->RegisterObjectType(MATERIAL_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
     mgr->RegisterObjectMethod(MATERIAL_PROP_TYPE_NAME, "void SetInt(int)", asMETHOD(MaterialShaderPropertyConf, SetIntValue), asCALL_THISCALL);
     mgr->RegisterObjectMethod(MATERIAL_PROP_TYPE_NAME, "void SetFloat(float)", asMETHOD(MaterialShaderPropertyConf, SetFloatValue), asCALL_THISCALL);
-    
+    mgr->RegisterObjectMethod(MATERIAL_PROP_TYPE_NAME, "void SetVec3(const Vec3& in)", asMETHOD(MaterialShaderPropertyConf, SetVec3Value), asCALL_THISCALL);
+
     mgr->RegisterObjectType(MAT_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
 
     mgr->RegisterObjectMethod(MAT_PROP_TYPE_NAME, "void setMaterial(MaterialResource@)", asMETHODPR(MaterialProperty, setMaterial, (MaterialResource*), void), asCALL_THISCALL);

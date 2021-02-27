@@ -1,6 +1,6 @@
-#include "../../headers/vulkan/ZSVulkanPipelineLayout.hpp"
-#include "../../headers/vulkan/VKTexture.hpp"
-#include "../../headers/game.h"
+#include <vulkan/ZSVulkanPipelineLayout.hpp>
+#include <vulkan/VKTexture.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

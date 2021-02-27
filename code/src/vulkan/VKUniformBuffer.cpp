@@ -1,5 +1,5 @@
-#include "../../headers/vulkan/VKUniformBuffer.hpp"
-#include "../../headers/game.h"
+#include <vulkan/VKUniformBuffer.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

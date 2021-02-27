@@ -1,4 +1,7 @@
 #version 450
+
+#include "../HEADER.glsl"
+
 #extension GL_ARB_separate_shader_objects : enable
 
 layout(location = 0) in vec3 FragPos;
@@ -43,16 +46,17 @@ layout (std140, binding = 2) uniform ShadowData{
     uniform int CasterDistance5; //4
 };
 
-layout (std140, binding = 0) uniform CamMatrices{
-    uniform mat4 cam_projection;
-    uniform mat4 cam_view;
-    uniform mat4 object_transform;
-    //Camera position
-    uniform vec3 cam_position;
-};
+layout(std140, set = 2, binding = 2) readonly buffer CamsBuffer{   
+	CameraInfo cameras[];
+} camsBuffer;
 
 layout( push_constant ) uniform material_constants
 {
+
+    int TransformMatIndex;
+    int SkinningMatIndex;
+    int CameraIndex;
+
 	layout(offset = 64) vec3 diffuse_color;
     bool hasDiffuseMap;
     bool hasNormalMap;
@@ -70,7 +74,7 @@ vec2 processParallaxMapUv(vec2 uv){
     if(!PushConstants.hasHeightMap) return uv;
     
     float height = texture(height_map, uv).r;
-    vec3 camera_dir = normalize(TBN * FragPos - TBN * cam_position);
+    vec3 camera_dir = normalize(TBN * FragPos - TBN * camsBuffer.cameras[PushConstants.CameraIndex].Pos);
     
     vec2 uv_offset = camera_dir.xy / camera_dir.z * (height);
     return uv - uv_offset;

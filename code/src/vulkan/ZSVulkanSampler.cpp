@@ -1,5 +1,5 @@
-#include "../../headers/vulkan/ZSVulkanSampler.hpp"
-#include "../../headers/game.h"
+#include <vulkan/ZSVulkanSampler.hpp>
+#include <game.h>
 
 extern ZSGAME_DATA* game_data;
 

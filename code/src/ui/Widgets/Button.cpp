@@ -1,5 +1,5 @@
-#include "../../../headers/ui/Widgets/Button.hpp"
-#include "../../../headers/input/Input.hpp"
+#include <ui/Widgets/Button.hpp>
+#include <input/Input.hpp>
 
 extern ZSGAME_DATA* game_data;
 

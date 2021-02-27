@@ -36,7 +36,7 @@ public:
 
     virtual void SetIntValue(int value){}
     virtual void SetFloatValue(float value){}
-    virtual void SetVec3Value(Vec3 value) {}
+    virtual void SetVec3Value(const Vec3& value) {}
     virtual void SetTexture(void* texture) {}
 
     MaterialShaderPropertyConf();
@@ -163,7 +163,7 @@ class Float3MtShPropConf : public MaterialShaderPropertyConf{
 public:
     Vec3 value;
 
-    void SetVec3Value(Vec3 value) {
+    void SetVec3Value(const Vec3& value) {
         this->value = value;
     }
 
@@ -178,7 +178,7 @@ public:
 };
 class Int2MtShPropConf : public MaterialShaderPropertyConf{
 public:
-    int value[2];
+    Vec2i value;
     //Construct
     Int2MtShPropConf();
 };
