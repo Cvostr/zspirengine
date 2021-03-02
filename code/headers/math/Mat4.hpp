@@ -9,6 +9,9 @@ class Mat4;
 float determinant(const Mat4& mat);
 Mat4 invert(const Mat4& mat);
 Mat4 transpose(const Mat4& mat);
+Mat4 matrixSum(const Mat4& l, const Mat4& r);
+Mat4 matrixMM(const Mat4& l, const Mat4& r);
+Vec4 matrixVecMM(const Mat4& l, const Vec4& r);
 
 class Mat4 {
 public:
@@ -33,6 +36,29 @@ public:
 				m[i][j] = 0;
 	}
 
+	Mat4 operator*(float r) const {
+		Mat4 result = *this;
+		for (unsigned int i = 0; i < 4; i++) {
+			for (unsigned int b = 0; b < 4; b++) {
+				result.m[i][b] *= r;
+			}
+		}
+
+		return result;
+	}
+
+	Vec4 operator*(const Vec4 r) const {
+		return matrixVecMM(*this, r);
+	}
+
+	Mat4 operator*(const Mat4& r) const {
+		return matrixMM(*this, r);
+	}
+
+	Mat4 operator+(const Mat4& r) const {
+		return matrixSum(*this, r);
+	}
+
 	Vec3	 GetPosition() { return Vec3(m[3][0], m[3][1], m[3][2]); }
 	Vec3	 GetScale() { return Vec3(m[0][0], m[1][1], m[2][2]); }
 
@@ -45,9 +71,9 @@ Mat4 getIdentity();
 
 
 float determinant(float a, float b, float c, float d, float e, float f, float g, float h, float i);
-Mat4 matrixMM(const Mat4& l, const Mat4& r);
-Vec4 matrixVecMM(const Mat4& l, const Vec4& r);
-Mat4 matrixSum(const Mat4& l, const Mat4& r);
+
+
+
 Mat4 getPerspective(float fovy, float aspect, float zNear, float zFar);
 Mat4 getPerspectiveVulkan(float fovy, float aspect, float zNear, float zFar);
 Mat4 getOrthogonal(float left, float right, float bottom, float top);
@@ -70,28 +96,3 @@ Mat4 getRotationMat(const Vec3& rotation, const Vec3& center);
 Mat4 getRotationMat(const ZSQUATERNION& quat);
 //Get reflection matrix over plane Ax + By + Cz + D = 0
 Mat4 GetPlaneReflectionMat(float A, float B, float C, float D);
-
-inline Mat4 operator*(const Mat4& l, const Mat4& r)
-{
-	return matrixMM(l, r);
-
-}
-
-inline Mat4 operator*(const Mat4& l, const float& r)
-{
-	Mat4 result = l;
-	for (unsigned int i = 0; i < 4; i++) {
-		for (unsigned int b = 0; b < 4; b++) {
-			result.m[i][b] *= r;
-		}
-	}
-
-	return l;
-
-}
-
-inline Mat4 operator+(const Mat4& l, const Mat4& r)
-{
-	return matrixSum(l, r);
-
-}

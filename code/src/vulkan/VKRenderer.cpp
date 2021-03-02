@@ -61,6 +61,8 @@ void Engine::VKRenderer::render3D() {
     FillShadowCmdBuf();
     
  */
+    FillFinalCmdBufs();
+
     ComputeAll();
 }
 
@@ -241,6 +243,7 @@ void Engine::VKRenderer::InitShaders() {
     this->default3d->compileFromFile("Shaders/vulkan_test/3d/vert.spv", "Shaders/vulkan_test/3d/frag.spv");
     this->deffered_light->compileFromFile("Shaders/vulkan_test/deffered/vert.spv", "Shaders/vulkan_test/deffered/frag.spv");
     this->mShadowMapShader->compileFromFile("Shaders/vulkan_test/shadowmap/vert.spv", "", "Shaders/vulkan_test/shadowmap/geom.spv");
+    final_shader->compileFromFile("Shaders/vulkan_test/final/vert.spv", "Shaders/vulkan_test/final/frag.spv");
 
     GBufferRenderPass = new ZSVulkanRenderPass;
     GBufferRenderPass->PushColorAttachment(TextureFormat::FORMAT_RGBA, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
@@ -274,13 +277,7 @@ void Engine::VKRenderer::InitShaders() {
     CamerasStorageBuf = static_cast<vkUniformBuffer*>(allocUniformBuffer());
     CamerasStorageBuf->init(2, 160 * 10, true);
 
-    OutRenderPass = new ZSVulkanRenderPass;
-    OutRenderPass->PushColorOutputAttachment();
-    OutRenderPass->Create();
-
-    OutFb = new ZSVulkanFramebuffer;
-    OutFb->PushOutputAttachment();
-    OutFb->Create(OutRenderPass);
+   
 
     ShadowRenderPass = new ZSVulkanRenderPass;
     ShadowRenderPass->PushDepthAttachment();
@@ -298,7 +295,6 @@ void Engine::VKRenderer::InitShaders() {
     Conf.hasDepth = false;
     Conf.cullFace = false;
     Conf.LayoutInfo.DescrSetLayout->pushStorageBuffer(GetCamerasStorageBuffer(), VK_SHADER_STAGE_ALL_GRAPHICS);
-    //Conf.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->transformBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
     Conf.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->lightsBuffer, VK_SHADER_STAGE_FRAGMENT_BIT);
     Conf.LayoutInfo.DescrSetLayoutSampler->pushImageSamplers(0, 5);
     Conf.LayoutInfo.AddPushConstant(4, VK_SHADER_STAGE_ALL_GRAPHICS);
@@ -313,7 +309,6 @@ void Engine::VKRenderer::InitShaders() {
     ConfShadow.LayoutInfo.DescrSetLayout->pushUniformBuffer((Engine::vkUniformBuffer*)this->shadowBuffer, VK_SHADER_STAGE_VERTEX_BIT);
     ConfShadow.LayoutInfo.DescrSetLayoutStorage->pushStorageBuffer(GetTransformStorageBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
     ConfShadow.LayoutInfo.DescrSetLayoutStorage->pushStorageBuffer(GetSkinningStorageBuffer(), VK_SHADER_STAGE_VERTEX_BIT);
-
     ConfShadow.LayoutInfo.AddPushConstant(64, VK_SHADER_STAGE_VERTEX_BIT);
     ConfShadow.Viewport.width = 4096;
     ConfShadow.Viewport.height = 4096;
@@ -323,10 +318,13 @@ void Engine::VKRenderer::InitShaders() {
 
 
 
+    
+
+
 	VkSemaphoreCreateInfo semaphoreInfo = {};
 	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-	vkCreateSemaphore(game_data->vk_main->mDevice->getVkDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphore);
+	
 	vkCreateSemaphore(game_data->vk_main->mDevice->getVkDevice(), &semaphoreInfo, nullptr, &MaterialsFinishedSemaphore);
     vkCreateSemaphore(game_data->vk_main->mDevice->getVkDevice(), &semaphoreInfo, nullptr, &DefferedFinishedSemaphore);
     vkCreateSemaphore(game_data->vk_main->mDevice->getVkDevice(), &semaphoreInfo, nullptr, &ShadowFinishedSemaphore);
@@ -349,8 +347,51 @@ void Engine::VKRenderer::InitShaders() {
     vkAllocateCommandBuffers(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, &mDefferedCmdBuf);
     vkAllocateCommandBuffers(game_data->vk_main->mDevice->getVkDevice(), &allocInfo, &mShadowCmdBuf);
 
+    PresentInfrastructure.Create(commandPool, game_data->vk_main->mSwapChain->GetSwapChainImagesCount());
+
+    Engine::ZsVkPipelineConf ConfFinal;
+    ConfFinal.hasDepth = false;
+    ConfFinal.cullFace = false;
+    ConfFinal.LayoutInfo.DescrSetLayoutSampler->pushImageSampler(0);
+
+    PresentPipeline = new Engine::ZSVulkanPipeline;
+    PresentPipeline->Create((Engine::vkShader*)final_shader, PresentInfrastructure.OutRenderPass, ConfFinal);
+
+
     if (engine_ptr->desc->game_perspective == PERSP_3D) {
         MtShProps::genDefaultMtShGroup(default3d, mSkyboxShader, mTerrainShader, water_shader);
+    }
+
+    
+}
+
+void Engine::VKRenderer::FillFinalCmdBufs() {
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = 0; // Optional
+    beginInfo.pInheritanceInfo = nullptr; // Optional
+
+    CameraComponent* MainCam = static_cast<CameraComponent*>(mMainCameraComponent);
+    ZSVulkanFramebuffer* CamFb = static_cast<ZSVulkanFramebuffer*>(MainCam->mDefferedBuffer);
+    ZSVulkanRenderPass* renderpass = PresentInfrastructure.OutRenderPass;
+
+    for (uint32_t SW_image = 0; SW_image < game_data->vk_main->mSwapChain->GetSwapChainImagesCount(); SW_image++) {
+        VkCommandBuffer cmdbuf = PresentInfrastructure.PresentCmdbufs[SW_image];
+        ZSVulkanFramebuffer* fb = PresentInfrastructure.OutFramebuffers[SW_image];
+        
+        vkBeginCommandBuffer(cmdbuf, &beginInfo);
+
+        game_data->vk_main->CurrentCmdBuffer = cmdbuf;
+
+        renderpass->CmdBegin(cmdbuf, fb);
+
+        PresentPipeline->CmdBindPipeline(cmdbuf);
+        CamFb->BindAttachmentsDescrSet(1, cmdbuf, PresentPipeline->GetPipelineLayout());
+        Engine::getPlaneMesh2D()->Draw();
+
+        vkCmdEndRenderPass(cmdbuf);
+        vkEndCommandBuffer(cmdbuf);
+
     }
 }
 
@@ -396,10 +437,10 @@ void Engine::VKRenderer::ComputeAll() {
 
     uint32_t _imageIndex;
     vkAcquireNextImageKHR(game_data->vk_main->mDevice->getVkDevice(),
-        game_data->vk_main->mSwapChain->GetSwapChain(), UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &_imageIndex);
-    _imageIndex = 0;
+        game_data->vk_main->mSwapChain->GetSwapChain(), UINT64_MAX, PresentInfrastructure.imageAvailableSemaphore, VK_NULL_HANDLE, &_imageIndex);
+    //_imageIndex = 0;
 
-    VkSemaphore Wait = imageAvailableSemaphore;
+    VkSemaphore Wait = PresentInfrastructure.imageAvailableSemaphore;
 
     for (uint32_t Camera_i = 0; Camera_i < CamerasToRender.size(); Camera_i++) {
 
@@ -427,17 +468,31 @@ void Engine::VKRenderer::ComputeAll() {
         Wait = DefferedFinishedSemaphore;
     }
 
+    
+    VkCommandBuffer final_cmdbuf = PresentInfrastructure.PresentCmdbufs[_imageIndex];
+
+    submitInfo.waitSemaphoreCount = 1;
+    submitInfo.pWaitSemaphores = &Wait;
+    submitInfo.pWaitDstStageMask = waitStages;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &final_cmdbuf;
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = &PresentInfrastructure.PresentBeginSemaphore;
+    vkQueueSubmit(game_data->vk_main->mDevice->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+
+
+
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
     presentInfo.waitSemaphoreCount = 1;
-    presentInfo.pWaitSemaphores = &Wait;
+    presentInfo.pWaitSemaphores = &PresentInfrastructure.PresentBeginSemaphore;
 
     VkSwapchainKHR swapChains[] = { game_data->vk_main->mSwapChain->GetSwapChain() };
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
-    uint32_t imageIndex = 0;
-    presentInfo.pImageIndices = &imageIndex;
+    //uint32_t imageIndex = 0;
+    presentInfo.pImageIndices = &_imageIndex;
     presentInfo.pResults = nullptr; // Optional
     vkQueuePresentKHR(game_data->vk_main->mDevice->GetPresentQueue(), &presentInfo);
 

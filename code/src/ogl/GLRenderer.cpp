@@ -189,7 +189,7 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
 
 void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
     BoundingBox3 bb = obj->getBoundingBox();
-    
+    //FrustumRelation Relation = mMainCamera->GetFrustum()->GetRelation(bb);
 
     if (current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
         //Call prerender on each property in object
@@ -207,7 +207,8 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
         transformBuffer->bind();
         transformBuffer->writeData(sizeof(Mat4) * 2, sizeof(Mat4), &transform_ptr->transform_mat);
 
-        if (current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT) {
+        //if (current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT && (Relation == FR_INTERSECTS || Relation == FR_INSIDE)) {
+        if (current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT ) {
             MeshProperty* mesh_prop = obj->getPropertyPtr<MeshProperty>();
             //Render all properties
             obj->onRender(this);
@@ -215,12 +216,7 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
                 game_data->resources->getMaterialByLabel("@default")->material->applyMatToPipeline();
             //Draw mesh
             obj->DrawMesh(this);
-            
-            //TESTING
-            /*transformBuffer->bind();
-            Mat4 BBTransform = bb.GetMatrix();
-            transformBuffer->writeData(sizeof(Mat4) * 2, sizeof(Mat4), &BBTransform);
-            Engine::getCubeMesh3D()->Draw();*/
+           
         }
 
         if (current_state == PIPELINE_STATE::PIPELINE_STATE_SHADOWDEPTH) {

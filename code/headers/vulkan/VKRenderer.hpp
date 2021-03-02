@@ -47,9 +47,26 @@ namespace Engine {
 		}
 	};
 
+	class VKPresentInfrastructure {
+	public:
+		VkSemaphore imageAvailableSemaphore;
+		VkSemaphore PresentBeginSemaphore;
+		std::vector<VkCommandBuffer> PresentCmdbufs;
+		std::vector<ZSVulkanFramebuffer*> OutFramebuffers;
+		ZSVulkanRenderPass* OutRenderPass;
+
+		void Create(VkCommandPool Pool, int Images);
+		void Destroy();
+
+		VKPresentInfrastructure(){}
+		~VKPresentInfrastructure(){
+			Destroy();
+		}
+	};
+
 	class VKRenderer : public Renderer{
 	private:
-		VkSemaphore imageAvailableSemaphore;
+		
 		VkSemaphore ShadowFinishedSemaphore;
 		VkSemaphore MaterialsFinishedSemaphore;
 		VkSemaphore DefferedFinishedSemaphore;
@@ -62,12 +79,10 @@ namespace Engine {
 
 		ZSVulkanPipeline* DefferedPipeline;
 		ZSVulkanPipeline* ShadowPipeline;
+		ZSVulkanPipeline* PresentPipeline;
 
 		ZSVulkanRenderPass* GBufferRenderPass;
 		ZSVulkanRenderPass* DefferedRenderPass;
-
-		ZSVulkanFramebuffer* OutFb;
-		ZSVulkanRenderPass* OutRenderPass;
 
 		ZSVulkanFramebuffer* ShadowFb;
 		ZSVulkanRenderPass* ShadowRenderPass;
@@ -81,9 +96,12 @@ namespace Engine {
 		std::vector<VKObjectToRender> ObjectsToRender;
 		std::vector<VKCameraToRender> CamerasToRender;
 
+		VKPresentInfrastructure PresentInfrastructure;
+
 		void ComputeAll();
 
 		void FillShadowCmdBuf();
+		void FillFinalCmdBufs();
 
 		int LastTransformOffset;
 		int LastSkinningOffset;

@@ -1,4 +1,5 @@
 *.user 
 *.exe
+*.spv
 x64/
 .vs/

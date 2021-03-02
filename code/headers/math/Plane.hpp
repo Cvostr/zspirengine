@@ -14,17 +14,31 @@ namespace Engine {
 		{
 		}
 
-		Plane(Vec3 Normal, float D) :
+		Plane(const Vec3 Normal, float D) :
 			mNormal(Normal),
 			mD(D)
 		{
 		}
 
+		Plane(const Vec3& v1, const Vec3& v2, const Vec3& v3) {
+			Create(v1, v2, v3);
+		}
+
+		Plane(const Vec3& Normal, const Vec3& Point) {
+			Create(Normal, Point);
+		}
+
+		float Distance(const Vec3& point) const { return vDot(mNormal, point) + mD; }
+
 		const Vec3& GetNormal() { return mNormal; }
 		float GetD() { return mD; }
 
-		Plane(Vec3 Normal, Vec3 Point);
+		void SetNormal(const Vec3& Normal) { this->mNormal = Normal; }
+		void SetD(float D) { this->mD = D; }
 
 		Mat4 GetReflectionMatrix();
+
+		void Create(const Vec3& Normal, const Vec3& Point);
+		void Create(const Vec3& v1, const Vec3& v2, const Vec3& v3);
 	};
 }

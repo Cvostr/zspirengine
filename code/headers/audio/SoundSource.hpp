@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../math/Vec3.hpp"
+#include <math/Vec3.hpp>
 #include "SoundBuffer.hpp"
 
 namespace Engine {

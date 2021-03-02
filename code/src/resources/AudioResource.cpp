@@ -1,4 +1,4 @@
-#include "../../headers/engine/Resources.hpp"
+#include <engine/Resources.hpp>
 
 Engine::AudioResource::AudioResource() {
     this->resource_type = RESOURCE_TYPE_AUDIO;

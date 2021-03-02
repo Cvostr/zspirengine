@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../render/Math.hpp"
-#include "../math/Plane.hpp"
-#include "../audio/SoundSource.hpp"
+#include <render/Math.hpp>
+#include <math/Frustum.hpp>
 
 enum ÑameraProjectionType {
     ZSCAMERA_PROJECTION_NONE,
@@ -45,7 +44,8 @@ namespace Engine{
         protected:
             Mat4 mProjectionMatrix; //Calculated Projection matrix
             Mat4 mViewMatrix; //Calculated View matrix
-
+            //Frustum mFrustum;
+            void UpdateFrustum();
         public:
             ÑameraProjectionType mProjectionType; //Type of projection
             Vec3 mCameraPos; //Camera position vector
@@ -65,6 +65,8 @@ namespace Engine{
             Vec3 getCameraUpVec() { return mCameraUp; }
             Vec3 getCameraRightVec();
             Vec3 getCameraFrontVec() { return mCameraFront; }
+
+            //Frustum* GetFrustum() { return &mFrustum; }
 
             ZSVIEWPORT getViewport() { return mViewport; }
 

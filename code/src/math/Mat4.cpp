@@ -53,7 +53,7 @@ Mat4 matrixSum(const Mat4& l, const Mat4& r) {
 Mat4 getPerspective(float fovy, float aspect, float zNear, float zFar) {
     Mat4 result;
 
-    double range = tan(static_cast<double>(ZS_PI * (fovy / (2.0f * 180.f))));
+    double range = tan(DegToRad(fovy) / 2);
 
     result.m[0][0] = (1.f) / static_cast<float>(aspect * range);
     result.m[1][1] = (1.f) / static_cast<float>(range);
@@ -67,7 +67,7 @@ Mat4 getPerspective(float fovy, float aspect, float zNear, float zFar) {
 Mat4 getPerspectiveVulkan(float fovy, float aspect, float zNear, float zFar) {
     Mat4 result;
 
-    double range = tan(static_cast<double>(ZS_PI * (fovy / (2.0f * 180.f))));
+    double range = tan(DegToRad(fovy) / 2);
 
     result.m[0][0] = (1.f) / static_cast<float>(aspect * range);
     result.m[1][1] = (-1.f) / static_cast<float>(range);

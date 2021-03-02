@@ -228,6 +228,7 @@
     <ClCompile Include="code\src\hw\CpuInfo.cpp" />
     <ClCompile Include="code\src\input\Input.cpp" />
     <ClCompile Include="code\src\math\BB3.cpp" />
+    <ClCompile Include="code\src\math\Frustum.cpp" />
     <ClCompile Include="code\src\math\Mat4.cpp" />
     <ClCompile Include="code\src\math\Plane.cpp" />
     <ClCompile Include="code\src\math\Quat.cpp" />
@@ -288,6 +289,7 @@
     <ClCompile Include="code\src\ui\Widgets\Button.cpp" />
     <ClCompile Include="code\src\ui\Widgets\Widget.cpp" />
     <ClCompile Include="code\src\vulkan\VKMaterial.cpp" />
+    <ClCompile Include="code\src\vulkan\VKPresentInfrastructure.cpp" />
     <ClCompile Include="code\src\vulkan\VKRenderer.cpp" />
     <ClCompile Include="code\src\vulkan\VKMesh.cpp" />
     <ClCompile Include="code\src\vulkan\VKShader.cpp" />
@@ -350,6 +352,7 @@
     <ClInclude Include="code\headers\hw\GpuInfo.hpp" />
     <ClInclude Include="code\headers\input\Input.hpp" />
     <ClInclude Include="code\headers\math\BB3.hpp" />
+    <ClInclude Include="code\headers\math\Frustum.hpp" />
     <ClInclude Include="code\headers\math\Mat4.hpp" />
     <ClInclude Include="code\headers\math\Plane.hpp" />
     <ClInclude Include="code\headers\math\Quat.hpp" />

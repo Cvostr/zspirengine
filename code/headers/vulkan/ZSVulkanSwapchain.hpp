@@ -32,12 +32,13 @@ namespace Engine {
         bool initSwapchain(ZSVulkanDevice* Device, ZSVulkanInstance* instance, int Width, int Height);
 
         VkSwapchainKHR GetSwapChain() { return mSwapChain; }
+        uint32_t GetSwapChainImagesCount() { 
+            return static_cast<uint32_t>(mSwapChainImages.size()); 
+        }
         VkImageView GetImageViewAtIndex(unsigned int Index);
         VkExtent2D GetExtent() { return swap_extend; }
 
         ZSVulkanSwapChain();
     };
-
-    //ZSVulkanDevice* CreatePrimaryDevice(ZSVulkanInstance* instance);
 
 }

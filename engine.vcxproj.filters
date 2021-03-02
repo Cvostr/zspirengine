@@ -480,6 +480,12 @@
     <ClCompile Include="code\src\world\GoProperty\AudioListenerComponent.cpp">
       <Filter>Исходные файлы\world\GoProperty</Filter>
     </ClCompile>
+    <ClCompile Include="code\src\math\Frustum.cpp">
+      <Filter>Исходные файлы\math</Filter>
+    </ClCompile>
+    <ClCompile Include="code\src\vulkan\VKPresentInfrastructure.cpp">
+      <Filter>Исходные файлы\vk</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\headers\world\Physics.h">
@@ -817,6 +823,9 @@
     </ClInclude>
     <ClInclude Include="code\headers\world\ObjectsComponents\AudioListenerComponent.hpp">
       <Filter>Файлы заголовков\world\ObjectComponents</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\math\Frustum.hpp">
+      <Filter>Файлы заголовков\math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

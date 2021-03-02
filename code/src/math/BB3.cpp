@@ -79,7 +79,7 @@ void BoundingBox3::ApplyTransform(const Mat4& Transform) {
 	PrepareForExtend();
 	for (int i = 0; i < 8; i++) {
 		Vec4 v4 = Vec4(corners[i], 1.0f);
-		v4 = matrixVecMM(Transform, v4);
+		v4 = Transform * v4;
 		Extend(v4._Vec3());
 	}
 }

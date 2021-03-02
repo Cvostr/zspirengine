@@ -86,6 +86,7 @@ void Engine::ZSVulkanFramebuffer::Destroy() {
 		if (Depth) {
 			depthTexture->Destroy();
 			delete depthTexture;
+			Depth = false;
 		}
 
 		mTexturesCount = 0;
@@ -93,8 +94,8 @@ void Engine::ZSVulkanFramebuffer::Destroy() {
 	}
 }
 
-void Engine::ZSVulkanFramebuffer::PushOutputAttachment() {
-	Views.push_back(game_data->vk_main->mSwapChain->GetImageViewAtIndex(0));
+void Engine::ZSVulkanFramebuffer::PushOutputAttachment(uint32_t Index) {
+	Views.push_back(game_data->vk_main->mSwapChain->GetImageViewAtIndex(Index));
 }
 
 void Engine::ZSVulkanFramebuffer::AddTexture(TextureFormat Format) {

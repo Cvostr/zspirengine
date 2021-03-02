@@ -1,4 +1,4 @@
-#include "../../headers/engine/Resources.hpp"
+#include <engine/Resources.hpp>
 
 Engine::PrefabResource::PrefabResource() {
 	this->resource_type = RESOURCE_TYPE::RESOURCE_TYPE_PREFAB;

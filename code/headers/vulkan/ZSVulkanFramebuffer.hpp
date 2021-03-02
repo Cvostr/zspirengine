@@ -22,7 +22,7 @@ namespace Engine {
         VkFramebuffer GetFramebuffer() { return mFramebuffer; }
 
         VkImageView getImageViewIndex(unsigned int i) { return Views[i]; }
-        void PushOutputAttachment();
+        void PushOutputAttachment(uint32_t Index);
         void SetLayersCount(unsigned int Layers) { mLayersCount = Layers; }
 		bool Create(ZSVulkanRenderPass* renderpass);
         void Create();

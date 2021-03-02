@@ -70,12 +70,18 @@ void Engine::Camera::updateProjectionMat(){
                              0, static_cast<float>(mViewport.endY - mViewport.startY),
             mNearZ, mFarZ);
     }
-    
+    UpdateFrustum();
 }
 
 void Engine::Camera::updateViewMat(){
     mViewMatrix = mReflectionMatrix * getScaleMat(mViewScale) *
         matrixLookAt(mCameraPos, (mCameraPos + mCameraFront), mCameraUp);
+
+    UpdateFrustum();
+}
+
+void Engine::Camera::UpdateFrustum() {
+    //mFrustum.Create(mProjectionMatrix * mViewMatrix);
 }
 
 void Engine::Camera::setPosition(const Vec3& pos){
