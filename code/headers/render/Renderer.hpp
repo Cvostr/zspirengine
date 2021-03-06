@@ -81,7 +81,7 @@ public:
     UniformBuffer* transformBuffer; //0
     UniformBuffer* lightsBuffer;    //1
     UniformBuffer* shadowBuffer;    //2
-    UniformBuffer* terrainUniformBuffer; //3
+    UniformBuffer* MaterialsUniformBuffer; //3
     UniformBuffer* skinningUniformBuffer; //4
     UniformBuffer* tileBuffer;  //5
     UniformBuffer* skyboxTransformUniformBuffer; //6
@@ -95,7 +95,7 @@ public:
     Engine::Shader* getTileShader() { return tile_shader; }
     Engine::Shader* getShadowmapShader() { return mShadowMapShader;  }
     Engine::Shader* getUiShader() { return mUiShader; }
-    UniformBuffer* GetTerrainUniformBuffer() { return terrainUniformBuffer; }
+    UniformBuffer* GetMaterialsUniformBuffer() { return MaterialsUniformBuffer; }
     UniformBuffer* GetTransformUniformBuffer() { return transformBuffer; }
     UniformBuffer* GetShadowmapUniformBuffer() { return shadowBuffer; }
 

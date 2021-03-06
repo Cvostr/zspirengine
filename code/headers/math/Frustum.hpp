@@ -31,7 +31,7 @@ namespace Engine {
 
 		void Create(float Fov, float AspectRatio, float nearZ, float farZ, Mat4& Transform);
 		void Create(Vec3 Near, Vec3 Far, Mat4& Transform);
-		void Create(const Mat4& projection);
+		void Create(const Mat4& projection, const Mat4& View);
 
 		FrustumRelation GetRelation(Vec3& Point);
 		FrustumRelation GetRelation(BoundingBox3& BB);

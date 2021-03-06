@@ -38,15 +38,15 @@ Material* allocMaterial(MaterialTemplate* Template) {
     return result;
 }
 
-MaterialTemplate* allocMaterialTemplate(Engine::Shader* shader, unsigned int UB_ConnectID, unsigned int UB_SIZE) {
+MaterialTemplate* allocMaterialTemplate(Engine::Shader* shader, unsigned int UB_SIZE) {
     MaterialTemplate* result = nullptr;
     switch (engine_ptr->engine_info->graphicsApi) {
     case OGL: {
-        result = new MaterialTemplate(shader, UB_ConnectID, UB_SIZE);
+        result = new MaterialTemplate(shader, UB_SIZE);
         break;
     }
     case VULKAN: {
-        result = new VKMaterialTemplate(shader, UB_ConnectID, UB_SIZE);
+        result = new VKMaterialTemplate(shader, UB_SIZE);
         break;
     }
     }
@@ -186,11 +186,12 @@ void Material::clear(){
 }
 
 void Material::WriteBytes(unsigned int offset, unsigned int size, void* data) {
-    if (engine_ptr->engine_info->graphicsApi == VULKAN) {
-        memcpy(this->MatData + offset, data, size);
-    }
     if (engine_ptr->engine_info->graphicsApi == OGL) {
-        mTemplate->setUB_Data(offset, size, data);
+        game_data->pipeline->GetMaterialsUniformBuffer()->writeDataBuffered(offset, size, data);
+    }
+    if (engine_ptr->engine_info->graphicsApi == VULKAN) {
+        VKMaterial* _VKMaterial = static_cast<VKMaterial*>(this);
+        _VKMaterial->WriteToBuffer(offset, size, (char*)data);
     }
 }
 
@@ -210,12 +211,10 @@ void Material::setTemplate(MaterialTemplate* Template){
     this->mTemplateStr = Template->str_path;
     
     unsigned int bytesize = 0;
-    if (mTemplate->mUniformBuffer != nullptr)
-        bytesize = mTemplate->mUniformBuffer->GetBufferSize();
-    MatData = new unsigned char[bytesize];
 
     if (engine_ptr->engine_info->graphicsApi == VULKAN && Template->mShader->mCreated) {
-
+        VKMaterialTemplate* VKTemplate = static_cast<VKMaterialTemplate*>(Template);
+        ((VKMaterial*)(this))->CreateBuffer(VKTemplate->BufferSize);
        ( (VKMaterial*)(this))->CreateDescriptors();
     }
     
@@ -640,10 +639,8 @@ void Material::applyMatToPipeline() {
         }
         }
     }
-    if (mTemplate->mUniformBuffer != nullptr) {
         if (engine_ptr->engine_info->graphicsApi == OGL) {
-            mTemplate->mUniformBuffer->bind();
-            mTemplate->mUniformBuffer->updateBufferedData();
+            game_data->pipeline->GetMaterialsUniformBuffer()->bind();
+            game_data->pipeline->GetMaterialsUniformBuffer()->updateBufferedData();
         }
-    }
 }

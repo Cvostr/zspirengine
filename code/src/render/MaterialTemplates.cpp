@@ -29,29 +29,20 @@ void MaterialTemplate::loadFromFile(const char* fpath){
 
     mat_shader_group.close();
 }
-MaterialTemplate::MaterialTemplate(Engine::Shader* shader, unsigned int UB_ConnectID, unsigned int UB_SIZE) :
+MaterialTemplate::MaterialTemplate(Engine::Shader* shader, unsigned int UB_SIZE) :
     mShader(shader),
     mAcceptShadows(false)
 {
     
     properties.resize(0);
 
-    if(UB_SIZE == 0) return;
-    //Generate uniform buffer
-    mUniformBuffer = Engine::allocUniformBuffer();
-    mUniformBuffer->init(UB_ConnectID, UB_SIZE);
-
-}
-
-void MaterialTemplate::setUB_Data(unsigned int offset, unsigned int size, void* data){
-    mUniformBuffer->writeDataBuffered(offset, size, data);
 }
 
 MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
                                                         Engine::Shader* heightmap,
                                                         Engine::Shader* water){
 
-    MaterialTemplate* default_group = allocMaterialTemplate(shader3d, 50, 48);
+    MaterialTemplate* default_group = allocMaterialTemplate(shader3d, 48);
     {
         default_group->mAcceptShadows = true;
         default_group->str_path = "@default";
@@ -114,7 +105,7 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
     {
 
         //Water
-        MaterialTemplate* water_group = allocMaterialTemplate(water, 51, 32);
+        MaterialTemplate* water_group = allocMaterialTemplate(water, 32);
         water_group->mAcceptShadows = true;
         water_group->str_path = "@basewater";
         water_group->Label = "Water";
@@ -155,7 +146,7 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
     }
 
 //Default skybox material
-    MaterialTemplate* default_sky_group = allocMaterialTemplate(skybox, 0, 0);
+    MaterialTemplate* default_sky_group = allocMaterialTemplate(skybox, 0);
     default_sky_group->str_path = "@skybox";
     default_sky_group->Label = "Default Skybox";
     Texture3MaterialShaderProperty* sky_texture =
@@ -167,7 +158,7 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
     MtShProps::addMtShaderPropertyGroup(default_sky_group);
 
 //Default terrain material
-    MaterialTemplate* default_heightmap_group = allocMaterialTemplate(heightmap, 0, 0);
+    MaterialTemplate* default_heightmap_group = allocMaterialTemplate(heightmap, 0);
     default_heightmap_group->str_path = "@heightmap";
     default_heightmap_group->Label = "Default Heightmap";
     default_heightmap_group->mAcceptShadows = true;

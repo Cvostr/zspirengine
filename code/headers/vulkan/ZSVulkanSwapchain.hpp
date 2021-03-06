@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 #include "ZSVulkanDevice.hpp"
+#include <render/GpuObject.hpp>
 
 namespace Engine {
 
@@ -11,7 +12,7 @@ namespace Engine {
         std::vector<VkPresentModeKHR> presentModes;
     }SwapChainSupportDetails;
 
-    class ZSVulkanSwapChain {
+    class ZSVulkanSwapChain : public GpuObject {
     private:
         //Vulkan swapchain object
         VkSwapchainKHR mSwapChain;

@@ -61,8 +61,8 @@ Engine::Renderer::Renderer(){
     shadowBuffer = allocUniformBuffer();
     shadowBuffer->init(2, 448);
     //Terrain uniform buffer
-    terrainUniformBuffer = allocUniformBuffer();
-    terrainUniformBuffer->init(3, 12 * 16 * 2 + 4 * 3);
+    MaterialsUniformBuffer = allocUniformBuffer();
+    MaterialsUniformBuffer->init(3, 2048);
     {
         //Skinning uniform buffer
         skinningUniformBuffer = allocUniformBuffer();
@@ -127,7 +127,7 @@ void Engine::Renderer::destroy(){
 
     delete lightsBuffer;
     delete transformBuffer;
-    delete terrainUniformBuffer;
+    delete MaterialsUniformBuffer;
     delete skinningUniformBuffer;
     delete skyboxTransformUniformBuffer;
     delete instancedTransformBuffer;

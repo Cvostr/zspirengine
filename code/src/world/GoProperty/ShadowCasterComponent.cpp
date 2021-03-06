@@ -132,7 +132,7 @@ int Engine::ShadowCasterProperty::GetSuitableCascadesAmount(BoundingBox3& Object
     if (mCamera != nullptr) {
 
         for (int cascade_i = 0; 0 < mCascadesNum; cascade_i++) {
-            if (longestDistance < sizes[cascade_i] * 2) {
+            if (longestDistance < sizes[cascade_i] * 2 - 2) {
                 InstNum = cascade_i + 1;
                 break;
             }

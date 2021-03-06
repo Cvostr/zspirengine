@@ -135,8 +135,9 @@ void Engine::VKRenderer::Render3DCamera(void* cam_prop, uint32_t cam_index) {
             GameObject* obj = ObjectsToRender[i].obj;
             if (obj->hasMesh() && obr->mat != nullptr) {
                 MeshProperty* mesh = obj->getPropertyPtr<MeshProperty>();
-                ZSVulkanPipeline* Pipeline = ((VKMaterialTemplate*)obr->mat->mTemplate)->Pipeline;
-                if (((VKMaterialTemplate*)obr->mat->mTemplate)->mPipelineCreated) {
+                VKMaterialTemplate* MaterialTemplate = (VKMaterialTemplate*)obr->mat->mTemplate;
+                ZSVulkanPipeline* Pipeline = MaterialTemplate->Pipeline;
+                if (MaterialTemplate->mPipelineCreated) {
                     if (!binded) {
                         Pipeline->CmdBindPipeline(gbuffer_cmdbuf);
 
@@ -147,19 +148,23 @@ void Engine::VKRenderer::Render3DCamera(void* cam_prop, uint32_t cam_index) {
                     }
 
 
-                    VkDescriptorSet set = obr->mat->DescrSetTextures->getDescriptorSet();
+                    
                     if (Pipeline != nullptr) {
+                        VkDescriptorSet set = VK_NULL_HANDLE;
 
-                        vkCmdBindDescriptorSets(gbuffer_cmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                            Pipeline->_GetPipelineLayout(), 1,
-                            1, &set, 0, nullptr);
+                        if (obr->mat->DescrSetTextures != nullptr) {
+                            set = obr->mat->DescrSetTextures->getDescriptorSet();
+
+                            vkCmdBindDescriptorSets(gbuffer_cmdbuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                Pipeline->_GetPipelineLayout(), 1,
+                                1, &set, 0, nullptr);
+                        }
                         //Send object transform
                         Pipeline->CmdPushConstants(gbuffer_cmdbuf, VK_SHADER_STAGE_ALL_GRAPHICS, 0, 8, &obr->TransformArrayIndex);
                         Pipeline->CmdPushConstants(gbuffer_cmdbuf, VK_SHADER_STAGE_ALL_GRAPHICS, 8, 4, &cam_index); 
                         //Send material props
-                        unsigned int bufsize = obr->mat->mTemplate->mUniformBuffer->GetBufferSize();
-                        void* bufdata = obr->mat->mTemplate->mUniformBuffer->GetCpuBuffer();
-                        Pipeline->CmdPushConstants(gbuffer_cmdbuf, VK_SHADER_STAGE_FRAGMENT_BIT, 64, bufsize, obr->mat->MatData);
+                        if(obr->mat->MaterialBuffer != nullptr)
+                            Pipeline->CmdPushConstants(gbuffer_cmdbuf, VK_SHADER_STAGE_FRAGMENT_BIT, 64, MaterialTemplate->BufferSize, obr->mat->MaterialBuffer);
 
                     }
                     if (mesh->mesh_ptr->resource_state == RESOURCE_STATE::STATE_LOADED)
@@ -436,9 +441,8 @@ void Engine::VKRenderer::ComputeAll() {
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
     uint32_t _imageIndex;
-    vkAcquireNextImageKHR(game_data->vk_main->mDevice->getVkDevice(),
+    VkResult imageResult = vkAcquireNextImageKHR(game_data->vk_main->mDevice->getVkDevice(),
         game_data->vk_main->mSwapChain->GetSwapChain(), UINT64_MAX, PresentInfrastructure.imageAvailableSemaphore, VK_NULL_HANDLE, &_imageIndex);
-    //_imageIndex = 0;
 
     VkSemaphore Wait = PresentInfrastructure.imageAvailableSemaphore;
 
@@ -468,7 +472,9 @@ void Engine::VKRenderer::ComputeAll() {
         Wait = DefferedFinishedSemaphore;
     }
 
-    
+    if (imageResult == VK_ERROR_OUT_OF_DATE_KHR)
+        _imageIndex = 0;
+
     VkCommandBuffer final_cmdbuf = PresentInfrastructure.PresentCmdbufs[_imageIndex];
 
     submitInfo.waitSemaphoreCount = 1;

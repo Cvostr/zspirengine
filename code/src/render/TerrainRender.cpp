@@ -137,7 +137,7 @@ void Engine::TerrainProperty::onRender(Engine::Renderer* pipeline) {
     int dtrue = 1;
     int dfalse = 0;
     //Binding terrain buffer
-    pipeline->terrainUniformBuffer->bind();
+    pipeline->GetMaterialsUniformBuffer()->bind();
     //Iterate over all textures to use them
     for (unsigned int i = 0; i < static_cast<unsigned int>(this->textures_size); i++) {
         //Get pair pointer
@@ -146,26 +146,26 @@ void Engine::TerrainProperty::onRender(Engine::Renderer* pipeline) {
         if (pair->diffuse != nullptr) {
             //Use diffuse texture
             pair->diffuse->Use(static_cast<int>(i));
-            pipeline->terrainUniformBuffer->writeData(16 * i, 4, &dtrue);
+            pipeline->GetMaterialsUniformBuffer()->writeData(16 * i, 4, &dtrue);
         }
         else {
-            pipeline->terrainUniformBuffer->writeData(16 * i, 4, &dfalse);
+            pipeline->GetMaterialsUniformBuffer()->writeData(16 * i, 4, &dfalse);
         }
         //Check, if pair has normal texture
         if (pair->normal != nullptr) {
             //Use normal texture
             pair->normal->Use(static_cast<int>(12 + i));
-            pipeline->terrainUniformBuffer->writeData(16 * 12 + 16 * i, 4, &dtrue);
+            pipeline->GetMaterialsUniformBuffer()->writeData(16 * 12 + 16 * i, 4, &dtrue);
         }
         else {
-            pipeline->terrainUniformBuffer->writeData(16 * 12 + 16 * i, 4, &dfalse);
+            pipeline->GetMaterialsUniformBuffer()->writeData(16 * 12 + 16 * i, 4, &dfalse);
         }
     }
     //Tell shader, that we rendering terrain in normal mode (non picking)
-    pipeline->terrainUniformBuffer->writeData(16 * 12 * 2, 4, &dfalse);
+    pipeline->GetMaterialsUniformBuffer()->writeData(16 * 12 * 2, 4, &dfalse);
     //Send dimensions to buffer
-    pipeline->terrainUniformBuffer->writeData(16 * 12 * 2 + 4, 4, &this->data.W);
-    pipeline->terrainUniformBuffer->writeData(16 * 12 * 2 + 8, 4, &this->data.H);
+    pipeline->GetMaterialsUniformBuffer()->writeData(16 * 12 * 2 + 4, 4, &this->data.W);
+    pipeline->GetMaterialsUniformBuffer()->writeData(16 * 12 * 2 + 8, 4, &this->data.H);
 
     //Apply material shader
     mat->onRender(pipeline);

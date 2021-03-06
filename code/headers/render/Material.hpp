@@ -50,15 +50,11 @@ public:
     bool mAcceptShadows;
     Engine::Shader* mShader; //Pointer to shader, that binds on object render
     std::vector<MaterialShaderProperty*> properties;
-    //ID of uniform buffer
-    Engine::UniformBuffer* mUniformBuffer;
-
-    void setUB_Data(unsigned int offset, unsigned int size, void* data);
 
     MaterialShaderProperty* addProperty(int type);
     void loadFromFile(const char* fpath);
 
-    explicit MaterialTemplate(Engine::Shader* shader, unsigned int UB_ConnectID, unsigned int UB_SIZE);
+    explicit MaterialTemplate(Engine::Shader* shader, unsigned int UB_SIZE);
 };
 
 class Material{
@@ -70,8 +66,6 @@ public:
     //Pointer to shader group
     MaterialTemplate* mTemplate;
     std::vector<MaterialShaderPropertyConf*> confs;
-
-    unsigned char* MatData;
 
     MaterialShaderPropertyConf* AddPropertyConf(int type);
     MaterialShaderPropertyConf* GetPropertyConf(std::string Identifier);
@@ -92,7 +86,7 @@ public:
 
 Material* allocMaterial();
 Material* allocMaterial(MaterialTemplate* Template);
-MaterialTemplate* allocMaterialTemplate(Engine::Shader* shader, unsigned int UB_ConnectID, unsigned int UB_SIZE);
+MaterialTemplate* allocMaterialTemplate(Engine::Shader* shader, unsigned int UB_SIZE);
 
 namespace MtShProps {
     MaterialShaderProperty* allocateProperty(int type);

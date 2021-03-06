@@ -27,7 +27,7 @@ layout (std140, binding = 0) uniform CamMatrices{
     uniform vec3 cam_position;
 };
 
-layout (std140, binding = 51) uniform WaterData{
+layout (std140, binding = 3) uniform WaterData{
     bool hasReflectionMap; //0
     bool hasDistortionMap; //4
     bool hasNormalMap; // 8

@@ -70,7 +70,6 @@ void Engine::Camera::updateProjectionMat(){
                              0, static_cast<float>(mViewport.endY - mViewport.startY),
             mNearZ, mFarZ);
     }
-    UpdateFrustum();
 }
 
 void Engine::Camera::updateViewMat(){
@@ -81,7 +80,10 @@ void Engine::Camera::updateViewMat(){
 }
 
 void Engine::Camera::UpdateFrustum() {
-    //mFrustum.Create(mProjectionMatrix * mViewMatrix);
+    mFrustum.Create(mProjectionMatrix, mViewMatrix);
+    //Mat4 ViewInverted = mViewMatrix;
+   // ViewInverted.Invert();
+    //mFrustum.Create(mFOV, mAspectRatio, mNearZ, mFarZ, ViewInverted);
 }
 
 void Engine::Camera::setPosition(const Vec3& pos){

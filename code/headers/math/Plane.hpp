@@ -33,12 +33,12 @@ namespace Engine {
 		const Vec3& GetNormal() { return mNormal; }
 		float GetD() { return mD; }
 
-		void SetNormal(const Vec3& Normal) { this->mNormal = Normal; }
-		void SetD(float D) { this->mD = D; }
+		void Normalize();
 
 		Mat4 GetReflectionMatrix();
 
 		void Create(const Vec3& Normal, const Vec3& Point);
 		void Create(const Vec3& v1, const Vec3& v2, const Vec3& v3);
+		void Create(const Vec3& Normal, float D);
 	};
 }

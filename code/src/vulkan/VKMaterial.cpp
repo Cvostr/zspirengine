@@ -16,7 +16,7 @@ void VKMaterialTemplate::CreatePipeline() {
         Conf.hasDepth = true;
         Conf.cullFace = true;
         Conf.LayoutInfo.AddPushConstant(64, VK_SHADER_STAGE_ALL_GRAPHICS);
-        Conf.LayoutInfo.AddPushConstant(mUniformBuffer->GetBufferSize(), VK_SHADER_STAGE_FRAGMENT_BIT);
+        Conf.LayoutInfo.AddPushConstant(BufferSize, VK_SHADER_STAGE_FRAGMENT_BIT);
 
         Pipeline = new Engine::ZSVulkanPipeline;
         Pipeline->Create((Engine::vkShader*)mShader, game_data->vk_main->mGBufferRenderPass, Conf);
@@ -57,7 +57,8 @@ void VKMaterialTemplate::MakeDescrSetTextures(Engine::ZSVulkanDescriptorSet* Des
 
 
 void VKMaterial::SetTexture(unsigned int slot, VkImageView view, Engine::ZSVulkanSampler* sampler) {
-    this->DescrSetTextures->setTexture(slot, view, sampler);
+    if(DescrSetTextures != nullptr)
+        DescrSetTextures->setTexture(slot, view, sampler);
 }
 
 void VKMaterial::CreateDescriptors() {
@@ -67,4 +68,15 @@ void VKMaterial::CreateDescriptors() {
 
         ((VKMaterialTemplate*)mTemplate)->MakeDescrSetTextures(DescrSetTextures);
     }
+}
+
+void VKMaterial::CreateBuffer(uint32_t Size) {
+    if (MaterialBuffer != nullptr)
+        delete[] MaterialBuffer;
+    MaterialBuffer = new char[Size];
+}
+
+void VKMaterial::WriteToBuffer(unsigned int offset, unsigned int size, char* data) {
+    if (MaterialBuffer != nullptr)
+        memcpy(MaterialBuffer + offset, data, size);
 }

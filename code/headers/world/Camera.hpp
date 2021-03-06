@@ -44,7 +44,7 @@ namespace Engine{
         protected:
             Mat4 mProjectionMatrix; //Calculated Projection matrix
             Mat4 mViewMatrix; //Calculated View matrix
-            //Frustum mFrustum;
+            Frustum mFrustum;
             void UpdateFrustum();
         public:
             ÑameraProjectionType mProjectionType; //Type of projection
@@ -66,7 +66,7 @@ namespace Engine{
             Vec3 getCameraRightVec();
             Vec3 getCameraFrontVec() { return mCameraFront; }
 
-            //Frustum* GetFrustum() { return &mFrustum; }
+            Frustum* GetFrustum() { return &mFrustum; }
 
             ZSVIEWPORT getViewport() { return mViewport; }
 

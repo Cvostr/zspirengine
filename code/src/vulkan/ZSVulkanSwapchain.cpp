@@ -88,6 +88,8 @@ bool Engine::ZSVulkanSwapChain::initSwapchain(ZSVulkanDevice* Device, ZSVulkanIn
 
     CreateImages(Device, chosenSurfaceFormat);
 
+    mCreated = true;
+
     return true;
 }
 
@@ -124,6 +126,8 @@ void Engine::ZSVulkanSwapChain::CreateImages(ZSVulkanDevice* Device, VkSurfaceFo
     }
 }
 
-Engine::ZSVulkanSwapChain::ZSVulkanSwapChain() {
+Engine::ZSVulkanSwapChain::ZSVulkanSwapChain() :
+    mSwapChain(VK_NULL_HANDLE)
+{
 
 }

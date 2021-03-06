@@ -216,7 +216,6 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
                 game_data->resources->getMaterialByLabel("@default")->material->applyMatToPipeline();
             //Draw mesh
             obj->DrawMesh(this);
-           
         }
 
         if (current_state == PIPELINE_STATE::PIPELINE_STATE_SHADOWDEPTH) {
