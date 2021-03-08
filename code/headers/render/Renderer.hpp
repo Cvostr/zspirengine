@@ -83,7 +83,6 @@ public:
     UniformBuffer* shadowBuffer;    //2
     UniformBuffer* MaterialsUniformBuffer; //3
     UniformBuffer* skinningUniformBuffer; //4
-    UniformBuffer* tileBuffer;  //5
     UniformBuffer* skyboxTransformUniformBuffer; //6
     UniformBuffer* uiUniformBuffer; //7
     UniformBuffer* instancedTransformBuffer; //9

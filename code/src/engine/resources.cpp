@@ -60,14 +60,16 @@ Engine::ResourceManager::ResourceManager(){
     sphere_resource->mesh_ptr = Engine::getSphereMesh();
     this->resources.push_back(sphere_resource);
 
+
+    MaterialResource* material3d_resource = new MaterialResource;
+    material3d_resource->resource_state = RESOURCE_STATE::STATE_LOADED;
+    material3d_resource->rel_path = "@default";
+    material3d_resource->resource_label = material3d_resource->rel_path;
+    material3d_resource->material = default3dmat;
+    this->resources.push_back(material3d_resource);
     //This material should be created only in 3D projects
     if(engine_ptr->desc->game_perspective == PERSP_3D){
-        MaterialResource* material3d_resource = new MaterialResource;
-        material3d_resource->resource_state = RESOURCE_STATE::STATE_LOADED;
-        material3d_resource->rel_path = "@default";
-        material3d_resource->resource_label = material3d_resource->rel_path;
-        material3d_resource->material = default3dmat;
-        this->resources.push_back(material3d_resource);
+        
 
         MaterialResource* materialTerrain_resource = new MaterialResource;
         materialTerrain_resource->resource_state = RESOURCE_STATE::STATE_LOADED;
@@ -204,8 +206,6 @@ void Engine::ResourceManager::loadResourcesTableFromMem(char* data, unsigned int
         if (prefix.compare("entry") == 0) { //If end reached
             ZsResource resource;
             iter++;
-            //Read relative path
-            readString(resource.rel_path, data, iter);
             //Read Label
             readString(resource.resource_label, data, iter);
             //read blob path

@@ -444,6 +444,12 @@ void Engine::VKRenderer::ComputeAll() {
     VkResult imageResult = vkAcquireNextImageKHR(game_data->vk_main->mDevice->getVkDevice(),
         game_data->vk_main->mSwapChain->GetSwapChain(), UINT64_MAX, PresentInfrastructure.imageAvailableSemaphore, VK_NULL_HANDLE, &_imageIndex);
 
+    if (imageResult == VK_ERROR_OUT_OF_DATE_KHR || imageResult == VK_SUBOPTIMAL_KHR) {
+        this->PresentInfrastructure.RecreateSwapchain();
+        _imageIndex = 0;
+        //return;
+    }
+
     VkSemaphore Wait = PresentInfrastructure.imageAvailableSemaphore;
 
     for (uint32_t Camera_i = 0; Camera_i < CamerasToRender.size(); Camera_i++) {
@@ -471,9 +477,6 @@ void Engine::VKRenderer::ComputeAll() {
 
         Wait = DefferedFinishedSemaphore;
     }
-
-    if (imageResult == VK_ERROR_OUT_OF_DATE_KHR)
-        _imageIndex = 0;
 
     VkCommandBuffer final_cmdbuf = PresentInfrastructure.PresentCmdbufs[_imageIndex];
 

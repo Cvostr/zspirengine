@@ -34,11 +34,33 @@ void Engine::VKPresentInfrastructure::Create(VkCommandPool Pool, int Images) {
 void Engine::VKPresentInfrastructure::Destroy() {
     for (unsigned int fb_i = 0; fb_i < OutFramebuffers.size(); fb_i++) {
         delete OutFramebuffers[fb_i];
-        
     }
 
     delete OutRenderPass;
 
     vkDestroySemaphore(game_data->vk_main->mDevice->getVkDevice(), imageAvailableSemaphore, nullptr);
     vkDestroySemaphore(game_data->vk_main->mDevice->getVkDevice(), PresentBeginSemaphore, nullptr);
+}
+
+void Engine::VKPresentInfrastructure::RecreateSwapchain() {
+    ZSVulkanSwapChain* swapchain = game_data->vk_main->mSwapChain;
+    Window* win = game_data->window;
+
+    swapchain->Destroy();
+
+    swapchain->initSwapchain(game_data->vk_main->mDevice, game_data->vk_main->mInstance,
+        win->GetWindowWidth(), win->GetWindowHeight());
+
+    for (unsigned int fb_i = 0; fb_i < OutFramebuffers.size(); fb_i++) {
+        delete OutFramebuffers[fb_i];
+    }
+    OutFramebuffers.clear();
+
+    for (unsigned int fb_i = 0; fb_i < swapchain->GetSwapChainImagesCount(); fb_i++) {
+        ZSVulkanFramebuffer* OutFb = new ZSVulkanFramebuffer;
+        OutFb->PushOutputAttachment(fb_i);
+        OutFb->Create(OutRenderPass);
+
+        this->OutFramebuffers.push_back(OutFb);
+    }
 }

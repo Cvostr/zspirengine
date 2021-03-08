@@ -121,9 +121,12 @@ void Engine::TileProperty::copyTo(Engine::IGameObjectComponent* dest){
 
     TileProperty* _dest = static_cast<TileProperty*>(dest);
     _dest->diffuse_relpath = diffuse_relpath;
-    _dest->texture_diffuse = texture_diffuse;
+    _dest->transparent_relpath = transparent_relpath;
+
     _dest->anim_property = anim_property;
     _dest->geometry = geometry;
+
+    _dest->updTexturePtr();
 }
 
 void Engine::TileProperty::playAnim(){

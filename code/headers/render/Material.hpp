@@ -22,9 +22,11 @@ enum MATSHPROP_TYPE{
 class MaterialShaderProperty{
 public:
     MATSHPROP_TYPE mType; //type of property
-    std::string mPropCaption;
+    std::string mPropCaption; //String caption, that will appear in material editor
     std::string mPropId; //String identifier, that will appear in material file
     unsigned int start_offset;
+    bool mShowInEditor;
+    bool mSaveInFile;
 
     MaterialShaderProperty();
 };
@@ -95,6 +97,9 @@ namespace MtShProps {
     MaterialTemplate* genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
                                                  Engine::Shader* heightmap,
         Engine::Shader* water);
+
+    MaterialTemplate* genDefaultMtShGroup2D(Engine::Shader* tile_shader);
+
     MaterialTemplate* getDefaultMtShGroup();
 
     void addMtShaderPropertyGroup(MaterialTemplate* group);

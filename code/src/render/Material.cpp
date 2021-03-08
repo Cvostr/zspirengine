@@ -56,6 +56,8 @@ MaterialTemplate* allocMaterialTemplate(Engine::Shader* shader, unsigned int UB_
 MaterialShaderProperty::MaterialShaderProperty(){
     mType = MATSHPROP_TYPE_NONE;
     start_offset = 0;
+    mShowInEditor = true;
+    mSaveInFile = true;
 }
 
 MaterialShaderPropertyConf::MaterialShaderPropertyConf(){
@@ -410,6 +412,10 @@ void Material::saveToFile() {
     for (unsigned int prop_i = 0; prop_i < mTemplate->properties.size(); prop_i++) {
         //Obtain pointers to prop and prop's configuration
         MaterialShaderProperty* prop_ptr = mTemplate->properties[prop_i];
+
+        if (!prop_ptr->mSaveInFile)
+            continue;
+
         MaterialShaderPropertyConf* conf_ptr = this->confs[prop_i];
         //write entry header
         mat_stream << "_ENTRY ";

@@ -56,6 +56,7 @@ namespace Engine {
 		ZSVulkanRenderPass* OutRenderPass;
 
 		void Create(VkCommandPool Pool, int Images);
+		void RecreateSwapchain();
 		void Destroy();
 
 		VKPresentInfrastructure(){}

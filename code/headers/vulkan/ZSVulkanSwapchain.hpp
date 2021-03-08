@@ -32,6 +32,8 @@ namespace Engine {
         VkSurfaceFormatKHR GetChosenSurfaceFormat() { return chosenSurfaceFormat; }
         bool initSwapchain(ZSVulkanDevice* Device, ZSVulkanInstance* instance, int Width, int Height);
 
+        void Destroy();
+
         VkSwapchainKHR GetSwapChain() { return mSwapChain; }
         uint32_t GetSwapChainImagesCount() { 
             return static_cast<uint32_t>(mSwapChainImages.size()); 

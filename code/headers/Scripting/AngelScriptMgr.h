@@ -8,6 +8,8 @@
 #include <string>
 #include "../engine/Resources.hpp"
 
+#define ZPS_DEFAULT_MODULE_NAME "ZSPscriptCore"
+
 #define GAME_OBJECT_TYPE_NAME "GameObject"
 #define WORLD_TYPE_NAME "World"
 #define GAME_OBJECT_PROP_TYPE_NAME "GameObjectProperty"

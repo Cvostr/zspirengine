@@ -31,8 +31,10 @@ layout (std140, binding = 3) uniform WaterData{
     bool hasReflectionMap; //0
     bool hasDistortionMap; //4
     bool hasNormalMap; // 8
-    float DistrtionFactor; //12
+    float DistortionFactor; //12
     vec4 DiffuseColor; //16
+
+    float TimeOffset; // 32
 };
 
 void main(){
@@ -44,13 +46,22 @@ void main(){
     ReflectionUV.y *= -1;
 
     vec2 Distortion = vec2(0, 0);
-    if(hasDistortionMap)
-        Distortion = texture(distortionMap, DistortionUV).rg * 2.0 - 1.0;
+    if(hasDistortionMap){
+
+        vec2 MovedDistortionUV = DistortionUV * 10 * DistortionFactor;
+        MovedDistortionUV.x += TimeOffset;
+        MovedDistortionUV.y += TimeOffset;
+
+        Distortion = (texture2D(distortionMap, MovedDistortionUV).rg * 2 - 1) * 0.1;
+    }
 
     vec4 Reflection = texture(reflectionMap, ReflectionUV + Distortion);
     
     if(hasNormalMap){
-        Normal = texture(normalMap, UV).xyz;
+        vec2 distortedTexCoords = texture(distortionMap, vec2(UV.x + TimeOffset, UV.y) * 10).rg * 0.1;
+	    distortedTexCoords = UV + vec2(distortedTexCoords.x, distortedTexCoords.y + TimeOffset);
+
+        Normal = texture(normalMap, distortedTexCoords).xyz;
 		Normal = normalize(Normal * 2 - 1);
 		Normal = normalize(TBN * Normal);
 	}
@@ -59,12 +70,14 @@ void main(){
     float angle = max(dot(CamToWater, vec3(0,1,0)), 0.0);
 
     color = Reflection;
-    color += DiffuseColor;
+    color *= DiffuseColor;
     color.a = (1 - angle);
 
     tDiffuse = color;
+    //tDiffuse = vec4(Normal, 1);
+
     tNormal = Normal;
     tPos = FragPos;
     tMasks = vec4(1.0, 0, 0, 0);
-    tSpec.r = 5.f / 255.f;
+    tSpec.r = 2.f / 255.f;
 }

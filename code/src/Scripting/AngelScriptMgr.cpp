@@ -170,8 +170,8 @@ void AGScriptMgr::CreateModule() {
 		mModule->Discard();
 	}
 	//Create module
-	mBuilder.StartNewModule(getAgScriptEngine(), "ZSPscriptCore");
-	mModule = getAgScriptEngine()->GetModule("ZSPscriptCore", asGM_ONLY_IF_EXISTS);
+	mBuilder.StartNewModule(getAgScriptEngine(), ZPS_DEFAULT_MODULE_NAME);
+	mModule = getAgScriptEngine()->GetModule(ZPS_DEFAULT_MODULE_NAME, asGM_ONLY_IF_EXISTS);
 	//Set builder #include callback
 	mBuilder.SetIncludeCallback(onInclude, this);
 }

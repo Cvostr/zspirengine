@@ -1,6 +1,10 @@
 #include <vulkan/ZSVulkanSwapchain.hpp>
 #include <engine/Logger.hpp>
 
+#include <game.h>
+
+extern ZSGAME_DATA* game_data;
+
 VkImageView Engine::ZSVulkanSwapChain::GetImageViewAtIndex(unsigned int Index) {
     if (Index > this->mSwapChainImageViews.size())
         Index = static_cast<uint32_t>(mSwapChainImageViews.size());
@@ -91,6 +95,23 @@ bool Engine::ZSVulkanSwapChain::initSwapchain(ZSVulkanDevice* Device, ZSVulkanIn
     mCreated = true;
 
     return true;
+}
+
+void Engine::ZSVulkanSwapChain::Destroy() {
+    VkDevice device = game_data->vk_main->mDevice->getVkDevice();
+    if (mCreated) {
+        //Destroy created image views
+        for (uint32_t img_i = 0; img_i < GetSwapChainImagesCount(); img_i++) {
+            vkDestroyImageView(device, mSwapChainImageViews[img_i], nullptr);
+        }
+        //Clear image view array
+        mSwapChainImageViews.clear();
+        mSwapChainImages.clear();
+        //Destroy Swapchain
+        vkDestroySwapchainKHR(device, mSwapChain, nullptr);
+
+        mCreated = false;
+    }
 }
 
 void Engine::ZSVulkanSwapChain::CreateImages(ZSVulkanDevice* Device, VkSurfaceFormatKHR ChosenSurfaceFormat) {

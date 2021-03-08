@@ -22,6 +22,8 @@ void Engine::GLRenderer::InitShaders() {
 
     if (engine_ptr->desc->game_perspective == PERSP_2D) {
         this->tile_shader->compileFromFile("Shaders/2d_tile/tile2d.vert", "Shaders/2d_tile/tile2d.frag");
+
+        MtShProps::genDefaultMtShGroup2D(tile_shader);
     }
     if (engine_ptr->desc->game_perspective == PERSP_3D) {
 

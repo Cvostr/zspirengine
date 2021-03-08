@@ -72,9 +72,7 @@ Engine::Renderer::Renderer(){
             skinningUniformBuffer->writeData(sizeof(Mat4) * i, sizeof(Mat4), &m);
         }
     }
-    //Tile uniform buffer
-    tileBuffer = allocUniformBuffer();
-    tileBuffer->init(5, 28);
+
     //Skybox uniform buffer
     skyboxTransformUniformBuffer = Engine::allocUniformBuffer();
     skyboxTransformUniformBuffer->init(6, sizeof(Mat4) * 2);
@@ -119,7 +117,6 @@ void Engine::Renderer::OnCreate(){
 
 void Engine::Renderer::destroy(){
     if(engine_ptr->desc->game_perspective == PERSP_2D){
-        delete tileBuffer;
         delete tile_shader;
     }
 
@@ -323,11 +320,7 @@ void Engine::SkyboxProperty::DrawSky(Renderer* pipeline){
 }
 
 void Engine::TileProperty::onRender(Engine::Renderer* pipeline){
-    Engine::Shader* tile_shader = pipeline->getTileShader();
-
-    tile_shader->Use();
-
-    pipeline->tileBuffer->bind();
+    pipeline->GetMaterialsUniformBuffer()->bind();
 
     //Checking for diffuse texture
     if(texture_diffuse != nullptr){
@@ -335,25 +328,25 @@ void Engine::TileProperty::onRender(Engine::Renderer* pipeline){
     }
 
     int diffuse1_ = texture_diffuse != nullptr;
-    pipeline->tileBuffer->writeData(20, 4, &diffuse1_);
+    pipeline->GetMaterialsUniformBuffer()->writeData(20, 4, &diffuse1_);
 
     //Checking for transparent texture
     if(texture_transparent != nullptr){
         texture_transparent->Use(1); //Use this texture
     }
     int diffuse2_ = texture_transparent != nullptr;
-    pipeline->tileBuffer->writeData(24, 4, &diffuse2_);
+    pipeline->GetMaterialsUniformBuffer()->writeData(24, 4, &diffuse2_);
     //calculate animation state
-    int anim_state_i = anim_property.isAnimated && anim_state.playing;
+    int anim_state_i = anim_state.playing;
     //Sending animation info
     if(anim_property.isAnimated && anim_state.playing == true){ //If tile animated, then send anim state to shader
-        pipeline->tileBuffer->writeData(16, 4, &anim_state_i);
-        pipeline->tileBuffer->writeData(0, 4, &anim_property.framesX);
-        pipeline->tileBuffer->writeData(4, 4, &anim_property.framesY);
-        pipeline->tileBuffer->writeData(8, 4, &anim_state.cur_frameX);
-        pipeline->tileBuffer->writeData(12, 4, &anim_state.cur_frameY);
+        pipeline->GetMaterialsUniformBuffer()->writeData(16, 4, &anim_state_i);
+        pipeline->GetMaterialsUniformBuffer()->writeData(0, 4, &anim_property.framesX);
+        pipeline->GetMaterialsUniformBuffer()->writeData(4, 4, &anim_property.framesY);
+        pipeline->GetMaterialsUniformBuffer()->writeData(8, 4, &anim_state.cur_frameX);
+        pipeline->GetMaterialsUniformBuffer()->writeData(12, 4, &anim_state.cur_frameY);
     }else{ //No animation or unplayed
-        pipeline->tileBuffer->writeData(16, 4, &anim_state_i);
+        pipeline->GetMaterialsUniformBuffer()->writeData(16, 4, &anim_state_i);
     }
 }
 
@@ -369,7 +362,11 @@ void Engine::Renderer::updateShadersCameraInfo(Engine::Camera* cam_ptr){
 
     uint32_t Width = engine_ptr->GetWindow()->GetWindowWidth();
     uint32_t Height = engine_ptr->GetWindow()->GetWindowHeight();
-    Mat4 UImatrix = getOrthogonal(0, Width, 0, Height);
+    Mat4 UImatrix = getOrthogonal(
+        0, 
+        static_cast<float>(Width), 
+        0,
+        static_cast<float>(Height));
     uiUniformBuffer->bind();
     uiUniformBuffer->writeData(0, sizeof (Mat4), &UImatrix);
     

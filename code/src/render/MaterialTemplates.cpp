@@ -142,6 +142,12 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
         diff_color_prop->mPropId = "c_diffuse"; //Identifier to save
         diff_color_prop->start_offset = 16;
 
+        MaterialShaderProperty* time_prop = (water_group->addProperty(MATSHPROP_TYPE_FLOAT));
+        time_prop->mPropId = "f_time"; //Identifier to save
+        time_prop->start_offset = 32;
+        time_prop->mSaveInFile = false;
+        time_prop->mShowInEditor = false;
+
         MtShProps::addMtShaderPropertyGroup(water_group);
     }
 
@@ -174,6 +180,25 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
 
     return default_group;
 }
+
+MaterialTemplate* MtShProps::genDefaultMtShGroup2D(Engine::Shader* tile_shader) {
+    MaterialTemplate* default_group = allocMaterialTemplate(tile_shader, 0);
+    {
+        default_group->mAcceptShadows = false;
+        default_group->str_path = "@default";
+        default_group->Label = "Default 2D";
+
+
+        ((VKMaterialTemplate*)default_group)->CreatePipeline();
+        MtShProps::addMtShaderPropertyGroup(default_group);
+    }
+
+    default3dmat = allocMaterial(default_group);
+    default3dmat->file_path = "@default";
+
+    return default_group;
+}
+
 MaterialTemplate* MtShProps::getDefaultMtShGroup(){
     return MatGroups[0];
 }
