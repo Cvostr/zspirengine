@@ -30,3 +30,8 @@ int sign(T value){
     return 1;
 }
 
+template <typename T, typename U>
+T lerp(T v1, T v2, U factor) {
+    T result = v1 * (1.f - factor) + v2 * factor;
+    return result;
+}

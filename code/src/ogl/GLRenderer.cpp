@@ -5,6 +5,7 @@
 #include <world/ObjectsComponents/TerrainComponent.hpp>
 #include <world/ObjectsComponents/ShadowCasterComponent.hpp>
 #include <world/ObjectsComponents/CameraComponent.hpp>
+#include <world/ObjectsComponents/ParticleEmitterComponent.hpp>
 
 extern ZSpireEngine* engine_ptr;
 extern ZSGAME_DATA* game_data;
@@ -131,6 +132,7 @@ void Engine::GLRenderer::Render3DCamera(void* cam_prop) {
     setFrontFace(cc->mCullFaceDirection);
 
     Camera* _cam = (Camera*)cc;
+    CurrentCamera = _cam;
 
     if (!cc->mIsMainCamera) {
         cc->UpdateTextureResource();
@@ -194,6 +196,7 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
     //FrustumRelation Relation = mMainCamera->GetFrustum()->GetRelation(bb);
 
     if (current_state == PIPELINE_STATE::PIPELINE_STATE_DEFAULT)
+        DrawParticleSystem(obj);
         //Call prerender on each property in object
         obj->onPreRender(this);
     if (obj->hasMesh() || obj->hasTerrain()) {
@@ -218,6 +221,8 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
                 game_data->resources->getMaterialByLabel("@default")->material->applyMatToPipeline();
             //Draw mesh
             obj->DrawMesh(this);
+
+            
         }
 
         if (current_state == PIPELINE_STATE::PIPELINE_STATE_SHADOWDEPTH) {
@@ -232,6 +237,40 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
                 obj->DrawMeshInstanced(this, caster->GetSuitableCascadesAmount(bb));
         }
     }
+}
+
+void Engine::GLRenderer::DrawParticleSystem(Engine::GameObject* obj) {
+    ParticleEmitterComponent* PartileEmitter = obj->getPropertyPtr<ParticleEmitterComponent>();
+
+    if (!PartileEmitter)
+        return;
+
+    if (!PartileEmitter->mSimulating)
+        return;
+
+    PartileEmitter->StepSimulation();
+
+    TransformProperty* Transform = obj->getTransformProperty();
+
+    default_particle->Use();
+
+    transformBuffer->bind();
+
+    setFaceCullState(false);
+
+    for (int i = 0; i < PartileEmitter->mParticles.size(); i++) {
+        Particle* Particle = PartileEmitter->mParticles[i];
+
+        Mat4 transformMat =  getTranslationMat(Particle->Position);
+        transformMat = removeRotationFromTransformMat(transformMat, CurrentCamera->getViewMatrix());
+        transformMat = getScaleMat(Particle->Size.X, Particle->Size.Y, 1) * getRotationZMat(Particle->Rotation) * transformMat;
+
+        transformBuffer->writeData(128, 64, &transformMat);
+
+        Engine::getPlaneMesh2D()->Draw();
+    }
+
+    setFaceCullState(true);
 }
 
 void Engine::GLRenderer::OnUpdateWindowSize(int W, int H) {

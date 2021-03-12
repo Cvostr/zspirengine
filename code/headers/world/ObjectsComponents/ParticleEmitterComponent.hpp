@@ -36,6 +36,28 @@ namespace Engine {
         {}
     };
     
+    template<typename T>
+    struct MinMaxValue {
+        T Min;
+        T Max;
+
+        MinMaxValue() :
+            Min(0),
+            Max(10)
+        {}
+
+        MinMaxValue(T Value) :
+            Min(Value),
+            Max(Value)
+        {
+        }
+
+        MinMaxValue(T BeginValue, T EndValue) :
+            Min(BeginValue),
+            Max(EndValue)
+        {}
+    };
+
     template <typename T>
     struct DeltaValue {
         T OriginalValue;
@@ -53,7 +75,6 @@ namespace Engine {
             Add(0),
             Mul(1) 
         {}
-
     };
 
     class ParticleEmitterComponent;
@@ -64,6 +85,7 @@ namespace Engine {
         Vec3 Position; //Current position of particle
         Vec3 Velocity; //Current velocity of particle
         Vec2 Size; // Current size of particle
+        float Rotation; //Rotation over Z of particle
         RGBAColor Color; //Current color of particle
         float mTimePassed; //Time, elapsed from creation
 
@@ -76,18 +98,22 @@ namespace Engine {
     class ParticleEmitterComponent : public Engine::IGameObjectComponent {
     public:
 
-        std::vector<Particle> mParticles;
-
+        Engine::TextureResource* particle_sprite;
+        std::string sprite_relpath;
+        //Array of particles
+        std::vector<Particle*> mParticles;
+        //Shape of emitter
         ParticleEmitterShape mShape;
         float mDuration; //single cycle duration
         bool mLooping; //Does particle system loop
-        bool mPrewarm;
         float mLifetime; //Lifetime of single particle
         int32_t mMaxParticles; //Limit particles amount
 
-        DeltaValue<Vec3> mVelocity;
-        DeltaValue<float> mSize;
-        float mStartRotation;
+        MinMaxValue<Vec3> mDirection;
+        DeltaValue<MinMaxValue<Vec2>> mSize;
+        MinMaxValue<float> mVelocity;
+        Vec3 mConstantForce;
+        MinMaxValue<float> mRotation;
 
         DeltaValue<RGBAColor> Color;
 
@@ -98,6 +124,15 @@ namespace Engine {
         void StepSimulation();
         void StartSimulation();
         void StopSimulation();
+
+        void GetNewParticleVelocityPos(Vec3& Velocity, Vec3& Pos);
+
+        Vec3 GetRandomDirection();
+        Vec2 GetRandomSize();
+        float GetRandomVelocity();
+        float GetRandomRotation();
+
+        float GetRandomFloat(float max);
 
         void addPropertyInterfaceToInspector();
         void onUpdate(float deltaTime);

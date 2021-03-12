@@ -24,10 +24,7 @@ void main(){
 	
 	vec4 diffuse = texture(diffuse, uv);
 	
-	if(diffuse.a < 0.4)
-       discard;
-        
-    FragColor = vec4(diffuse.rgb, 1);    
+    FragColor = diffuse;    
     tPos = FragPos;
     tMasks.r = 1;
 }

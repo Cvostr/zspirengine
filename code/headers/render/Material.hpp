@@ -39,7 +39,7 @@ public:
     virtual void SetIntValue(int value){}
     virtual void SetFloatValue(float value){}
     virtual void SetVec3Value(const Vec3& value) {}
-    virtual void SetTexture(void* texture) {}
+    virtual void SetTexture(std::string TextureName) {}
 
     MaterialShaderPropertyConf();
 };
@@ -132,6 +132,8 @@ class TextureMtShPropConf : public MaterialShaderPropertyConf{
 public:
     void* texture;
     std::string path;
+
+    void SetTexture(std::string TextureName);
 
     TextureMtShPropConf();
 };

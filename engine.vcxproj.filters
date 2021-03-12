@@ -486,6 +486,9 @@
     <ClCompile Include="code\src\vulkan\VKPresentInfrastructure.cpp">
       <Filter>Исходные файлы\vk</Filter>
     </ClCompile>
+    <ClCompile Include="code\src\ui\Widgets\ImageWidget.cpp">
+      <Filter>Исходные файлы\ui\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\headers\world\Physics.h">
@@ -826,6 +829,12 @@
     </ClInclude>
     <ClInclude Include="code\headers\math\Frustum.hpp">
       <Filter>Файлы заголовков\math</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\ui\Widgets\ImageWidget.hpp">
+      <Filter>Файлы заголовков\ui\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\engine\EngineSettings.hpp">
+      <Filter>Файлы заголовков\engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

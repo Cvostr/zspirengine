@@ -5,6 +5,10 @@ public:
 	float X;
 	float Y;
 
+	Vec2 operator+(const Vec2& r) const {
+		return Vec2(X + r.X, Y + r.Y);
+	}
+
 	Vec2 operator-(const Vec2& r) const {
 		return Vec2(X - r.X, Y - r.Y);
 	}

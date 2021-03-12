@@ -3,6 +3,7 @@
 #include <ui/UiScripting.hpp>
 
 #include <ui/Widgets/Button.hpp>
+#include <ui/Widgets/ImageWidget.hpp>
 #include <ui/Layouts/LinearLayout.hpp>
 
 #define VIEWSIZE_TYPE_NAME "ViewSize"
@@ -17,6 +18,7 @@
 
 #define WIDGET_TYPE_NAME "Widget"
 #define BUTTON_TYPE_NAME "Button"
+#define IMAGEVIEW_TYPE_NAME "ImageView"
 
 static void CreateViewSize(int Width, int Height, Engine::ViewSize* ptr) {
 	new (ptr) Engine::ViewSize(Width, Height);
@@ -31,6 +33,7 @@ static void CreateMargin(int Top, int Bottom, int Left, int Right, Engine::ViewM
 }
 
 void bindButtonSDK(Engine::AGScriptMgr* mgr);
+void bindImageViewSDK(Engine::AGScriptMgr* mgr);
 void bindLinearLayoutSDK(Engine::AGScriptMgr* mgr);
 
 void Engine::bindUiSDK(AGScriptMgr* mgr) {
@@ -65,6 +68,7 @@ void Engine::bindUiSDK(AGScriptMgr* mgr) {
 
 	bindLinearLayoutSDK(mgr);
 	bindButtonSDK(mgr);
+	bindImageViewSDK(mgr);
 	
 }
 
@@ -74,6 +78,13 @@ void bindButtonSDK(Engine::AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "bool isClicked()", asMETHOD(Engine::Button, isClicked), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "void SetDefaultSprite(TextureResource@)", asMETHOD(Engine::Button, SetDefaultSprite), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(BUTTON_TYPE_NAME, "bool SetHoveredSprite(TextureResource@)", asMETHOD(Engine::Button, SetHoveredSprite), asCALL_THISCALL);
+}
+
+void bindImageViewSDK(Engine::AGScriptMgr* mgr) {
+	Engine::bindWidgetSDK<Engine::ImageView>(mgr, IMAGEVIEW_TYPE_NAME);
+	mgr->RegisterObjectBehaviour(IMAGEVIEW_TYPE_NAME, asBEHAVE_FACTORY, "ImageView@ f()", asFUNCTION(Engine::new_as_ref_T<Engine::ImageView>), asCALL_CDECL);
+	mgr->RegisterObjectMethod(IMAGEVIEW_TYPE_NAME, "void SetSprite(TextureResource@)", asMETHOD(Engine::ImageView, SetSprite), asCALL_THISCALL);
+
 }
 
 void bindLinearLayoutSDK(Engine::AGScriptMgr* mgr) {

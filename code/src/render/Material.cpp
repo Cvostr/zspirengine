@@ -542,7 +542,7 @@ void Material::applyMatToPipeline() {
             TextureMaterialShaderProperty* texture_p = static_cast<TextureMaterialShaderProperty*>(prop_ptr);
             TextureMtShPropConf* texture_conf = static_cast<TextureMtShPropConf*>(conf_ptr);
 
-            int db = 0;
+            int IsTexturePicked = 0;
             //If correct path is set to texture
             if (texture_conf->path.compare("@none") != 0) {
                 //if texture isn't loaded
@@ -552,7 +552,7 @@ void Material::applyMatToPipeline() {
                     if (texture_conf->texture == nullptr) break; //No resource with that name, exiting
                 }
                 //Set opengl texture
-                db = 1;
+                IsTexturePicked = 1;
                 Engine::TextureResource* tex_ptr = static_cast<Engine::TextureResource*>(texture_conf->texture);
                 tex_ptr->Use(texture_p->slotToBind);
                 if (engine_ptr->engine_info->graphicsApi == VULKAN) {
@@ -561,7 +561,7 @@ void Material::applyMatToPipeline() {
             }
             
             //Set texture state
-            WriteBytes(texture_p->start_offset, 4, &db);
+            WriteBytes(texture_p->start_offset, 4, &IsTexturePicked);
 
             break;
         }

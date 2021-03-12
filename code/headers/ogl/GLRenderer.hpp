@@ -12,6 +12,7 @@ namespace Engine {
 	public:
 
 		GLScreenEffect* effect;
+		Camera* CurrentCamera;
 
 		void InitShaders();
 		void initManager();
@@ -21,6 +22,8 @@ namespace Engine {
 		void render3D();
 
 		void Render3DCamera(void* cam_prop);
+
+		void DrawParticleSystem(Engine::GameObject* obj);
 
 
 		void ClearFBufferGL(bool clearColor, bool clearDepth);

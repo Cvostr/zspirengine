@@ -3,7 +3,8 @@
 #include <string>
 #include <fstream>
 #include <cstring>
-#include "../math/Vec3.hpp"
+#include <math/Vec3.hpp>
+#include <math/Vec2.hpp>
 #include <SDL2/SDL.h>
 
 void genRandomString(std::string* result, unsigned int len);
@@ -40,6 +41,10 @@ public:
 
 	void writeVec3(Vec3& vec) {
 		write(reinterpret_cast<char*>(&vec), sizeof(float) * 3);
+	}
+
+	void writeVec2(Vec2& vec) {
+		write(reinterpret_cast<char*>(&vec), sizeof(float) * 2);
 	}
 
 	void writeString(std::string str);

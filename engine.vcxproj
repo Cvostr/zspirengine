@@ -287,6 +287,7 @@
     <ClCompile Include="code\src\ui\UiScripting.cpp" />
     <ClCompile Include="code\src\ui\View.cpp" />
     <ClCompile Include="code\src\ui\Widgets\Button.cpp" />
+    <ClCompile Include="code\src\ui\Widgets\ImageWidget.cpp" />
     <ClCompile Include="code\src\ui\Widgets\Widget.cpp" />
     <ClCompile Include="code\src\vulkan\VKMaterial.cpp" />
     <ClCompile Include="code\src\vulkan\VKPresentInfrastructure.cpp" />
@@ -340,6 +341,7 @@
     <ClInclude Include="code\headers\engine.h" />
     <ClInclude Include="code\headers\engine\EngineComponent.h" />
     <ClInclude Include="code\headers\engine\EngineComponentManager.hpp" />
+    <ClInclude Include="code\headers\engine\EngineSettings.hpp" />
     <ClInclude Include="code\headers\engine\Window.hpp" />
     <ClInclude Include="code\headers\engine\BackgroundLoader.hpp" />
     <ClInclude Include="code\headers\engine\LocaleStringsFile.h" />
@@ -402,6 +404,7 @@
     <ClInclude Include="code\headers\ui\UiScripting.hpp" />
     <ClInclude Include="code\headers\ui\View.hpp" />
     <ClInclude Include="code\headers\ui\Widgets\Button.hpp" />
+    <ClInclude Include="code\headers\ui\Widgets\ImageWidget.hpp" />
     <ClInclude Include="code\headers\ui\Widgets\Widget.hpp" />
     <ClInclude Include="code\headers\vulkan\VKMaterial.hpp" />
     <ClInclude Include="code\headers\vulkan\VKMesh.hpp" />

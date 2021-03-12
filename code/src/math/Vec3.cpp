@@ -11,10 +11,6 @@ float vDot(const Vec3& v1, const Vec3& v2)
 	return v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
 }
 
-Vec3 lerp(Vec3 v1, Vec3 v2, float factor) {
-    Vec3 result = v1 * (1.f - factor) + v2 * factor;
-    return result;
-}
 
 Vec3 vmul(Vec3& v, float f) {
     Vec3 Ret(v.X * f, v.Y * f, v.Z * f);

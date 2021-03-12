@@ -23,6 +23,11 @@ MaterialShaderProperty* MaterialTemplate::addProperty(int type){
     return properties[properties.size() - 1];
 }
 
+void TextureMtShPropConf::SetTexture(std::string TextureName) {
+    this->path = TextureName;
+    this->texture = game_data->resources->getTextureByLabel(TextureName);
+}
+
 void MaterialTemplate::loadFromFile(const char* fpath){
     std::ifstream mat_shader_group;
     mat_shader_group.open(fpath);
@@ -188,6 +193,19 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup2D(Engine::Shader* tile_shader) 
         default_group->str_path = "@default";
         default_group->Label = "Default 2D";
 
+        TextureMaterialShaderProperty* diffuse_prop =
+            static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
+        diffuse_prop->slotToBind = 0;
+        diffuse_prop->mPropCaption = "Diffuse";
+        diffuse_prop->mPropId = "t_diffuse"; //Identifier to save
+        diffuse_prop->start_offset = 20;
+
+        TextureMaterialShaderProperty* transparent_prop =
+            static_cast<TextureMaterialShaderProperty*>(default_group->addProperty(MATSHPROP_TYPE_TEXTURE));
+        transparent_prop->slotToBind = 1;
+        transparent_prop->mPropCaption = "Transparent";
+        transparent_prop->mPropId = "t_transparent"; //Identifier to save
+        transparent_prop->start_offset = 24;
 
         ((VKMaterialTemplate*)default_group)->CreatePipeline();
         MtShProps::addMtShaderPropertyGroup(default_group);
