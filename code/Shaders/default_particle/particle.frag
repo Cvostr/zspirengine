@@ -23,6 +23,9 @@ void main(){
 	vec2 uv = UVCoord;
 	
 	vec4 diffuse = texture(diffuse, uv);
+
+    if(diffuse.a < 0.05)
+        discard;
 	
     FragColor = diffuse;    
     tPos = FragPos;

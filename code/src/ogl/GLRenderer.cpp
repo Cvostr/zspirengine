@@ -240,35 +240,45 @@ void Engine::GLRenderer::DrawObject(Engine::GameObject* obj) {
 }
 
 void Engine::GLRenderer::DrawParticleSystem(Engine::GameObject* obj) {
-    ParticleEmitterComponent* PartileEmitter = obj->getPropertyPtr<ParticleEmitterComponent>();
+    ParticleEmitterComponent* ParticleEmitter = obj->getPropertyPtr<ParticleEmitterComponent>();
 
-    if (!PartileEmitter)
+    if (!ParticleEmitter)
         return;
 
-    if (!PartileEmitter->mSimulating)
+    if (!ParticleEmitter->mSimulating || ParticleEmitter->mParticleMesh == nullptr)
         return;
 
-    PartileEmitter->StepSimulation();
+    ParticleEmitter->StepSimulation();
 
     TransformProperty* Transform = obj->getTransformProperty();
 
     default_particle->Use();
 
-    transformBuffer->bind();
+    GetInstancedUniformBuffer()->bind();
 
     setFaceCullState(false);
 
-    for (int i = 0; i < PartileEmitter->mParticles.size(); i++) {
-        Particle* Particle = PartileEmitter->mParticles[i];
+    Mat4* ParticleTransforms;
+    ParticleEmitter->GetParticlesTransforms(&ParticleTransforms, *CurrentCamera);
 
-        Mat4 transformMat =  getTranslationMat(Particle->Position);
-        transformMat = removeRotationFromTransformMat(transformMat, CurrentCamera->getViewMatrix());
-        transformMat = getScaleMat(Particle->Size.X, Particle->Size.Y, 1) * getRotationZMat(Particle->Rotation) * transformMat;
+    int parts = ParticleEmitter->mParticles.size() / INSTANCED_RENDER_BUFFER_SIZE;
+    parts += (ParticleEmitter->mParticles.size() % INSTANCED_RENDER_BUFFER_SIZE > 0) ? 1 : 0;
 
-        transformBuffer->writeData(128, 64, &transformMat);
+    int particles_left = ParticleEmitter->mParticles.size();
 
-        Engine::getPlaneMesh2D()->Draw();
+
+    for (int part = 0; part < parts; part++) {
+        
+        int amount = particles_left / INSTANCED_RENDER_BUFFER_SIZE > 0 ? INSTANCED_RENDER_BUFFER_SIZE : particles_left;
+        particles_left /= INSTANCED_RENDER_BUFFER_SIZE;
+
+        GetInstancedUniformBuffer()->writeData(0, sizeof(Mat4) * amount, ParticleTransforms + part * INSTANCED_RENDER_BUFFER_SIZE);
+
+        ParticleEmitter->mParticleMesh->DrawInstanced(amount);
     }
+
+
+    delete[] ParticleTransforms;
 
     setFaceCullState(true);
 }

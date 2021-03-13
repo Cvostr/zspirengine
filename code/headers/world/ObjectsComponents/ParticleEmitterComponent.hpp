@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../World.hpp"
-#include "../../math/RGBColor.hpp"
-#include "../../math/Vec3.hpp"
-#include "../../math/Vec2.hpp"
+#include <math/RGBColor.hpp>
+#include <math/Vec3.hpp>
+#include <math/Vec2.hpp>
 
 namespace Engine {
 
@@ -86,20 +86,22 @@ namespace Engine {
         Vec3 Velocity; //Current velocity of particle
         Vec2 Size; // Current size of particle
         float Rotation; //Rotation over Z of particle
+        float RotationSpeed;
         RGBAColor Color; //Current color of particle
         float mTimePassed; //Time, elapsed from creation
 
         Particle() :
             mAlive(true),
-            mTimePassed(0)
+            mTimePassed(0),
+            Rotation(0)
         {}
     };
 
     class ParticleEmitterComponent : public Engine::IGameObjectComponent {
     public:
 
-        Engine::TextureResource* particle_sprite;
-        std::string sprite_relpath;
+        Engine::MeshResource* mParticleMesh;
+        std::string mMeshResLabel;
         //Array of particles
         std::vector<Particle*> mParticles;
         //Shape of emitter
@@ -113,11 +115,15 @@ namespace Engine {
         DeltaValue<MinMaxValue<Vec2>> mSize;
         MinMaxValue<float> mVelocity;
         Vec3 mConstantForce;
+        float mDampingForce;
         MinMaxValue<float> mRotation;
+        MinMaxValue<float> mRotationSpeed;
 
         DeltaValue<RGBAColor> Color;
 
         bool mSimulating;
+
+        void GetParticlesTransforms(Mat4** Transforms, Camera& cam);
 
         void DestroyParticle(Particle* Particle);
         void EmitNewParticle();
@@ -131,16 +137,20 @@ namespace Engine {
         Vec2 GetRandomSize();
         float GetRandomVelocity();
         float GetRandomRotation();
+        float GetRandomRotationSpeed();
 
         float GetRandomFloat(float max);
 
+        void updateMeshPtr(); //Updates pointer according to resource_relpath
         void addPropertyInterfaceToInspector();
+        void onValueChanged(); //Update mesh    pointer
         void onUpdate(float deltaTime);
         void copyTo(Engine::IGameObjectComponent* dest);
         void onStart();
 
         void loadPropertyFromMemory(const char* data, GameObject* obj);
         void savePropertyToStream(ZsStream* stream, GameObject* obj);
+        void bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr);
 
 
         ParticleEmitterComponent();

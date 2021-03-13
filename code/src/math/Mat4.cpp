@@ -308,8 +308,10 @@ Mat4 getRotationMat(const ZSQUATERNION& quat) {
     float wz = quat.W * quat.Z;
 
     // This calculation would be a lot more complicated for non-unit length quaternions // Note: The constructor of Matrix4 expects the Matrix in column-major format like expected by // OpenGL
-    Mat4 rot = Mat4(Vec4(1.0f - 2.0f * (y2 + z2), 2.0f * (xy - wz), 2.0f * (xz + wy), 0.0f), Vec4(2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz - wx), 0.0f)
-        , Vec4(2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f),
+    Mat4 rot = Mat4(
+        Vec4(1.0f - 2.0f * (y2 + z2), 2.0f * (xy - wz), 2.0f * (xz + wy), 0.0f), 
+        Vec4(2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz - wx), 0.0f),
+        Vec4(2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f),
         Vec4(0.0f, 0.0f, 0.0f, 1.0f));
     return rot;
 }

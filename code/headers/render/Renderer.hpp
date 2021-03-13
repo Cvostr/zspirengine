@@ -97,6 +97,7 @@ public:
     UniformBuffer* GetMaterialsUniformBuffer() { return MaterialsUniformBuffer; }
     UniformBuffer* GetTransformUniformBuffer() { return transformBuffer; }
     UniformBuffer* GetShadowmapUniformBuffer() { return shadowBuffer; }
+    UniformBuffer* GetInstancedUniformBuffer() { return instancedTransformBuffer; }
 
     void processObjects(World* world_ptr);
 

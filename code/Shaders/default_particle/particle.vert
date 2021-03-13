@@ -28,10 +28,11 @@ layout (std140, binding = 11) uniform Time{
 void main(){
 	UVCoord = uv;
 
-	//FragPos = (object_transform * inst_transform[gl_InstanceID] * vec4(position, 1.0)).xyz;
-    FragPos = (object_transform * vec4(position, 1.0)).xyz;
+	FragPos = (inst_transform[gl_InstanceID] * vec4(position, 1.0)).xyz;
+    //FragPos = (object_transform * vec4(position, 1.0)).xyz;
+    gl_Position = cam_projection * cam_view * vec4(FragPos, 1);
 	
-	gl_Position = cam_projection * cam_view * object_transform * vec4(position, 1.0);
+	//gl_Position = cam_projection * cam_view * object_transform * vec4(position, 1.0);
 	
 }
  
