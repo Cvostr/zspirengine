@@ -21,7 +21,7 @@ Vec3 vadd(Vec3& v1, Vec3& v2) {
     return Ret;
 }
 
-Vec3 quatToEuler(const ZSQUATERNION& q) {
+Vec3 quatToEuler(const Quaternion& q) {
     return _getDirection(q.X, q.Y, q.Z);
 }
 

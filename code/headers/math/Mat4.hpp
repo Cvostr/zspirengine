@@ -93,6 +93,6 @@ Mat4 getRotationZMat(float thetaN);
 Mat4 getRotationMat(float thetaX, float thetaY, float thetaZ);
 Mat4 getRotationMat(const Vec3& rotation);
 Mat4 getRotationMat(const Vec3& rotation, const Vec3& center);
-Mat4 getRotationMat(const ZSQUATERNION& quat);
+Mat4 getRotationMat(const Quaternion& quat);
 //Get reflection matrix over plane Ax + By + Cz + D = 0
 Mat4 GetPlaneReflectionMat(float A, float B, float C, float D);

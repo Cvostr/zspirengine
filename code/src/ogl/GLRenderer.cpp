@@ -38,7 +38,7 @@ void Engine::GLRenderer::InitShaders() {
         this->water_shader->compileFromFile("Shaders/water/water.vert", "Shaders/water/water.frag");
         this->default_particle->compileFromFile("Shaders/default_particle/particle.vert", "Shaders/default_particle/particle.frag");
 
-        MtShProps::genDefaultMtShGroup(default3d, mSkyboxShader, mTerrainShader, water_shader);
+        MtShProps::genDefaultMtShGroup(default3d, mSkyboxShader, mTerrainShader, water_shader, default_particle);
     }
 }
 
@@ -252,7 +252,11 @@ void Engine::GLRenderer::DrawParticleSystem(Engine::GameObject* obj) {
 
     TransformProperty* Transform = obj->getTransformProperty();
 
-    default_particle->Use();
+    if (ParticleEmitter->mParticleMaterial == nullptr)
+        return;
+
+    ParticleEmitter->mParticleMaterial->material->mTemplate->mShader->Use();
+    ParticleEmitter->mParticleMaterial->material->applyMatToPipeline();
 
     GetInstancedUniformBuffer()->bind();
 
@@ -264,7 +268,7 @@ void Engine::GLRenderer::DrawParticleSystem(Engine::GameObject* obj) {
     int parts = ParticleEmitter->mParticles.size() / INSTANCED_RENDER_BUFFER_SIZE;
     parts += (ParticleEmitter->mParticles.size() % INSTANCED_RENDER_BUFFER_SIZE > 0) ? 1 : 0;
 
-    int particles_left = ParticleEmitter->mParticles.size();
+    int particles_left = ParticleEmitter->GetAliveParticlesCount();
 
 
     for (int part = 0; part < parts; part++) {

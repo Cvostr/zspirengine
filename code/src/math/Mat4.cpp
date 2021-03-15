@@ -296,7 +296,7 @@ Mat4 getRotationMat(const Vec3& rotation, const Vec3& center) {
     return result;
 }
 
-Mat4 getRotationMat(const ZSQUATERNION& quat) {
+Mat4 getRotationMat(const Quaternion& quat) {
     float x2 = quat.X * quat.X;
     float y2 = quat.Y * quat.Y;
     float z2 = quat.Z * quat.Z;

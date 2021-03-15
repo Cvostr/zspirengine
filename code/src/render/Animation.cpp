@@ -101,15 +101,15 @@ Vec3 Engine::AnimationChannel::getScaleInterpolated(double Time){
     return lerp(v1, v2, static_cast<float>(delta));
 }
 
-ZSQUATERNION Engine::AnimationChannel::getRotationInterpolated(double Time){
+Quaternion Engine::AnimationChannel::getRotationInterpolated(double Time){
     unsigned int index1 = getRotationIndex(Time);
     unsigned int index2 = index1 + 1;
 
     double delta = Time - posTimes[index1];
     delta /= anim_ptr->TPS;
 
-    ZSQUATERNION q1 = rot[index1];
-    ZSQUATERNION q2 = rot[index2];
+    Quaternion q1 = rot[index1];
+    Quaternion q2 = rot[index2];
 
     return slerp(q1, q2, static_cast<float>(delta));
 }

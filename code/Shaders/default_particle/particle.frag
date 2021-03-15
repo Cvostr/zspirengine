@@ -18,16 +18,22 @@ layout (std140, binding = 0) uniform CamMatrices{
     uniform vec3 cam_position;
 };
 
+layout (std140, binding = 3) uniform Particle{
+    vec3 tint_color;
+    bool hasParticleTexture;
+};
+
 void main(){
 
 	vec2 uv = UVCoord;
 	
-	vec4 diffuse = texture(diffuse, uv);
+	vec4 sprite = texture(diffuse, uv);
+    vec3 color = sprite.rgb * tint_color;
 
-    if(diffuse.a < 0.05)
+    if(sprite.a < 0.05)
         discard;
 	
-    FragColor = diffuse;    
+    FragColor = vec4(color, sprite.a);    
     tPos = FragPos;
     tMasks.r = 1;
 }

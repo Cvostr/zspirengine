@@ -18,7 +18,7 @@ public:
 
     Vec3 node_translation;
     Vec3 node_scaling;
-    ZSQUATERNION node_rotation;
+    Quaternion node_rotation;
 
     std::vector<std::string> child_node_labels;
     std::vector<SceneNode*> children;

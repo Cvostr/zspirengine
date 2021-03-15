@@ -3,21 +3,21 @@
 #include <cmath>
 #define REAL_NUM_EQ(x, y) (fabs((x) - (y)) < 0.000001f)
 
-class ZSQUATERNION {
+class Quaternion {
 public:
 	float X;
 	float Y;
 	float Z;
 	float W;
 
-	ZSQUATERNION() {
+	Quaternion() {
 		X = 0;
 		Y = 0;
 		Z = 0;
 		W = 0;
 	}
 
-	ZSQUATERNION(float x, float y, float z, float w) {
+	Quaternion(float x, float y, float z, float w) {
 		this->X = x;
 		this->Y = y;
 		this->Z = z;
@@ -38,7 +38,7 @@ public:
 		W *= m;
 	}
 
-	ZSQUATERNION& operator=(ZSQUATERNION r) {
+	Quaternion& operator=(Quaternion r) {
 		X = r.X;
 		Y = r.Y;
 		Z = r.Z;
@@ -47,4 +47,4 @@ public:
 	}
 };
 
-ZSQUATERNION slerp(ZSQUATERNION q1, ZSQUATERNION q2, float factor);
+Quaternion slerp(Quaternion q1, Quaternion q2, float factor);

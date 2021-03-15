@@ -38,7 +38,7 @@ public:
 
     Vec3* pos;
     Vec3* scale;
-    ZSQUATERNION* rot;
+    Quaternion* rot;
 
     double* posTimes;
     double* scaleTimes;
@@ -50,7 +50,7 @@ public:
 
     Vec3 getPostitionInterpolated(double Time);
     Vec3 getScaleInterpolated(double Time);
-    ZSQUATERNION getRotationInterpolated(double Time);
+    Quaternion getRotationInterpolated(double Time);
 
     AnimationChannel();
     ~AnimationChannel();

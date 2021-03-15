@@ -96,7 +96,7 @@ namespace MtShProps {
 
     MaterialTemplate* genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
                                                  Engine::Shader* heightmap,
-        Engine::Shader* water);
+        Engine::Shader* water, Engine::Shader* particle_shader);
 
     MaterialTemplate* genDefaultMtShGroup2D(Engine::Shader* tile_shader);
 

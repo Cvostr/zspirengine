@@ -43,7 +43,7 @@ Engine::GameObject* Engine::GameObjectLink::updLinkPtr(){
 }
 
 bool Engine::GameObjectLink::isEmpty(){
-    if (this->world_ptr == nullptr) return true;
+    if (this->world_ptr == nullptr || this->obj_str_id.empty()) return true;
     return false;
 }
 

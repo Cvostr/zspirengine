@@ -9,7 +9,7 @@ namespace Engine {
 
         Vec3 translation;
         Vec3 scale;
-        ZSQUATERNION rotation;
+        Quaternion rotation;
         //Node transform from file
         Mat4 transform_mat;
         //Caclulated node transform

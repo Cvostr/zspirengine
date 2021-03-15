@@ -98,7 +98,7 @@ inline bool operator!=(const Vec3& l, const Vec3& r)
 Vec3 vCross(const Vec3& v1, const Vec3& v2);
 Vec3 vmul(Vec3& v, float f);
 Vec3 vadd(Vec3& v1, Vec3& v2);
-Vec3 quatToEuler(const ZSQUATERNION& q);
+Vec3 quatToEuler(const Quaternion& q);
 float getDistance(const Vec3& p1, const Vec3& p2);
 Vec3 _getDirection(const Vec3& rot);
 Vec3 _getDirection(float pitch, float yaw, float roll);

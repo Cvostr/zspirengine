@@ -93,7 +93,8 @@ namespace Engine {
         Particle() :
             mAlive(true),
             mTimePassed(0),
-            Rotation(0)
+            Rotation(0),
+            RotationSpeed(0)
         {}
     };
 
@@ -102,6 +103,10 @@ namespace Engine {
 
         Engine::MeshResource* mParticleMesh;
         std::string mMeshResLabel;
+
+        Engine::MaterialResource* mParticleMaterial;
+        std::string mMaterialResLabel;
+
         //Array of particles
         std::vector<Particle*> mParticles;
         //Shape of emitter
@@ -110,6 +115,7 @@ namespace Engine {
         bool mLooping; //Does particle system loop
         float mLifetime; //Lifetime of single particle
         int32_t mMaxParticles; //Limit particles amount
+        MinMaxValue<int> mEmissionRate; //Particles per second emitted
 
         MinMaxValue<Vec3> mDirection;
         DeltaValue<MinMaxValue<Vec2>> mSize;
@@ -130,6 +136,11 @@ namespace Engine {
         void StepSimulation();
         void StartSimulation();
         void StopSimulation();
+        uint32_t GetFreeParticleIndex();
+        uint32_t GetParticlesCount() {
+            return static_cast<uint32_t>(mParticles.size());
+        }
+        uint32_t GetAliveParticlesCount();
 
         void GetNewParticleVelocityPos(Vec3& Velocity, Vec3& Pos);
 

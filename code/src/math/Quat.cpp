@@ -1,7 +1,7 @@
-#include "../../headers/math/Quat.hpp"
+#include <math/Quat.hpp>
 
-ZSQUATERNION slerp(ZSQUATERNION q1, ZSQUATERNION q2, float factor) {
-    ZSQUATERNION result;
+Quaternion slerp(Quaternion q1, Quaternion q2, float factor) {
+    Quaternion result;
     //Normalize quaternions
     q1.Normalize();
     q2.Normalize();

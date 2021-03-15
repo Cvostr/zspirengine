@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../World.hpp"
-#include "../../math/Vec3.hpp"
+#include <math/Vec3.hpp>
 #include "PhysicalComponent.hpp"
 
 namespace Engine {

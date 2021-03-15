@@ -45,8 +45,10 @@ MaterialTemplate::MaterialTemplate(Engine::Shader* shader, unsigned int UB_SIZE)
 
 MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engine::Shader* skybox,
                                                         Engine::Shader* heightmap,
-                                                        Engine::Shader* water){
+                                                        Engine::Shader* water, Engine::Shader* particle_shader){
 
+    
+    //Default 3D
     MaterialTemplate* default_group = allocMaterialTemplate(shader3d, 48);
     {
         default_group->mAcceptShadows = true;
@@ -107,9 +109,9 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
         ((VKMaterialTemplate*)default_group)->CreatePipeline();
         MtShProps::addMtShaderPropertyGroup(default_group);
     }
+    //Water
     {
 
-        //Water
         MaterialTemplate* water_group = allocMaterialTemplate(water, 32);
         water_group->mAcceptShadows = true;
         water_group->str_path = "@basewater";
@@ -155,33 +157,66 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
 
         MtShProps::addMtShaderPropertyGroup(water_group);
     }
-
-//Default skybox material
-    MaterialTemplate* default_sky_group = allocMaterialTemplate(skybox, 0);
-    default_sky_group->str_path = "@skybox";
-    default_sky_group->Label = "Default Skybox";
-    Texture3MaterialShaderProperty* sky_texture =
+    //Default skybox material
+    {
+        MaterialTemplate* default_sky_group = allocMaterialTemplate(skybox, 20);
+        default_sky_group->str_path = "@skybox";
+        default_sky_group->Label = "Default Skybox";
+        Texture3MaterialShaderProperty* sky_texture =
             static_cast<Texture3MaterialShaderProperty*>(default_sky_group->addProperty(MATSHPROP_TYPE_TEXTURE3));
-    sky_texture->slotToBind = 0;
-    sky_texture->mPropCaption = "Sky";
-    sky_texture->mPropId = "skytexture3"; //Identifier to save
+        sky_texture->slotToBind = 0;
+        sky_texture->mPropCaption = "Sky";
+        sky_texture->mPropId = "skytexture3"; //Identifier to save
 
-    MtShProps::addMtShaderPropertyGroup(default_sky_group);
+        MaterialShaderProperty* tint_color_prop = (default_sky_group->addProperty(MATSHPROP_TYPE_COLOR));
+        tint_color_prop->mPropCaption = "Tint Color"; //Set caption in Inspector
+        tint_color_prop->mPropId = "c_tint"; //Identifier to save
+        tint_color_prop->start_offset = 0;
 
-//Default terrain material
+        MaterialShaderProperty* shininess_factor_prop = default_sky_group->addProperty(MATSHPROP_TYPE_FLOAT);
+        shininess_factor_prop->mPropCaption = "Exposure";
+        shininess_factor_prop->mPropId = "f_exposure"; //Identifier to save
+        shininess_factor_prop->start_offset = 12;
+
+        MtShProps::addMtShaderPropertyGroup(default_sky_group);
+    }
+    //Default terrain material
     MaterialTemplate* default_heightmap_group = allocMaterialTemplate(heightmap, 0);
-    default_heightmap_group->str_path = "@heightmap";
-    default_heightmap_group->Label = "Default Heightmap";
-    default_heightmap_group->mAcceptShadows = true;
+    {
+        default_heightmap_group->str_path = "@heightmap";
+        default_heightmap_group->Label = "Default Heightmap";
+        default_heightmap_group->mAcceptShadows = true;
 
-    MtShProps::addMtShaderPropertyGroup(default_heightmap_group);
-
+        MtShProps::addMtShaderPropertyGroup(default_heightmap_group);
+    }
     //Create default base material
     default3dmat = allocMaterial(default_group);
     default3dmat->file_path = "@default";
 
     defaultTerrainMat = allocMaterial(default_heightmap_group);
     defaultTerrainMat->file_path = "@defaultHeightmap";
+
+    MaterialTemplate* particle_group = allocMaterialTemplate(particle_shader, 20);
+    {
+        particle_group->mAcceptShadows = false;
+        particle_group->str_path = "@default_particle";
+        particle_group->Label = "Default Particle";
+
+        TextureMaterialShaderProperty* diffuse_prop =
+            static_cast<TextureMaterialShaderProperty*>(particle_group->addProperty(MATSHPROP_TYPE_TEXTURE));
+        diffuse_prop->slotToBind = 0;
+        diffuse_prop->mPropCaption = "Diffuse";
+        diffuse_prop->mPropId = "t_diffuse"; //Identifier to save
+        diffuse_prop->start_offset = 16;
+
+        MaterialShaderProperty* diff_color_prop = (particle_group->addProperty(MATSHPROP_TYPE_COLOR));
+        diff_color_prop->mPropCaption = "Color"; //Set caption in Inspector
+        diff_color_prop->mPropId = "c_diffuse"; //Identifier to save
+        diff_color_prop->start_offset = 0;
+
+        ((VKMaterialTemplate*)particle_group)->CreatePipeline();
+        MtShProps::addMtShaderPropertyGroup(particle_group);
+    }
 
     return default_group;
 }

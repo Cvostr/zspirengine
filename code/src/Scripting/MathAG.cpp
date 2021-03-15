@@ -11,7 +11,7 @@ static void CreateVec3(float x, float y, float z, Vec3* ptr) {
 }
 
 static void CreateQuat(float x, float y, float z, float w, Vec3* ptr) {
-	new (ptr) ZSQUATERNION(x, y, z, w);
+	new (ptr) Quaternion(x, y, z, w);
 }
 
 static void CreateRgbColor(int r, int g, int b, RGBAColor* ptr) {
@@ -41,16 +41,16 @@ void Engine::bindMathSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, "Vec3 opAdd(const Vec3&in) const", asMETHOD(Vec3, operator+), asCALL_THISCALL);
 	mgr->RegisterObjectMethod(VEC3_TYPE_NAME, "bool opEquals(const Vec3&in) const", asMETHOD(Vec3, operator ==), asCALL_THISCALL);
 	//Bind Quaternion
-	mgr->RegisterObjectType(QUAT_TYPE_NAME, sizeof(ZSQUATERNION), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<ZSQUATERNION>());
-	mgr->RegisterObjectBehaviour(QUAT_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(new_as_obj_T<ZSQUATERNION>), asCALL_CDECL_OBJLAST);
+	mgr->RegisterObjectType(QUAT_TYPE_NAME, sizeof(Quaternion), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<Quaternion>());
+	mgr->RegisterObjectBehaviour(QUAT_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(new_as_obj_T<Quaternion>), asCALL_CDECL_OBJLAST);
 	mgr->RegisterObjectBehaviour(QUAT_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(CreateQuat), asCALL_CDECL_OBJLAST);
-	mgr->RegisterObjectBehaviour(QUAT_TYPE_NAME, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(del_as_obj_T<ZSQUATERNION>), asCALL_CDECL_OBJLAST);
-	mgr->RegisterObjectProperty(QUAT_TYPE_NAME, "float x", offsetof(ZSQUATERNION, X));
-	mgr->RegisterObjectProperty(QUAT_TYPE_NAME, "float y", offsetof(ZSQUATERNION, Y));
-	mgr->RegisterObjectProperty(QUAT_TYPE_NAME, "float z", offsetof(ZSQUATERNION, Z));
-	mgr->RegisterObjectProperty(QUAT_TYPE_NAME, "float w", offsetof(ZSQUATERNION, W));
-	mgr->RegisterObjectMethod(QUAT_TYPE_NAME, "void Normalize()", asMETHOD(ZSQUATERNION, Normalize), asCALL_THISCALL);
-	mgr->RegisterObjectMethod(QUAT_TYPE_NAME, "Quat &opAssign(Quat &in)", asMETHODPR(ZSQUATERNION, operator =, (ZSQUATERNION), ZSQUATERNION&), asCALL_THISCALL);
+	mgr->RegisterObjectBehaviour(QUAT_TYPE_NAME, asBEHAVE_DESTRUCT, "void f()", asFUNCTION(del_as_obj_T<Quaternion>), asCALL_CDECL_OBJLAST);
+	mgr->RegisterObjectProperty(QUAT_TYPE_NAME, "float x", offsetof(Quaternion, X));
+	mgr->RegisterObjectProperty(QUAT_TYPE_NAME, "float y", offsetof(Quaternion, Y));
+	mgr->RegisterObjectProperty(QUAT_TYPE_NAME, "float z", offsetof(Quaternion, Z));
+	mgr->RegisterObjectProperty(QUAT_TYPE_NAME, "float w", offsetof(Quaternion, W));
+	mgr->RegisterObjectMethod(QUAT_TYPE_NAME, "void Normalize()", asMETHOD(Quaternion, Normalize), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(QUAT_TYPE_NAME, "Quat &opAssign(Quat &in)", asMETHODPR(Quaternion, operator =, (Quaternion), Quaternion&), asCALL_THISCALL);
 	//Bind RGB color
 	mgr->RegisterObjectType(RGBACOLOR_TYPE_NAME, sizeof(RGBAColor), asOBJ_VALUE | asOBJ_POD | asGetTypeTraits<RGBAColor>());
 	mgr->RegisterObjectBehaviour(RGBACOLOR_TYPE_NAME, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(new_as_obj_T<RGBAColor>), asCALL_CDECL_OBJLAST);

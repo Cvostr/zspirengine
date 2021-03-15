@@ -2,7 +2,7 @@
 #include <game.h>
 
 extern ZSGAME_DATA* game_data;
-static unsigned int ParticlesRandomSeed = 3467828329819;
+static long long int ParticlesRandomSeed = 3467828329819;
 
 int Rand()
 {
@@ -70,6 +70,7 @@ void Engine::ParticleEmitterComponent::loadPropertyFromMemory(const char* data, 
 	readBinaryValue(&mRotationSpeed.Max, data + offset, offset);
 
 	readString(mMeshResLabel, data, offset);
+	readString(mMaterialResLabel, data, offset);
 	
 	updateMeshPtr();
 }
@@ -100,13 +101,16 @@ void Engine::ParticleEmitterComponent::savePropertyToStream(ZsStream* stream, Ga
 	stream->writeBinaryValue(&mRotationSpeed.Max);
 
 	stream->writeString(mMeshResLabel);
+	stream->writeString(mMaterialResLabel);
 }
 
 void Engine::ParticleEmitterComponent::StartSimulation() {
-
+	mParticles.resize(mMaxParticles);
 	TransformProperty* transform = go_link.updLinkPtr()->getTransformProperty();
 
 	for (unsigned int particle_i = 0; particle_i < mMaxParticles; particle_i++) {
+		mParticles[particle_i] = new Particle;
+		mParticles[particle_i]->mAlive = false;
 		EmitNewParticle();
 	}
 
@@ -115,8 +119,13 @@ void Engine::ParticleEmitterComponent::StartSimulation() {
 
 void Engine::ParticleEmitterComponent::EmitNewParticle() {
 	TransformProperty* transform = go_link.updLinkPtr()->getTransformProperty();
-	Particle* particlePtr = new Particle;
-	mParticles.push_back(particlePtr);
+
+	uint32_t FreeIndex = GetFreeParticleIndex();
+
+	if (FreeIndex == 0xFFFFFFFF)
+		return;
+
+	Particle* particlePtr = mParticles[FreeIndex];
 
 	Vec3 BaseDir = _getDirection(transform->abs_rotation);
 
@@ -155,6 +164,8 @@ void Engine::ParticleEmitterComponent::EmitNewParticle() {
 	particlePtr->Rotation = GetRandomRotation();
 	particlePtr->RotationSpeed = GetRandomRotationSpeed();
 	particlePtr->Velocity = Dir * GetRandomVelocity();
+	particlePtr->mAlive = true;
+	particlePtr->mTimePassed = 0;
 	//particlePtr->Position += Dir * particlePtr->Size.Y;
 }
 
@@ -163,11 +174,14 @@ void Engine::ParticleEmitterComponent::GetNewParticleVelocityPos(Vec3& Velocity,
 }
 
 void Engine::ParticleEmitterComponent::DestroyParticle(Particle* Particle) {
-	std::remove(mParticles.begin(), mParticles.end(), Particle);
-	mParticles.pop_back();
+	Particle->mAlive = false;
 }
 
 void Engine::ParticleEmitterComponent::StopSimulation() {
+	for (int i = 0; i < mParticles.size(); i++) {
+		delete mParticles[i];
+	}
+
 	mParticles.clear();
 
 	mSimulating = false;
@@ -208,34 +222,37 @@ void Engine::ParticleEmitterComponent::StepSimulation() {
 }
 
 void Engine::ParticleEmitterComponent::GetParticlesTransforms(Mat4** Transforms, Camera& cam) {
+	uint32_t aliveParticlesCount = GetAliveParticlesCount();
 	*Transforms = new Mat4[mParticles.size()];
+	uint32_t TransformI = 0;
 
 	for (int i = 0; i < mParticles.size(); i++) {
 		Particle* Particle = mParticles[i];
+		if (Particle->mAlive) {
+			Mat4 transformMat = getTranslationMat(Particle->Position);
+			transformMat = removeRotationFromTransformMat(transformMat, cam.getViewMatrix());
+			transformMat = getScaleMat(Particle->Size.X, Particle->Size.Y, 1) * getRotationZMat(Particle->Rotation) * transformMat;
 
-		 Mat4 transformMat =  getTranslationMat(Particle->Position);
-		 transformMat = removeRotationFromTransformMat(transformMat, cam.getViewMatrix());
-		 transformMat = getScaleMat(Particle->Size.X, Particle->Size.Y, 1) * getRotationZMat(Particle->Rotation) * transformMat;
-		 
-		Vec3 Rt = Particle->Velocity;
-		Rt.Normalize();
-		float q1 = Rt.X;
-		float q2 = Rt.Y;
-		float q3 = Rt.Z;
+			Vec3 Rt = Particle->Velocity;
+			Rt.Normalize();
+			float q1 = Rt.X;
+			float q2 = Rt.Y;
+			float q3 = Rt.Z;
 
-		/*Mat4 transformMat = getScaleMat(Particle->Size.X, Particle->Size.Y, 1)
-			* getRotationMat(ZSQUATERNION(q1, q2, q3, 0)) * getRotationZMat(Particle->Rotation)
-			* getTranslationMat(Particle->Position);
-			*/
-		(*Transforms)[i] = transformMat;
+			/*Mat4 transformMat = getScaleMat(Particle->Size.X, Particle->Size.Y, 1)
+				* getRotationMat(ZSQUATERNION(q1, q2, q3, 0)) * getRotationZMat(Particle->Rotation)
+				* getTranslationMat(Particle->Position);
+				*/
+			(*Transforms)[TransformI++] = transformMat;
+		}
 	}
 
 	Vec3 CamPos = cam.getCameraPosition();
 	//Sort Array
-	for (int i = 1; i < mParticles.size() - 1; i++) {
-		for (int j = 0; j < mParticles.size() - i - 1; j++) {
+	for (int i = 1; i < aliveParticlesCount - 1; i++) {
+		for (unsigned int j = 0; j < aliveParticlesCount - i - 1; j++) {
 			Vec3 Pos1 = (*Transforms)[j].GetPosition();
-			Vec3 Pos2 = (*Transforms)[j + 1].GetPosition();
+			Vec3 Pos2 = (*(*Transforms + (j + 1))).GetPosition();
 
 			float Dist1 = getDistance(CamPos, Pos1);
 			float Dist2 = getDistance(CamPos, Pos2);
@@ -243,7 +260,7 @@ void Engine::ParticleEmitterComponent::GetParticlesTransforms(Mat4** Transforms,
 			if (Dist1 < Dist2) {
 				Mat4 temp = (*Transforms)[j];
 				(*Transforms)[j] = (*Transforms)[j + 1];
-				(*Transforms)[j + 1] = temp;
+				*(*Transforms + (j + 1)) = temp;
 			}
 		}
 	}
@@ -285,6 +302,24 @@ float Engine::ParticleEmitterComponent::GetRandomFloat(float max) {
 
 void Engine::ParticleEmitterComponent::updateMeshPtr() {
 	this->mParticleMesh = game_data->resources->getMeshByLabel(this->mMeshResLabel);
+	this->mParticleMaterial = game_data->resources->getMaterialByLabel(this->mMaterialResLabel);
+}
+
+uint32_t Engine::ParticleEmitterComponent::GetFreeParticleIndex() {
+	for (uint32_t i = 0; i < static_cast<uint32_t>(mParticles.size()); i++) {
+		if (!mParticles[i]->mAlive)
+			return i;
+	}
+	return 0xFFFFFFFF;
+}
+
+uint32_t Engine::ParticleEmitterComponent::GetAliveParticlesCount() {
+	uint32_t Result = 0;
+	for (uint32_t i = 0; i < static_cast<uint32_t>(mParticles.size()); i++) {
+		if (mParticles[i]->mAlive)
+			Result += 1;
+	}
+	return Result;
 }
 
 void Engine::ParticleEmitterComponent::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
@@ -305,7 +340,8 @@ Engine::ParticleEmitterComponent::ParticleEmitterComponent() :
 	mDampingForce(0),
 	mRotation(0, 0),
 	mRotationSpeed(0, 0),
-	mMeshResLabel("@plane")
+	mMeshResLabel("@plane"),
+	mEmissionRate(30, 30)
 {
 	type = PROPERTY_TYPE::GO_PROPERTY_TYPE_PARTICLE_EMITTER;
 	updateMeshPtr();

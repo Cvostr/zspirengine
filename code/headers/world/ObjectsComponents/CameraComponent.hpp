@@ -2,7 +2,7 @@
 
 #include "../World.hpp"
 #include "../Camera.hpp"
-#include "../../render/Framebuffer.hpp"
+#include <render/Framebuffer.hpp>
 #include <engine/Resources.hpp>
 
 namespace Engine {
