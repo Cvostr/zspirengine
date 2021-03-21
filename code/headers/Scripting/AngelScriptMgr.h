@@ -46,6 +46,7 @@
 #define RIGIDBODY_PROP_TYPE_NAME "Rigidbody"
 #define COLLIDER_PROP_TYPE_NAME "Collider"
 #define SHADOWCAST_PROP_TYPE_NAME "ShadowCaster"
+#define PARTICLE_EMITTER_PROP_TYPE_NAME "ParticleEmitter"
 #define CAMERA_PROP_TYPE_NAME "CameraComponent"
 
 #define MATERIAL_PROP_TYPE_NAME "MaterialShaderPropertyConf"

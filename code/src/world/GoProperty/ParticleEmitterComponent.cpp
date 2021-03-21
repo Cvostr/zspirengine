@@ -24,6 +24,7 @@ void Engine::ParticleEmitterComponent::copyTo(Engine::IGameObjectComponent* dest
 	_dest->mShape = mShape;
 	_dest->mDuration = mDuration;
 	_dest->mLooping = mLooping;
+	_dest->mPrewarm = mPrewarm;
 	_dest->mLifetime = mLifetime;
 	_dest->mMaxParticles = mMaxParticles;
 
@@ -47,8 +48,12 @@ void Engine::ParticleEmitterComponent::loadPropertyFromMemory(const char* data, 
 	readBinaryValue(&mShape, data + offset, offset);
 	readBinaryValue(&mDuration, data + offset, offset);
 	readBinaryValue(&mLooping, data + offset, offset);
+	readBinaryValue(&mPrewarm, data + offset, offset);
 	readBinaryValue(&mLifetime, data + offset, offset);
 	readBinaryValue(&mMaxParticles, data + offset, offset);
+
+	readBinaryValue(&mEmissionRate.Min, data + offset, offset);
+	readBinaryValue(&mEmissionRate.Max, data + offset, offset);
 
 	readBinaryValue(&mDirection.Min, data + offset, offset);
 	readBinaryValue(&mDirection.Max, data + offset, offset);
@@ -78,8 +83,12 @@ void Engine::ParticleEmitterComponent::savePropertyToStream(ZsStream* stream, Ga
 	stream->writeBinaryValue(&mShape);
 	stream->writeBinaryValue(&mDuration);
 	stream->writeBinaryValue(&mLooping);
+	stream->writeBinaryValue(&mPrewarm);
 	stream->writeBinaryValue(&mLifetime);
 	stream->writeBinaryValue(&mMaxParticles);
+
+	stream->writeBinaryValue(&mEmissionRate.Min);
+	stream->writeBinaryValue(&mEmissionRate.Max);
 
 	stream->writeVec3(mDirection.Min);
 	stream->writeVec3(mDirection.Max);
@@ -110,20 +119,20 @@ void Engine::ParticleEmitterComponent::StartSimulation() {
 
 	for (unsigned int particle_i = 0; particle_i < mMaxParticles; particle_i++) {
 		mParticles[particle_i] = new Particle;
-		mParticles[particle_i]->mAlive = false;
-		EmitNewParticle();
 	}
 
 	mSimulating = true;
+	mSimulationTime = 0;
+	mEmitterTime = 0;
 }
 
-void Engine::ParticleEmitterComponent::EmitNewParticle() {
+bool Engine::ParticleEmitterComponent::EmitNewParticle() {
 	TransformProperty* transform = go_link.updLinkPtr()->getTransformProperty();
 
 	uint32_t FreeIndex = GetFreeParticleIndex();
 
-	if (FreeIndex == 0xFFFFFFFF)
-		return;
+	if (FreeIndex == 0xFFFFFFFF || FreeIndex > (mMaxParticles - 1))
+		return false;
 
 	Particle* particlePtr = mParticles[FreeIndex];
 
@@ -167,6 +176,8 @@ void Engine::ParticleEmitterComponent::EmitNewParticle() {
 	particlePtr->mAlive = true;
 	particlePtr->mTimePassed = 0;
 	//particlePtr->Position += Dir * particlePtr->Size.Y;
+
+	return true;
 }
 
 void Engine::ParticleEmitterComponent::GetNewParticleVelocityPos(Vec3& Velocity, Vec3& Pos) {
@@ -191,14 +202,41 @@ void Engine::ParticleEmitterComponent::StepSimulation() {
 	if (!mSimulating)
 		return;
 
+	if (mSimulationTime >= mDuration) {
+		if (mLooping) {
+			if(!mPrewarm)
+				RestartSimulation();
+		}
+		else {
+			StopSimulation();
+		}
+	}
+
 	float DeltaTime = game_data->time->GetDeltaTime();
 
-	for (unsigned int particle_i = 0; particle_i < mMaxParticles; particle_i++) {
+	mSimulationTime += DeltaTime;
+	mEmitterTime += DeltaTime;
+
+	int32_t leftToEmit = mMaxParticles - GetAliveParticlesCount();
+
+	while (leftToEmit > 0 && mEmitterTime > 0) {
+		if (EmitNewParticle()) {
+			mEmitterTime -= (1.f / GetRandomEmissionRate());
+			leftToEmit--;
+		}
+		else
+			break;
+	}
+
+	for (unsigned int particle_i = 0; particle_i < GetAliveParticlesCount(); particle_i++) {
 		Particle* particlePtr = mParticles[particle_i];
+
+		if (!particlePtr->mAlive)
+			continue;
 
 		if (particlePtr->mTimePassed >= mLifetime) {
 			DestroyParticle(particlePtr);
-			EmitNewParticle();
+			continue;
 		}
 
 		//update velocity
@@ -221,9 +259,14 @@ void Engine::ParticleEmitterComponent::StepSimulation() {
 	}
 }
 
+void Engine::ParticleEmitterComponent::RestartSimulation() {
+	StopSimulation();
+	StartSimulation();
+}
+
 void Engine::ParticleEmitterComponent::GetParticlesTransforms(Mat4** Transforms, Camera& cam) {
 	uint32_t aliveParticlesCount = GetAliveParticlesCount();
-	*Transforms = new Mat4[mParticles.size()];
+	*Transforms = new Mat4[aliveParticlesCount];
 	uint32_t TransformI = 0;
 
 	for (int i = 0; i < mParticles.size(); i++) {
@@ -240,16 +283,16 @@ void Engine::ParticleEmitterComponent::GetParticlesTransforms(Mat4** Transforms,
 			float q3 = Rt.Z;
 
 			/*Mat4 transformMat = getScaleMat(Particle->Size.X, Particle->Size.Y, 1)
-				* getRotationMat(ZSQUATERNION(q1, q2, q3, 0)) * getRotationZMat(Particle->Rotation)
-				* getTranslationMat(Particle->Position);
-				*/
+				* getRotationMat(Quaternion(q1, q2, q3, 0)) * getRotationZMat(Particle->Rotation)
+				* getTranslationMat(Particle->Position);*/
+				
 			(*Transforms)[TransformI++] = transformMat;
 		}
 	}
 
 	Vec3 CamPos = cam.getCameraPosition();
 	//Sort Array
-	for (int i = 1; i < aliveParticlesCount - 1; i++) {
+	for (unsigned int i = 1; i < aliveParticlesCount - 1; i++) {
 		for (unsigned int j = 0; j < aliveParticlesCount - i - 1; j++) {
 			Vec3 Pos1 = (*Transforms)[j].GetPosition();
 			Vec3 Pos2 = (*(*Transforms + (j + 1))).GetPosition();
@@ -296,6 +339,10 @@ float Engine::ParticleEmitterComponent::GetRandomRotationSpeed() {
 	return lerp(mRotationSpeed.Min, mRotationSpeed.Max, GetRandomFloat(1.f));
 }
 
+int Engine::ParticleEmitterComponent::GetRandomEmissionRate() {
+	return lerp(mEmissionRate.Min, mEmissionRate.Max, GetRandomFloat(1.f));
+}
+
 float Engine::ParticleEmitterComponent::GetRandomFloat(float max) {
 	return (Rand() * max) / 32767.f;
 }
@@ -323,6 +370,12 @@ uint32_t Engine::ParticleEmitterComponent::GetAliveParticlesCount() {
 }
 
 void Engine::ParticleEmitterComponent::bindObjectPropertyToAngel(Engine::AGScriptMgr* mgr) {
+	mgr->RegisterObjectType(PARTICLE_EMITTER_PROP_TYPE_NAME, 0, asOBJ_REF | asOBJ_NOCOUNT);
+
+
+	mgr->RegisterObjectMethod(PARTICLE_EMITTER_PROP_TYPE_NAME, "void Start()", asMETHOD(ParticleEmitterComponent, StartSimulation), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(PARTICLE_EMITTER_PROP_TYPE_NAME, "void Stop()", asMETHOD(ParticleEmitterComponent, StopSimulation), asCALL_THISCALL);
+	mgr->RegisterObjectMethod(PARTICLE_EMITTER_PROP_TYPE_NAME, "bool IsSimulating()", asMETHOD(ParticleEmitterComponent, IsSimulating), asCALL_THISCALL);
 
 }
 
@@ -332,6 +385,7 @@ Engine::ParticleEmitterComponent::ParticleEmitterComponent() :
 	mShape(PE_SHAPE_SPHERE),
 	mDuration(5),
 	mLooping(true),
+	mPrewarm(true),
 	mLifetime(2),
 	mMaxParticles(100),
 	mDirection(Vec3(0.f, 1.f, 0.f)),
@@ -341,7 +395,7 @@ Engine::ParticleEmitterComponent::ParticleEmitterComponent() :
 	mRotation(0, 0),
 	mRotationSpeed(0, 0),
 	mMeshResLabel("@plane"),
-	mEmissionRate(30, 30)
+	mEmissionRate(200, 200)
 {
 	type = PROPERTY_TYPE::GO_PROPERTY_TYPE_PARTICLE_EMITTER;
 	updateMeshPtr();

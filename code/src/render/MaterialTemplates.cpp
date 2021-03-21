@@ -36,7 +36,8 @@ void MaterialTemplate::loadFromFile(const char* fpath){
 }
 MaterialTemplate::MaterialTemplate(Engine::Shader* shader, unsigned int UB_SIZE) :
     mShader(shader),
-    mAcceptShadows(false)
+    mAcceptShadows(false),
+    mReflective(false)
 {
     
     properties.resize(0);
@@ -105,6 +106,7 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
         uv_factor_prop->mPropCaption = "UV repeat";
         uv_factor_prop->mPropId = "i_uv_repeat"; //Identifier to save
         uv_factor_prop->start_offset = 36;
+        uv_factor_prop->DefaultValue = new Vec2i(1, 1);
 
         ((VKMaterialTemplate*)default_group)->CreatePipeline();
         MtShProps::addMtShaderPropertyGroup(default_group);
@@ -177,6 +179,8 @@ MaterialTemplate* MtShProps::genDefaultMtShGroup(Engine::Shader* shader3d, Engin
         shininess_factor_prop->mPropCaption = "Exposure";
         shininess_factor_prop->mPropId = "f_exposure"; //Identifier to save
         shininess_factor_prop->start_offset = 12;
+        shininess_factor_prop->DefaultValue = new float;
+        *((float*)shininess_factor_prop->DefaultValue) = 1.f;
 
         MtShProps::addMtShaderPropertyGroup(default_sky_group);
     }

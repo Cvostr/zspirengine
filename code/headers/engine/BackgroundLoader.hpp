@@ -3,7 +3,7 @@
 #include <threading/Thread.hpp>
 #include <threading/Mutex.hpp>
 
-#define LOADER_QUEUE_SIZE 300
+#define LOADER_QUEUE_SIZE 500
 
 namespace Engine {
     namespace Loader {

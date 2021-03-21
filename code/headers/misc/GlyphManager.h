@@ -3,10 +3,10 @@
 #include <map>
 #include <string>
 
-#include "../render/Math.hpp"
+#include <render/Math.hpp>
 #include "../engine/EngineComponent.h"
-#include "../render/Shader.hpp"
-#include "../render/Texture.h"
+#include <render/Shader.hpp>
+#include <render/Texture.h>
 #include "ft2build.h"
 
 #include FT_FREETYPE_H

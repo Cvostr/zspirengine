@@ -1,15 +1,16 @@
-#include "../../headers/Scripting/AngelScriptMgr.h"
+#include <Scripting/AngelScriptMgr.h>
 
-#include "../../headers/world/ObjectsComponents/AudioSourceComponent.hpp"
-#include "../../headers/world/ObjectsComponents/LightSourceComponent.hpp"
-#include "../../headers/world/ObjectsComponents/ShadowCasterComponent.hpp"
-#include "../../headers/world/ObjectsComponents/MaterialComponent.hpp"
-#include "../../headers/world/ObjectsComponents/MeshComponent.hpp"
-#include "../../headers/world/ObjectsComponents/AnimationComponent.hpp"
-#include "../../headers/world/ObjectsComponents/CharacterController.hpp"
-#include "../../headers/world/ObjectsComponents/RigidbodyComponent.hpp"
-#include "../../headers/world/ObjectsComponents/ColliderComponent.hpp"
-#include "../../headers/world/ObjectsComponents/CameraComponent.hpp"
+#include <world/ObjectsComponents/AudioSourceComponent.hpp>
+#include <world/ObjectsComponents/LightSourceComponent.hpp>
+#include <world/ObjectsComponents/ShadowCasterComponent.hpp>
+#include <world/ObjectsComponents/MaterialComponent.hpp>
+#include <world/ObjectsComponents/MeshComponent.hpp>
+#include <world/ObjectsComponents/AnimationComponent.hpp>
+#include <world/ObjectsComponents/CharacterController.hpp>
+#include <world/ObjectsComponents/RigidbodyComponent.hpp>
+#include <world/ObjectsComponents/ColliderComponent.hpp>
+#include <world/ObjectsComponents/CameraComponent.hpp>
+#include <world/ObjectsComponents/ParticleEmitterComponent.hpp>
 
 //Hack to support resources
 extern ZSGAME_DATA* game_data;
@@ -140,6 +141,7 @@ void AGScriptMgr::create_Engine() {
 	bindGameObjectPropertySDK<ColliderProperty>(this, COLLIDER_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<ShadowCasterProperty>(this, SHADOWCAST_PROP_TYPE_NAME);
 	bindGameObjectPropertySDK<CameraComponent>(this, CAMERA_PROP_TYPE_NAME);
+	bindGameObjectPropertySDK<ParticleEmitterComponent>(this, PARTICLE_EMITTER_PROP_TYPE_NAME);
 
 	bindGameObjectPropertiesSDK(this);
 

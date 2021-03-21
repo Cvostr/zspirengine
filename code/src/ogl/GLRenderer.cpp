@@ -245,14 +245,14 @@ void Engine::GLRenderer::DrawParticleSystem(Engine::GameObject* obj) {
     if (!ParticleEmitter)
         return;
 
-    if (!ParticleEmitter->mSimulating || ParticleEmitter->mParticleMesh == nullptr)
+    if (!ParticleEmitter->IsSimulating() || ParticleEmitter->mParticleMesh == nullptr)
         return;
 
     ParticleEmitter->StepSimulation();
 
     TransformProperty* Transform = obj->getTransformProperty();
 
-    if (ParticleEmitter->mParticleMaterial == nullptr)
+    if (ParticleEmitter->mParticleMaterial == nullptr || !ParticleEmitter->IsSimulating())
         return;
 
     ParticleEmitter->mParticleMaterial->material->mTemplate->mShader->Use();
@@ -265,11 +265,10 @@ void Engine::GLRenderer::DrawParticleSystem(Engine::GameObject* obj) {
     Mat4* ParticleTransforms;
     ParticleEmitter->GetParticlesTransforms(&ParticleTransforms, *CurrentCamera);
 
-    int parts = ParticleEmitter->mParticles.size() / INSTANCED_RENDER_BUFFER_SIZE;
-    parts += (ParticleEmitter->mParticles.size() % INSTANCED_RENDER_BUFFER_SIZE > 0) ? 1 : 0;
-
     int particles_left = ParticleEmitter->GetAliveParticlesCount();
-
+    
+    int parts = particles_left / INSTANCED_RENDER_BUFFER_SIZE;
+    parts += (particles_left % INSTANCED_RENDER_BUFFER_SIZE > 0) ? 1 : 0;
 
     for (int part = 0; part < parts; part++) {
         

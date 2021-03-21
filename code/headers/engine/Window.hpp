@@ -54,7 +54,8 @@ namespace Engine {
 
         Window():
             mWindow(nullptr),
-            mComponentManager(nullptr)
+            mComponentManager(nullptr),
+            window_info(nullptr)
         {}
     };
 }

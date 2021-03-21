@@ -14,6 +14,11 @@ namespace Engine {
         PE_SHAPE_CONE
     };
 
+    enum ParticleRotateMode {
+        PRM_BILLBOARD,
+        PRM_DIRECTION
+    };
+
     template <typename T>
     struct BeginEndValue {
         T Begin;
@@ -91,7 +96,7 @@ namespace Engine {
         float mTimePassed; //Time, elapsed from creation
 
         Particle() :
-            mAlive(true),
+            mAlive(false),
             mTimePassed(0),
             Rotation(0),
             RotationSpeed(0)
@@ -99,6 +104,13 @@ namespace Engine {
     };
 
     class ParticleEmitterComponent : public Engine::IGameObjectComponent {
+    private:
+        //Array of particles
+        std::vector<Particle*> mParticles;
+
+        bool mSimulating;
+        float mEmitterTime;
+        float mSimulationTime;
     public:
 
         Engine::MeshResource* mParticleMesh;
@@ -107,12 +119,12 @@ namespace Engine {
         Engine::MaterialResource* mParticleMaterial;
         std::string mMaterialResLabel;
 
-        //Array of particles
-        std::vector<Particle*> mParticles;
+        
         //Shape of emitter
         ParticleEmitterShape mShape;
         float mDuration; //single cycle duration
         bool mLooping; //Does particle system loop
+        bool mPrewarm; //Restart system on loop
         float mLifetime; //Lifetime of single particle
         int32_t mMaxParticles; //Limit particles amount
         MinMaxValue<int> mEmissionRate; //Particles per second emitted
@@ -127,15 +139,17 @@ namespace Engine {
 
         DeltaValue<RGBAColor> Color;
 
-        bool mSimulating;
-
         void GetParticlesTransforms(Mat4** Transforms, Camera& cam);
 
         void DestroyParticle(Particle* Particle);
-        void EmitNewParticle();
+        bool EmitNewParticle();
         void StepSimulation();
         void StartSimulation();
         void StopSimulation();
+        void RestartSimulation();
+        bool IsSimulating() {
+            return mSimulating;
+        }
         uint32_t GetFreeParticleIndex();
         uint32_t GetParticlesCount() {
             return static_cast<uint32_t>(mParticles.size());
@@ -149,6 +163,7 @@ namespace Engine {
         float GetRandomVelocity();
         float GetRandomRotation();
         float GetRandomRotationSpeed();
+        int GetRandomEmissionRate();
 
         float GetRandomFloat(float max);
 

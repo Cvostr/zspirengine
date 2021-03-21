@@ -23,7 +23,6 @@ void Engine::TransformProperty::updateMatrix() {
     }
 
     abs_translation = p_translation + this->translation;
-    abs_translation = abs_translation ;
 
     abs_scale = p_scale * this->scale;
     abs_rotation = this->rotation + p_rotation;

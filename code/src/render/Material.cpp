@@ -58,6 +58,7 @@ MaterialShaderProperty::MaterialShaderProperty(){
     start_offset = 0;
     mShowInEditor = true;
     mSaveInFile = true;
+    DefaultValue = nullptr;
 }
 
 MaterialShaderPropertyConf::MaterialShaderPropertyConf(){
@@ -206,6 +207,10 @@ void Material::setTemplate(MaterialTemplate* Template){
         //Add PropertyConf with the same type
         MaterialShaderPropertyConf* Conf = this->AddPropertyConf(prop_ptr->mType);
         Conf->mProperty = prop_ptr;
+
+        if (prop_ptr->DefaultValue != nullptr) {
+            Conf->SetValuePtr(prop_ptr->DefaultValue);
+        }
     }
     //store pointer of picked group
     this->mTemplate = Template;

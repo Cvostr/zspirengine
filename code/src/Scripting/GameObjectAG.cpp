@@ -11,6 +11,7 @@
 #include <world/ObjectsComponents/RigidbodyComponent.hpp>
 #include <world/ObjectsComponents/ColliderComponent.hpp>
 #include <world/ObjectsComponents/CameraComponent.hpp>
+#include <world/ObjectsComponents/ParticleEmitterComponent.hpp>
 
 void Engine::bindGameObjectSDK(AGScriptMgr* mgr) {
 	//Regiter base GameObject
@@ -54,4 +55,5 @@ void Engine::bindGameObjectPropertiesSDK(AGScriptMgr* mgr) {
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(COLLIDER_PROP_TYPE_NAME) + "@ collider()", asFUNCTION(ASGetPropertyPtr<ColliderProperty>), asCALL_CDECL_OBJFIRST);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(SHADOWCAST_PROP_TYPE_NAME) + "@ shadow()", asFUNCTION(ASGetPropertyPtr<ShadowCasterProperty>), asCALL_CDECL_OBJFIRST);
 	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(CAMERA_PROP_TYPE_NAME) + "@ camera()", asFUNCTION(ASGetPropertyPtr<CameraComponent>), asCALL_CDECL_OBJFIRST);
+	mgr->RegisterObjectMethod(GAME_OBJECT_TYPE_NAME, std::string(PARTICLE_EMITTER_PROP_TYPE_NAME) + "@ particles()", asFUNCTION(ASGetPropertyPtr<ParticleEmitterComponent>), asCALL_CDECL_OBJFIRST);
 }

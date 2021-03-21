@@ -1,7 +1,8 @@
 #include <engine/Resources.hpp>
 
 Engine::TextureResource::TextureResource() :
-    texture_ptr(nullptr)
+    texture_ptr(nullptr),
+    IsRenderTarget(false)
 {
     this->resource_type = RESOURCE_TYPE_TEXTURE;
 }

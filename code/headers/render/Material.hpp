@@ -28,6 +28,8 @@ public:
     bool mShowInEditor;
     bool mSaveInFile;
 
+    void* DefaultValue; //Pointer to default value
+
     MaterialShaderProperty();
 };
 
@@ -41,6 +43,8 @@ public:
     virtual void SetVec3Value(const Vec3& value) {}
     virtual void SetTexture(std::string TextureName) {}
 
+    virtual void SetValuePtr(void* ptr){}
+
     MaterialShaderPropertyConf();
 };
 
@@ -49,7 +53,11 @@ class MaterialTemplate {
 public:
     std::string str_path;
     std::string Label;
-    bool mAcceptShadows;
+    bool mAcceptShadows; //Does this material use shadow map
+
+    bool mReflective; //Does this material use reflection box
+    unsigned int mReflectionBoxBindSlot; //Slot for binding reflection box
+
     Engine::Shader* mShader; //Pointer to shader, that binds on object render
     std::vector<MaterialShaderProperty*> properties;
 
@@ -146,6 +154,10 @@ public:
         this->value = value;
     }
 
+    void SetValuePtr(void* ptr) {
+        value = *((int*)ptr);
+    }
+
     //Construct
     IntegerMtShPropConf();
 };
@@ -155,6 +167,10 @@ public:
 
     void SetFloatValue(float value) {
         this->value = value;
+    }
+
+    void SetValuePtr(void* ptr) {
+        value = *((float*)ptr);
     }
 
     //Construct
@@ -168,24 +184,41 @@ public:
         this->value = value;
     }
 
+    void SetValuePtr(void* ptr) {
+        value = *((float*)ptr);
+    }
+
     //Construct
     Float3MtShPropConf();
 };
 class Float2MtShPropConf : public MaterialShaderPropertyConf{
 public:
     Vec2 value;
+
+    void SetValuePtr(void* ptr) {
+        value = *((Vec2*)ptr);
+    }
+
     //Construct
     Float2MtShPropConf();
 };
 class Int2MtShPropConf : public MaterialShaderPropertyConf{
 public:
     Vec2i value;
+
+    void SetValuePtr(void* ptr) {
+        value = *((Vec2i*)ptr);
+    }
     //Construct
     Int2MtShPropConf();
 };
 class ColorMtShPropConf : public MaterialShaderPropertyConf{
 public:
     RGBAColor color;
+
+    void SetValuePtr(void* ptr) {
+        color = *((RGBAColor*)ptr);
+    }
 
     ColorMtShPropConf();
 };

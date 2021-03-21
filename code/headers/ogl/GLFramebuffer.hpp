@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../render/Renderer.hpp"
+#include <render/Renderer.hpp>
 #include "../ogl/GLTexture.hpp"
 
 namespace Engine {

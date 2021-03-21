@@ -43,10 +43,10 @@ bool Engine::Texture::LoadFromBuffer(unsigned char* data, uint32_t size) {
     if (data[0] == 'D' && data[1] == 'D' && data[2] == 'S') {
         result = LoadDDSTextureFromBuffer(data);
     }
-    if (data[0] == '\x89' && data[1] == 'P' && data[2] == 'N' && data[3] == 'G') {
-        LoadPNGTextureFromBuffer(data, (int)size);
+    else if (data[1] == 'P' && data[2] == 'N' && data[3] == 'G') {
+        result = LoadPNGTextureFromBuffer(data, (int)size);
     }
-    if (data[0] == 'R' && data[1] == 'T' && data[2] == 'B' ) {
+    else if (data[0] == 'R' && data[1] == 'T' && data[2] == 'B' ) {
         if (engine_ptr->engine_info->graphicsApi == VULKAN) {
             vkTexture* vkt = static_cast<vkTexture*>(this);
 
