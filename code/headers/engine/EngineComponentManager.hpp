@@ -10,6 +10,7 @@ namespace Engine {
 	public:
 		void startManager(IEngineComponent* component);
 		void updateResolution(int W, int H);
+		void CallOnUpdate();
 		void destroyAllManagers();
 		unsigned int GetComponentsCount() { 
 			return static_cast<unsigned int>(components.size()); }

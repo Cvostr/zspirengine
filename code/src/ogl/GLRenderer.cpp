@@ -262,7 +262,7 @@ void Engine::GLRenderer::DrawParticleSystem(Engine::GameObject* obj) {
 
     setFaceCullState(false);
 
-    Mat4* ParticleTransforms;
+    Mat4* ParticleTransforms = nullptr;
     ParticleEmitter->GetParticlesTransforms(&ParticleTransforms, *CurrentCamera);
 
     int particles_left = ParticleEmitter->GetAliveParticlesCount();
@@ -280,8 +280,8 @@ void Engine::GLRenderer::DrawParticleSystem(Engine::GameObject* obj) {
         ParticleEmitter->mParticleMesh->DrawInstanced(amount);
     }
 
-
-    delete[] ParticleTransforms;
+    if(ParticleTransforms != nullptr)
+        delete[] ParticleTransforms;
 
     setFaceCullState(true);
 }

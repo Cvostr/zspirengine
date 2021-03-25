@@ -11,6 +11,7 @@
 #include <world/ObjectsComponents/NodeComponent.hpp>
 #include <world/ObjectsComponents/CameraComponent.hpp>
 #include <world/ObjectsComponents/WindZoneComponent.hpp>
+#include <world/ObjectsComponents/ParticleEmitterComponent.hpp>
 
 extern ZSpireEngine* engine_ptr;
 //Hack to support resources
@@ -451,6 +452,7 @@ void Engine::Renderer::lookForCameras(World* world_ptr) {
     mCameras.clear();
     mLights.clear();
     mWinds.clear();
+    mParticleSystems.clear();
 
     mMainCameraComponent = nullptr;
     mMainCamera = nullptr;
@@ -464,6 +466,7 @@ void Engine::Renderer::lookForCameras(World* world_ptr) {
             CameraComponent* cam = object->getPropertyPtr<CameraComponent>();
             LightsourceComponent* light = object->getPropertyPtr<LightsourceComponent>();
             WindZoneComponent* wind = object->getPropertyPtr<WindZoneComponent>();
+            ParticleEmitterComponent* emitter = object->getPropertyPtr<ParticleEmitterComponent>();
 
             if (cam != nullptr) {
                 if (cam->isActive()) {
@@ -486,6 +489,17 @@ void Engine::Renderer::lookForCameras(World* world_ptr) {
             if (wind != nullptr) {
                 if (wind->isActive()) {
                     mWinds.push_back(wind);
+                }
+            }
+
+            if (emitter != nullptr) {
+                if (emitter->isActive()) {
+                    if (!emitter->IsSimulating() || emitter->mParticleMesh == nullptr)
+                        return;
+
+                    
+
+                    mParticleSystems.push_back(emitter);
                 }
             }
         }

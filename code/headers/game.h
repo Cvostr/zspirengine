@@ -2,6 +2,7 @@
 #define zs_GAME
 
 #include "world/World.hpp"
+#include "world/WorldLoadManager.hpp"
 #include "render/Renderer.hpp"
 #include "engine/Resources.hpp"
 #include "misc/output.hpp"
@@ -18,6 +19,7 @@ typedef struct ZSGAME_DATA{
     Engine::ResourceManager* resources; 
     //Pointer to World class
     Engine::World* world;
+    Engine::WorldLoadManager* wlm;
     //Pointer to rendering pipeline class
     Engine::Renderer* pipeline;
     //Pointer to glyph (font) manager
@@ -36,13 +38,17 @@ typedef struct ZSGAME_DATA{
         resources = nullptr;
         world = nullptr;
         pipeline = nullptr;
-        glyph_manager = nullptr;
+        glyph_manager = new GlyphManager;
         isEditor = false;
         script_manager = nullptr;
-        out_manager = nullptr;
-        ui_manager = nullptr;
-        oal_manager = nullptr;
+        out_manager = new Engine::OutputManager;;
+        ui_manager = new Engine::UiManager;
+        oal_manager = new Engine::OALManager;
         vk_main = nullptr;
+        time = new Engine::Time;
+
+        wlm = nullptr;
+        window = nullptr;
     }
 }ZSGAME_DATA;
 

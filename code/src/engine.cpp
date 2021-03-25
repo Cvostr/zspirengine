@@ -71,23 +71,20 @@ void ZSpireEngine::loadGame(){
     game_data->resources = new Engine::ResourceManager;
     //Start it as manager
     mComponentManager->startManager(game_data->resources);
-    //Allocate Glyph manager
-    game_data->glyph_manager = new GlyphManager;
-    mComponentManager->startManager(game_data->glyph_manager);
-    //Allocate script manager
-    game_data->script_manager = new Engine::AGScriptMgr;
-    //Allocate output manager
-    game_data->out_manager = new Engine::OutputManager;
-    game_data->out_manager->consoleLogWorking = true;
 
-    game_data->ui_manager = new Engine::UiManager;
+    game_data->script_manager = new Engine::AGScriptMgr;
+
+    //Allocate Glyph manager
+    mComponentManager->startManager(game_data->glyph_manager);
+    //Allocate output manager
+    game_data->out_manager->consoleLogWorking = true;
     //Allocate OpenAL manager
-    game_data->oal_manager = new Engine::OALManager;
     game_data->oal_manager->initAL();
     //Allocate time manager
-    game_data->time = new Engine::Time;
 
     game_data->world = new Engine::World();
+    game_data->wlm = new Engine::WorldLoadManager;
+    mComponentManager->startManager(game_data->wlm);
 
     Loader::start();
     Loader::setBlobRootDirectory(this->desc->blob_root_path);
@@ -96,18 +93,21 @@ void ZSpireEngine::loadGame(){
     //Compile script
     game_data->script_manager->AddScriptFiles();
 
-    SceneResource* world_resource = game_data->resources->getResource<SceneResource>(desc->startup_scene);
+    /*SceneResource* world_resource = game_data->resources->getResource<SceneResource>(desc->startup_scene);
     //check, if World resource found
     if (world_resource) {
         world_resource->load();
         game_data->world->loadFromMemory((const char*)world_resource->data, world_resource->size, game_data->pipeline->getRenderSettings());
-    }
+    }*/
+    game_data->wlm->ScheduleWorldLoad(desc->startup_scene);
+
     //call onStart on all objects
-    game_data->world->call_onStart();
+    //game_data->world->call_onStart();
 
     while(gameRuns == true){
 
         game_data->time->Tick();
+        mComponentManager->CallOnUpdate();
 
         SDL_Event event;
         while (SDL_PollEvent(&event)){

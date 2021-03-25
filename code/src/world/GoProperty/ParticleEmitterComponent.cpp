@@ -11,7 +11,7 @@ int Rand()
 }
 
 void Engine::ParticleEmitterComponent::onUpdate(float deltaTime) {
-
+	
 }
 void Engine::ParticleEmitterComponent::copyTo(Engine::IGameObjectComponent* dest) {
 	if (dest->type != this->type) return; //if it isn't Lightsource, then exit
@@ -266,6 +266,8 @@ void Engine::ParticleEmitterComponent::RestartSimulation() {
 
 void Engine::ParticleEmitterComponent::GetParticlesTransforms(Mat4** Transforms, Camera& cam) {
 	uint32_t aliveParticlesCount = GetAliveParticlesCount();
+	if (aliveParticlesCount == 0)
+		return;
 	*Transforms = new Mat4[aliveParticlesCount];
 	uint32_t TransformI = 0;
 

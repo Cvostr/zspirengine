@@ -2,14 +2,14 @@
 
 #include "Shader.hpp"
 #include "Mesh.hpp"
-#include "../../headers/engine/EngineComponent.h"
-#include "../../headers/render/UniformBuffer.hpp"
+#include <engine/EngineComponent.h>
+#include <render/UniformBuffer.hpp>
 #include "SDL2/SDL.h"
-#include "../world/Camera.hpp"
-#include "../../headers/engine/Resources.hpp"
+#include <world/Camera.hpp>
+#include <engine/Resources.hpp>
 #include <vector>
-#include "../render/Framebuffer.hpp"
-#include "../ui/Layouts/ILayout.hpp"
+#include <render/Framebuffer.hpp>
+#include <ui/Layouts/ILayout.hpp>
 
 #define LIGHT_STRUCT_SIZE 64
 
@@ -48,6 +48,7 @@ protected:
     std::vector<void*> mLights;
     std::vector<void*> mCameras;
     std::vector<void*> mWinds;
+    std::vector<void*> mParticleSystems;
 
     RenderSettings render_settings;
 

@@ -10,6 +10,10 @@ IEngineComponent::~IEngineComponent(){
 
 }
 
+void IEngineComponent::OnUpdate() {
+
+}
+
 void IEngineComponent::OnCreate(){
 
 }

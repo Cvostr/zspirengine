@@ -450,6 +450,8 @@
     <ClInclude Include="code\headers\world\tile_properties.h" />
     <ClInclude Include="code\headers\world\World.hpp" />
     <ClInclude Include="code\headers\world\Camera.hpp" />
+    <ClInclude Include="code\headers\world\WorldLoadManager.hpp" />
+    <ClCompile Include="code\src\world\WorldLoadManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="code\Shaders\3d\3d.frag" />

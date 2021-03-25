@@ -489,6 +489,9 @@
     <ClCompile Include="code\src\ui\Widgets\ImageWidget.cpp">
       <Filter>Исходные файлы\ui\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="code\src\world\WorldLoadManager.cpp">
+      <Filter>Исходные файлы\world</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\headers\world\Physics.h">
@@ -835,6 +838,9 @@
     </ClInclude>
     <ClInclude Include="code\headers\engine\EngineSettings.hpp">
       <Filter>Файлы заголовков\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="code\headers\world\WorldLoadManager.hpp">
+      <Filter>Файлы заголовков\world</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
