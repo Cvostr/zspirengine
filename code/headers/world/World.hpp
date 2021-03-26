@@ -14,7 +14,7 @@
 
 #include "../Scripting/AngelScriptMgr.h"
 
-#include "../math/BB3.hpp"
+#include <math/BB3.hpp>
 
 #define OBJ_PROPS_SIZE 10
 #define OBJ_SCRIPT_PROPS_SIZE 5
@@ -274,7 +274,7 @@ public:
 
     void onStart(); //calls onStart() on all properties
     void onStop(); //calls onStop() on all properties
-    void onUpdate(int deltaTime); //calls onUpdate on all properties
+    void onUpdate(float deltaTime); //calls onUpdate on all properties
     void onPreRender(Renderer* pipeline); //calls onPreRender on all properties
     void onRender(Renderer* pipeline); //calls onRender on all properties
     void onTrigger(GameObject* obj);

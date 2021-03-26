@@ -309,15 +309,15 @@ void Engine::GameObject::onStop() {
     }
 }
 
-void Engine::GameObject::onUpdate(int deltaTime){   //calls onUpdate on all properties
+void Engine::GameObject::onUpdate(float deltaTime){   //calls onUpdate on all properties
     for(unsigned int i = 0; i < props_num; i ++){ //iterate over all properties
         if(!mComponents[i]->active) continue; //if property is inactive, then skip it
-        mComponents[i]->onUpdate(static_cast<float>(deltaTime)); //and call onUpdate on each property
+        mComponents[i]->onUpdate(deltaTime); //and call onUpdate on each property
     }
     //Work with scripts
     for (unsigned int i = 0; i < scripts_num; i++) { //iterate over all scripts
         if (!mScripts[i]->active) continue; //if script is inactive, then skip it
-        mScripts[i]->onUpdate(static_cast<float>(deltaTime)); //and call onUpdate on each script
+        mScripts[i]->onUpdate(deltaTime); //and call onUpdate on each script
     }
 }
 

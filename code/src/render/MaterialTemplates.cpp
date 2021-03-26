@@ -37,7 +37,8 @@ void MaterialTemplate::loadFromFile(const char* fpath){
 MaterialTemplate::MaterialTemplate(Engine::Shader* shader, unsigned int UB_SIZE) :
     mShader(shader),
     mAcceptShadows(false),
-    mReflective(false)
+    mReflective(false),
+    mReflectionBoxBindSlot(0)
 {
     
     properties.resize(0);

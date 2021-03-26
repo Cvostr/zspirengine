@@ -112,6 +112,10 @@ Window* GetWindow() {
 	return game_data->window;
 }
 
+void LoadWorld(std::string World) {
+	game_data->wlm->ScheduleWorldLoad(World);
+}
+
 void AGScriptMgr::create_Engine() {
 	mEngine = asCreateScriptEngine();
 
@@ -154,6 +158,8 @@ void AGScriptMgr::create_Engine() {
 
 	Engine::Window::bindAngelScript(this);
 	RegisterGlobalFunction("Window@ GetWindow()", asFUNCTION(GetWindow), asCALL_CDECL);
+
+	RegisterGlobalFunction("void LoadWorld(string)", asFUNCTION(LoadWorld), asCALL_CDECL);
 
 	std::string args = "?&in";
 	for (unsigned int i = 0; i < 9; i++) {

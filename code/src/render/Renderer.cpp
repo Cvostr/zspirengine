@@ -28,7 +28,6 @@ void Engine::RenderSettings::resetPointers(){
 }
 
 Engine::Renderer::Renderer(){
-    game_data->pipeline = this;
     mMainCameraComponent = nullptr;
 
     this->current_state = PIPELINE_STATE::PIPELINE_STATE_DEFAULT;
@@ -456,12 +455,12 @@ void Engine::Renderer::lookForCameras(World* world_ptr) {
 
     mMainCameraComponent = nullptr;
     mMainCamera = nullptr;
-    for (unsigned int object_i = 0; object_i < world_ptr->objects.size(); object_i++) {
+    for (size_t object_i = 0; object_i < world_ptr->objects.size(); object_i++) {
         GameObject* object = world_ptr->objects[object_i];
         if (object->mAlive && object->isActive()) {
             //Call update on every property in objects
             if (allowOnUpdate)
-                object->onUpdate(static_cast<int>(game_data->time->GetDeltaTime()));
+                object->onUpdate(game_data->time->GetDeltaTime());
 
             CameraComponent* cam = object->getPropertyPtr<CameraComponent>();
             LightsourceComponent* light = object->getPropertyPtr<LightsourceComponent>();
@@ -494,12 +493,11 @@ void Engine::Renderer::lookForCameras(World* world_ptr) {
 
             if (emitter != nullptr) {
                 if (emitter->isActive()) {
-                    if (!emitter->IsSimulating() || emitter->mParticleMesh == nullptr)
-                        return;
-
-                    
 
                     mParticleSystems.push_back(emitter);
+
+                    emitter->StepSimulation();
+
                 }
             }
         }

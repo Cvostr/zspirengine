@@ -228,7 +228,7 @@ void Engine::ParticleEmitterComponent::StepSimulation() {
 			break;
 	}
 
-	for (unsigned int particle_i = 0; particle_i < GetAliveParticlesCount(); particle_i++) {
+	for (uint32_t particle_i = 0; particle_i < GetAliveParticlesCount(); particle_i++) {
 		Particle* particlePtr = mParticles[particle_i];
 
 		if (!particlePtr->mAlive)

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../Scripting/AngelScript.hpp"
-#include "../../engine/Resources.hpp"
+#include <Scripting/AngelScript.hpp>
+#include <engine/Resources.hpp>
 
 namespace Engine {
     class ZPScriptComponent : public Engine::IGameObjectComponent {

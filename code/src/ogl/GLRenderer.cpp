@@ -248,8 +248,6 @@ void Engine::GLRenderer::DrawParticleSystem(Engine::GameObject* obj) {
     if (!ParticleEmitter->IsSimulating() || ParticleEmitter->mParticleMesh == nullptr)
         return;
 
-    ParticleEmitter->StepSimulation();
-
     TransformProperty* Transform = obj->getTransformProperty();
 
     if (ParticleEmitter->mParticleMaterial == nullptr || !ParticleEmitter->IsSimulating())
